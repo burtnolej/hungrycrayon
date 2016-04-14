@@ -1,0 +1,39 @@
+from selenium import webdriver
+
+baseurl = "https://www.trainerroad.com/login"
+username = "burtnolejusa"
+password = "G0ldm@n1"
+
+xpaths = { 
+	'usernameTxtBox' : "//input[@name='Username']",
+        'passwordTxtBox' : "//input[@name='Password']",
+        'submitButton' :   "//button[contains(text(),'Log In')]",
+   	'downloadButton' : "//button[contains(text(),'Download')]"
+        }
+
+mydriver = webdriver.Firefox()
+mydriver.get(baseurl)
+#mydriver.maximize_window()
+
+#Clear Username TextBox if already allowed "Remember Me" 
+mydriver.find_element_by_xpath(xpaths['usernameTxtBox']).clear()
+
+#Write Username in Username TextBox
+mydriver.find_element_by_xpath(xpaths['usernameTxtBox']).send_keys(username)
+
+#Clear Password TextBox if already allowed "Remember Me" 
+mydriver.find_element_by_xpath(xpaths['passwordTxtBox']).clear()
+
+#Write Password in password TextBox
+mydriver.find_element_by_xpath(xpaths['passwordTxtBox']).send_keys(password)
+
+#Click Login button
+mydriver.find_element_by_xpath(xpaths['submitButton']).click()
+
+ride_links = mydriver.find_elements_by_partial_link_text('Free')
+
+for ride in ride_links:
+	ride.click()
+	mydriver.find_element_by_xpath(xpaths['downloadButton']).click()
+
+	mydriver.switchTo().alert().accept()

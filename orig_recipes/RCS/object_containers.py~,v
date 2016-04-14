@@ -1,0 +1,41 @@
+head	1.1;
+access;
+symbols;
+locks
+	burtnolej:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2013.08.10.05.40.03;	author burtnolej;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@
+
+class CarCollection(dict):
+    def __init__
+
+    def car
+        c = Car
+        return (c)
+    
+class Car(Entity):
+    pass
+
+cc = CarCollection()
+cc.car()
+
+for name in cc:
+    
+@

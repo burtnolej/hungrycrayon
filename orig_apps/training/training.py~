@@ -1,0 +1,7 @@
+from sys import path,stdout
+import sys
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+import read_file_delim
+
+
+records = read_file_delim("2405-1.dat","\t")

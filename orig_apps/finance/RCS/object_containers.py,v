@@ -1,0 +1,207 @@
+head	1.3;
+access;
+symbols;
+locks
+	burtnolej:1.3; strict;
+comment	@# @;
+
+
+1.3
+date	2013.08.10.12.47.40;	author burtnolej;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2013.08.09.12.34.16;	author burtnolej;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2013.08.08.13.14.01;	author burtnolej;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@enhanced to use new db_util and Database object that stores all tables pushing all commit and reporting logic into db.close()
+@
+text
+@#!/usr/bin/python
+
+from sys import path, argv, stdout
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+from misc_util import file2list, switch, pprint_exception, Logger, datetime_to_secs,secs_to_datetime, date_to_secs
+from counterparty import Counterpartys, Counterparty
+from transaction import Transactions, Transaction
+from transaction_type import TransactionTypes, TransactionType
+from operator import mod
+from collections import OrderedDict
+from db_util import Database
+
+import subprocess
+import re
+
+l = Logger("/private/tmp/log.txt")
+
+coutts_trans = file2list(argv[1])
+
+class Finance(Database):
+    pass
+
+finance = Finance("~/Downloads/gadflyZip/gadfly/scripts/")
+cc = finance.table(Counterpartys())
+tc = finance.table(Transactions())
+ttc = finance.table(TransactionTypes())
+#dcc = finance.table('DateConvertions')
+
+if coutts_trans[0].split(",")[0] == 'Sort code':
+    coutts_trans.pop(0) # remove header
+
+for record in coutts_trans:
+    # find any , between " " like "fdfsdf,ddf"
+    p = re.compile('["][^"]*["]|[^,]*')
+    y = p.findall(record)
+    # re creates empty strings so need to remove them and keep real one 
+    x = [y[i] for i in range(0,len(y)-1) if y[i+1] == '']
+    # now remove the , from within the strings
+    record = ",".join(z.replace(",","") for z in x)
+    
+    fields = record.split(",")
+    mangle = re.sub("\"","",fields[3])
+
+    if fields[6] == '':
+        debit_amt = float(fields[5])
+        tran_amt = float(debit_amt)
+        credit_amt = float(0.0)
+    else:
+        credit_amt = float(fields[6])
+        tran_amt = float(credit_amt)
+        debit_amt = float(0.0)
+        
+    try:
+        cpy = cc.counterparty(_mangle = mangle,
+                              _tran_amt = tran_amt)
+
+        if hasattr(cpy,'c_name') :
+            cpy._db_name = cpy.c_name
+            delattr(cpy,"c_name")
+
+        cpy._db_id = cpy._id
+
+        tt = ttc.transaction_type(_mangle = mangle,
+                                  _tran_amt = tran_amt)
+
+        tt._db_id = tt._id
+
+        tc.transaction(_db_credit_amt = credit_amt,
+                       _db_debit_amt  = debit_amt,
+                       _cpy           = cpy,
+                       _db_cpy_id     = cpy._id,
+                       _tt            = tt,
+                       _db_tt_id      = tt._id,
+                       _db_tran_secs  = date_to_secs(fields[2]),
+                       _db_tran_date  = fields[2],
+                       _db_balance    = fields[7])
+                
+    except:
+        pprint_exception(record)
+
+finance.close()
+
+del l
+
+input_file_len = subprocess.check_output(['wc','-l',argv[1]]).split()[0]
+out_str =  "input file : " + str(argv[1]) + "\n"
+out_str += "input lines : " + input_file_len + "\n"
+
+stdout.write(out_str)
+
+qry_str =  "select cpy_id,sum(debit_amt) "
+qry_str += "from transactions "
+qry_str += "where debit_amt < -1000 "
+qry_str += "group by cpy_id"
+#finance.run_qry(qry_str)
+
+qry_str =  "select c.name, sum(t.debit_amt) "
+qry_str += "from transactions as t, counterpartys as c "
+qry_str += "where t.debit_amt < -1000 "
+qry_str += "and t.cpy_id = c.id "
+qry_str += "group by c.name "
+qry_str += "order by 2"
+#finance.run_qry(qry_str)
+
+qry_str =  "select t.tran_date, t.debit_amt "
+qry_str += "from transactions as t, counterpartys as c "
+qry_str += "where c.name = 'WAITROSE'"
+qry_str += "and t.cpy_id = c.id "
+qry_str += "order by 2"
+finance.run_qry(qry_str)
+@
+
+
+1.2
+log
+@works for dates
+@
+text
+@d8 1
+a15 3
+cc = Counterpartys()
+tt = Transactions()
+
+d24 4
+a53 1
+        # add _db_ to the attr to have that committed to the db
+a56 1
+        # have to call it _db_ to persist in db
+d63 6
+a68 1
+        tt.transaction(_db_credit_amt = credit_amt,
+d72 2
+d81 1
+a81 7
+
+tt.persist_to_db(finance())
+cc.persist_to_db(finance())
+
+finance.executepp("select count(*) from Counterpartys")
+finance.executepp("select count(*) from Transactions")
+finance.executepp("select * from __datadefs__")
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+from misc_util import file2list, switch, pprint_exception, Logger
+d40 1
+a40 1
+    cpy_mangle = re.sub("\"","",fields[3])
+d52 2
+a53 3
+        # need to add prefxs to attr names to denote which ones
+        # go into db
+        cpy = cc.counterparty(_cpy_mangle = cpy_mangle,
+d56 15
+a70 5
+        tt.transaction(_credit_amt = credit_amt,
+                       _debit_amt  = debit_amt,
+                       _cpy        = cpy.c_name,
+                       _tran_date  = fields[2],
+                       _balance    = fields[7])
+d74 1
+d88 1
+d90 20
+a109 2
+
+stdout.write(out_str)
+@

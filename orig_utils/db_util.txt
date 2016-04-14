@@ -1,0 +1,137 @@
+
+_load_from_gf
+  _set_schema
+    _table_exists_in_gf
+  
+
+R_DRTY = "_dirty__"
+R_OLDV = "_oldv__"
+R_DEL = "_delete__"
+T_PKEY = "_pkey__"
+R_ID = "_id"
+R_TS = "_last_update"
+R_VER = "_version"
+------------------------- 
+Class Database
+methods {
+ _table_exists_in_gf() # does table exists in gadfly
+ _commit_to_gf()
+ _init_objects_in_db()
+ _find_changed_record() #
+ _upd_rec_in_gf() # 
+ _gf_init()
+ pprint()
+ create_gfplus_wrapper()
+ _set_db_name()
+ _startup()
+ _get_cursor()
+ _commit()
+ _close()
+ _set_dirs()
+ exists()
+ fetchall_single_val()
+ fetchall_num_rows()
+ fetchall_descr_val_pair()
+ fetchall()
+ fetchall_list()
+ parse_descr()
+ fetchall_desc_list()
+ _description()
+ desc_list()
+ _fetchall()
+ fetchall_like()
+ run_qry()
+ print_fetchall()
+ pp()
+ execute()
+ column_index()
+ description()
+ cursor()
+------------------------- 
+Class DatabaseTable
+
+attributes {
+ _table_name
+ _record_count
+ _schema 
+}
+
+methods {
+ _get_pk()
+ _set_pk()
+ _iter_records()
+ _get_table()
+ _get_record()
+ _schema_has_field()
+ update_rec()
+ get_rec_field_value()
+ add_list()
+ rec_exists()
+ add
+ record_exists()
+ load_from_gf()
+ get_num_records()
+ empty()
+ create_in_gf()
+ ins_rec_in_gf()
+ upd_rec_in_gf()
+ del_rec_in_gf()
+ find_changed_records()
+ _set_table_name()
+ _get_type()
+ _set_schema()
+ _format_attribute()
+ print_status()
+
+
+ _del_rec()
+
+ # constructors
+ table()
+ view()
+ close()
+
+------------------------- 
+Class DatabaseRecord
+attributes{
+ _table
+ _dirty__
+ _oldv__
+ _delete__
+ _pkey__
+ _id
+ _last_update
+ _version
+}
+
+methods {
+ _set_table()
+ _get_table()
+ _increment_version()
+ _has_field()
+ _set_field_value()
+ _get_field_value()
+ _get_version()
+ _update_timestamp()
+ _get_table_pk()
+ _get_pk()
+ _not_orig_version()
+ _get_old_version(pk)
+ _init_old_version(pk)
+ _set_old_version(pk)
+ _get_dirty() 
+ _set_dirty()
+ _unset_dirty()
+ _get_delete() 
+ _set_delete()
+ _unset_delete()
+ lists()
+ compare_records()
+ pprint()
+ pprint_all()
+ pprint_all_flat()
+ get_data_values()
+ get_data_items()
+}
+
+

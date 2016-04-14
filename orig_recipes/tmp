@@ -1,0 +1,457 @@
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'Search']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality []
+<strong>(.*?)<\/strong>
+addressLocality []
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress []
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet []
+<p>(.*?)<\/p>
+keywords snippet []
+<a[^>]*>(.*?)<\/a>
+keywords snippet []
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode []
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'De Santis']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  11-13, Old St,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'          <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Bars+%26+Wine+Bars&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Bars ; Wine Bars">Bars ; Wine Bars</a>      </p>      ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Bars+%26+Wine+Bars&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Bars ; Wine Bars">Bars ; Wine Bars</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Bars ; Wine Bars']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'EC1V  9HL']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'Chips & Spray']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Mobile+Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Mobile Car Body Repairs">Mobile Car Body Repairs</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Paint Less        <strong>   Dent   </strong>         Removal   </li>     <li  data-company-item="keyword">  <span></span>     Wheel Refurbishments   </li>     <li  data-company-item="keyword">  <span></span>     Scratches,   <span></span>     <strong>   Dents   </strong>    <span></span>     , Valeting   </li>     <li  data-company-item="keyword">  <span></span>     All Car Accident Repair   </li>     <li  data-company-item="keyword">  <span></span>     Car Body Repairs   </li>     <li  data-company-item="keyword">  <span></span>     We Come To You   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Mobile+Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Mobile Car Body Repairs">Mobile Car Body Repairs</a>      ']
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  3 Acacia Road,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet []
+<p>(.*?)<\/p>
+keywords snippet []
+<a[^>]*>(.*?)<\/a>
+keywords snippet []
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'SW16  5PP']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'PENGE AUTO SPRAYS']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Minor        <strong>   Dent   </strong>         Cosmetic Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Bumper Scuff & Scratches   </li>     <li  data-company-item="keyword">  <span></span>     Accident Claims Specialists   </li>     <li  data-company-item="keyword">  <span></span>     Smart Repairs Same Day Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Cars & Commercial Vehicles   </li>     <li  data-company-item="keyword">  <span></span>     Spraying & Crash Repairs   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      ']
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  85, Maple Rd,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet []
+<p>(.*?)<\/p>
+keywords snippet []
+<a[^>]*>(.*?)<\/a>
+keywords snippet []
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'SE20  8LN']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'SMARTEN UP CAR REPAIRS']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality []
+<strong>(.*?)<\/strong>
+addressLocality []
+<div class=\"keywords\">(.*?)<\/div>
+keywords [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Mobile+Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Mobile Car Body Repairs">Mobile Car Body Repairs</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Car Body Repairs - London   </li>     <li  data-company-item="keyword">  <span></span>     Mobile Car Body Repairs Barnet   </li>     <li  data-company-item="keyword">  <span></span>     <strong>   Dent   </strong>    <span></span>     Repairs - Enfield   </li>     <li  data-company-item="keyword">  <span></span>     Scratch Repairs - East London   </li>     <li  data-company-item="keyword">  <span></span>     Bumper Repairs - Chingford   </li>     <li  data-company-item="keyword">  <span></span>     All Areas Of London Covered   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Mobile+Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Mobile Car Body Repairs">Mobile Car Body Repairs</a>      ']
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress []
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet []
+<p>(.*?)<\/p>
+keywords snippet []
+<a[^>]*>(.*?)<\/a>
+keywords snippet []
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode []
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'Auto Refinish']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Mobile Bodyshop Service   </li>     <li  data-company-item="keyword">  <span></span>     Alloy Wheels, Bumper Scuffs   </li>     <li  data-company-item="keyword">  <span></span>     <strong>   Dents   </strong>    <span></span>     , Stone Chips   </li>     <li  data-company-item="keyword">  <span></span>     Whole Resprays   </li>     <li  data-company-item="keyword">  <span></span>     Credit Cards Accepted   </li>     <li  data-company-item="keyword">  <span></span>     Free Estimates   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      ']
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  Flat A,  47 Vineyard Hill Road,     ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet []
+<p>(.*?)<\/p>
+keywords snippet []
+<a[^>]*>(.*?)<\/a>
+keywords snippet []
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'SW19  7JL']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'Dosantos Decorating']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  Flat 17, Mickleton House,  Westbourne Park Rd,     ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'          <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Painters+%26+Decorators&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Painters ; Decorators">Painters ; Decorators</a>      </p>      ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Painters+%26+Decorators&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Painters ; Decorators">Painters ; Decorators</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Painters ; Decorators']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'W2  5UL']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'JIM Body Repairs & Servicing']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  260 Knights Hill,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Non-Insurance Car Body Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Paint Work, Welding, Scratches   </li>     <li  data-company-item="keyword">  <span></span>     Garage Services   </li>     <li  data-company-item="keyword">  <span></span>     Car Servicing & Oil Changes   </li>     <li  data-company-item="keyword">  <span></span>     Brakes, Exhausts & Clutches   </li>     <li  data-company-item="keyword">  <span></span>     Mechanical Repairs   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Car Body Repairs']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'SE27  0QP']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'Merton Crash Repairs Ltd']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords [u'         <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      </p>             <span class="pipeSpacer">|</span>    <span data-company-item="freetext">Body Work Specialists, All Makes & Models, Crash, Scratch & </span>      <span data-company-item="freetext"><strong>Dent</strong></span>        <span data-company-item="freetext"> Repairs, Bumper ScuffsVandal Scratches, Colour Coding, Free Estimates, Courtesy Car, Insurance Approved</span>           ']
+<p>(.*?)<\/p>
+keywords [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      ']
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  17 Deer Park Road,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet []
+<p>(.*?)<\/p>
+keywords snippet []
+<a[^>]*>(.*?)<\/a>
+keywords snippet []
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'SW19  3UX']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'Hackney Motor Services']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Free Estimate   </li>     <li  data-company-item="keyword">  <span></span>     <strong>   Dent   </strong>    <span></span>     And Scratches Repaired   </li>     <li  data-company-item="keyword">  <span></span>     Full Resprays   </li>     <li  data-company-item="keyword">  <span></span>     Alloy Wheel Refurbish   </li>     <li  data-company-item="keyword">  <span></span>     Compound And Polish   </li>     <li  data-company-item="keyword">  <span></span>     Competitive Prices   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      ']
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  20 Andre Street,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet []
+<p>(.*?)<\/p>
+keywords snippet []
+<a[^>]*>(.*?)<\/a>
+keywords snippet []
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'E8  2AA']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u"ST JOHNS WOOD AUTO'S"]
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  Langford Place, Abbey Rd,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Garage+Services&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Garage Services">Garage Services</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       MOT Testing   </li>     <li  data-company-item="keyword">  <span></span>     Car Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Clutches & Brakes   </li>     <li  data-company-item="keyword">  <span></span>     Tyres   </li>     <li  data-company-item="keyword">  <span></span>     Exhausts   </li>     <li  data-company-item="keyword">  <span></span>     Bodywork   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Garage+Services&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Garage Services">Garage Services</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Garage Services']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'NW8  9DN']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'COLLINS MOTORS']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  232, Trussley Rd,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Garage+Services&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Garage Services">Garage Services</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       MOT   </li>     <li  data-company-item="keyword">  <span></span>     Garage Services   </li>     <li  data-company-item="keyword">  <span></span>     Tyres   </li>     <li  data-company-item="keyword">  <span></span>     Servicing   </li>     <li  data-company-item="keyword">  <span></span>     Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Wheel Alignments   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Garage+Services&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Garage Services">Garage Services</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Garage Services']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'W6  7PS']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'WALTHAM FOREST ACCIDENT ASSISTANCE']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  49a, Gainsford Rd,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Body Shop Crash Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Free Home Call Outs   </li>     <li  data-company-item="keyword">  <span></span>     All Vehicles Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Free Collection And Delivery   </li>     <li  data-company-item="keyword">  <span></span>     Guild Master Craftsman Member   </li>     <li  data-company-item="keyword">  <span></span>     Fault / Non Fault Accident   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Car Body Repairs']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'E17  6QB']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'R & S Garage']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  115, Ormside St,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Garage+Services&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Garage Services">Garage Services</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       PCO car hire   </li>     <li  data-company-item="keyword">  <span></span>     Car Servicing & Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Diagnostics check & Engine   </li>     <li  data-company-item="keyword">  <span></span>     Brakes, Clutches & gearbox   </li>     <li  data-company-item="keyword">  <span></span>     Exahust   </li>     <li  data-company-item="keyword">  <span></span>     Repairs on all made vechile   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Garage+Services&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Garage Services">Garage Services</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Garage Services']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'SE15  1TF']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'Allway Car Care']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality [u'<strong>London</strong>']
+<strong>(.*?)<\/strong>
+addressLocality [u'London']
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress [u'  651, Barking Rd,      ']
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Automatic Transmission   </li>     <li  data-company-item="keyword">  <span></span>     Bodyworks   </li>     <li  data-company-item="keyword">  <span></span>     Car & Van Servicing   </li>     <li  data-company-item="keyword">  <span></span>     MOT Testing   </li>     <li  data-company-item="keyword">  <span></span>     Brakes   </li>     <li  data-company-item="keyword">  <span></span>     Exhausts   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Car+Body+Repairs&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Car Body Repairs">Car Body Repairs</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Car Body Repairs']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode [u'E13  9EX']
+<span class=\"offscreen\">(.*?)<\/span>
+offscreen [u'Diamond Glass & Glazing Ltd']
+<span itemprop=\"addressLocality\">(.*?)<\/span>
+addressLocality []
+<strong>(.*?)<\/strong>
+addressLocality []
+<div class=\"keywords\">(.*?)<\/div>
+keywords []
+<p>(.*?)<\/p>
+keywords []
+<strong>(.*?)<\/strong>
+keywords []
+<span itemprop=\"streetAddress\">(.*?)<\/span>
+streetAddress []
+<div class=\"keywords snippet\">(.*?)<\/div>
+keywords snippet [u'        <p>              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Double+Glazing+Repair&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Double Glazing Repair">Double Glazing Repair</a>      </p>               <span class="pipeSpacer">|</span> <ul>    <li class="first" data-company-item="keyword">       Family Business Est. 1989   </li>     <li  data-company-item="keyword">  <span></span>     All Double Glazing Repairs   </li>     <li  data-company-item="keyword">  <span></span>     Specialists In PVCU Door Locks   </li>     <li  data-company-item="keyword">  <span></span>     Misted & Broken Units   </li>     <li  data-company-item="keyword">  <span></span>     PVCU Windows, Doors, Cat Flaps   </li>     <li  data-company-item="keyword">  <span></span>     We Also Supply Trade Windows   </li>   </ul>          ']
+<p>(.*?)<\/p>
+keywords snippet [u'              <a href="/ucs/UcsSearchAction.do;jsessionid=E2864F1AED13026603CDDB7C04AF4E38?M=&filterDistance=&keywords=Desantis&companyName=&searchType=refinedclassification&ooa=&location=London&layout=&auto=&boost=&scrambleSeed=58471740&broaderLocation=&selectedClassification=Double+Glazing+Repair&advanced=&filterOH=&useOH=&startTime=&endTime=&intCam=capclass&atoz=" title="Show only those results in Double Glazing Repair">Double Glazing Repair</a>      ']
+<a[^>]*>(.*?)<\/a>
+keywords snippet [u'Double Glazing Repair']
+<span itemprop=\"postalCode\">(.*?)<\/span>
+postalCode []
+offscreen       De Santis
+addressLocality London
+postalCode      EC1V  9HL
+streetAddress   11-13, Old St,      
+keywords snippet Bars ; Wine Bars
+keywords       
+
+offscreen       Chips & Spray
+addressLocality London
+postalCode      SW16  5PP
+streetAddress   3 Acacia Road,      
+keywords snippet
+keywords       
+
+offscreen       PENGE AUTO SPRAYS
+addressLocality London
+postalCode      SE20  8LN
+streetAddress   85, Maple Rd,      
+keywords snippet
+keywords       
+
+offscreen       SMARTEN UP CAR REPAIRS
+addressLocality
+postalCode     
+streetAddress  
+keywords snippet
+keywords       
+
+offscreen       Auto Refinish
+addressLocality London
+postalCode      SW19  7JL
+streetAddress   Flat A,  47 Vineyard Hill Road,     
+keywords snippet
+keywords       
+
+offscreen       Dosantos Decorating
+addressLocality London
+postalCode      W2  5UL
+streetAddress   Flat 17, Mickleton House,  Westbourne Park Rd,     
+keywords snippet Painters ; Decorators
+keywords       
+
+offscreen       JIM Body Repairs & Servicing
+addressLocality London
+postalCode      SE27  0QP
+streetAddress   260 Knights Hill,      
+keywords snippet Car Body Repairs
+keywords       
+
+offscreen       Merton Crash Repairs Ltd
+addressLocality London
+postalCode      SW19  3UX
+streetAddress   17 Deer Park Road,      
+keywords snippet
+keywords       
+
+offscreen       Hackney Motor Services
+addressLocality London
+postalCode      E8  2AA
+streetAddress   20 Andre Street,      
+keywords snippet
+keywords       
+
+offscreen       ST JOHNS WOOD AUTO'S
+addressLocality London
+postalCode      NW8  9DN
+streetAddress   Langford Place, Abbey Rd,      
+keywords snippet Garage Services
+keywords       
+
+offscreen       COLLINS MOTORS
+addressLocality London
+postalCode      W6  7PS
+streetAddress   232, Trussley Rd,      
+keywords snippet Garage Services
+keywords       
+
+offscreen       WALTHAM FOREST ACCIDENT ASSISTANCE
+addressLocality London
+postalCode      E17  6QB
+streetAddress   49a, Gainsford Rd,      
+keywords snippet Car Body Repairs
+keywords       
+
+offscreen       R & S Garage
+addressLocality London
+postalCode      SE15  1TF
+streetAddress   115, Ormside St,      
+keywords snippet Garage Services
+keywords       
+
+offscreen       Allway Car Care
+addressLocality London
+postalCode      E13  9EX
+streetAddress   651, Barking Rd,      
+keywords snippet Car Body Repairs
+keywords       
+
+offscreen       Diamond Glass & Glazing Ltd
+addressLocality
+postalCode     
+streetAddress  
+keywords snippet Double Glazing Repair
+keywords       
+

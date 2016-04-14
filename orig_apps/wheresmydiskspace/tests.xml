@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<data>
+  <test name = 'TestGetDirSize'>
+    <description name = 'Test valid output/resuts'/>
+    <pos_test value = 'True'/>
+    <exception name = 'TestUnexpectedResult'/>
+    <field name = 'results'>
+      <value type = 'tuple'>
+	<item>170000</item>
+	<item>16</item>
+	<item>[]</item>
+	<item>True</item>
+      </value>
+    </field>
+    <field name = "start_path">
+      <value type = 'var'>/</value>
+    </field>
+  </test>
+</data>
+
+  

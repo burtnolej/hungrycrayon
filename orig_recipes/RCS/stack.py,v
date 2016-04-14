@@ -1,0 +1,224 @@
+head	1.1;
+access;
+symbols;
+locks
+	burtnolej:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2013.07.03.20.28.43;	author burtnolej;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#!/usr/bin/python
+
+
+
+import inspect
+from sys import exc_info, exit,path
+
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+
+from linecache import getline
+from os import path
+import traceback
+from table_print import Table
+
+'''
+todo : need to modify table_print to expand lists so recurse if list contains objects
+'''
+
+class FrameRecord():
+    __list__ = []
+    __key_list__ = ['frame_object','filename','line_no','function_name','source_lines','current_line_index']
+            
+    def __init__(self,frame_record):
+        self.convert_list_to_object(frame_record)
+        self.__list__.append(self)
+        print "created FrameRecord instance",self
+
+    def convert_list_to_object(self,frame_record):
+        assert (len(frame_record) == len(self.__key_list__))
+        
+        [setattr(self,self.__key_list__[i],frame_record[i]) for i in range(0,len(self.__key_list__))]
+
+def convert_list_to_dict(key_list,value_list):
+    '''
+    take a list containing key names and a list containing values
+    this is just to help readability
+    '''
+    assert (len(key_list) == len(value_list))
+    assert isinstance(key_list,(list,tuple))
+    assert isinstance(value_list,(list,tuple))
+
+    return({key_list[i]:value_list[i] for i in range(0,len(key_list))})
+
+def print_dict(d):
+    '''
+    take a frame and print it so its more readable
+    '''
+    assert isinstance(d,dict)
+
+    for k,v in d.iteritems():
+        print str(k).rjust(20) + " :",
+        print str(v).ljust(20)
+
+def print_frame_record_list(frame_record_list):
+    '''
+    take a frame list and print it out so its more readable
+    '''
+    assert isinstance(frame_list,(list,tuple))
+    
+    for f in frame_list:
+        print type(f),f
+        assert inspect.isframe(f)
+        
+        fi = get_frame_info(f)
+        print_frame_info(fi)
+
+def get_outer_frames(current_frame=None):
+    '''
+    get frames represent the calls that lead to the creatino of current
+    frame
+    args:current_frame frame object
+         None use current frame
+    return:list of frame records
+    '''
+    if current_frame == None:
+        current_frame = inspect.currentframe()
+
+    assert inspect.isframe(current_frame)
+    return(inspect.getouterframes(current_frame))
+
+def get_frame_info(frame=None):
+    '''
+    returns info about the frame object for the callers stack frame
+    returns a FrameRecord instance
+    '''
+    if frame == None:
+        frame = inspect.currentframe()
+    
+    fi = inspect.getframeinfo(frame)
+
+    return(FrameRecord([fi[i-1] if i > 0 else "" for i in range(0,len(fi)+1)]))
+
+def get_exception_info():
+    '''
+    returns info about the exception that is currently being handled
+    info is specific to the current thread and the current stack frame
+    'handling an exception' means a stack frame that is executing an
+    an except clause
+    
+    returns in a dict so easy to read and self documenting
+
+    type : (class object) exception type of the exception being handled
+    value : (class instancwe) the exception parameter (its associated
+    value of the 2nd arg to raise which is always a class instance
+    traceback (traceback object) : encapsulating the call stack at the
+    point where the exception originally occured
+    '''
+    l=exc_info()
+    return(convert_list_to_dict(['type','value','traceback'],l))
+
+def get_inner_frames(traceback=None):
+    '''
+    get a list of frame records for a tracebacks frame and all inner
+    frames. these frames represent the calls that lead to the creation
+    of the last frame
+    args:   traceback object of exception to use
+            None to denote use current exception
+    return: None
+    '''
+    if traceback == None:
+        current_traceback = get_exception_info().__getitem__("traceback")
+        return(inspect.getinnerframes(current_traceback))
+    else:
+        assert istraceback(traceback)
+        return(inspect.getinnerframes(traceback))
+
+def print_frame_info(frame_record=None):
+    '''
+    print out useful attributes of a frame object
+    args:frame_info dict
+    returns:None
+    '''
+    if frame_record==None:
+        frame_record = get_frame_info()
+        
+    assert isinstance(frame_record,FrameRecord)
+    
+    pretty_print_object(frame_record)
+
+def cell_generator(object):
+    def get_object_directory():
+        column_titles = ["name","value"]
+        yield column_titles
+        for name,value in inspect.getmembers(object):
+            if name[-2:] != "__":
+                if not callable(getattr(object,name)):
+                    yield [name,value]
+            
+    return(get_object_directory)
+
+#*** should turn this into a derived class so can be over ridden more easilly
+def pretty_print_object(object):
+    table = Table(_max_column_width=50,
+                  _max_cell_depth=10,
+                  _pad_char=" ",
+                  _table_pad_char="_",
+                  _spacer=" |",
+                  _seed=object,
+    # this is going into table.config not table
+                  _cell_generator=cell_generator(object))
+    table.printout()
+
+def get_stack():
+    '''
+    populate class FrameRecord with the current stack
+    '''
+    [FrameRecord(fr) for fr in inspect.stack()]
+    return(FrameRecord)
+
+def get_number_of_frame_records():
+    return(len(FrameRecord.__list__))
+               
+def print_stack():
+    '''
+    print out stack. if no stack to print then populate
+    args: none
+    returns: none
+    '''
+    if get_number_of_frame_records() == 0:
+        get_stack()
+
+    # this needs to use a different printing template
+    # actually should probably move the one i created here back into table_print.py so everyone can use
+    # also need to add recursion ability
+    pretty_print_object(FrameRecord)
+
+    for i in range(0,len(FrameRecord.__list__)):
+        pretty_print_object(FrameRecord.__list__[i])
+
+
+    
+if __name__ == '__main__':
+
+    #print_frame_info()
+    # print_frame_record_list(get_outer_frames())
+    # lets figure out the difference between a frame record and a frame
+    # also lets explore the stack
+    print_stack()
+
+  
+@

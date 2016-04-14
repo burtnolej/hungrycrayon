@@ -1,0 +1,2 @@
+Sort code,Account number,Date,Description,Currency,Debit GBP,Credit GBP,Balance GBP
+="18-00-02",07893752,26/07/2013,POS - PRET A MANGER 9/10 CHARTERH GB 24JUL13 2201, GBP,-2.10,,956936.95,

@@ -1,0 +1,1 @@
+python ~/gadfly/scripts/gfplus.py Football _Football_dir

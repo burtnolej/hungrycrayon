@@ -1,0 +1,44 @@
+#!/usr/bin/python
+
+from sys import path, argv
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+from db_util import Database, DatabaseTable, DatabaseRecord
+
+class Finance(Database):
+    pass
+
+finance = Finance("~/Downloads/gadflyZip/gadfly/scripts/",'use')
+
+q_ct_summary  = "select offscreen,c.name,keywords,keywordssnippet "
+q_ct_summary += "from   counterpartytypes, "
+q_ct_summary += "       counterpartys as c "
+q_ct_summary += "where  c.id = cpy_id "
+q_ct_summary += "and    result_count=2 "
+#qry_str += "order by cpy_id"
+
+d_ct = "drop table counterpartytypes"
+
+q_tn = "select * from __table_names__"
+q_cn = "select * from __columns__"
+
+q_c  = "select count(*) from counterpartys"
+q_ct  = "select count(*) from counterpartytypes"
+
+q_t  = "select tran_date,count(*) "
+q_t += "from transactions "
+q_t += "group by tran_date "
+q_t += "order by tran_date"
+
+if argv[1] == 'q':
+    finance.executepp(argv[2])
+else:
+    finance.executepp(locals()[argv[1]])
+
+#q_st += "select count(*) from counterpartytypes"
+
+
+
+
+finance.close()
+
+

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!-- assumes that fields 'description',pos_test',exception-->
+<!-- exist.-->
+<data>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name = 'Test valid output/resuts'/>
+    <pos_test value = 'True'/>
+    <!-- exception may not be necessary for +ve test-->
+    <exception name = 'TestUnexpectedResult'/>
+    <field name = 'results'>
+      <value type = 'list'>
+	<item>1</item>
+	<item>2.5</item>
+	<item>4.5</item>
+	<item>6.5</item>
+	<item>8.5</item>
+	<item>10.5</item>
+	<item>12.5</item>
+	<item>14.5</item>
+      </value>
+    </field>
+  </test>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name = 'Test invalid output'/>
+    <pos_test value  = 'False'/>
+    <exception name = 'TestUnexpectedResult'/>
+    <field name = 'results'>
+      <value type = 'list'>
+	<item>1</item>
+	<item>2.5</item>
+	<item>4.5</item>
+	<item>6.5</item>
+	<item>8.5</item>
+	<item>10.5</item>
+	<item>12.5</item>
+	<item>14500</item>
+      </value>
+    </field>
+  </test>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name='Test invalid weight too low'/>
+    <pos_test value = 'False'/>
+    <exception name='InvalidWeight'/>
+    <field name='weight'>
+      <value type = 'var'>-1</value>
+    </field>
+  </test>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name='Test invalid weight too low'/>
+    <pos_test value = 'True'/>
+    <exception name='InvalidWeight'/>
+    <field name='weight'>
+      <value type = 'var'>2</value>
+    </field>
+  </test>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name='Test invalid weight > ts length'/>
+    <pos_test value = 'False'/>
+    <exception name='InvalidWeightMoreThanTSLen'/>
+    <field name='weight'>
+      <value type = 'var'>30</value>
+    </field>
+  </test>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name='Test invalid weight > ts length'/>
+    <pos_test value = 'True'/>
+    <exception name='InvalidWeightMoreThanTSLen'/>
+    <field name='weight'>
+      <value type = 'var'>5</value>
+    </field>
+    <field name = 'results'>
+      <value type = 'list'>
+	<item>3.0</item>
+	<item>8.0</item>
+	<item>13.0</item>
+      </value>
+    </field>
+  </test>
+</data>
+
+  

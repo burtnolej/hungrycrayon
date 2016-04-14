@@ -1,0 +1,68 @@
+Error ./workouts/2405/sdfsfsd.dat not in format %m-%d-%Y_%i
+Log ./workouts/2405/05-24-2014_1.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+147 74 0
+170 69 58
+183 66 113
+187 64 115
+192 63 118
+194 62 120
+195 62 123
+195 62 121
+196 62 124
+195 62 125
+197 61 125
+195 61 130
+194 61 126
+195 61 126
+197 61 127
+201 60 129
+186 63 139
+Log ./workouts/2405/05-24-2014_2.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+336 63 155
+Log ./workouts/2405/05-24-2014_3.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+Log ./workouts/2405/05-24-2014_4.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+327 63 159
+Log ./workouts/2405/05-24-2014_5.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+Log ./workouts/2405/05-24-2014_6.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+310 64 162
+Log ./workouts/2405/05-24-2014_7.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+Log ./workouts/2405/05-24-2014_8.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+288 67 161
+Log ./workouts/2405/05-24-2014_9.dat processed
+Log made l[0] an int
+3 fields detected
+300 sample size
+NO_SAMPLES sample size unit
+59 40073 124

@@ -1,0 +1,7 @@
+HEADER	Power [W],Elapsed time [h:mm:ss.hh],Heart rate [bpm]
+DELIM	,
+MAVG	10	
+MAVG_UNIT	NO_SAMPLES
+#DIR_NAME		./workouts/TEST
+DATFILE_DELIM		'\t'
+DIR_EXT			"dat"

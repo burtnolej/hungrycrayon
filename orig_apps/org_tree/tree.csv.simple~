@@ -1,0 +1,65 @@
+name	loc	locmgr	glbmgr	matmgr	title	code	
+### title line is already required and must be first
+jon	ny	na	na	na	md	md
+mahesh	ny	jon	jon	na	vp	m1
+chris	lon	damian	jon	na	md	md
+ronald	ny	jon	jon	na	vp	m2
+wyn	lon	chris	jon	na	vp	m1
+ilya	ny	jon	jon	fathers	vp	s2
+jms	lon	chris	jon	analisa	vp	s2
+pieck	ny	jon	jon	fathers	vp	s2
+ashoke	blr	rajiv	jon	na	vp	m2
+jim	ny	jon	jon	analisa	vp	s1
+warner	ny	ashish	ashish	na	vp	m1
+aqil	ny	ashish	ashish	na	vp	m1
+scott	ny	ashish	ashish	na	vp	m1
+marshal	lon	wyn	ashish	na	vp	ad03
+william	lon	wyn	ashish	na	vp	s1
+ashish	ny	jon	jon	na	vp	m2
+aaa	ny	warner	warner	na	vp	ad03
+aab	ny	warner	warner	na	vp	ad03
+aac	ny	warner	warner	na	none	ad01
+jja	ny	aac	aac	na	vp	ad03
+jjb	ny	aac	aac	na	vp	ad03
+jjc	ny	aac	aac	na	none	ad01
+bba	ny	aaa	aaa	na	vp	ad02
+bbb	ny	aaa	aaa	na	none	ad02
+bbc	ny	aaa	aaa	na	vp	ad03
+bbd	ny	aaa	aaa	na	none	ad01
+cba	ny	bbc	bbc	na	vp	ad02
+cbb	ny	bbc	bbc	na	vp	ad02
+cbc	ny	bbc	bbc	na	vp	ad02
+cbd	ny	bbc	bbc	na	vp	ad02
+cbe	ny	bbc	bbc	na	vp	ad02
+cbf	ny	bbc	bbc	na	vp	ad02
+cbh	ny	bbc	bbc	na	vp	ad02
+cbi	ny	bbc	bbc	na	vp	ad02
+dba	ny	aab	aab	na	vp	ad02
+dbb	ny	aab	aab	na	none	ad02
+dbc	ny	aab	aab	na	vp	ad03
+dbd	ny	aab	aab	na	none	ad02
+eea	lon	ronald	ronald	na	vp	ad02
+eeb	lon	ronald	ronald	na	vp	ad02
+eec	lon	ronald	ronald	na	vp	ad03
+eed	lon	ronald	ronald	na	none	ad02
+eee	lon	ronald	ronald	na	none	ad02
+eef	lon	ronald	ronald	na	none	ad02
+eeg	lon	ronald	ronald	na	none	ad01
+eeh	lon	ronald	ronald	na	none	ad01
+eei	lon	ronald	ronald	na	none	ad01
+eej	lon	ronald	ronald	na	none	ad01
+eek	lon	ronald	ronald	na	none	ad01
+ffa	ny	ronald	ronald	na	vp	m1
+ffb	ny	ronald	ronald	na	vp	s1
+ffc	ny	ronald	ronald	na	vp	m1
+ffd	ny	ronald	ronald	na	vp	s1
+ffe	ny	ronald	ronald	na	vp	m1
+gga	tok	ffa	ffa	na	vp	ad03
+ggb	tok	ffa	ffa	na	vp	ad03
+ggc	tok	ffa	ffa	na	vp	ad03
+ggd	tok	ffa	ffa	na	vp	ad02
+
+
+
+### blank lines are allowed
+### comment lines need to be proceeded by '###'

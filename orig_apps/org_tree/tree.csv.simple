@@ -1,0 +1,22 @@
+name	loc	locmgr	glbmgr	matmgr	title	code	
+### title line is already required and must be first
+jon	ny	na	na	na	md	md
+ronald	ny	jon	jon	na	vp	m2
+william	lon	wyn	ashish	na	vp	s1
+ashish	ny	jon	jon	na	vp	m2
+warner	ny	ashish	ashish	na	vp	m2
+aaa	ny	warner	warner	na	vp	ad03
+aab	ny	warner	warner	na	vp	ad03
+aac	ny	warner	warner	na	none	ad01
+jja	ny	aac	aac	na	vp	ad03
+bbc	ny	aaa	aaa	na	vp	ad02
+cba	ny	bbc	bbc	na	vp	ad02
+dba	ny	aab	aab	na	vp	ad02
+eea	lon	ronald	ronald	na	vp	ad02
+ffa	ny	ronald	ronald	na	vp	m1
+gga	tok	ffa	ffa	na	vp	ad03
+
+
+
+### blank lines are allowed
+### comment lines need to be proceeded by '###'

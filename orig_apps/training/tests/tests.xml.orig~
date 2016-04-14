@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<data>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name = 'Test invalid output/resuts'/>
+    <exception name = 'TestUnexpectedResult'/>
+    <postest val = 'True'>
+      <field name = 'results'>
+	<!--
+	-->
+	<value type = 'list'>
+	  <item>1</item>
+	  <item>2.5</item>
+	  <item>4.5</item>
+	  <item>6.5</item>
+	  <item>8.5</item>
+	  <item>10.5</item>
+	  <item>12.5</item>
+	  <item>14.5</item>
+	</value>
+      </field>
+    </postest>
+    <pos_test val = 'False'>
+      <field name = 'results'>
+	<value type = 'list'>
+	  <item>1</item>
+	  <item>2.5</item>
+	  <item>4.5</item>
+	  <item>6.5</item>
+	  <item>8.5</item>
+	  <item>10.5</item>
+	  <item>12.5</item>
+	  <item>14500</item>
+	</value>
+      </field>
+    </pos_test>
+  </test>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name='Test invalid weight too low'/>
+    <exception name='InvalidWeight'/>
+    <postest>
+      <field name='weight'>
+	<value type = 'var'>-1</value>
+      </field>
+    </postest>
+    <negtest>
+      <field name='weight'>
+	<value type = 'var'>2</value>
+      </field>
+    </negtest>
+  </test>
+  <test name = 'TestTimeseries2MAVG'>
+    <description name='Test invalid weight > ts length'/>
+    <exception name='InvalidWeightMoreThanTSLen'/>
+    <postest>
+      <field name='weight'>
+	<value type = 'var'>30</value>
+      </field>
+    </postest>
+    <negtest>
+      <field name='weight'>
+	<value type = 'var'>5</value>
+      </field>
+    </negtest>
+  </test>
+</data>
+
+  

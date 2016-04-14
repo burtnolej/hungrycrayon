@@ -1,0 +1,270 @@
+bash-3.2$ 
+bash-3.2$ 
+bash-3.2$ ls
+#ui_util.py#            kivy_util.py            table_print.py
+curses_util.py          list.txt                table_print.pyc
+datetime_util.py        log_util.py             table_print.py~
+datetime_util.pyc       log_util.pyc            tag_util.py
+db_util.py              misc_util.py            tag_util.pyc
+db_util.pyc             misc_util.pyc           test_db_util.py
+dropbox_util.py         notification_util.py    test_log_util.py
+dropbox_util.py~        osx_util.py             test_util.py
+elasticsearch_util.py   proc_util.py            test_util.pyc
+elasticsearch_util.pyc  queue_util.py           thread_util.py
+error_base.py           queue_util.py~          thread_util.pyc
+error_util.py           simplenote_util.py      thread_util.py~
+error_util.pyc          sort_util.py            ui_util.py
+filesystem_util.py      stack_util.py           ui_util.pyc
+filesystem_util.pyc     stack_util.pyc          url_util.py
+bash-3.2$ cd .
+bash-3.2$ s
+bash: s: command not found
+bash-3.2$ cd ..
+bash-3.2$ ls
+apps            recipes         util
+myapp.py        tests
+bash-3.2$ cd apps/p
+bash: cd: apps/p: No such file or directory
+bash-3.2$ l
+bash: l: command not found
+bash-3.2$ cd apps/
+bash-3.2$ 
+bash-3.2$ cd db_test/
+bash-3.2$ 
+bash-3.2$ python ./db_test.py
+Traceback (most recent call last):
+  File "./db_test.py", line 5, in <module>
+    from db_util import Database, DatabaseTable, DatabaseRecord, Databas
+eView                                                                  
+  File "/Users/burtnolej/Dev/pythonapps/util/db_util.py", line 456
+    def update_rec(self,pkey,pred,value):
+      ^
+SyntaxError: invalid syntax
+bash-3.2$ python ./db_test.py
+Traceback (most recent call last):
+  File "./db_test.py", line 5, in <module>
+    from db_util import Database, DatabaseTable, DatabaseRecord, Databas
+eView                                                                  
+  File "/Users/burtnolej/Dev/pythonapps/util/db_util.py", line 597
+    self._set_clean(rec,getattr(rec,self._PKEY)))
+                                                ^
+SyntaxError: invalid syntax
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (682 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (682 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (232 bytes)
+/private/tmp/log.txt.err (753 bytes)
+bash-3.2$ python ./db_test.py
+Traceback (most recent call last):
+  File "./db_test.py", line 5, in <module>
+    from db_util import Database, DatabaseTable, DatabaseRecord, Databas
+eView                                                                  
+  File "/Users/burtnolej/Dev/pythonapps/util/db_util.py", line 693
+    _get_version.log = True
+               ^
+SyntaxError: invalid syntax
+bash-3.2$ python ./db_test.py
+Traceback (most recent call last):
+  File "./db_test.py", line 5, in <module>
+    from db_util import Database, DatabaseTable, DatabaseRecord, Databas
+eView                                                                  
+  File "/Users/burtnolej/Dev/pythonapps/util/db_util.py", line 695
+    def _update_timestamp(self)
+                              ^
+SyntaxError: invalid syntax
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (859 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (916 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (475 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (595 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (925 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (583 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (925 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (583 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (230 bytes)
+/private/tmp/log.txt.err (643 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (230 bytes)
+/private/tmp/log.txt.err (634 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (728 bytes)
+bash-3.2$ python
+Python 2.7.6 (v2.7.6:3a1db0d2747e, Nov 10 2013, 00:42:54) 
+[GCC 4.2.1 (Apple Inc. build 5666) (dot 3)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+>>> 
+>>> d = {'a':1,'b':2}
+>>> for e in d.items():
+...     print e
+... ^D
+('a', 1)
+('b', 2)
+>>> for e in d.values():
+...     print e
+... ^D
+1
+2
+>>>     print e
+  File "<stdin>", line 1
+    print e
+    ^
+IndentationError: unexpected indent
+>>> 
+>>> exit()
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (626 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (723 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (751 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (872 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1121 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1121 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1121 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1121 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (4383 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1256 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (48 bytes)
+/private/tmp/log.txt.err (1256 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1251 bytes)
+bash-3.2$ python ./db_test.py
+Traceback (most recent call last):
+  File "./db_test.py", line 5, in <module>
+    from db_util import Database, DatabaseTable, DatabaseRecord, Databas
+eView                                                                  
+ImportError: cannot import name DatabaseRecord
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (728 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1147 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1341 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (924 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (924 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (803 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (696 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (692 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1386 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (3607 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (6195 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (6614 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (6614 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (6614 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (6614 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (6614 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (3333 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (5495 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (259 bytes)
+/private/tmp/log.txt.err (757 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (906 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (1016 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (21 bytes)
+/private/tmp/log.txt.err (863 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (6463 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (3607 bytes)
+/private/tmp/log.txt.err (175 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (10074 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (7664 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (7823 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (3832 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+/private/tmp/log.txt (3902 bytes)
+/private/tmp/log.txt.err (0 bytes)
+bash-3.2$ python ./db_test.py
+  File "./db_test.py", line 6
+    from misc_util import Logger,pprint_dictofobjects()
+                                                     ^
+SyntaxError: invalid syntax
+bash-3.2$ 

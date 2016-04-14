@@ -1,0 +1,187 @@
+head	1.2;
+access;
+symbols;
+locks
+	burtnolej:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2013.08.18.05.47.41;	author burtnolej;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2013.08.17.13.11.05;	author burtnolej;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@working prior to adding multi threads
+@
+text
+@#!/usr/bin/python
+
+from sys import path, argv, stdout
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+from misc_util import Logger
+from counterparty import Counterpartys, Counterparty
+from transaction import Transactions, Transaction
+from transaction_type import TransactionTypes, TransactionType
+#from counterparty_type import CounterpartyTypes, CounterpartyType
+from collections import OrderedDict
+from db_util import Database, DatabaseTable, DatabaseRecord
+from url_util import *
+from table_print import SimpleTable
+from error_util import Notification
+from thread_util import MyThread
+
+import subprocess
+import re
+import copy
+
+l = Logger("/private/tmp/log.txt")
+
+class YellDataItems(URLDataItems):
+    def __init__(self,cpy,loc):
+        self.get_url(self._gen_url(cpy,loc))
+        # modify _doc
+        self.doc = self.doc.split("<div class=\"parentListing\"")
+        
+    def _gen_url(self,cpy,loc):
+        url = "http://www.yell.com/ucs/UcsSearchAction.do?keywords="
+        url += cpy
+        url += "&location="
+        url += loc
+        url += "&scrambleSeed=58471740&searchType=&M=&bandedclarifyResults=&ssm=1"
+        return(url)
+
+class Finance(Database):
+    pass
+
+class CounterpartyTypes(DatabaseTable):
+    def add(self,**kwargs):
+        tmp_kwargs = copy.deepcopy(kwargs) # avoid writing into kwargs being read
+        for k,v in tmp_kwargs.iteritems():
+            new_attr_name = '_db_'+"".join(k.split()).lower()
+            kwargs.__setitem__(new_attr_name,v)
+            kwargs.__delitem__(k)
+        
+        dr = DatabaseRecord(**kwargs)
+        dr._db_id = dr._id # make id a db atribute
+        
+        self[dr._db_id] = dr
+
+d = OrderedDict({'offscreen':[('span','class=','')],
+                     'streetAddress':[('span','itemprop=','')],
+                     'addressLocality':[('span','itemprop=',''),
+                                        ('strong','','')],
+                     'addressLocality':[('span','itemprop=',''),
+                                        ('strong','','')],
+
+                     'postalCode':[('span','itemprop=','')],
+                     'keywords':[('div','class=',''),
+                                 ('p','',''),
+                                 ('strong','','')],
+                     'keywords snippet':[('div','class=',''),
+                                 ('p','',''),
+                                 ('a','','[^>]*')]})
+
+finance = Finance("~/Downloads/gadflyZip/gadfly/scripts/",'use')
+
+ctc = finance.table(CounterpartyTypes())
+
+qry_str  = "select * \n"
+qry_str += "from   counterpartys"
+
+finance.execute(qry_str)
+
+
+def process(cpy):
+    pass
+    
+#for cpy_id,cpy in finance.fetchall_like('name','WAITROSE'):
+#for cpy_id,cpy in finance.fetchall_like('name','^W.*'):
+for cpy_id,cpy in finance.fetchall():   
+    
+    print cpy
+    print "--------------------"
+    try:
+        yd = YellDataItems(cpy,'London')
+        yd.scrape(d,cpy)
+
+        for res in yd:
+            ## need to get res to not be returning arrays
+            res.__setitem__('cpy_id',cpy_id)
+            ctc.add(**res)
+            
+    except URLSearchStringAlert:
+        pass
+    except URLFindallLenAlert:
+        pass
+    except URLFindall0LenAlert:
+        pass
+    except:
+        pass
+    
+
+    l.tmp_stdout.write(cpy+"\n")
+        
+if len(ctc) > 0:
+    finance.commit()
+    ctc.empty()
+    
+finance.close()
+
+SimpleTable(Notification,0,2,1).deep_print()
+SimpleTable(Notification,0,5,4).deep_print()
+
+
+del l
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+from misc_util import pprint_exception, Logger
+d13 3
+d19 1
+d42 4
+a45 2
+        for k,v in kwargs.iteritems():
+            kwargs.__setitem__('_db_'+"".join(k.split()),v)
+d47 1
+a47 1
+                      
+d77 4
+d82 2
+a83 2
+for cpy_id,cpy in finance.fetchall_like('name','^W.*'):
+#for cpy_id,cpy in finance:   
+d89 1
+a89 1
+        yd.scrape(d)
+d96 9
+a104 4
+    except URLSearchStringException:
+        pprint_exception(cpy)
+    except URLFindallLenException:
+        pprint_exception(cpy)
+d108 3
+a110 3
+    if len(ctc) > 0:
+        finance.commit()
+        ctc.empty()
+d114 4
+@

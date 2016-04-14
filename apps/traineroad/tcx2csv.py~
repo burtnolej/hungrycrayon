@@ -1,0 +1,28 @@
+"Simple parser for Garmin TCX files."
+
+from lxml import objectify
+
+__version__ = '0.4.0'
+
+
+class TcxParser:
+
+    def __init__(self, tcx_file):
+        tree = objectify.parse(tcx_file)
+        self.root = tree.getroot()
+        
+    def dump_csv(self):
+
+        #for el in self.root:
+
+        #x1 = objectify.SubElement(self.root,"Track")
+        self.track = self.root.Activities.Activity.Lap.Track
+        for el in self.root.Track.iterchildren():
+            print el.tag
+
+
+tcx = TcxParser("test.tcx")
+print dir(tcx.root)
+#self.lap = self.root.Activities.Activity.Lap
+
+#tcx.dump_csv()

@@ -1,0 +1,755 @@
+#!/usr/bin/python
+
+from sys import path,stdout,stderr
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+from misc_util import Singleton, Logger, file2list
+from misc_util import in_method_log_lite as im_log
+from datetime_util import MyDT
+from threading import Thread
+import thread_util
+import curses
+from collections import OrderedDict
+import time
+from Queue import Queue
+from table_print import SimpleTable
+import re
+
+TERM_CHAR_LEN = 1
+TERM_CHAR = "\n"
+myQueue = Queue()
+
+class Window(Thread):
+    _debug = False
+    _debug_win = None
+    
+    def __init__(self,wm,name,size_y,size_x,init_y,init_x,debug=False):
+        '''
+        args:
+        sy = size of y axis (height)
+        sx = size of x axis (width)
+        y = begin y coord (origin)
+        x = begin x coord (origin)
+        '''
+        Thread.__init__(self)
+        assert int(size_y),"height arg needs to be an int"        
+        
+        self._items = []
+        self._items_top = None
+        self._items_bottom = None
+        # selected items
+        self._items_sel_idx = 0 # index of item
+        self._items_sel_len = None # length of text str
+        self._oy = 1
+        self._ox = 1
+        self._sy = size_y
+        self._sx = size_x
+        self._asy = self._sy -2 # (take off 2 for the borders)
+        self._asx = self._sx -2 # (take off 2 for the borders)
+        self._iy = init_y
+        self._ix = init_x
+        self._lastevent = -1
+       
+        self._name = name
+
+        if debug:
+            Window._debug = True
+            Window._debug_win = self
+        else:
+            assert hasattr(self,'event_handler'),"event_handler needs to be implemented"
+
+        self._new_win()
+        self._init_title_bar()
+        self.set_focus_origin()
+        self.refresh()
+
+        wm.add_win(self) #register with the wm
+
+    @classmethod
+    def listitems(cls,wm,name,sy,sx,y,x,items=None,debug=False):
+        cls1 = cls(wm,name,sy,sx,y,x,debug)
+        if items != None:
+            cls1._items = items
+        cls1._draw_items(0)
+        return(cls1)
+
+    def _new_win(self):
+        '''
+        create a curses.win and store ref in _win_ref
+        '''
+        self._win_ref = curses.newwin(self._sy,self._sx,self._iy,self._ix)
+        self._win_ref.border()
+        self._win_ref.keypad(1)
+
+    def _draw_title_bar_text(self,left,right):
+        '''
+        write text into the title bar
+        '''
+        txt_len = len(str(left)) + len(str(right))
+        bar_text = str(left) + "".ljust(self._asx-txt_len) + str(right)
+        self._title_bar_ref.addstr(1,1,str(bar_text))
+        self._title_bar_ref.refresh()
+
+    def _init_title_bar(self):
+        '''
+        create a title bar of height 3
+        overlap bottom of title with top of main win so only
+        need to take -2 of main win init y not -3 (height of title)
+        '''
+        win = curses.newwin(3,self._sx,self._iy-2,self._ix) 
+        win.border()
+        self._title_bar_ref = win
+        self._draw_title_bar_text(self.name,"")
+        
+    def set_focus_origin(self):
+        '''
+        to be overriden for subclass that want different behaviour
+        ie list will want to change attribute to highight new focussed element
+        '''
+        self._win_ref.move(self._oy,self._ox)
+
+    def set_focus_bottom(self):
+        '''
+        as set focus origin
+        '''
+        self._win_ref.move(self._oy+self._asy,self._ox+self._asx)
+
+    #def event_handler(self,event):
+    #    '''
+    #    to be over-ridden as specific to function of window
+    #    '''
+    #    pass
+
+    def onclick_handler():
+        pass
+
+    def addstr_yx(self,y,x,text,attr=None):
+        with thread_util.threadLock:
+            self._win_ref.addstr(y,x,text) # rewrite with new attr
+
+    def addstr(self,text):
+        self.addstr_yx(self._y,self._x,text) # rewrite with new attr
+
+    @property
+    def _y(self):
+        y,_ = self._win_ref.getyx()
+        return(y)
+
+    @property
+    def _x(self):
+        _,x = self._win_ref.getyx()
+        return(x)
+
+    @_x.setter
+    def _x(self,val):
+        pass
+    
+    def _items_sel(self):
+        return(self._items[self._items_sel_idx])
+
+    def get_yx(self):
+        return(self._y,self._x)
+
+    def delch(self,y,x):
+        self._win_ref.delch(y,x)
+
+    def move(self,y,x):
+        with thread_util.threadLock:
+            self._win_ref.move(y,x)
+
+    def refresh(self):
+        #with lock:
+        self._win_ref.refresh()
+
+    #def instr(self,from_y,from_x,to_x):
+    #    self._win_ref.instr(y,1,self._sx) # get row text
+
+    def getch(self):
+        win_ref = self._win_ref
+        return(win_ref.getch())
+
+    def addstr_no_cursor(self,attr,y,x,width,win=None):
+        '''
+        write a string to a specific without moving the cursor
+        useful for debug statements
+        args:
+        width is the number of chars expected so can blank out before each write
+        win is set if the attr to print id not of parent object
+        '''
+        if win:
+            text = str(getattr(win,attr))
+            text = text.rjust(width+ 1) + " " + attr.ljust(30) + win._name
+        else:
+            text = str(getattr(self,attr))
+            text = text.rjust(width+ 1) + " " + attr.ljust(30) + self._name
+        
+        cy, cx = self.get_yx() # get current pos of cursor
+        self.addstr_yx(y,x,"".ljust(width))
+        self.addstr_yx(y,x,text)
+        self.move(cy,cx)
+
+    def _draw_items(self,start,cursor_bottom=False):
+        '''
+        args:
+        start is where in _items we should draw from if start == 0 then its the start
+        cursor_bottom is to force focus element to be the bottom not the top (default)
+        '''
+        self.set_focus_origin() # make sure at origin
+        self._blank_items()
+        self._items_len = len(self._items)        
+        
+        end = start+self._asy
+        if end > self._items_len:
+            end = self._items_len
+            
+        for i in range(start,end):
+            item_text,_,_ = tuple(self._items[i])
+            self.addstr_yx(self._y,self._ox,item_text)
+            self.move(self._y+1,self._ox)
+                
+        self._items_bottom = start+ self._asy
+        if cursor_bottom:
+                self.set_focus_bottom()                
+        else:
+                self.set_focus_origin()
+        self._draw_title_bar_text(self._name,self._items_len)
+
+        # update an object attribute with the current selected content
+        # mainly for debug purposes
+        self._items_sel_content = self._items[0]
+
+        self.refresh()
+        
+    def _load_dbitems(self):
+        '''
+        _dbview : ref to DatabaseTable/DatabaseView instance
+        _items : list containing data to be displayed in widget
+        
+        load the current items of db table/view object to be
+        ready to be displayed
+        '''
+        for key,rec in self._dbview.iteritems():
+            assert hasattr(rec,"display_text")
+            self._items.append((rec.display_text,0,0,rec))
+
+    def _blank_items(self,set_to_origin=True):
+        for i in range(self._oy,self._asy):
+                self.addstr_yx(i,self._ox,"".ljust(self._asx))
+                self.move(i,self._ox)
+        if set_to_origin: self.set_focus_origin()
+
+    def _reload_dbitems(self,predicate_val):
+        self._dbview.init_load(predicate_val)
+        self._blank_items()
+        self._items = []
+        self._load_dbitems()
+        self._draw_items(0)
+        self._draw_title_bar_text(self._name,self._items_len)        
+        self.refresh()
+
+    def _filter_dbitems(self,expr):
+        print "re expr",expr
+        if hasattr(self,"_items_orig"):
+            self._items = self._items_orig
+        else:
+            self._items_orig = self._items
+
+        if expr == "":
+            self._items = self._items_orig
+        else:
+            _new_items = []
+            p = re.compile(expr)
+            for row in self._items:
+                if len(p.findall(row)) > 0:
+                    _new_items.append(row)
+            self._items = _new_items
+
+        self._blank_items()
+        self._draw_items(0)
+        self._draw_title_bar_text(self._name,self._items_len)        
+        self.refresh()
+
+    def event_handler(self,event):
+        pass
+
+    @im_log()
+    def register_debug_attr(self,attr_list):
+        if self._debug:
+            for attr in attr_list:
+                self._debug_win.register(attr,8,self)
+        return(True)
+
+    def run(self):
+        '''
+        in subclass implement run with a command like:
+        thread_util.MyThread.check_q(self.name,self._reload_dbitems)         '''
+        while 1:
+            time.sleep(0.1)
+
+class ListBox(Window):
+    def __init__(self,*args):
+        super(ListBox,self).__init__(*args)
+
+        self.register_debug_attr(["_y","_x","_sy","_sx","_lastevent","_items_sel_len","_items_sel_idx"])
+
+        self.refresh()
+
+    @classmethod
+    def dbitems(cls,wm,name,sy,sx,y,x,dbview=None,debug=False):
+        cls1 = cls.clsobj(wm,name,sy,sx,y,x,debug)
+        cls1._dbview = dbview # ref to dbview or table being viewed
+        cls1._load_dbitems()
+        cls1._draw_items(0)
+        return(cls1)
+        
+    @classmethod
+    def listitems(cls,wm,name,sy,sx,y,x,items=None,debug=False):
+        cls1 = cls.clsobj(wm,name,sy,sx,y,x,debug)
+        if items != None:
+            cls1._items = items
+
+        cls1._draw_items(0)
+        return(cls1)
+
+    @classmethod
+    def func(cls,wm,name,sy,sx,y,x,func,debug=False):
+        '''
+        get contents of listbox from func passed as arg
+        '''
+        cls1 = cls(wm,name,sy,sx,y,x,debug)
+        cls1._items = func()
+        cls1._draw_items(0)
+        return(cls1)
+
+    def set_row_attr(self,screen,y,x,attr):
+        text_at_row = screen.instr(y,1,self._asx) # get row text
+        screen.addstr(y,1,text_at_row,attr) # rewrite with new attr
+        screen.move(y,x) # return cursor to origin
+
+    def set_focus_origin(self):
+        '''
+        to be overriden for subclass that want different behaviour
+        ie list will want to change attribute to highight new focussed element
+        '''
+        self._win_ref.move(self._oy,self._ox)
+        self.set_row_attr(self._win_ref,self._oy,self._ox,curses.A_REVERSE)
+
+    def set_focus_bottom(self):
+        '''
+        as set focus origin
+        '''
+        self._win_ref.move(self._oy+self._asy-1,self._ox+self._asx)
+        self.set_row_attr(self._win_ref,self._oy+self._asy-1,self._ox,curses.A_REVERSE)
+
+    @im_log()
+    def _move_up(self):
+        if self._items_sel_idx == 0: # first element in item list
+            self.set_row_attr(self._win_ref,self._y,self._x,curses.A_NORMAL)
+            new_top = (len(self._items)//self._asy) * self._asy # calculate top of last list items ( that contains the last element)
+            self._items_sel_idx = new_top
+            self._draw_items(new_top)
+        elif self._y == 1: # highest visible element
+            self.set_row_attr(self._win_ref,self._y,self._x,curses.A_NORMAL)
+            self._draw_items(self._items_sel_idx - self._asy,True)
+            self._items_sel_idx -= 1 
+        else:  # just move
+            self.set_row_attr(self._win_ref,self._y,self._x,curses.A_NORMAL)
+            self.set_row_attr(self._win_ref,self._y-1,self._x,curses.A_REVERSE)
+            self._items_sel_idx -= 1
+
+        self._items_sel_len = self._items[self._items_sel_idx][1]
+        return(self._items_sel_idx,self._x,self._y)
+
+    @im_log()
+    def _move_down(self):
+        if self._items_sel_idx == len(self._items)-1: # last element in item list
+            self.set_row_attr(self._win_ref,self._y,self._x,curses.A_NORMAL)
+            self._items_sel_idx = 0
+            self._draw_items(0)
+        elif self._y == self._asy: # lowest visible element
+            self.set_row_attr(self._win_ref,self._y,self._x,curses.A_NORMAL)
+            self._items_sel_idx = self._items_bottom
+            self._draw_items(self._items_sel_idx)
+        else: # just move 
+            self.set_row_attr(self._win_ref,self._y,self._x,curses.A_NORMAL)
+            self.set_row_attr(self._win_ref,self._y+1,self._x,curses.A_REVERSE)
+            self._items_sel_idx += 1
+
+            self._items_sel_len = self._items[self._items_sel_idx][1]
+        return(self._items_sel_idx,self._x,self._y)
+
+    @im_log()
+    def _move_left(self):
+        if self._x-1 >=1:
+            self._win_ref.move(self._y,self._x-1)
+        else:
+            self._move_up()
+            self._win_ref.move(self._y,self._items_sel_len)
+        return(self._items_sel_idx,self._x,self._y)
+
+    @im_log()
+    def _move_right(self):
+        if self._x+1 <= self._items_sel_len and self._x+1 <= self._asx : # if not edge of listbox and edge of the string
+            self._win_ref.move(self._y,self._x+1)
+        else:
+            self._move_down()
+            self._win_ref.move(self._y,1)
+        return(self._items_sel_idx,self._x,self._y)
+
+    def _page_down(self):
+        self.set_row_attr(self._win_ref,self._y,self._x,curses.A_NORMAL)
+        if self._items_bottom -1 < len(self._items):
+            self._items_sel_idx = self._items_bottom - 1
+            self._draw_items(self._items_sel_idx-1)
+        else:
+            self._items_sel_idx = 0
+            self._draw_items(self._items_sel_idx)
+
+    @im_log()                
+    def event_handler(self,event):
+        self._lastevent = event # so the lastevent can be queried 
+        res=False
+        if getattr(self,'context_event_handler',None):
+            res = self.context_event_handler(event) 
+        if getattr(self,'userdefn_event_handler',None) and not res:
+            res = self.userdefn_event_handler(event)
+        if res:
+            return(True)
+
+        if event == curses.KEY_LEFT:
+            self._move_left()
+        elif event == curses.KEY_RIGHT:
+            self._move_right()
+        elif event == curses.KEY_UP:
+            self._move_up()
+        elif event == curses.KEY_DOWN:
+            self._move_down()
+        elif event == 4: # CTRL-d
+            self._page_down()
+        elif event == 21: # CTRL-u
+            pass
+        elif event == 10:
+            text_at_row = self._win_ref.instr(self._y,0,curses.COLS) # get string at xy
+        
+        else:
+            return(False)
+
+        return(True)
+        
+class DebugBox(Window):
+    def __init__(self,*args):
+        super(DebugBox,self).__init__(*args)
+        self.attr_list = OrderedDict()
+        self.next_free = 1
+
+    def register(self,text,width,win):
+        '''
+        store details of watch in an ordered dict of tuples
+        dict1{"attr"+win} = attr, win_ref, width, index
+        index = order on the screen (y coord)
+        '''
+        if not self.attr_list.has_key(text + str(win)):
+            self.attr_list.__setitem__(text + str(win),(text,win,width,self.next_free))
+            self.next_free += 1
+        else:
+            pass
+            #raise Exception # nothing should try to register twice
+
+    def run(self):
+        while 1:
+            for key in self.attr_list.keys():
+                text,win,width,index = self.attr_list.__getitem__(key)
+            
+                self.addstr_no_cursor(text,index,1,width,win)
+            time.sleep(0.25)
+            self.refresh()
+            
+class TextBox(Window):
+    def __init__(self,*args):
+        super(TextBox,self).__init__(*args)
+
+    def run(self):
+        while 1:
+            self.addstr_yx(1,1,MyDT(display_fmt='%H:%M:%S'))
+            #with lock:
+            self.refresh()
+            time.sleep(1)
+            #self.addstr('x')
+            #pass
+
+class EntryBox(Window):
+
+    def __init__(self,*args):
+        super(EntryBox,self).__init__(*args)
+
+    def event_handler(self,event):
+        if event == 263: # delete
+            if self._x >0:
+                self.delch(self._y,self._x-1)
+        elif event == curses.KEY_LEFT:
+            if self._x>0:
+                self.move(self._y,self._x-1)
+        elif event == curses.KEY_RIGHT:
+            if self._x<curses.COLS-1:
+                self.move(self._y,self._x+1)
+        elif event == curses.KEY_UP:
+            pass
+        elif event == curses.KEY_DOWN:
+            pass
+        elif event == 10:
+            self._current_str = self._win_ref.instr(1,1,self._asx).strip()
+        else:
+            self.addstr(chr(event))            
+
+        if getattr(self,'context_event_handler',None):
+            self.context_event_handler(event) 
+
+    def run(self):
+        while 1:
+            time.sleep(1)
+
+class DocBox(ListBox):
+    def __init__(self,wm,name,sy,sx,y,x,doc_str,debug=False):
+        '''
+        instantiate a DocBox with string doc_str
+        '''
+        super(DocBox,self).__init__(wm,name,sy,sx,y,x,False)
+        self._doc_str = doc_str
+        self._doc_str_idx = 0 # keep track of rel posn in string of cursor in list box
+        self._doc_str_sel = self._doc_str[self._doc_str_idx:1] # actual char
+        self._doc_to_items()
+        self._draw_items(0)
+
+
+    def _reload_dbitems(self,predicate_val):
+        '''
+        have to implement as DocBox has to use doc_to_items to convert
+        a dbview into _items
+        '''
+        self._dbview.init_load(predicate_val)
+        self._blank_items()
+        self._items = []
+        self._doc_to_items(self._dbview.keys()[0]) # content is 1 string
+        self._draw_items(0)
+        self._draw_title_bar_text(self._name,self._items_len)        
+        self.refresh()
+
+    def _doc_to_items(self):
+        input_list = self._doc_str.split(TERM_CHAR)
+        self._items = []
+        n=self._sx-2
+        for j in range(0, len(input_list)):
+            if len(input_list[j]) == 0: # blank line, just \n
+                self._items.append(('',0,n))
+            else:
+                for i in range(0, len(input_list[j]), n):
+                    chunk = input_list[j][i:i+n]
+                    self._items.append((chunk,len(chunk),0))
+
+    def print_items(self):
+        for i in self._items:
+            text,length,term_length,_ = tuple(i)
+            print text,length,term_length
+            
+    def get_pos_in_str(self):
+        pos=0
+        #for i in range(0,self._y-1):
+        for i in range(0,self._items_sel_idx):
+            (_,length,term_str,_) = tuple(self._items[i])
+            pos += length + term_str
+        pos += self._x-1
+        return(pos)
+
+    def _move_to_start_of_line(self):
+        self.move(self._y,1)
+
+    def _update_item_term_char(self,item_idx,new_term_length):
+        (text,length,old_term_length,_) = tuple(self._items[item_idx])
+        self._items[item_idx] = (text,length,new_term_length)
+
+    def _add_new_item(self,text=""):
+        self._items.append((text,1,0,None))
+
+    #def save_item(self):
+    #    pass
+    
+    def amendstr(self,text=None):
+        '''
+        need to splice in and then redraw
+        '''
+        #pos_in_string = ((self._y-1) * (self._asx)) + self._x-1
+        pos_in_string = self.get_pos_in_str()
+        old_doc = self._doc
+        if text: # adding a char
+            new_doc = old_doc[:pos_in_string] + text + old_doc[pos_in_string:]
+            if text == TERM_CHAR:
+                if self._items_sel_idx == len(self._items) -1:
+                    self._update_item_term_char(self._items_sel_idx,TERM_CHAR_LEN)
+                    self._add_new_item()
+                
+                self._move_down()
+                self._move_to_start_of_line()
+            elif self._x == self._asx and self._items_sel_idx == len(self._items) -1:
+                self._add_new_item(text)
+                self._move_down()
+                self._move_to_start_of_line()
+            else:
+                self._move_right()
+        else: # deleting a char
+            (_,_,term_str,_) = tuple(self._items[self._items_sel_idx-1])
+            if self._x == 1 and term_str == 2: # deleting a newline
+                self._items.pop(self._items_sel_idx-1)
+                new_doc = old_doc[:pos_in_string-2] + old_doc[pos_in_string:]
+                self._move_up()
+            else:
+                new_doc = old_doc[:pos_in_string-1] + old_doc[pos_in_string:]
+                self._move_left()
+        
+        current_x = self._x
+        current_y = self._y                        
+        self._doc_to_items(new_doc)
+        self._draw_items(self._items_sel_idx - self._y + 1)
+        self.move(current_y,current_x) # replace cursor
+
+    @im_log()
+    def userdefn_event_handler(self,event):
+        if event in range(32,122): #draw
+            self.amendstr(chr(event))
+        elif event == 263: # delete
+            self.amendstr()
+        elif event == 23: # ctrl-w write
+            self.save_item()
+        elif event == 13: # return
+            self.amendstr(TERM_CHAR)
+            pass
+        else:
+            return False
+        return True
+    
+    def run(self):
+        while 1:
+            time.sleep(1)
+
+
+class WindowManager():
+    __metaclass__ = Singleton
+    '''
+    rudimentary window manager
+    '''
+    def __init__(self):
+        '''
+        '''
+        self._wins = [] # refs to all the windows init'd
+        self._focus = 0 # index of _wins containing current focus
+
+    @im_log()
+    def add_win(self,win_ref,focus=False):
+        '''
+        add a win to be handled by the manager
+        '''
+        self._wins.append(win_ref)
+        if focus:
+            self._focus = len(self._wins)-1
+            
+    @im_log()
+    def get_win_ref(self,index=None):
+        '''
+        get ref of win in focus or ref of win index
+        '''
+        assert len(self._wins) > 0
+         
+        if index==None:
+            return(self._wins[self._focus])
+        else:
+            self._focus = index
+        return(self._wins[index])
+
+    @im_log()
+    def get_next_win_ref(self):
+        if (self._focus + 1) < len(self._wins): # if one more left
+            self._focus += 1
+        else:
+            self._focus = 0
+        return(self.get_win_ref(self._focus))
+
+    @im_log()
+    def event_handler(self,event):
+        '''
+        needs to be the first event handler always called and then
+        throw to the window in focus if keypress not handled here
+        '''        
+        if event == 9: # tab is the key to switch window focus
+            focus_win = self.get_next_win_ref()
+            focus_win.refresh
+            return(True)
+        elif event == ord("q"):
+            exit()
+        return(False)
+
+    @im_log()
+    def mainloop(self):
+        while True:
+            focus_win = self.get_win_ref()
+            focus_win.refresh()
+            event = focus_win.getch()
+            if not focus_win.event_handler(event):
+                self.event_handler(event)
+
+def file2itemlist(filename):
+    l=[]
+    fh = open(filename, 'r+')
+    return [(line.rstrip(),0,0) for line in fh]
+
+
+def file2string(filename):
+    fh = open(filename, 'r+')
+    str = ""
+    for line in fh:
+        #str = str + line.rstrip + TERM_CHAR
+        str = str + line
+    return str
+
+if __name__ == '__main__':
+    def main(screen):
+
+        logger = Logger("/tmp/log.txt")
+
+        l = file2itemlist("./list.txt")
+    
+        screen.keypad(1)
+        curses.mousemask(1)
+
+        wm = WindowManager()
+        db = DebugBox(wm,"db1",10,50,26,5,True)
+        db.daemon = True
+        db.start()
+        db.name = "db1"
+    
+        lb = ListBox.listitems(wm,"lb1",15,50,8,5,l)
+        lb.daemon = True
+        lb.start()
+        lb.name = "lb1"
+    
+        lb2 = ListBox.listitems(wm,"lb2",15,50,8,60,l)
+        lb2.daemon = True
+        lb2.start()
+        lb2.name = "lb2"
+
+        eb = EntryBox(wm,"eb1",3,50,2,5)
+        eb.daemon = True
+        eb.start()
+        eb.name = "eb1"
+    
+        tb = TextBox(wm,"tb1",3,50,39,5,None)
+        tb.daemon = True
+        tb.start()
+        tb.name = "tb1"
+    
+        wm.mainloop()
+
+    try:
+        curses.wrapper(main)
+    except KeyboardInterrupt:
+        print "Got KeyboardInterrupt exception. Exiting..."
+        exit()
+
+    

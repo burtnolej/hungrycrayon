@@ -1,0 +1,21 @@
+2013-07-03  Jon Butler  <burtnolej@gazelle>
+
+	* nested_objects.py:
+	put the _cell_generator definition a as class method
+	expicitly calling the super class constructor from the subclass and then user can overide any config by specifying in subclass constructor
+
+	* nested_objects.py: New file.
+
+2013-07-03  Jon Butler  <burtnolej@gazelle>
+
+	* nested_objects.py:
+	put the _cell_generator definition a as class method
+	expicitly calling the super class constructor from the subclass and then user can overide any config by specifying in subclass constructor
+	to do
+	need to be able to pass in some tag so printout can show visually how deep in the tree we are. could be a space offset could be a depth number
+	to do
+	could also add the deep print as an override of print ?
+	or could just add it into super directly so user can choose print or deep print ? maybe deep print should always be the default??
+
+	* nested_objects.py: New file.
+

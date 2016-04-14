@@ -1,0 +1,238 @@
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ python -v
+# installing zipimport hook
+import zipimport # builtin
+# installed zipimport hook
+# /usr/lib/python2.7/site.pyc matches /usr/lib/python2.7/site.py
+import site # precompiled from /usr/lib/python2.7/site.pyc
+# /usr/lib/python2.7/os.pyc matches /usr/lib/python2.7/os.py
+import os # precompiled from /usr/lib/python2.7/os.pyc
+import errno # builtin
+import posix # builtin
+# /usr/lib/python2.7/posixpath.pyc matches /usr/lib/python2.7/posixpath.py
+import posixpath # precompiled from /usr/lib/python2.7/posixpath.pyc
+# /usr/lib/python2.7/stat.pyc matches /usr/lib/python2.7/stat.py
+import stat # precompiled from /usr/lib/python2.7/stat.pyc
+# /usr/lib/python2.7/genericpath.pyc matches /usr/lib/python2.7/genericpath.py
+import genericpath # precompiled from /usr/lib/python2.7/genericpath.pyc
+# /usr/lib/python2.7/warnings.pyc matches /usr/lib/python2.7/warnings.py
+import warnings # precompiled from /usr/lib/python2.7/warnings.pyc
+# /usr/lib/python2.7/linecache.pyc matches /usr/lib/python2.7/linecache.py
+import linecache # precompiled from /usr/lib/python2.7/linecache.pyc
+# /usr/lib/python2.7/types.pyc matches /usr/lib/python2.7/types.py
+import types # precompiled from /usr/lib/python2.7/types.pyc
+# /usr/lib/python2.7/UserDict.pyc matches /usr/lib/python2.7/UserDict.py
+import UserDict # precompiled from /usr/lib/python2.7/UserDict.pyc
+# /usr/lib/python2.7/_abcoll.pyc matches /usr/lib/python2.7/_abcoll.py
+import _abcoll # precompiled from /usr/lib/python2.7/_abcoll.pyc
+# /usr/lib/python2.7/abc.pyc matches /usr/lib/python2.7/abc.py
+import abc # precompiled from /usr/lib/python2.7/abc.pyc
+# /usr/lib/python2.7/_weakrefset.pyc matches /usr/lib/python2.7/_weakrefset.py
+import _weakrefset # precompiled from /usr/lib/python2.7/_weakrefset.pyc
+import _weakref # builtin
+# /usr/lib/python2.7/copy_reg.pyc matches /usr/lib/python2.7/copy_reg.py
+import copy_reg # precompiled from /usr/lib/python2.7/copy_reg.pyc
+# /usr/lib/python2.7/traceback.pyc matches /usr/lib/python2.7/traceback.py
+import traceback # precompiled from /usr/lib/python2.7/traceback.pyc
+# /usr/lib/python2.7/sysconfig.pyc matches /usr/lib/python2.7/sysconfig.py
+import sysconfig # precompiled from /usr/lib/python2.7/sysconfig.pyc
+# /usr/lib/python2.7/re.pyc matches /usr/lib/python2.7/re.py
+import re # precompiled from /usr/lib/python2.7/re.pyc
+# /usr/lib/python2.7/sre_compile.pyc matches /usr/lib/python2.7/sre_compile.py
+import sre_compile # precompiled from /usr/lib/python2.7/sre_compile.pyc
+import _sre # builtin
+# /usr/lib/python2.7/sre_parse.pyc matches /usr/lib/python2.7/sre_parse.py
+import sre_parse # precompiled from /usr/lib/python2.7/sre_parse.pyc
+# /usr/lib/python2.7/sre_constants.pyc matches /usr/lib/python2.7/sre_constants.py
+import sre_constants # precompiled from /usr/lib/python2.7/sre_constants.pyc
+# /usr/lib/python2.7/_sysconfigdata.pyc matches /usr/lib/python2.7/_sysconfigdata.py
+import _sysconfigdata # precompiled from /usr/lib/python2.7/_sysconfigdata.pyc
+# /usr/lib/python2.7/plat-x86_64-linux-gnu/_sysconfigdata_nd.pyc matches /usr/lib/python2.7/plat-x86_64-linux-gnu/_sysconfigdata_nd.py
+import _sysconfigdata_nd # precompiled from /usr/lib/python2.7/plat-x86_64-linux-gnu/_sysconfigdata_nd.pyc
+# zipimport: found 7 names in /usr/local/lib/python2.7/dist-packages/python_magic-0.4.10-py2.7.egg
+# /usr/lib/python2.7/sitecustomize.pyc matches /usr/lib/python2.7/sitecustomize.py
+import sitecustomize # precompiled from /usr/lib/python2.7/sitecustomize.pyc
+import encodings # directory /usr/lib/python2.7/encodings
+# /usr/lib/python2.7/encodings/__init__.pyc matches /usr/lib/python2.7/encodings/__init__.py
+import encodings # precompiled from /usr/lib/python2.7/encodings/__init__.pyc
+# /usr/lib/python2.7/codecs.pyc matches /usr/lib/python2.7/codecs.py
+import codecs # precompiled from /usr/lib/python2.7/codecs.pyc
+import _codecs # builtin
+# /usr/lib/python2.7/encodings/aliases.pyc matches /usr/lib/python2.7/encodings/aliases.py
+import encodings.aliases # precompiled from /usr/lib/python2.7/encodings/aliases.pyc
+# /usr/lib/python2.7/encodings/utf_8.pyc matches /usr/lib/python2.7/encodings/utf_8.py
+import encodings.utf_8 # precompiled from /usr/lib/python2.7/encodings/utf_8.pyc
+Python 2.7.6 (default, Jun 22 2015, 17:58:13) 
+[GCC 4.8.2] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+dlopen("/usr/lib/python2.7/lib-dynload/readline.x86_64-linux-gnu.so", 2);
+import readline # dynamically loaded from /usr/lib/python2.7/lib-dynload/readline.x86_64-linux-gnu.so
+>>> # zipimport: found 7 names in /usr/local/lib/python2.7/dist-packages/python_magic-0.4.10-py2.7.egg
+... 
+>>> 
+>>> 
+>>> exit
+Use exit() or Ctrl-D (i.e. EOF) to exit
+>>> 
+>>> 
+>>> exit()
+# clear __builtin__._
+# clear sys.path
+# clear sys.argv
+# clear sys.ps1
+# clear sys.ps2
+# clear sys.exitfunc
+# clear sys.exc_type
+# clear sys.exc_value
+# clear sys.exc_traceback
+# clear sys.last_type
+# clear sys.last_value
+# clear sys.last_traceback
+# clear sys.path_hooks
+# clear sys.path_importer_cache
+# clear sys.meta_path
+# clear sys.flags
+# clear sys.float_info
+# restore sys.stdin
+# restore sys.stdout
+# restore sys.stderr
+# cleanup __main__
+# cleanup[1] encodings
+# cleanup[1] site
+# cleanup[1] sysconfig
+# cleanup[1] abc
+# cleanup[1] _weakrefset
+# cleanup[1] sre_constants
+# cleanup[1] re
+# cleanup[1] _codecs
+# cleanup[1] _warnings
+# cleanup[1] zipimport
+# cleanup[1] _sysconfigdata
+# cleanup[1] encodings.utf_8
+# cleanup[1] codecs
+# cleanup[1] readline
+# cleanup[1] _sysconfigdata_nd
+# cleanup[1] sitecustomize
+# cleanup[1] signal
+# cleanup[1] traceback
+# cleanup[1] posix
+# cleanup[1] encodings.aliases
+# cleanup[1] exceptions
+# cleanup[1] _weakref
+# cleanup[1] sre_compile
+# cleanup[1] _sre
+# cleanup[1] sre_parse
+# cleanup[2] copy_reg
+# cleanup[2] posixpath
+# cleanup[2] errno
+# cleanup[2] _abcoll
+# cleanup[2] types
+# cleanup[2] genericpath
+# cleanup[2] stat
+# cleanup[2] warnings
+# cleanup[2] UserDict
+# cleanup[2] os.path
+# cleanup[2] linecache
+# cleanup[2] os
+# cleanup sys
+# cleanup __builtin__
+# cleanup ints: 55 unfreed ints
+# cleanup floats
+burtnolej@blackbear:~/Development/Development/pythonapps3$ python ./locateduplicatefiles.py
+Traceback (most recent call last):
+  File "./locateduplicatefiles.py", line 24, in <module>
+    read_osxfilesystem("./test")
+  File "./locateduplicatefiles.py", line 21, in read_osxfilesystem
+    print from_file(fullpath)
+  File "build/bdist.linux-x86_64/egg/magic.py", line 127, in from_file
+    """
+  File "build/bdist.linux-x86_64/egg/magic.py", line 80, in from_file
+    _setflags.argtypes = [magic_t, c_int]
+IOError: File does not exist: file2.1.2/./test/dir2/dir2.1
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+bash: burtnolej@blackbear:~/Development/Development/pythonapps3$: No such file or directory
+burtnolej@blackbear:~/Development/Development/pythonapps3$ burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+bash: burtnolej@blackbear:~/Development/Development/pythonapps3$: No such file or directory
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ python ./locateduplicatefiles.py
+empty 
+empty 
+empty 
+empty 
+empty 
+empty 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ python ./locateduplicatefiles.py
+file2.1.2 is type empty 
+file2.1.1 is type empty 
+file1.1.2 is type empty 
+file1.1.1 is type empty 
+file1.2.1 is type empty 
+file1.2.2 is type empty 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ ls
+locateduplicatefiles.py  locateduplicatefiles.py~  test
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ cd test
+burtnolej@blackbear:~/Development/Development/pythonapps3/test$ ls
+dir1  dir2
+burtnolej@blackbear:~/Development/Development/pythonapps3/test$ cd dir1
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir1$ ls
+dir1.1  dir1.2
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir1$ cd ..
+burtnolej@blackbear:~/Development/Development/pythonapps3/test$ ls
+dir1  dir2
+burtnolej@blackbear:~/Development/Development/pythonapps3/test$mkdir dir3
+burtnolej@blackbear:~/Development/Development/pythonapps3/test$ ls
+dir1  dir2  dir3
+burtnolej@blackbear:~/Development/Development/pythonapps3/test$ cd dir3
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ ls
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ cp ~/Documents/Documents/399\ Dogwood/el .
+cp: cannot stat ‘/home/burtnolej/Documents/Documents/399 Dogwood/el’: No such file or directory
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ cp ~/Documents/Documents/399\ Dogwood/*.pdf .
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ ls
+Gym elevations.pdf
+burtnolej@blackbear:~/Development/Development/pythonapps3/test/dir3$ cd ..
+burtnolej@blackbear:~/Development/Development/pythonapps3/test$ ls
+dir1  dir2  dir3
+burtnolej@blackbear:~/Development/Development/pythonapps3/test$ cd ..
+burtnolej@blackbear:~/Development/Development/pythonapps3$ ls
+locateduplicatefiles.py  locateduplicatefiles.py~  test
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ cp ~/Documents/Documents/399\ Dogwood/*.pdf .
+burtnolej@blackbear:~/Development/Development/pythonapps3$ rm *pdf
+burtnolej@blackbear:~/Development/Development/pythonapps3$ python ./locateduplicatefiles.py
+Gym elevations.pdf is type PDF document, version 1.5
+file2.1.2 is type empty 
+file2.1.1 is type empty 
+file1.1.2 is type empty 
+file1.1.1 is type empty 
+file1.2.1 is type empty 
+file1.2.2 is type empty 
+burtnolej@blackbear:~/Development/Development/pythonapps3$ python ./locateduplicatefiles.py
+Gym elevations.pdf is type PDF document, version 1.5 fullpath:./test/dir3/Gym elevations.pdf
+file2.1.2 is type empty  fullpath:./test/dir2/dir2.1/file2.1.2
+file2.1.1 is type empty  fullpath:./test/dir2/dir2.1/file2.1.1
+file1.1.2 is type empty  fullpath:./test/dir1/dir1.1/file1.1.2
+file1.1.1 is type empty  fullpath:./test/dir1/dir1.1/file1.1.1
+file1.2.1 is type empty  fullpath:./test/dir1/dir1.2/file1.2.1
+file1.2.2 is type empty  fullpath:./test/dir1/dir1.2/file1.2.2
+burtnolej@blackbear:~/Development/Development/pythonapps3$ 

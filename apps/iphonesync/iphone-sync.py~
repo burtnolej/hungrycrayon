@@ -1,0 +1,39 @@
+
+
+import command
+import os
+
+mount_point = "/media/iPhone"
+iphone_pic_path = os.path.join(mount_point,"DCIM")
+
+cmd_iphone_pair="idevicepair pair"
+cmd_iphone_mount="ifuse " + mount_point
+cmd_iphone_unmount="fusermount -u " + mount_point
+cmd_iphone_ls="ls -ltr " + iphone_pic_path
+
+log=[]
+
+def exec_cmd(cmd,log):
+    print "executing:",cmd_iphone_
+    log.append(command.getstatusoutput(cmd))
+    
+# pair with iPhone - hit OK on device
+exec_cmd(cmd_iphone_pair,log)
+
+
+# mount iPhone user directories to local mount point 
+#exec_cmd(cmd_iphone_mount,log)
+
+# list files to move
+#exec_cmd(cmd_iphone_ls,log)
+
+# unmount 
+#exec_cmd(cmd_iphone_unmount,log)
+
+for logentry in log:
+    print logentry
+
+exit()
+
+#cp -r /media/iPhone/DCIM/* ~/Pictures/iPhones-sync/"DCIM-" + [phone name]
+#phone name = tarantula

@@ -1,0 +1,376 @@
+head	1.5;
+access;
+symbols;
+locks
+	burtnolej:1.5; strict;
+comment	@# @;
+
+
+1.5
+date	2013.09.01.17.04.55;	author burtnolej;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2013.09.01.15.06.52;	author burtnolej;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2013.08.26.17.49.01;	author burtnolej;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2013.08.24.18.46.43;	author burtnolej;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2013.08.24.09.35.46;	author burtnolej;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.5
+log
+@fixed bug in event handlers where they did not pass back true / false depending on whether or not they caught the event
+@
+text
+@#!/usr/bin/python
+
+from sys import path,stdout
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+from misc_util import Singleton, get_time_hms, in_method_log, Logger, file2list
+from ui_util import ListBox,EntryBox,TextBox,WindowManager,DocBox,Window,DebugBox
+from db_util import Database, DatabaseTable, DatabaseRecord, DatabaseView
+from error_util import Notification
+from stack_util import get_exception_info
+import thread_util 
+import curses
+import time
+
+class Finance(Database):
+    pass
+
+def main(screen):
+    try:    
+        screen.keypad(1)
+        curses.mousemask(1)
+        curses.nonl()
+
+        l = file2list("doc.txt")
+
+        finance = Finance("~/Downloads/gadflyZip/gadfly/scripts/",'use')
+    
+        cn = finance.view(CounterpartyNames)
+        tv = finance.view(TransactionView)
+        #nt = finance.table(NoteTable)
+    
+        finance.loadviews()
+
+        wm = WindowManager()
+        lb = CounterpartyNamesLB.dbitems(wm,"lb1",20,30,10,10,cn)
+        lb.daemon = True
+        lb.start()
+        lb.parent = None
+        lb.name = "lb1"
+    
+        lb2 = TransactionViewLB.dbitems(wm,"lb2",20,30,10,40,tv)
+        lb2.daemon = True
+        lb2.start()
+        lb2.parent = "lb1"
+        lb2.name = "lb2"
+    
+        #eb = CounterpartyNamesFilterEB(wm,"eb1",3,30,32,10)
+        #eb.daemon = True
+        #eb.start()
+        #eb.parent = "lb1"
+        #eb.name = "eb1"
+
+        #db = DebugBox(wm,"db",10,50,26,5,True)
+        #db.daemon = True
+        #db.start()
+        #db.name = "db"
+
+        #db1 = MyDocsDB.listitems(wm,"db1",15,30,5,5,l)
+        #db1.daemon = True
+        #db1.start()
+        #db1.parent = "db1"
+        #db1.name = "db1"
+
+        wm.mainloop()
+    except KeyboardInterrupt:
+        print "Got KeyboardInterrupt exception. Exiting..."
+        exit()
+    except AssertionError:
+        e = get_exception_info()
+        Notification.enrich(e['value'])
+        exit()
+    except:
+        e = get_exception_info()
+        
+        Notification.enrich(e['value'])
+        exit()
+    finally:
+        Notification.print_summary()
+
+class MyDocsDB(DocBox):
+    #def context_event_handler(self,event):
+    #    pass
+    
+    def run(self):
+        while 1:
+            time.sleep(0.1)
+    
+class CounterpartyNamesLB(ListBox):
+    def context_event_handler(self,event):
+        if event in [curses.KEY_DOWN,curses.KEY_UP]:
+            (text,_,_) = tuple(self._items_sel())
+            qm = thread_util.QueueMessage("lb2",sender=self.name,payload=text)
+            qm.pprint("put",self.name)
+            with thread_util.threadLock:
+                thread_util.MyThread.myQueue.put(qm)
+            return True
+        return False
+
+    def run(self):
+        while 1:
+            thread_util.MyThread.check_q(self.name,self._filter_dbitems)            
+            time.sleep(0.1)
+
+class TransactionViewLB(ListBox):
+    def run(self):
+        while 1:
+            thread_util.MyThread.check_q(self.name,self._reload_dbitems)            
+            time.sleep(0.1)
+
+class CounterpartyNamesFilterEB(EntryBox):
+    def context_event_handler(self,event):
+        print event
+        if event == 10:
+            qm = thread_util.QueueMessage("lb1",sender=self.name,payload=self._current_str)
+            qm.pprint("put",self.name)
+            with thread_util.threadLock:
+                thread_util.MyThread.myQueue.put(qm)
+            return True
+        return False
+
+class CounterpartyNames(DatabaseView):
+    def init_load(self,arg=None,re=None):
+        init_load_qry  = "select name "
+        init_load_qry += "from   counterpartys "
+        init_load_qry += "order by name"
+        self.__load(init_load_qry,re)
+        
+    def __load(self,qry,re=None):
+        self.db.execute(qry)
+        for col1 in self.db.fetchall():
+            #window constructor needs a rec field called display_text
+            self.add(cpy_name = str(col1),display_text=str(col1))
+
+    def add(self,**kwargs):
+        dr = DatabaseRecord(**kwargs)
+        self[dr.cpy_name] = dr
+        
+class TransactionView(DatabaseView):
+    def init_load(self,arg=None,re=None):
+        init_load_qry  = "select tran_date,debit_amt,c.name "
+        init_load_qry += "from   transactions, "
+        init_load_qry += "       counterpartys as c "
+        init_load_qry += "where  c.id = cpy_id "
+        if arg:
+            init_load_qry += "and    c.name = '" + arg + "'"
+        
+        self.__load(init_load_qry,re)
+        
+    def __load(self,qry,re=None):
+        print qry
+        self.db.execute(qry)
+        self.clear()
+        for col1,col2,col3 in self.db.fetchall():
+            self.add(tran_date = str(col1),
+                     debit_amt = str(col2),
+                     c_name = str(col3),
+                     display_text=str(str(col1) + " " + str(col2)))
+        
+    def add(self,**kwargs):
+        dr = DatabaseRecord(**kwargs)
+        self[dr._id] = dr
+
+logger = Logger("/tmp/log.txt")
+curses.wrapper(main)
+logger.__del__()
+@
+
+
+1.4
+log
+@updated to use the new ui_util items with tuples not strings (needed for the doc edit subclass)
+@
+text
+@d95 2
+d117 2
+a118 1
+        pass
+a156 1
+        print len(self)
+@
+
+
+1.3
+log
+@works with a filter window
+rewored to allow app specificity to be implemented in the app not the util
+@
+text
+@d6 1
+a6 1
+from ui_util import ListBox,EntryBox,TextBox,WindowManager,Window
+d8 2
+d18 4
+d23 1
+a23 5
+    logger = Logger("/tmp/log.txt")
+    l = file2list("./list.txt")
+    
+    screen.keypad(1)
+    curses.mousemask(1)
+d25 1
+a25 1
+    finance = Finance("~/Downloads/gadflyZip/gadfly/scripts/",'use')
+d27 3
+a29 2
+    cn = finance.view(CounterpartyNames)
+    tv = finance.view(TransactionView)
+d31 1
+a31 1
+    finance.loadviews()
+d33 12
+a44 6
+    wm = WindowManager()
+    lb = CounterpartyNamesLB.dbcontent(wm,"lb1",20,30,10,10,cn)
+    lb.daemon = True
+    lb.start()
+    lb.parent = None
+    lb.name = "lb1"
+d46 40
+a85 5
+    lb2 = TransactionViewLB.dbcontent(wm,"lb2",20,30,10,40,tv)
+    lb2.daemon = True
+    lb2.start()
+    lb2.parent = "lb1"
+    lb2.name = "lb2"
+a86 10
+    eb = CounterpartyNamesFilterEB(wm,"eb1",3,30,32,10)
+    eb.daemon = True
+    eb.start()
+    eb.parent = "lb1"
+    eb.name = "eb1"
+
+
+    wm.mainloop()
+    del logger
+
+d90 2
+a91 1
+            qm = thread_util.QueueMessage("lb2",sender=self.name,payload=self._content_selection())
+d98 1
+a98 1
+            thread_util.MyThread.check_q(self.name,self._filter_dbcontents)            
+a100 1
+
+d104 1
+a104 1
+            thread_util.MyThread.check_q(self.name,self._reload_dbcontents)            
+d160 3
+a162 5
+try:
+    curses.wrapper(main)
+except KeyboardInterrupt:
+    print "Got KeyboardInterrupt exception. Exiting..."
+    exit()
+@
+
+
+1.2
+log
+@basic context bus between widgets works
+@
+text
+@d3 1
+a3 1
+from sys import path
+d10 1
+a24 1
+    #cn = finance.view(CounterpartyNames())
+a25 1
+    #tv = finance.view(TransactionView())
+d31 1
+a31 1
+    lb = ListBox.dbcontent(wm,"lb1",30,30,10,10,cn)
+d34 1
+d36 2
+a37 2
+    lb.parent = None
+    lb2 = ListBox.dbcontent(wm,"lb2",30,30,10,40,tv)
+d40 1
+d42 7
+a48 1
+    lb2.parent = "lb1"
+d53 30
+d102 7
+a108 2
+        init_load_qry  = "select tran_date,debit_amt "
+        init_load_qry += "from   transactions "
+a110 8
+    def reload(self,arg,re=None):
+        reload_qry  = "select tran_date,debit_amt "
+        reload_qry += "from   transactions, "
+        reload_qry += "       counterpartys as c "
+        reload_qry += "where  c.id = cpy_id "
+        reload_qry += "and    c.name = '" + arg + "'"
+        self.__load(reload_qry,re)
+
+d115 1
+a115 1
+        for col1,col2 in self.db.fetchall():
+d118 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d23 5
+a27 2
+    cn = finance.view(CounterpartyNames())
+    tv = finance.view(TransactionView())
+d47 11
+a57 8
+    load_qry  = "select name "
+    load_qry += "from   counterpartys "
+    load_qry += "order by name"
+
+    def load(self,qry,db,arg=None,re=None):
+        db.execute(qry)
+        for col1 in db.fetchall():
+            self.add(cpy_name = str(col1))
+d64 23
+a86 9
+    load_qry  = "select debit_amt "
+    load_qry += "from   transactions "
+    load_qry += "where  debit_amt < -200.00"
+
+    def load(self,qry,db,arg=None,re=None):
+        db.execute(qry)
+        for col1 in db.fetchall():
+            self.add(debit_amt = col1)
+
+@

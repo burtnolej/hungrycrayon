@@ -1,0 +1,43 @@
+#!/usr/bin/python
+
+from sys import path
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+from misc_util import file2list, switch, pprint_exception
+from db_util import DatabaseTable, DatabaseRecord
+from operator import mod
+from collections import OrderedDict
+import re
+
+class Transactions(DatabaseTable):
+    def __init__(self,*arg,**kwargs):
+        super(Transactions,self).__init__(*arg, **kwargs)
+
+    def add(self,*arg,**kwargs):
+        '''
+        only add tran to collection if it doesnt already exist
+        return new tran or existing tran object
+        '''
+        t = Transaction(**kwargs)
+        key = t._dup_id # make local copy so visible in print_error
+        if not self.has_key(key):
+            self[key] = t # new
+            #self.print_status("added",t,t._dup_id)
+        else:
+            raise Exception('duplicate transaction')
+
+class Transaction(DatabaseRecord):
+    def __init__(self,*arg,**kwargs):
+        super(Transaction,self).__init__(*arg, **kwargs)
+        self.gen_dup_id()
+
+    def gen_dup_id(self):
+        '''
+        we will assue that coutts ledeger is threadsafe
+        so only 1 transaction can have a given balance and tran_date
+        credits are so rare and large that we can discount a balance occuring twice on the same day
+        '''
+        assert hasattr(self,"_db_tran_date")
+        assert hasattr(self,"_db_balance")
+        
+        self._dup_id = str(self._db_tran_date) + str(self._db_balance)
+        self._dup_id = re.sub(r"[^a-zA-Z0-9]","",self._dup_id)

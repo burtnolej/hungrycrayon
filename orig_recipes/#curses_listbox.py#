@@ -1,0 +1,74 @@
+
+#!/usr/bin/python
+
+
+import curses
+
+def write_char_to_screen(self,char,color_pair_id,supress_increment,x=None,y=None):
+        color_pair = 1
+        
+        if (x != None): # do not use current cursor posn
+            self.move_cursor_on_screen_abs(x,y)
+        
+        self._screen.addstr(str(chr(char)),color_pair)
+
+        if supress_increment == False: # do not supress cursor increment
+            self.set_cursor_coord_offset('x',1)
+        else:
+            self.move_cursor_on_screen_abs(x,y)
+            
+        return(self.get_cursor_coord_xy())
+
+def set_row_attribute(screen,y,x,attr):
+    text_at_row = screen.instr(y,0,curses.COLS) # get row text
+    screen.addstr(y,0,text_at_row,attr) # rewrite with new attr
+    screen.move(y,x) # return cursor to origin
+
+def populate_list(screen,filename):
+    fh = open(filename, 'r+')
+    l = []
+    [l.append(line) for line in fh]
+    return(l)
+
+def main(screen):
+
+
+    screen.keypad(1)
+    curses.mousemask(1)
+    populate_list(screen, "./list.txt")
+
+
+    while True:                                            
+        event = screen.getch()
+        y, x = screen.getyx() # get current pos of cursor
+                
+        if event == ord("q"): break
+        elif event == curses.KEY_LEFT:
+                if x>0:
+                        screen.move(y,x-1)
+        elif event == curses.KEY_RIGHT:
+                if x<curses.COLS-1:
+                        screen.move(y,x+1)
+        elif event == curses.KEY_UP:
+                if y>0:
+                        set_row_attribute(screen,y,x,curses.A_NORMAL)
+                        set_row_attribute(screen,y-1,x,curses.A_REVERSE)
+        elif event == curses.KEY_DOWN:
+                if y<curses.LINES-2:
+                        set_row_attribute(screen,y,x,curses.A_NORMAL)
+                        set_row_attribute(screen,y+1,x,curses.A_REVERSE)
+        elif event == 10:
+                text_at_row = screen.instr(y,0,curses.COLS) # get string at xy
+                screen.addstr(curses.LINES-2,0,text_at_row,curses.A_BLINK)
+                
+                screen.move(y,x)
+        else:
+                screen.addstr(chr(event),1)
+        
+
+if __name__ == '__main__':
+    try:
+        curses.wrapper(main)
+    except KeyboardInterrupt:
+        print "Got KeyboardInterrupt exception. Exiting..."
+        exit()

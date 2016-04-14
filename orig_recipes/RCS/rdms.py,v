@@ -1,0 +1,50 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2013.07.27.10.36.17;	author burtnolej;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#!/usr/bin/python
+
+from gadfly import gadfly
+import os, shutil
+from sys import path
+
+connect = gadfly()
+if os.path.exists('_test_dir'):
+    shutil.rmtree('_test_dir')
+os.makedirs('_test_dir')
+
+connect.startup("test","_test_dir")
+curs = connect.cursor()
+curs.execute('create table player (last_name varchar, club varchar)')
+C = "insert into player (last_name,club) values (?, ?)"
+D = [("Lineker","Leicester City"),
+     ("Rooney","Manchester United")]
+curs.execute(C,D)
+
+curs.execute("select * from player where club='Manchester United'")
+
+print curs.pp()
+#print curs.fetchall()
+
+
+connect.commit()
+connect.close()
+@

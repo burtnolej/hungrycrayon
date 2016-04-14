@@ -1,0 +1,198 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2013.08.12.12.56.28;	author burtnolej;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2013.08.05.10.38.13;	author burtnolej;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@added a 3rd option to search for tag that allows wildcards in the tag
+ie can now specify <a 'any text here '> sfjlsdjfdlkf <a\a>
+@
+text
+@#!/usr/bin/python
+
+from BeautifulSoup import BeautifulSoup
+import requests
+import re
+import sys
+from collections import OrderedDict
+sys.path.append("/Users/burtnolej/Dev/pythonapps/util")
+from misc_util import get_log_handle
+
+class YellDataitems(list):
+    def __init__(self,cpy,loc):
+        self._gen_url(cpy,loc)
+        self._text = requests.get(self._url).text
+        self._doc = self._text.split("<div class=\"parentListing\"")
+        
+    def bs_prettify(self):
+        bs = BeautifulSoup(self._text)
+        print bs.prettify()
+
+    def _gen_url(self,cpy,loc):
+
+        self._url = "http://www.yell.com/ucs/UcsSearchAction.do?keywords="
+        self._url += cpy
+        self._url += "&location="
+        self._url += loc
+        self._url += "&scrambleSeed=58471740&searchType=&M=&bandedclarifyResults=&ssm=1"
+
+    def pprint(self,count=100):
+        i=0
+        for res in self:
+            if i>=count:
+                return
+            else:
+                for key,value in res.iteritems():
+                    print key.ljust(15),
+                    if value: print value[0].lstrip(),
+                    print
+                print 
+            i+=1
+
+    def search_for_tag(self,tag,item,regex,dataitem,text):
+        re_str =  "<"
+        re_str += tag
+        if item != "":
+            re_str += " "
+            re_str += item
+            re_str += r"\""
+            re_str += dataitem
+            re_str += r"\""
+        elif regex != "":
+            re_str += regex
+        re_str += ">"
+        re_str += "(.*?)<\/"
+        re_str += tag
+        re_str +=">"
+
+
+        r = re.compile(re_str)
+        return(r.findall("".join(m for m in text)))
+
+    def scrape(self,dataitems):
+        for para in self._doc:
+            # remove any unwanted chrs/strs
+            para = re.sub("\&amp","",para)
+
+            res = {}
+
+            for dataitem,match_method in dataitems.iteritems():
+                mypara = para # create a local cp
+                for tag,item,regex in match_method:
+                    mypara = self.search_for_tag(tag,item,regex,dataitem,mypara)
+                res.__setitem__(dataitem,mypara)
+                
+            if res.__getitem__('offscreen')[0] != 'Search':
+                self.append(res)
+
+if __name__ == '__main__':
+
+    cpy = sys.argv[1]
+    loc = sys.argv[2]
+
+    d = OrderedDict({'offscreen':[('span','class=','')],
+                     'streetAddress':[('span','itemprop=','')],
+                     'addressLocality':[('span','itemprop=',''),
+                                        ('strong','','')],
+                     'addressLocality':[('span','itemprop=',''),
+                                        ('strong','','')],
+
+                     'postalCode':[('span','itemprop=','')],
+                     'keywords':[('div','class=',''),
+                                 ('p','',''),
+                                 ('strong','','')],
+                     'keywords snippet':[('div','class=',''),
+                                 ('p','',''),
+                                 ('a','','[^>]*')]})
+
+    
+
+    yd = YellDataitems(cpy,loc)
+    yd.scrape(d)
+    yd.pprint()
+
+    sys.stdout = get_log_handle("./yell.htm")
+    print yd.bs_prettify()
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 90
+a97 30
+cpy = "DELEADUS"
+loc = "EC1V"
+
+url_str = "http://www.yell.com/ucs/UcsSearchAction.do?keywords="
+url_str += cpy
+url_str += "&location="
+url_str += loc
+url_str += "&scrambleSeed=58471740&searchType=&M=&bandedclarifyResults=&ssm=1"
+
+text = requests.get(url_str).text
+soup = BeautifulSoup(text)
+#print soup.prettify()
+#sys.exit()
+
+d = {'streetAddress':[('span','itemprop=')],
+     'addressLocality':[('span','itemprop=')],
+     'postalCode':[('span','itemprop=')],
+     'keywords':[('div','class='),
+                 ('p',''),
+                 ('strong','')]}
+
+doc = text.split("<div class=\"parentListing\"")
+
+for para in doc:
+    r = re.compile("<h2 class=\"ellipsis\">(.*?)<\/h2>")
+    h2 = r.findall(para)
+
+    r2 = re.compile("<a[^>]*> (.*?) </a>")
+    if len(h2)>0:
+        cpy_name = r2.findall(h2[0])
+a98 5
+        r = re.compile("<span itemprop=\"streetAddress\"(.*?)<\/span>")
+        street_address = r.findall(para)
+
+        r = re.compile("<span itemprop=\"addressLocality\"(.*?)<\/span>")
+        address_locality = r.findall(para)
+d100 3
+a102 15
+        r = re.compile("<span itemprop=\"postalCode\"(.*?)<\/span>")
+        postal_code = r.findall(para)
+
+        r = re.compile("div class=\"keywords\"(.*?)<\/div>")        
+        keywords_obj = r.findall(para)
+        r2 = re.compile("<p>(.*?)<\/p>")
+        keywords_str = r2.findall(keywords_obj[0])
+        r3 = re.compile("<strong>(.*?)<\/strong>")
+        keywords = r3.findall(keywords_str[0])
+        
+        print cpy_name[0].lstrip(">").lstrip()
+        print street_address[0].lstrip(">").lstrip()
+        print address_locality[0].lstrip(">").lstrip()
+        print postal_code[0].lstrip(">").lstrip()
+        print keywords[0].lstrip(">").lstrip()
+d104 2
+@

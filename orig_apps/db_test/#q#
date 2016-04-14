@@ -1,0 +1,2049 @@
+<generator object compare_records at 0x102ca3820> <type 'generator'>
+330662 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Players set id__='3712816' where last_name='neymar'",), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+330952 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+331242 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+331561 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+331812 <type 'int'>
+<type 'object'> <type 'type'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+<generator object compare_records at 0x102ca3a50> <type 'generator'>
+333354 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Grounds set id__='6326072' where ground_name='bernabau'",), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+333621 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+333859 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+334109 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+commit_to_gf <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+335363 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+2 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+384632 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+_commit <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+385182 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+close <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+{} <type 'dict'>
+True
+None <type 'NoneType'>
+descr: 
+ seed: [{'function': '_gf_init', 'args': ((), {}), 'results': None, 'len': 1, 'kws': {}, 'time': 237760, 'super': <class 'db_util.Database'>, 'clas
+s': 'Football'}, {'function': 'table', 'args': ((<class '__main__.Grounds'>,), {}), 'results': <class '__main__.Grounds'>, 'len': 1, 'kws': {}, 'ti
+me': 304365, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'table', 'args': ((<class '__main__.Players'>,), {}), 'results
+': <class '__main__.Players'>, 'len': 1, 'kws': {}, 'time': 304624, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'execut
+e', 'args': (("select count(*) from __table_names__ where table_name = 'PLAYERS'",), {}), 'results': None, 'len': 4, 'kws': {}, 'time': 310537, 'su
+per': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'table_exists_in_gf', 'args': (('Players',), {}), 'results': True, 'len': 3, '
+kws': {}, 'time': 311081, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'execute', 'args': (('select * from Players',), {
+}), 'results': None, 'len': 3, 'kws': {}, 'time': 312960, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': '_set_schema', 'a
+rgs': ((), {}), 'results': None, 'len': 3, 'kws': {}, 'time': 315296, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': '
+load_from_gf', 'args': ((), {}), 'results': None, 'len': 2, 'kws': {}, 'time': 315764, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'
+}, {'function': 'execute', 'args': (("select count(*) from __table_names__ where table_name = 'GROUNDS'",), {}), 'results': None, 'len': 4, 'kws': 
+{}, 'time': 318339, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'table_exists_in_gf', 'args': (('Grounds',), {}), 'resu
+lts': True, 'len': 3, 'kws': {}, 'time': 318862, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'execute', 'args': (('sele
+ct * from Grounds',), {}), 'results': None, 'len': 3, 'kws': {}, 'time': 320676, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'funct
+ion': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'kws': {}, 'time': 322167, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Gr
+ounds'}, {'function': 'load_from_gf', 'args': ((), {}), 'results': None, 'len': 2, 'kws': {}, 'time': 322629, 'super': <class 'db_util.DatabaseTabl
+e'>, 'class': 'Grounds'}, {'function': 'init_objects_in_db', 'args': ((), {}), 'results': 2, 'len': 1, 'kws': {}, 'time': 323028, 'super': <class '
+db_util.Database'>, 'class': 'Football'}, {'function': 'add', 'args': ((), {'capacity': 100000, 'ground_name': 'bernabau'}), 'results': <class 'db_
+util.DatabaseRecord'>, 'len': 2, 'kws': {}, 'time': 323501, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'add_list',
+ 'args': (([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}), 'results': None, 'len': 1, 'kws': {}, 'time': 323940, 'super': <class 'db_util
+.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'add', 'args': ((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}), 'results': <clas
+s 'db_util.DatabaseRecord'>, 'len': 2, 'kws': {}, 'time': 324400, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': 'add_
+list', 'args': (([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],), {}), 'results': None, 'len': 1, 'kws': {}, 'time': 324824, 'super': 
+<class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'kws': {}, 'time': 3
+25275, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, T
+rue), {}), 'results': <generator object compare_records at 0x102ca3820>, 'len': 4, 'kws': {}, 'time': 328605, 'super': <type 'object'>, 'class': 'D
+atabaseRecord'}, {'function': 'execute', 'args': (("update Players set id__='3712816' where last_name='neymar'",), {}), 'results': None, 'len': 4, 
+'kws': {}, 'time': 330662, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'upd_rec_in_gf', 'args': ((<class 'db_util.Datab
+aseRecord'>,), {}), 'results': None, 'len': 3, 'kws': {}, 'time': 330952, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function
+': 'find_changed_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'kws': {}, 'time': 331242, 'super': <class 'db_
+util.DatabaseTable'>, 'class': 'Players'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'kws': {}, 'time': 331561, 'sup
+er': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 
+'results': <generator object compare_records at 0x102ca3a50>, 'len': 4, 'kws': {}, 'time': 331812, 'super': <type 'object'>, 'class': 'DatabaseReco
+rd'}, {'function': 'execute', 'args': (("update Grounds set id__='6326072' where ground_name='bernabau'",), {}), 'results': None, 'len': 4, 'kws': 
+{}, 'time': 333354, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'upd_rec_in_gf', 'args': ((<class 'db_util.DatabaseReco
+rd'>,), {}), 'results': None, 'len': 3, 'kws': {}, 'time': 333621, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'fin
+d_changed_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'kws': {}, 'time': 333859, 'super': <class 'db_util.Da
+tabaseTable'>, 'class': 'Grounds'}, {'function': 'commit_to_gf', 'args': ((), {}), 'results': None, 'len': 1, 'kws': {}, 'time': 334109, 'super': <
+class 'db_util.Database'>, 'class': 'Football'}, {'function': 'execute', 'args': (('select * from Players',), {}), 'results': None, 'len': 2, 'kws'
+: {}, 'time': 335363, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': '_commit', 'args': ((), {}), 'results': None, 'len': 
+2, 'kws': {}, 'time': 384632, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'close', 'args': ((), {}), 'results': None, '
+len': 1, 'kws': {}, 'time': 385182, 'super': <class 'db_util.Database'>, 'class': 'Football'}]  depth: 0  max_depth: 10  start_depth: 0  show_summa
+ry: False  show_summry: False  prefix:                                                                                                            
+LIST:32:{'FUNCTION': '_GF_INIT', 'ARGS': ((), {}), 'RESULTS': NONE, 'LEN': 1, 'KWS': {}, 'TIME': 237760, 'SUPER': <CLASS 'DB_UTIL.DATABASE'>, 'CLAS
+S': 'FOOTBALL'}                                                                                                                                   
+ | time   | super                | function             | len | args                 | kws | results              |
+ | 237760 | <class 'db_util.Data | _gf_init             | 1   | ((), {})             | {}  | None                 |
+ |        | base'>               |                      |     |                      |     |                      |
+ | 304365 | <class 'db_util.Data | table                | 1   | ((<class '__main__.G | {}  | <class '__main__.Gro |
+ |        | base'>               |                      |     | rounds'>,), {})      |     | unds'>               |
+ | 304624 | <class 'db_util.Data | table                | 1   | ((<class '__main__.P | {}  | <class '__main__.Pla |
+ |        | base'>               |                      |     | layers'>,), {})      |     | yers'>               |
+ | 310537 | <class 'db_util.Data | execute              | 4   | (("select count(*) f | {}  | None                 |
+ |        | base'>               |                      |     | rom __table_names__  |     |                      |
+ |        |                      |                      |     | where table_name = ' |     |                      |
+ |        |                      |                      |     | PLAYERS'",), {})     |     |                      |
+ | 311081 | <class 'db_util.Data | table_exists_in_gf   | 3   | (('Players',), {})   | {}  | True                 |
+ |        | base'>               |                      |     |                      |     |                      |
+ | 312960 | <class 'db_util.Data | execute              | 3   | (('select * from Pla | {}  | None                 |
+ |        | base'>               |                      |     | yers',), {})         |     |                      |
+ | 315296 | <class 'db_util.Data | _set_schema          | 3   | ((), {})             | {}  | None                 |
+ |        | baseTable'>          |                      |     |                      |     |                      |
+ | 315764 | <class 'db_util.Data | load_from_gf         | 2   | ((), {})             | {}  | None                 |
+ |        | baseTable'>          |                      |     |                      |     |                      |
+ | 318339 | <class 'db_util.Data | execute              | 4   | (("select count(*) f | {}  | None                 |
+ |        | base'>               |                      |     | rom __table_names__  |     |                      |
+ |        |                      |                      |     | where table_name = ' |     |                      |
+ |        |                      |                      |     | GROUNDS'",), {})     |     |                      |
+ | 318862 | <class 'db_util.Data | table_exists_in_gf   | 3   | (('Grounds',), {})   | {}  | True                 |
+ |        | base'>               |                      |     |                      |     |                      |
+ | 320676 | <class 'db_util.Data | execute              | 3   | (('select * from Gro | {}  | None                 |
+ |        | base'>               |                      |     | unds',), {})         |     |                      |
+ | 322167 | <class 'db_util.Data | _set_schema          | 3   | ((), {})             | {}  | None                 |
+ |        | baseTable'>          |                      |     |                      |     |                      |
+ | 322629 | <class 'db_util.Data | load_from_gf         | 2   | ((), {})             | {}  | None                 |
+ |        | baseTable'>          |                      |     |                      |     |                      |
+ | 323028 | <class 'db_util.Data | init_objects_in_db   | 1   | ((), {})             | {}  | 2                    |
+ |        | base'>               |                      |     |                      |     |                      |
+ | 323501 | <class 'db_util.Data | add                  | 2   | ((), {'capacity': 10 | {}  | <class 'db_util.Data |
+ |        | baseTable'>          |                      |     | 0000, 'ground_name': |     | baseRecord'>         |
+ |        |                      |                      |     |  'bernabau'})        |     |                      |
+ | 323940 | <class 'db_util.Data | add_list             | 1   | (([{'capacity': 1000 | {}  | None                 |
+ |        | baseTable'>          |                      |     | 00, 'ground_name': ' |     |                      |
+ |        |                      |                      |     | bernabau'}],), {})   |     |                      |
+ | 324400 | <class 'db_util.Data | add                  | 2   | ((), {'last_name': ' | {}  | <class 'db_util.Data |
+ |        | baseTable'>          |                      |     | neymar', 'debut': '1 |     | baseRecord'>         |
+ |        |                      |                      |     | /10/11', 'goals': 50 |     |                      |
+ |        |                      |                      |     | })                   |     |                      |
+ | 324824 | <class 'db_util.Data | add_list             | 1   | (([{'debut': '1/10/1 | {}  | None                 |
+ |        | baseTable'>          |                      |     | 1', 'last_name': 'ne |     |                      |
+ |        |                      |                      |     | ymar', 'goals': 50}] |     |                      |
+ |        |                      |                      |     | ,), {})              |     |                      |
+ | 325275 | <class 'db_util.Data | _set_schema          | 3   | ((), {})             | {}  | None                 |
+ |        | baseTable'>          |                      |     |                      |     |                      |
+ | 328605 | <type 'object'>      | compare_records      | 4   | ((<class 'db_util.Da | {}  | <generator object co |
+ |        |                      |                      |     | tabaseRecord'>, True |     | mpare_records at 0x1 |
+ |        |                      |                      |     | ), {})               |     | 02ca3820>            |
+ | 330662 | <class 'db_util.Data | execute              | 4   | (("update Players se | {}  | None                 |
+ |        | base'>               |                      |     | t id__='3712816' whe |     |                      |
+ |        |                      |                      |     | re last_name='neymar |     |                      |
+ |        |                      |                      |     | '",), {})            |     |                      |
+ | 330952 | <class 'db_util.Data | upd_rec_in_gf        | 3   | ((<class 'db_util.Da | {}  | None                 |
+ |        | baseTable'>          |                      |     | tabaseRecord'>,), {} |     |                      |
+ |        |                      |                      |     | )                    |     |                      |
+ | 331242 | <class 'db_util.Data | find_changed_records | 2   | ((<class '__main__.F | {}  | None                 |
+ |        | baseTable'>          |                      |     | ootball'>,), {})     |     |                      |
+ | 331561 | <class 'db_util.Data | _set_schema          | 3   | ((), {})             | {}  | None                 |
+ |        | baseTable'>          |                      |     |                      |     |                      |
+ | 331812 | <type 'object'>      | compare_records      | 4   | ((<class 'db_util.Da | {}  | <generator object co |
+ |        |                      |                      |     | tabaseRecord'>, True |     | mpare_records at 0x1 |
+ |        |                      |                      |     | ), {})               |     | 02ca3a50>            |
+ | 333354 | <class 'db_util.Data | execute              | 4   | (("update Grounds se | {}  | None                 |
+ |        | base'>               |                      |     | t id__='6326072' whe |     |                      |
+ |        |                      |                      |     | re ground_name='bern |     |                      |
+ |        |                      |                      |     | abau'",), {})        |     |                      |
+ | 333621 | <class 'db_util.Data | upd_rec_in_gf        | 3   | ((<class 'db_util.Da | {}  | None                 |
+ |        | baseTable'>          |                      |     | tabaseRecord'>,), {} |     |                      |
+ |        |                      |                      |     | )                    |     |                      |
+ | 333859 | <class 'db_util.Data | find_changed_records | 2   | ((<class '__main__.F | {}  | None                 |
+ |        | baseTable'>          |                      |     | ootball'>,), {})     |     |                      |
+ | 334109 | <class 'db_util.Data | commit_to_gf         | 1   | ((), {})             | {}  | None                 |
+ |        | base'>               |                      |     |                      |     |                      |
+ | 335363 | <class 'db_util.Data | execute              | 2   | (('select * from Pla | {}  | None                 |
+ |        | base'>               |                      |     | yers',), {})         |     |                      |
+ | 384632 | <class 'db_util.Data | _commit              | 2   | ((), {})             | {}  | None                 |
+ |        | base'>               |                      |     |                      |     |                      |
+ | 385182 | <class 'db_util.Data | close                | 1   | ((), {})             | {}  | None                 |
+ |        | base'>               |                      |     |                      |     |                      |
+bash-3.2$ 
+bash-3.2$ python ./db_test.py
+db opened with 'use'
+()
+<class 'db_util.Database'>
+(<class '__main__.Grounds'>,)
+<class 'db_util.Database'>
+(<class '__main__.Players'>,)
+<class 'db_util.Database'>
+("select count(*) from __table_names__ where table_name = 'PLAYERS'",)
+<class 'db_util.Database'>
+('Players',)
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+("select count(*) from __table_names__ where table_name = 'GROUNDS'",)
+<class 'db_util.Database'>
+('Grounds',)
+<class 'db_util.Database'>
+('select * from Grounds',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+([{'capacity': 100000, 'ground_name': 'bernabau'}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Players set id__='9549670' where last_name='neymar'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Grounds set id__='3232091' where ground_name='bernabau'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+messi                1/12/13              False                True                 1335481              1500                
+bale                 1/10/13              False                True                 2871475              0                   
+lopez                2/10/13              False                True                 4286392              60                  
+neymar               1/10/11              False                True                 9549670              50                  
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.Database'>
+675724 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+_gf_init <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+737590 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Grounds'>,), {}) <type 'tuple'>
+<class '__main__.Grounds'> <class '__main__.Grounds'>
+True
+738038 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Players'>,), {}) <type 'tuple'>
+<class '__main__.Players'> <class '__main__.Players'>
+True
+743712 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'PLAYERS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+744302 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Players',), {}) <type 'tuple'>
+True <type 'bool'>
+746191 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+748369 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+748803 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+751397 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'GROUNDS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+751885 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Grounds',), {}) <type 'tuple'>
+True <type 'bool'>
+753484 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Grounds',), {}) <type 'tuple'>
+None <type 'NoneType'>
+754931 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+755384 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+755774 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+init_objects_in_db <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+2 <type 'int'>
+756267 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+add <type 'str'>
+2 <type 'int'>
+((), {'capacity': 100000, 'ground_name': 'bernabau'}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+756677 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+757151 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+add <type 'str'>
+2 <type 'int'>
+((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+757569 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+757973 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+762091 <type 'int'>
+<type 'object'> <type 'type'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2820> <type 'generator'>
+764121 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Players set id__='9549670' where last_name='neymar'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+764421 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+764666 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+764982 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+765245 <type 'int'>
+<type 'object'> <type 'type'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2a50> <type 'generator'>
+766645 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Grounds set id__='3232091' where ground_name='bernabau'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+766954 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+767196 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+767422 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+commit_to_gf <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+768564 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+2 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+836609 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+_commit <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+837131 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+close <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+descr: 
+ seed: [{'function': '_gf_init', 'args': ((), {}), 'results': None, 'len': 1, 'time': 675724, 'super': <class 'db_util.Database'>, 'class': 'Footba
+ll'}, {'function': 'table', 'args': ((<class '__main__.Grounds'>,), {}), 'results': <class '__main__.Grounds'>, 'len': 1, 'time': 737590, 'super': 
+<class 'db_util.Database'>, 'class': 'Football'}, {'function': 'table', 'args': ((<class '__main__.Players'>,), {}), 'results': <class '__main__.Pl
+ayers'>, 'len': 1, 'time': 738038, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'execute', 'args': (("select count(*) fr
+om __table_names__ where table_name = 'PLAYERS'",), {}), 'results': None, 'len': 4, 'time': 743712, 'super': <class 'db_util.Database'>, 'class': '
+Football'}, {'function': 'table_exists_in_gf', 'args': (('Players',), {}), 'results': True, 'len': 3, 'time': 744302, 'super': <class 'db_util.Data
+base'>, 'class': 'Football'}, {'function': 'execute', 'args': (('select * from Players',), {}), 'results': None, 'len': 3, 'time': 746191, 'super':
+ <class 'db_util.Database'>, 'class': 'Football'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 748369, 'super'
+: <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': 'load_from_gf', 'args': ((), {}), 'results': None, 'len': 2, 'time': 748803, '
+super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': 'execute', 'args': (("select count(*) from __table_names__ where table_n
+ame = 'GROUNDS'",), {}), 'results': None, 'len': 4, 'time': 751397, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'table_
+exists_in_gf', 'args': (('Grounds',), {}), 'results': True, 'len': 3, 'time': 751885, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'
+function': 'execute', 'args': (('select * from Grounds',), {}), 'results': None, 'len': 3, 'time': 753484, 'super': <class 'db_util.Database'>, 'cl
+ass': 'Football'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 754931, 'super': <class 'db_util.DatabaseTable'
+>, 'class': 'Grounds'}, {'function': 'load_from_gf', 'args': ((), {}), 'results': None, 'len': 2, 'time': 755384, 'super': <class 'db_util.Database
+Table'>, 'class': 'Grounds'}, {'function': 'init_objects_in_db', 'args': ((), {}), 'results': 2, 'len': 1, 'time': 755774, 'super': <class 'db_util
+.Database'>, 'class': 'Football'}, {'function': 'add', 'args': ((), {'capacity': 100000, 'ground_name': 'bernabau'}), 'results': <class 'db_util.Da
+tabaseRecord'>, 'len': 2, 'time': 756267, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'add_list', 'args': (([{'capa
+city': 100000, 'ground_name': 'bernabau'}],), {}), 'results': None, 'len': 1, 'time': 756677, 'super': <class 'db_util.DatabaseTable'>, 'class': 'G
+rounds'}, {'function': 'add', 'args': ((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}), 'results': <class 'db_util.DatabaseRecord'>, 
+'len': 2, 'time': 757151, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': 'add_list', 'args': (([{'debut': '1/10/11', '
+last_name': 'neymar', 'goals': 50}],), {}), 'results': None, 'len': 1, 'time': 757569, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'
+}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 757973, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Pla
+yers'}, {'function': 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x1
+02ca2820>, 'len': 4, 'time': 762091, 'super': <type 'object'>, 'class': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Players set id
+__='9549670' where last_name='neymar'",), {}), 'results': None, 'len': 4, 'time': 764121, 'super': <class 'db_util.Database'>, 'class': 'Football'}
+, {'function': 'upd_rec_in_gf', 'args': ((<class 'db_util.DatabaseRecord'>,), {}), 'results': None, 'len': 3, 'time': 764421, 'super': <class 'db_u
+til.DatabaseTable'>, 'class': 'Players'}, {'function': 'find_changed_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len'
+: 2, 'time': 764666, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 
+'len': 3, 'time': 764982, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'compare_records', 'args': ((<class 'db_util.
+DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x102ca2a50>, 'len': 4, 'time': 765245, 'super': <type 'object'>, 'cl
+ass': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Grounds set id__='3232091' where ground_name='bernabau'",), {}), 'results': None
+, 'len': 4, 'time': 766645, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'upd_rec_in_gf', 'args': ((<class 'db_util.Data
+baseRecord'>,), {}), 'results': None, 'len': 3, 'time': 766954, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'find_c
+hanged_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'time': 767196, 'super': <class 'db_util.DatabaseTable'>,
+ 'class': 'Grounds'}, {'function': 'commit_to_gf', 'args': ((), {}), 'results': None, 'len': 1, 'time': 767422, 'super': <class 'db_util.Database'>
+, 'class': 'Football'}, {'function': 'execute', 'args': (('select * from Players',), {}), 'results': None, 'len': 2, 'time': 768564, 'super': <clas
+s 'db_util.Database'>, 'class': 'Football'}, {'function': '_commit', 'args': ((), {}), 'results': None, 'len': 2, 'time': 836609, 'super': <class '
+db_util.Database'>, 'class': 'Football'}, {'function': 'close', 'args': ((), {}), 'results': None, 'len': 1, 'time': 837131, 'super': <class 'db_ut
+il.Database'>, 'class': 'Football'}]  depth: 0  max_depth: 10  start_depth: 0  show_summary: False  show_summry: False  prefix:                   
+LIST:32:{'FUNCTION': '_GF_INIT', 'ARGS': ((), {}), 'RESULTS': NONE, 'LEN': 1, 'TIME': 675724, 'SUPER': <CLASS 'DB_UTIL.DATABASE'>, 'CLASS': 'FOOTBA
+LL'}                                                                                                                                              
+ | time   | super                     | function             | len | args                      | results                   |
+ | 675724 | <class 'db_util.Database' | _gf_init             | 1   | ((), {})                  | None                      |
+ |        | >                         |                      |     |                           |                           |
+ | 737590 | <class 'db_util.Database' | table                | 1   | ((<class '__main__.Ground | <class '__main__.Grounds' |
+ |        | >                         |                      |     | s'>,), {})                | >                         |
+ | 738038 | <class 'db_util.Database' | table                | 1   | ((<class '__main__.Player | <class '__main__.Players' |
+ |        | >                         |                      |     | s'>,), {})                | >                         |
+ | 743712 | <class 'db_util.Database' | execute              | 4   | (("select count(*) from _ | None                      |
+ |        | >                         |                      |     | _table_names__ where tabl |                           |
+ |        |                           |                      |     | e_name = 'PLAYERS'",), {} |                           |
+ |        |                           |                      |     | )                         |                           |
+ | 744302 | <class 'db_util.Database' | table_exists_in_gf   | 3   | (('Players',), {})        | True                      |
+ |        | >                         |                      |     |                           |                           |
+ | 746191 | <class 'db_util.Database' | execute              | 3   | (('select * from Players' | None                      |
+ |        | >                         |                      |     | ,), {})                   |                           |
+ | 748369 | <class 'db_util.DatabaseT | _set_schema          | 3   | ((), {})                  | None                      |
+ |        | able'>                    |                      |     |                           |                           |
+ | 748803 | <class 'db_util.DatabaseT | load_from_gf         | 2   | ((), {})                  | None                      |
+ |        | able'>                    |                      |     |                           |                           |
+ | 751397 | <class 'db_util.Database' | execute              | 4   | (("select count(*) from _ | None                      |
+ |        | >                         |                      |     | _table_names__ where tabl |                           |
+ |        |                           |                      |     | e_name = 'GROUNDS'",), {} |                           |
+ |        |                           |                      |     | )                         |                           |
+ | 751885 | <class 'db_util.Database' | table_exists_in_gf   | 3   | (('Grounds',), {})        | True                      |
+ |        | >                         |                      |     |                           |                           |
+ | 753484 | <class 'db_util.Database' | execute              | 3   | (('select * from Grounds' | None                      |
+ |        | >                         |                      |     | ,), {})                   |                           |
+ | 754931 | <class 'db_util.DatabaseT | _set_schema          | 3   | ((), {})                  | None                      |
+ |        | able'>                    |                      |     |                           |                           |
+ | 755384 | <class 'db_util.DatabaseT | load_from_gf         | 2   | ((), {})                  | None                      |
+ |        | able'>                    |                      |     |                           |                           |
+ | 755774 | <class 'db_util.Database' | init_objects_in_db   | 1   | ((), {})                  | 2                         |
+ |        | >                         |                      |     |                           |                           |
+ | 756267 | <class 'db_util.DatabaseT | add                  | 2   | ((), {'capacity': 100000, | <class 'db_util.DatabaseR |
+ |        | able'>                    |                      |     |  'ground_name': 'bernabau | ecord'>                   |
+ |        |                           |                      |     | '})                       |                           |
+ | 756677 | <class 'db_util.DatabaseT | add_list             | 1   | (([{'capacity': 100000, ' | None                      |
+ |        | able'>                    |                      |     | ground_name': 'bernabau'} |                           |
+ |        |                           |                      |     | ],), {})                  |                           |
+ | 757151 | <class 'db_util.DatabaseT | add                  | 2   | ((), {'last_name': 'neyma | <class 'db_util.DatabaseR |
+ |        | able'>                    |                      |     | r', 'debut': '1/10/11', ' | ecord'>                   |
+ |        |                           |                      |     | goals': 50})              |                           |
+ | 757569 | <class 'db_util.DatabaseT | add_list             | 1   | (([{'debut': '1/10/11', ' | None                      |
+ |        | able'>                    |                      |     | last_name': 'neymar', 'go |                           |
+ |        |                           |                      |     | als': 50}],), {})         |                           |
+ | 757973 | <class 'db_util.DatabaseT | _set_schema          | 3   | ((), {})                  | None                      |
+ |        | able'>                    |                      |     |                           |                           |
+ | 762091 | <type 'object'>           | compare_records      | 4   | ((<class 'db_util.Databas | <generator object compare |
+ |        |                           |                      |     | eRecord'>, True), {})     | _records at 0x102ca2820>  |
+ | 764121 | <class 'db_util.Database' | execute              | 4   | (("update Players set id_ | None                      |
+ |        | >                         |                      |     | _='9549670' where last_na |                           |
+ |        |                           |                      |     | me='neymar'",), {})       |                           |
+ | 764421 | <class 'db_util.DatabaseT | upd_rec_in_gf        | 3   | ((<class 'db_util.Databas | None                      |
+ |        | able'>                    |                      |     | eRecord'>,), {})          |                           |
+ | 764666 | <class 'db_util.DatabaseT | find_changed_records | 2   | ((<class '__main__.Footba | None                      |
+ |        | able'>                    |                      |     | ll'>,), {})               |                           |
+ | 764982 | <class 'db_util.DatabaseT | _set_schema          | 3   | ((), {})                  | None                      |
+ |        | able'>                    |                      |     |                           |                           |
+ | 765245 | <type 'object'>           | compare_records      | 4   | ((<class 'db_util.Databas | <generator object compare |
+ |        |                           |                      |     | eRecord'>, True), {})     | _records at 0x102ca2a50>  |
+ | 766645 | <class 'db_util.Database' | execute              | 4   | (("update Grounds set id_ | None                      |
+ |        | >                         |                      |     | _='3232091' where ground_ |                           |
+ |        |                           |                      |     | name='bernabau'",), {})   |                           |
+ | 766954 | <class 'db_util.DatabaseT | upd_rec_in_gf        | 3   | ((<class 'db_util.Databas | None                      |
+ |        | able'>                    |                      |     | eRecord'>,), {})          |                           |
+ | 767196 | <class 'db_util.DatabaseT | find_changed_records | 2   | ((<class '__main__.Footba | None                      |
+ |        | able'>                    |                      |     | ll'>,), {})               |                           |
+ | 767422 | <class 'db_util.Database' | commit_to_gf         | 1   | ((), {})                  | None                      |
+ |        | >                         |                      |     |                           |                           |
+ | 768564 | <class 'db_util.Database' | execute              | 2   | (('select * from Players' | None                      |
+ |        | >                         |                      |     | ,), {})                   |                           |
+ | 836609 | <class 'db_util.Database' | _commit              | 2   | ((), {})                  | None                      |
+ |        | >                         |                      |     |                           |                           |
+ | 837131 | <class 'db_util.Database' | close                | 1   | ((), {})                  | None                      |
+ |        | >                         |                      |     |                           |                           |
+bash-3.2$ 
+bash-3.2$ python ./db_test.py
+db opened with 'use'
+()
+<class 'db_util.Database'>
+(<class '__main__.Grounds'>,)
+<class 'db_util.Database'>
+(<class '__main__.Players'>,)
+<class 'db_util.Database'>
+("select count(*) from __table_names__ where table_name = 'PLAYERS'",)
+<class 'db_util.Database'>
+('Players',)
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+("select count(*) from __table_names__ where table_name = 'GROUNDS'",)
+<class 'db_util.Database'>
+('Grounds',)
+<class 'db_util.Database'>
+('select * from Grounds',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+([{'capacity': 100000, 'ground_name': 'bernabau'}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Players set id__='9432974' where last_name='neymar'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Grounds set id__='4975259' where ground_name='bernabau'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+messi                1/12/13              False                True                 1335481              1500                
+bale                 1/10/13              False                True                 2871475              0                   
+lopez                2/10/13              False                True                 4286392              60                  
+neymar               1/10/11              False                True                 9432974              50                  
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.Database'>
+165451 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+_gf_init <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+242885 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Grounds'>,), {}) <type 'tuple'>
+<class '__main__.Grounds'> <class '__main__.Grounds'>
+True
+243340 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Players'>,), {}) <type 'tuple'>
+<class '__main__.Players'> <class '__main__.Players'>
+True
+249279 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'PLAYERS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+249813 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Players',), {}) <type 'tuple'>
+True <type 'bool'>
+251526 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+253391 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+253864 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+256534 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'GROUNDS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+257085 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Grounds',), {}) <type 'tuple'>
+True <type 'bool'>
+258880 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Grounds',), {}) <type 'tuple'>
+None <type 'NoneType'>
+259875 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+260216 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+260452 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+init_objects_in_db <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+2 <type 'int'>
+260737 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+add <type 'str'>
+2 <type 'int'>
+((), {'capacity': 100000, 'ground_name': 'bernabau'}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+261016 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+261332 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+add <type 'str'>
+2 <type 'int'>
+((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+261656 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+261901 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+271935 <type 'int'>
+<type 'object'> <type 'type'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2820> <type 'generator'>
+274079 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Players set id__='9432974' where last_name='neymar'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+274388 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+274650 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+275029 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+275306 <type 'int'>
+<type 'object'> <type 'type'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2a50> <type 'generator'>
+276833 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Grounds set id__='4975259' where ground_name='bernabau'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+277121 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+277371 <type 'int'>
+<class 'db_util.DatabaseTable'> <class 'log_util.LogMeta'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+277664 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+commit_to_gf <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+278905 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+execute <type 'str'>
+2 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+434676 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+_commit <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+435290 <type 'int'>
+<class 'db_util.Database'> <class 'log_util.LogMeta'>
+close <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+descr: 
+ seed: [{'function': '_gf_init', 'args': ((), {}), 'results': None, 'len': 1, 'time': 165451, 'super': <class 'db_util.Database'>, 'class': 'Footba
+ll'}, {'function': 'table', 'args': ((<class '__main__.Grounds'>,), {}), 'results': <class '__main__.Grounds'>, 'len': 1, 'time': 242885, 'super': 
+<class 'db_util.Database'>, 'class': 'Football'}, {'function': 'table', 'args': ((<class '__main__.Players'>,), {}), 'results': <class '__main__.Pl
+ayers'>, 'len': 1, 'time': 243340, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'execute', 'args': (("select count(*) fr
+om __table_names__ where table_name = 'PLAYERS'",), {}), 'results': None, 'len': 4, 'time': 249279, 'super': <class 'db_util.Database'>, 'class': '
+Football'}, {'function': 'table_exists_in_gf', 'args': (('Players',), {}), 'results': True, 'len': 3, 'time': 249813, 'super': <class 'db_util.Data
+base'>, 'class': 'Football'}, {'function': 'execute', 'args': (('select * from Players',), {}), 'results': None, 'len': 3, 'time': 251526, 'super':
+ <class 'db_util.Database'>, 'class': 'Football'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 253391, 'super'
+: <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': 'load_from_gf', 'args': ((), {}), 'results': None, 'len': 2, 'time': 253864, '
+super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': 'execute', 'args': (("select count(*) from __table_names__ where table_n
+ame = 'GROUNDS'",), {}), 'results': None, 'len': 4, 'time': 256534, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'table_
+exists_in_gf', 'args': (('Grounds',), {}), 'results': True, 'len': 3, 'time': 257085, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'
+function': 'execute', 'args': (('select * from Grounds',), {}), 'results': None, 'len': 3, 'time': 258880, 'super': <class 'db_util.Database'>, 'cl
+ass': 'Football'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 259875, 'super': <class 'db_util.DatabaseTable'
+>, 'class': 'Grounds'}, {'function': 'load_from_gf', 'args': ((), {}), 'results': None, 'len': 2, 'time': 260216, 'super': <class 'db_util.Database
+Table'>, 'class': 'Grounds'}, {'function': 'init_objects_in_db', 'args': ((), {}), 'results': 2, 'len': 1, 'time': 260452, 'super': <class 'db_util
+.Database'>, 'class': 'Football'}, {'function': 'add', 'args': ((), {'capacity': 100000, 'ground_name': 'bernabau'}), 'results': <class 'db_util.Da
+tabaseRecord'>, 'len': 2, 'time': 260737, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'add_list', 'args': (([{'capa
+city': 100000, 'ground_name': 'bernabau'}],), {}), 'results': None, 'len': 1, 'time': 261016, 'super': <class 'db_util.DatabaseTable'>, 'class': 'G
+rounds'}, {'function': 'add', 'args': ((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}), 'results': <class 'db_util.DatabaseRecord'>, 
+'len': 2, 'time': 261332, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': 'add_list', 'args': (([{'debut': '1/10/11', '
+last_name': 'neymar', 'goals': 50}],), {}), 'results': None, 'len': 1, 'time': 261656, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'
+}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 261901, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Pla
+yers'}, {'function': 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x1
+02ca2820>, 'len': 4, 'time': 271935, 'super': <type 'object'>, 'class': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Players set id
+__='9432974' where last_name='neymar'",), {}), 'results': None, 'len': 4, 'time': 274079, 'super': <class 'db_util.Database'>, 'class': 'Football'}
+, {'function': 'upd_rec_in_gf', 'args': ((<class 'db_util.DatabaseRecord'>,), {}), 'results': None, 'len': 3, 'time': 274388, 'super': <class 'db_u
+til.DatabaseTable'>, 'class': 'Players'}, {'function': 'find_changed_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len'
+: 2, 'time': 274650, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Players'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 
+'len': 3, 'time': 275029, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'compare_records', 'args': ((<class 'db_util.
+DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x102ca2a50>, 'len': 4, 'time': 275306, 'super': <type 'object'>, 'cl
+ass': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Grounds set id__='4975259' where ground_name='bernabau'",), {}), 'results': None
+, 'len': 4, 'time': 276833, 'super': <class 'db_util.Database'>, 'class': 'Football'}, {'function': 'upd_rec_in_gf', 'args': ((<class 'db_util.Data
+baseRecord'>,), {}), 'results': None, 'len': 3, 'time': 277121, 'super': <class 'db_util.DatabaseTable'>, 'class': 'Grounds'}, {'function': 'find_c
+hanged_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'time': 277371, 'super': <class 'db_util.DatabaseTable'>,
+ 'class': 'Grounds'}, {'function': 'commit_to_gf', 'args': ((), {}), 'results': None, 'len': 1, 'time': 277664, 'super': <class 'db_util.Database'>
+, 'class': 'Football'}, {'function': 'execute', 'args': (('select * from Players',), {}), 'results': None, 'len': 2, 'time': 278905, 'super': <clas
+s 'db_util.Database'>, 'class': 'Football'}, {'function': '_commit', 'args': ((), {}), 'results': None, 'len': 2, 'time': 434676, 'super': <class '
+db_util.Database'>, 'class': 'Football'}, {'function': 'close', 'args': ((), {}), 'results': None, 'len': 1, 'time': 435290, 'super': <class 'db_ut
+il.Database'>, 'class': 'Football'}]  depth: 0  max_depth: 10  start_depth: 0  show_summary: False  show_summry: False  prefix:                   
+LIST:32:{'FUNCTION': '_GF_INIT', 'ARGS': ((), {}), 'RESULTS': NONE, 'LEN': 1, 'TIME': 165451, 'SUPER': <CLASS 'DB_UTIL.DATABASE'>, 'CLASS': 'FOOTBA
+LL'}                                                                                                                                              
+ | time   | super                          | function             | len | args                           | results                        |
+ | 165451 | <class 'db_util.Database'>     | _gf_init             | 1   | ((), {})                       | None                           |
+ | 242885 | <class 'db_util.Database'>     | table                | 1   | ((<class '__main__.Grounds'>,) | <class '__main__.Grounds'>     |
+ |        |                                |                      |     | , {})                          |                                |
+ | 243340 | <class 'db_util.Database'>     | table                | 1   | ((<class '__main__.Players'>,) | <class '__main__.Players'>     |
+ |        |                                |                      |     | , {})                          |                                |
+ | 249279 | <class 'db_util.Database'>     | execute              | 4   | (("select count(*) from __tabl | None                           |
+ |        |                                |                      |     | e_names__ where table_name = ' |                                |
+ |        |                                |                      |     | PLAYERS'",), {})               |                                |
+ | 249813 | <class 'db_util.Database'>     | table_exists_in_gf   | 3   | (('Players',), {})             | True                           |
+ | 251526 | <class 'db_util.Database'>     | execute              | 3   | (('select * from Players',), { | None                           |
+ |        |                                |                      |     | })                             |                                |
+ | 253391 | <class 'db_util.DatabaseTable' | _set_schema          | 3   | ((), {})                       | None                           |
+ |        | >                              |                      |     |                                |                                |
+ | 253864 | <class 'db_util.DatabaseTable' | load_from_gf         | 2   | ((), {})                       | None                           |
+ |        | >                              |                      |     |                                |                                |
+ | 256534 | <class 'db_util.Database'>     | execute              | 4   | (("select count(*) from __tabl | None                           |
+ |        |                                |                      |     | e_names__ where table_name = ' |                                |
+ |        |                                |                      |     | GROUNDS'",), {})               |                                |
+ | 257085 | <class 'db_util.Database'>     | table_exists_in_gf   | 3   | (('Grounds',), {})             | True                           |
+ | 258880 | <class 'db_util.Database'>     | execute              | 3   | (('select * from Grounds',), { | None                           |
+ |        |                                |                      |     | })                             |                                |
+ | 259875 | <class 'db_util.DatabaseTable' | _set_schema          | 3   | ((), {})                       | None                           |
+ |        | >                              |                      |     |                                |                                |
+ | 260216 | <class 'db_util.DatabaseTable' | load_from_gf         | 2   | ((), {})                       | None                           |
+ |        | >                              |                      |     |                                |                                |
+ | 260452 | <class 'db_util.Database'>     | init_objects_in_db   | 1   | ((), {})                       | 2                              |
+ | 260737 | <class 'db_util.DatabaseTable' | add                  | 2   | ((), {'capacity': 100000, 'gro | <class 'db_util.DatabaseRecord |
+ |        | >                              |                      |     | und_name': 'bernabau'})        | '>                             |
+ | 261016 | <class 'db_util.DatabaseTable' | add_list             | 1   | (([{'capacity': 100000, 'groun | None                           |
+ |        | >                              |                      |     | d_name': 'bernabau'}],), {})   |                                |
+ | 261332 | <class 'db_util.DatabaseTable' | add                  | 2   | ((), {'last_name': 'neymar', ' | <class 'db_util.DatabaseRecord |
+ |        | >                              |                      |     | debut': '1/10/11', 'goals': 50 | '>                             |
+ |        |                                |                      |     | })                             |                                |
+ | 261656 | <class 'db_util.DatabaseTable' | add_list             | 1   | (([{'debut': '1/10/11', 'last_ | None                           |
+ |        | >                              |                      |     | name': 'neymar', 'goals': 50}] |                                |
+ |        |                                |                      |     | ,), {})                        |                                |
+ | 261901 | <class 'db_util.DatabaseTable' | _set_schema          | 3   | ((), {})                       | None                           |
+ |        | >                              |                      |     |                                |                                |
+ | 271935 | <type 'object'>                | compare_records      | 4   | ((<class 'db_util.DatabaseReco | <generator object compare_reco |
+ |        |                                |                      |     | rd'>, True), {})               | rds at 0x102ca2820>            |
+ | 274079 | <class 'db_util.Database'>     | execute              | 4   | (("update Players set id__='94 | None                           |
+ |        |                                |                      |     | 32974' where last_name='neymar |                                |
+ |        |                                |                      |     | '",), {})                      |                                |
+ | 274388 | <class 'db_util.DatabaseTable' | upd_rec_in_gf        | 3   | ((<class 'db_util.DatabaseReco | None                           |
+ |        | >                              |                      |     | rd'>,), {})                    |                                |
+ | 274650 | <class 'db_util.DatabaseTable' | find_changed_records | 2   | ((<class '__main__.Football'>, | None                           |
+ |        | >                              |                      |     | ), {})                         |                                |
+ | 275029 | <class 'db_util.DatabaseTable' | _set_schema          | 3   | ((), {})                       | None                           |
+ |        | >                              |                      |     |                                |                                |
+ | 275306 | <type 'object'>                | compare_records      | 4   | ((<class 'db_util.DatabaseReco | <generator object compare_reco |
+ |        |                                |                      |     | rd'>, True), {})               | rds at 0x102ca2a50>            |
+ | 276833 | <class 'db_util.Database'>     | execute              | 4   | (("update Grounds set id__='49 | None                           |
+ |        |                                |                      |     | 75259' where ground_name='bern |                                |
+ |        |                                |                      |     | abau'",), {})                  |                                |
+ | 277121 | <class 'db_util.DatabaseTable' | upd_rec_in_gf        | 3   | ((<class 'db_util.DatabaseReco | None                           |
+ |        | >                              |                      |     | rd'>,), {})                    |                                |
+ | 277371 | <class 'db_util.DatabaseTable' | find_changed_records | 2   | ((<class '__main__.Football'>, | None                           |
+ |        | >                              |                      |     | ), {})                         |                                |
+ | 277664 | <class 'db_util.Database'>     | commit_to_gf         | 1   | ((), {})                       | None                           |
+ | 278905 | <class 'db_util.Database'>     | execute              | 2   | (('select * from Players',), { | None                           |
+ |        |                                |                      |     | })                             |                                |
+ | 434676 | <class 'db_util.Database'>     | _commit              | 2   | ((), {})                       | None                           |
+ | 435290 | <class 'db_util.Database'>     | close                | 1   | ((), {})                       | None                           |
+bash-3.2$ python ./db_test.py
+db opened with 'use'
+()
+<class 'db_util.Database'>
+(<class '__main__.Grounds'>,)
+<class 'db_util.Database'>
+(<class '__main__.Players'>,)
+<class 'db_util.Database'>
+("select count(*) from __table_names__ where table_name = 'PLAYERS'",)
+<class 'db_util.Database'>
+('Players',)
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+("select count(*) from __table_names__ where table_name = 'GROUNDS'",)
+<class 'db_util.Database'>
+('Grounds',)
+<class 'db_util.Database'>
+('select * from Grounds',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+([{'capacity': 100000, 'ground_name': 'bernabau'}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Players set id__='3073185' where last_name='neymar'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Grounds set id__='6886718' where ground_name='bernabau'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+messi                1/12/13              False                True                 1335481              1500                
+bale                 1/10/13              False                True                 2871475              0                   
+lopez                2/10/13              False                True                 4286392              60                  
+neymar               1/10/11              False                True                 3073185              50                  
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.Database'>
+992799 <type 'int'>
+Database <type 'str'>
+_gf_init <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+58238 <type 'int'>
+Database <type 'str'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Grounds'>,), {}) <type 'tuple'>
+<class '__main__.Grounds'> <class '__main__.Grounds'>
+True
+58536 <type 'int'>
+Database <type 'str'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Players'>,), {}) <type 'tuple'>
+<class '__main__.Players'> <class '__main__.Players'>
+True
+62560 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'PLAYERS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+63004 <type 'int'>
+Database <type 'str'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Players',), {}) <type 'tuple'>
+True <type 'bool'>
+64242 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+65792 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+66134 <type 'int'>
+DatabaseTable <type 'str'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+67903 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'GROUNDS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+68356 <type 'int'>
+Database <type 'str'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Grounds',), {}) <type 'tuple'>
+True <type 'bool'>
+69872 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Grounds',), {}) <type 'tuple'>
+None <type 'NoneType'>
+71211 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+71631 <type 'int'>
+DatabaseTable <type 'str'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+71986 <type 'int'>
+Database <type 'str'>
+init_objects_in_db <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+2 <type 'int'>
+72383 <type 'int'>
+DatabaseTable <type 'str'>
+add <type 'str'>
+2 <type 'int'>
+((), {'capacity': 100000, 'ground_name': 'bernabau'}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+72774 <type 'int'>
+DatabaseTable <type 'str'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+73141 <type 'int'>
+DatabaseTable <type 'str'>
+add <type 'str'>
+2 <type 'int'>
+((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+73516 <type 'int'>
+DatabaseTable <type 'str'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+73900 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+97442 <type 'int'>
+object <type 'str'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2820> <type 'generator'>
+100220 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Players set id__='3073185' where last_name='neymar'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+100670 <type 'int'>
+DatabaseTable <type 'str'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+101084 <type 'int'>
+DatabaseTable <type 'str'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+101462 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+101893 <type 'int'>
+object <type 'str'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2a50> <type 'generator'>
+104081 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Grounds set id__='6886718' where ground_name='bernabau'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+104492 <type 'int'>
+DatabaseTable <type 'str'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+104892 <type 'int'>
+DatabaseTable <type 'str'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+105247 <type 'int'>
+Database <type 'str'>
+commit_to_gf <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+106971 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+2 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+211076 <type 'int'>
+Database <type 'str'>
+_commit <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+211632 <type 'int'>
+Database <type 'str'>
+close <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+descr: 
+ seed: [{'function': '_gf_init', 'args': ((), {}), 'results': None, 'len': 1, 'time': 992799, 'super': 'Database', 'class': 'Football'}, {'function
+': 'table', 'args': ((<class '__main__.Grounds'>,), {}), 'results': <class '__main__.Grounds'>, 'len': 1, 'time': 58238, 'super': 'Database', 'clas
+s': 'Football'}, {'function': 'table', 'args': ((<class '__main__.Players'>,), {}), 'results': <class '__main__.Players'>, 'len': 1, 'time': 58536,
+ 'super': 'Database', 'class': 'Football'}, {'function': 'execute', 'args': (("select count(*) from __table_names__ where table_name = 'PLAYERS'",)
+, {}), 'results': None, 'len': 4, 'time': 62560, 'super': 'Database', 'class': 'Football'}, {'function': 'table_exists_in_gf', 'args': (('Players',
+), {}), 'results': True, 'len': 3, 'time': 63004, 'super': 'Database', 'class': 'Football'}, {'function': 'execute', 'args': (('select * from Playe
+rs',), {}), 'results': None, 'len': 3, 'time': 64242, 'super': 'Database', 'class': 'Football'}, {'function': '_set_schema', 'args': ((), {}), 'res
+ults': None, 'len': 3, 'time': 65792, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'load_from_gf', 'args': ((), {}), 'results': None
+, 'len': 2, 'time': 66134, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'execute', 'args': (("select count(*) from __table_names__ w
+here table_name = 'GROUNDS'",), {}), 'results': None, 'len': 4, 'time': 67903, 'super': 'Database', 'class': 'Football'}, {'function': 'table_exist
+s_in_gf', 'args': (('Grounds',), {}), 'results': True, 'len': 3, 'time': 68356, 'super': 'Database', 'class': 'Football'}, {'function': 'execute', 
+'args': (('select * from Grounds',), {}), 'results': None, 'len': 3, 'time': 69872, 'super': 'Database', 'class': 'Football'}, {'function': '_set_s
+chema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 71211, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function': 'load_from_gf', 'ar
+gs': ((), {}), 'results': None, 'len': 2, 'time': 71631, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function': 'init_objects_in_db', 'args': 
+((), {}), 'results': 2, 'len': 1, 'time': 71986, 'super': 'Database', 'class': 'Football'}, {'function': 'add', 'args': ((), {'capacity': 100000, '
+ground_name': 'bernabau'}), 'results': <class 'db_util.DatabaseRecord'>, 'len': 2, 'time': 72383, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'
+function': 'add_list', 'args': (([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}), 'results': None, 'len': 1, 'time': 72774, 'super': 'Data
+baseTable', 'class': 'Grounds'}, {'function': 'add', 'args': ((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}), 'results': <class 'db_
+util.DatabaseRecord'>, 'len': 2, 'time': 73141, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'add_list', 'args': (([{'debut': '1/10/
+11', 'last_name': 'neymar', 'goals': 50}],), {}), 'results': None, 'len': 1, 'time': 73516, 'super': 'DatabaseTable', 'class': 'Players'}, {'functi
+on': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 73900, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'compar
+e_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x102ca2820>, 'len': 4, 'time':
+ 97442, 'super': 'object', 'class': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Players set id__='3073185' where last_name='neymar
+'",), {}), 'results': None, 'len': 4, 'time': 100220, 'super': 'Database', 'class': 'Football'}, {'function': 'upd_rec_in_gf', 'args': ((<class 'db
+_util.DatabaseRecord'>,), {}), 'results': None, 'len': 3, 'time': 100670, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'find_changed
+_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'time': 101084, 'super': 'DatabaseTable', 'class': 'Players'}, 
+{'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 101462, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function'
+: 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x102ca2a50>, 'len': 4
+, 'time': 101893, 'super': 'object', 'class': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Grounds set id__='6886718' where ground_
+name='bernabau'",), {}), 'results': None, 'len': 4, 'time': 104081, 'super': 'Database', 'class': 'Football'}, {'function': 'upd_rec_in_gf', 'args'
+: ((<class 'db_util.DatabaseRecord'>,), {}), 'results': None, 'len': 3, 'time': 104492, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function':
+ 'find_changed_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'time': 104892, 'super': 'DatabaseTable', 'class'
+: 'Grounds'}, {'function': 'commit_to_gf', 'args': ((), {}), 'results': None, 'len': 1, 'time': 105247, 'super': 'Database', 'class': 'Football'}, 
+{'function': 'execute', 'args': (('select * from Players',), {}), 'results': None, 'len': 2, 'time': 106971, 'super': 'Database', 'class': 'Footbal
+l'}, {'function': '_commit', 'args': ((), {}), 'results': None, 'len': 2, 'time': 211076, 'super': 'Database', 'class': 'Football'}, {'function': '
+close', 'args': ((), {}), 'results': None, 'len': 1, 'time': 211632, 'super': 'Database', 'class': 'Football'}]  depth: 0  max_depth: 10  start_dep
+th: 0  show_summary: False  show_summry: False  prefix:                                                                                           
+******LIST:32:{'FUNCTION': '_GF_INIT', 'ARGS': ((), {}), 'RESULTS': NONE, 'LEN': 1, 'TIME': 992799, 'SUPER': 'DATABASE', 'CLASS': 'FOOTBALL'}******
+ | time   | super         | function             | len | args                           | results                        |
+ | 992799 | Database      | _gf_init             | 1   | ((), {})                       | None                           |
+ | 58238  | Database      | table                | 1   | ((<class '__main__.Grounds'>,) | <class '__main__.Grounds'>     |
+ |        |               |                      |     | , {})                          |                                |
+ | 58536  | Database      | table                | 1   | ((<class '__main__.Players'>,) | <class '__main__.Players'>     |
+ |        |               |                      |     | , {})                          |                                |
+ | 62560  | Database      | execute              | 4   | (("select count(*) from __tabl | None                           |
+ |        |               |                      |     | e_names__ where table_name = ' |                                |
+ |        |               |                      |     | PLAYERS'",), {})               |                                |
+ | 63004  | Database      | table_exists_in_gf   | 3   | (('Players',), {})             | True                           |
+ | 64242  | Database      | execute              | 3   | (('select * from Players',), { | None                           |
+ |        |               |                      |     | })                             |                                |
+ | 65792  | DatabaseTable | _set_schema          | 3   | ((), {})                       | None                           |
+ | 66134  | DatabaseTable | load_from_gf         | 2   | ((), {})                       | None                           |
+ | 67903  | Database      | execute              | 4   | (("select count(*) from __tabl | None                           |
+ |        |               |                      |     | e_names__ where table_name = ' |                                |
+ |        |               |                      |     | GROUNDS'",), {})               |                                |
+ | 68356  | Database      | table_exists_in_gf   | 3   | (('Grounds',), {})             | True                           |
+ | 69872  | Database      | execute              | 3   | (('select * from Grounds',), { | None                           |
+ |        |               |                      |     | })                             |                                |
+ | 71211  | DatabaseTable | _set_schema          | 3   | ((), {})                       | None                           |
+ | 71631  | DatabaseTable | load_from_gf         | 2   | ((), {})                       | None                           |
+ | 71986  | Database      | init_objects_in_db   | 1   | ((), {})                       | 2                              |
+ | 72383  | DatabaseTable | add                  | 2   | ((), {'capacity': 100000, 'gro | <class 'db_util.DatabaseRecord |
+ |        |               |                      |     | und_name': 'bernabau'})        | '>                             |
+ | 72774  | DatabaseTable | add_list             | 1   | (([{'capacity': 100000, 'groun | None                           |
+ |        |               |                      |     | d_name': 'bernabau'}],), {})   |                                |
+ | 73141  | DatabaseTable | add                  | 2   | ((), {'last_name': 'neymar', ' | <class 'db_util.DatabaseRecord |
+ |        |               |                      |     | debut': '1/10/11', 'goals': 50 | '>                             |
+ |        |               |                      |     | })                             |                                |
+ | 73516  | DatabaseTable | add_list             | 1   | (([{'debut': '1/10/11', 'last_ | None                           |
+ |        |               |                      |     | name': 'neymar', 'goals': 50}] |                                |
+ |        |               |                      |     | ,), {})                        |                                |
+ | 73900  | DatabaseTable | _set_schema          | 3   | ((), {})                       | None                           |
+ | 97442  | object        | compare_records      | 4   | ((<class 'db_util.DatabaseReco | <generator object compare_reco |
+ |        |               |                      |     | rd'>, True), {})               | rds at 0x102ca2820>            |
+ | 100220 | Database      | execute              | 4   | (("update Players set id__='30 | None                           |
+ |        |               |                      |     | 73185' where last_name='neymar |                                |
+ |        |               |                      |     | '",), {})                      |                                |
+ | 100670 | DatabaseTable | upd_rec_in_gf        | 3   | ((<class 'db_util.DatabaseReco | None                           |
+ |        |               |                      |     | rd'>,), {})                    |                                |
+ | 101084 | DatabaseTable | find_changed_records | 2   | ((<class '__main__.Football'>, | None                           |
+ |        |               |                      |     | ), {})                         |                                |
+ | 101462 | DatabaseTable | _set_schema          | 3   | ((), {})                       | None                           |
+ | 101893 | object        | compare_records      | 4   | ((<class 'db_util.DatabaseReco | <generator object compare_reco |
+ |        |               |                      |     | rd'>, True), {})               | rds at 0x102ca2a50>            |
+ | 104081 | Database      | execute              | 4   | (("update Grounds set id__='68 | None                           |
+ |        |               |                      |     | 86718' where ground_name='bern |                                |
+ |        |               |                      |     | abau'",), {})                  |                                |
+ | 104492 | DatabaseTable | upd_rec_in_gf        | 3   | ((<class 'db_util.DatabaseReco | None                           |
+ |        |               |                      |     | rd'>,), {})                    |                                |
+ | 104892 | DatabaseTable | find_changed_records | 2   | ((<class '__main__.Football'>, | None                           |
+ |        |               |                      |     | ), {})                         |                                |
+ | 105247 | Database      | commit_to_gf         | 1   | ((), {})                       | None                           |
+ | 106971 | Database      | execute              | 2   | (('select * from Players',), { | None                           |
+ |        |               |                      |     | })                             |                                |
+ | 211076 | Database      | _commit              | 2   | ((), {})                       | None                           |
+ | 211632 | Database      | close                | 1   | ((), {})                       | None                           |
+bash-3.2$ python ./db_test.py
+db opened with 'use'
+()
+<class 'db_util.Database'>
+(<class '__main__.Grounds'>,)
+<class 'db_util.Database'>
+(<class '__main__.Players'>,)
+<class 'db_util.Database'>
+("select count(*) from __table_names__ where table_name = 'PLAYERS'",)
+<class 'db_util.Database'>
+('Players',)
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+("select count(*) from __table_names__ where table_name = 'GROUNDS'",)
+<class 'db_util.Database'>
+('Grounds',)
+<class 'db_util.Database'>
+('select * from Grounds',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+([{'capacity': 100000, 'ground_name': 'bernabau'}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Players set id__='2519887' where last_name='neymar'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Grounds set id__='2929694' where ground_name='bernabau'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+messi                1/12/13              False                True                 1335481              1500                
+bale                 1/10/13              False                True                 2871475              0                   
+lopez                2/10/13              False                True                 4286392              60                  
+neymar               1/10/11              False                True                 2519887              50                  
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.Database'>
+900520 <type 'int'>
+Database <type 'str'>
+_gf_init <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+983882 <type 'int'>
+Database <type 'str'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Grounds'>,), {}) <type 'tuple'>
+<class '__main__.Grounds'> <class '__main__.Grounds'>
+True
+984341 <type 'int'>
+Database <type 'str'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Players'>,), {}) <type 'tuple'>
+<class '__main__.Players'> <class '__main__.Players'>
+True
+988458 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'PLAYERS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+988882 <type 'int'>
+Database <type 'str'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Players',), {}) <type 'tuple'>
+True <type 'bool'>
+990075 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+991982 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+992468 <type 'int'>
+DatabaseTable <type 'str'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+994872 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'GROUNDS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+995419 <type 'int'>
+Database <type 'str'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Grounds',), {}) <type 'tuple'>
+True <type 'bool'>
+997226 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Grounds',), {}) <type 'tuple'>
+None <type 'NoneType'>
+998599 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+999012 <type 'int'>
+DatabaseTable <type 'str'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+999402 <type 'int'>
+Database <type 'str'>
+init_objects_in_db <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+2 <type 'int'>
+999859 <type 'int'>
+DatabaseTable <type 'str'>
+add <type 'str'>
+2 <type 'int'>
+((), {'capacity': 100000, 'ground_name': 'bernabau'}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+261 <type 'int'>
+DatabaseTable <type 'str'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+729 <type 'int'>
+DatabaseTable <type 'str'>
+add <type 'str'>
+2 <type 'int'>
+((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+1183 <type 'int'>
+DatabaseTable <type 'str'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+1754 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+18260 <type 'int'>
+object <type 'str'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2820> <type 'generator'>
+21058 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Players set id__='2519887' where last_name='neymar'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+21542 <type 'int'>
+DatabaseTable <type 'str'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+21951 <type 'int'>
+DatabaseTable <type 'str'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+22358 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+22797 <type 'int'>
+object <type 'str'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2a50> <type 'generator'>
+25015 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Grounds set id__='2929694' where ground_name='bernabau'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+25453 <type 'int'>
+DatabaseTable <type 'str'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+25866 <type 'int'>
+DatabaseTable <type 'str'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+26246 <type 'int'>
+Database <type 'str'>
+commit_to_gf <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+28055 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+2 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+192509 <type 'int'>
+Database <type 'str'>
+_commit <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+193272 <type 'int'>
+Database <type 'str'>
+close <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+descr: 
+ seed: [{'function': '_gf_init', 'args': ((), {}), 'results': None, 'len': 1, 'time': 900520, 'super': 'Database', 'class': 'Football'}, {'function
+': 'table', 'args': ((<class '__main__.Grounds'>,), {}), 'results': <class '__main__.Grounds'>, 'len': 1, 'time': 983882, 'super': 'Database', 'cla
+ss': 'Football'}, {'function': 'table', 'args': ((<class '__main__.Players'>,), {}), 'results': <class '__main__.Players'>, 'len': 1, 'time': 98434
+1, 'super': 'Database', 'class': 'Football'}, {'function': 'execute', 'args': (("select count(*) from __table_names__ where table_name = 'PLAYERS'"
+,), {}), 'results': None, 'len': 4, 'time': 988458, 'super': 'Database', 'class': 'Football'}, {'function': 'table_exists_in_gf', 'args': (('Player
+s',), {}), 'results': True, 'len': 3, 'time': 988882, 'super': 'Database', 'class': 'Football'}, {'function': 'execute', 'args': (('select * from P
+layers',), {}), 'results': None, 'len': 3, 'time': 990075, 'super': 'Database', 'class': 'Football'}, {'function': '_set_schema', 'args': ((), {}),
+ 'results': None, 'len': 3, 'time': 991982, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'load_from_gf', 'args': ((), {}), 'results'
+: None, 'len': 2, 'time': 992468, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'execute', 'args': (("select count(*) from __table_na
+mes__ where table_name = 'GROUNDS'",), {}), 'results': None, 'len': 4, 'time': 994872, 'super': 'Database', 'class': 'Football'}, {'function': 'tab
+le_exists_in_gf', 'args': (('Grounds',), {}), 'results': True, 'len': 3, 'time': 995419, 'super': 'Database', 'class': 'Football'}, {'function': 'e
+xecute', 'args': (('select * from Grounds',), {}), 'results': None, 'len': 3, 'time': 997226, 'super': 'Database', 'class': 'Football'}, {'function
+': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 998599, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function': 'load_fr
+om_gf', 'args': ((), {}), 'results': None, 'len': 2, 'time': 999012, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function': 'init_objects_in_d
+b', 'args': ((), {}), 'results': 2, 'len': 1, 'time': 999402, 'super': 'Database', 'class': 'Football'}, {'function': 'add', 'args': ((), {'capacit
+y': 100000, 'ground_name': 'bernabau'}), 'results': <class 'db_util.DatabaseRecord'>, 'len': 2, 'time': 999859, 'super': 'DatabaseTable', 'class': 
+'Grounds'}, {'function': 'add_list', 'args': (([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}), 'results': None, 'len': 1, 'time': 261, 's
+uper': 'DatabaseTable', 'class': 'Grounds'}, {'function': 'add', 'args': ((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}), 'results':
+ <class 'db_util.DatabaseRecord'>, 'len': 2, 'time': 729, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'add_list', 'args': (([{'debu
+t': '1/10/11', 'last_name': 'neymar', 'goals': 50}],), {}), 'results': None, 'len': 1, 'time': 1183, 'super': 'DatabaseTable', 'class': 'Players'},
+ {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 1754, 'super': 'DatabaseTable', 'class': 'Players'}, {'function':
+ 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x102ca2820>, 'len': 4,
+ 'time': 18260, 'super': 'object', 'class': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Players set id__='2519887' where last_name
+='neymar'",), {}), 'results': None, 'len': 4, 'time': 21058, 'super': 'Database', 'class': 'Football'}, {'function': 'upd_rec_in_gf', 'args': ((<cl
+ass 'db_util.DatabaseRecord'>,), {}), 'results': None, 'len': 3, 'time': 21542, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'find_c
+hanged_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'time': 21951, 'super': 'DatabaseTable', 'class': 'Player
+s'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 22358, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'funct
+ion': 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x102ca2a50>, 'len
+': 4, 'time': 22797, 'super': 'object', 'class': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Grounds set id__='2929694' where grou
+nd_name='bernabau'",), {}), 'results': None, 'len': 4, 'time': 25015, 'super': 'Database', 'class': 'Football'}, {'function': 'upd_rec_in_gf', 'arg
+s': ((<class 'db_util.DatabaseRecord'>,), {}), 'results': None, 'len': 3, 'time': 25453, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function'
+: 'find_changed_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'time': 25866, 'super': 'DatabaseTable', 'class'
+: 'Grounds'}, {'function': 'commit_to_gf', 'args': ((), {}), 'results': None, 'len': 1, 'time': 26246, 'super': 'Database', 'class': 'Football'}, {
+'function': 'execute', 'args': (('select * from Players',), {}), 'results': None, 'len': 2, 'time': 28055, 'super': 'Database', 'class': 'Football'
+}, {'function': '_commit', 'args': ((), {}), 'results': None, 'len': 2, 'time': 192509, 'super': 'Database', 'class': 'Football'}, {'function': 'cl
+ose', 'args': ((), {}), 'results': None, 'len': 1, 'time': 193272, 'super': 'Database', 'class': 'Football'}]  depth: 0  max_depth: 10  start_depth
+: 0  show_summary: False  show_summry: False  prefix:                                                                                             
+******LIST:32:{'FUNCTION': '_GF_INIT', 'ARGS': ((), {}), 'RESULTS': NONE, 'LEN': 1, 'TIME': 900520, 'SUPER': 'DATABASE', 'CLASS': 'FOOTBALL'}******
+ | time   | super         | function             | len | args                                | results                             |
+ | 900520 | Database      | _gf_init             | 1   | ((), {})                            | None                                |
+ | 983882 | Database      | table                | 1   | ((<class '__main__.Grounds'>,), {}) | <class '__main__.Grounds'>          |
+ | 984341 | Database      | table                | 1   | ((<class '__main__.Players'>,), {}) | <class '__main__.Players'>          |
+ | 988458 | Database      | execute              | 4   | (("select count(*) from __table_nam | None                                |
+ |        |               |                      |     | es__ where table_name = 'PLAYERS'", |                                     |
+ |        |               |                      |     | ), {})                              |                                     |
+ | 988882 | Database      | table_exists_in_gf   | 3   | (('Players',), {})                  | True                                |
+ | 990075 | Database      | execute              | 3   | (('select * from Players',), {})    | None                                |
+ | 991982 | DatabaseTable | _set_schema          | 3   | ((), {})                            | None                                |
+ | 992468 | DatabaseTable | load_from_gf         | 2   | ((), {})                            | None                                |
+ | 994872 | Database      | execute              | 4   | (("select count(*) from __table_nam | None                                |
+ |        |               |                      |     | es__ where table_name = 'GROUNDS'", |                                     |
+ |        |               |                      |     | ), {})                              |                                     |
+ | 995419 | Database      | table_exists_in_gf   | 3   | (('Grounds',), {})                  | True                                |
+ | 997226 | Database      | execute              | 3   | (('select * from Grounds',), {})    | None                                |
+ | 998599 | DatabaseTable | _set_schema          | 3   | ((), {})                            | None                                |
+ | 999012 | DatabaseTable | load_from_gf         | 2   | ((), {})                            | None                                |
+ | 999402 | Database      | init_objects_in_db   | 1   | ((), {})                            | 2                                   |
+ | 999859 | DatabaseTable | add                  | 2   | ((), {'capacity': 100000, 'ground_n | <class 'db_util.DatabaseRecord'>    |
+ |        |               |                      |     | ame': 'bernabau'})                  |                                     |
+ | 261    | DatabaseTable | add_list             | 1   | (([{'capacity': 100000, 'ground_nam | None                                |
+ |        |               |                      |     | e': 'bernabau'}],), {})             |                                     |
+ | 729    | DatabaseTable | add                  | 2   | ((), {'last_name': 'neymar', 'debut | <class 'db_util.DatabaseRecord'>    |
+ |        |               |                      |     | ': '1/10/11', 'goals': 50})         |                                     |
+ | 1183   | DatabaseTable | add_list             | 1   | (([{'debut': '1/10/11', 'last_name' | None                                |
+ |        |               |                      |     | : 'neymar', 'goals': 50}],), {})    |                                     |
+ | 1754   | DatabaseTable | _set_schema          | 3   | ((), {})                            | None                                |
+ | 18260  | object        | compare_records      | 4   | ((<class 'db_util.DatabaseRecord'>, | <generator object compare_records a |
+ |        |               |                      |     |  True), {})                         | t 0x102ca2820>                      |
+ | 21058  | Database      | execute              | 4   | (("update Players set id__='2519887 | None                                |
+ |        |               |                      |     | ' where last_name='neymar'",), {})  |                                     |
+ | 21542  | DatabaseTable | upd_rec_in_gf        | 3   | ((<class 'db_util.DatabaseRecord'>, | None                                |
+ |        |               |                      |     | ), {})                              |                                     |
+ | 21951  | DatabaseTable | find_changed_records | 2   | ((<class '__main__.Football'>,), {} | None                                |
+ |        |               |                      |     | )                                   |                                     |
+ | 22358  | DatabaseTable | _set_schema          | 3   | ((), {})                            | None                                |
+ | 22797  | object        | compare_records      | 4   | ((<class 'db_util.DatabaseRecord'>, | <generator object compare_records a |
+ |        |               |                      |     |  True), {})                         | t 0x102ca2a50>                      |
+ | 25015  | Database      | execute              | 4   | (("update Grounds set id__='2929694 | None                                |
+ |        |               |                      |     | ' where ground_name='bernabau'",),  |                                     |
+ |        |               |                      |     | {})                                 |                                     |
+ | 25453  | DatabaseTable | upd_rec_in_gf        | 3   | ((<class 'db_util.DatabaseRecord'>, | None                                |
+ |        |               |                      |     | ), {})                              |                                     |
+ | 25866  | DatabaseTable | find_changed_records | 2   | ((<class '__main__.Football'>,), {} | None                                |
+ |        |               |                      |     | )                                   |                                     |
+ | 26246  | Database      | commit_to_gf         | 1   | ((), {})                            | None                                |
+ | 28055  | Database      | execute              | 2   | (('select * from Players',), {})    | None                                |
+ | 192509 | Database      | _commit              | 2   | ((), {})                            | None                                |
+ | 193272 | Database      | close                | 1   | ((), {})                            | None                                |
+bash-3.2$ python ./db_test.py
+db opened with 'use'
+()
+<class 'db_util.Database'>
+(<class '__main__.Grounds'>,)
+<class 'db_util.Database'>
+(<class '__main__.Players'>,)
+<class 'db_util.Database'>
+("select count(*) from __table_names__ where table_name = 'PLAYERS'",)
+<class 'db_util.Database'>
+('Players',)
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+("select count(*) from __table_names__ where table_name = 'GROUNDS'",)
+<class 'db_util.Database'>
+('Grounds',)
+<class 'db_util.Database'>
+('select * from Grounds',)
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.DatabaseTable'>
+([{'capacity': 100000, 'ground_name': 'bernabau'}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Players set id__='2341763' where last_name='neymar'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.DatabaseTable'>
+(<class 'db_util.DatabaseRecord'>, True)
+<type 'object'>
+("update Grounds set id__='2194156' where ground_name='bernabau'",)
+<class 'db_util.Database'>
+(<class 'db_util.DatabaseRecord'>,)
+<class 'db_util.DatabaseTable'>
+(<class '__main__.Football'>,)
+<class 'db_util.DatabaseTable'>
+()
+<class 'db_util.Database'>
+('select * from Players',)
+<class 'db_util.Database'>
+messi                1/12/13              False                True                 1335481              1500                
+bale                 1/10/13              False                True                 2871475              0                   
+lopez                2/10/13              False                True                 4286392              60                  
+neymar               1/10/11              False                True                 2341763              50                  
+()
+<class 'db_util.Database'>
+()
+<class 'db_util.Database'>
+392691 <type 'int'>
+Database <type 'str'>
+_gf_init <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+464592 <type 'int'>
+Database <type 'str'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Grounds'>,), {}) <type 'tuple'>
+<class '__main__.Grounds'> <class '__main__.Grounds'>
+True
+465014 <type 'int'>
+Database <type 'str'>
+table <type 'str'>
+1 <type 'int'>
+((<class '__main__.Players'>,), {}) <type 'tuple'>
+<class '__main__.Players'> <class '__main__.Players'>
+True
+470888 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'PLAYERS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+471455 <type 'int'>
+Database <type 'str'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Players',), {}) <type 'tuple'>
+True <type 'bool'>
+473302 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+475501 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+475932 <type 'int'>
+DatabaseTable <type 'str'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+478532 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("select count(*) from __table_names__ where table_name = 'GROUNDS'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+479069 <type 'int'>
+Database <type 'str'>
+table_exists_in_gf <type 'str'>
+3 <type 'int'>
+(('Grounds',), {}) <type 'tuple'>
+True <type 'bool'>
+480758 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+3 <type 'int'>
+(('select * from Grounds',), {}) <type 'tuple'>
+None <type 'NoneType'>
+482257 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+482692 <type 'int'>
+DatabaseTable <type 'str'>
+load_from_gf <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+483091 <type 'int'>
+Database <type 'str'>
+init_objects_in_db <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+2 <type 'int'>
+483548 <type 'int'>
+DatabaseTable <type 'str'>
+add <type 'str'>
+2 <type 'int'>
+((), {'capacity': 100000, 'ground_name': 'bernabau'}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+483980 <type 'int'>
+DatabaseTable <type 'str'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+484418 <type 'int'>
+DatabaseTable <type 'str'>
+add <type 'str'>
+2 <type 'int'>
+((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}) <type 'tuple'>
+<class 'db_util.DatabaseRecord'> <class 'db_util.DatabaseRecord'>
+484821 <type 'int'>
+DatabaseTable <type 'str'>
+add_list <type 'str'>
+1 <type 'int'>
+(([{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],), {}) <type 'tuple'>
+None <type 'NoneType'>
+485239 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+485660 <type 'int'>
+object <type 'str'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2820> <type 'generator'>
+488042 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Players set id__='2341763' where last_name='neymar'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+488332 <type 'int'>
+DatabaseTable <type 'str'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+488628 <type 'int'>
+DatabaseTable <type 'str'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+488974 <type 'int'>
+DatabaseTable <type 'str'>
+_set_schema <type 'str'>
+3 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+489423 <type 'int'>
+object <type 'str'>
+compare_records <type 'str'>
+4 <type 'int'>
+((<class 'db_util.DatabaseRecord'>, True), {}) <type 'tuple'>
+<generator object compare_records at 0x102ca2a50> <type 'generator'>
+562460 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+4 <type 'int'>
+(("update Grounds set id__='2194156' where ground_name='bernabau'",), {}) <type 'tuple'>
+None <type 'NoneType'>
+563182 <type 'int'>
+DatabaseTable <type 'str'>
+upd_rec_in_gf <type 'str'>
+3 <type 'int'>
+((<class 'db_util.DatabaseRecord'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+563624 <type 'int'>
+DatabaseTable <type 'str'>
+find_changed_records <type 'str'>
+2 <type 'int'>
+((<class '__main__.Football'>,), {}) <type 'tuple'>
+None <type 'NoneType'>
+564035 <type 'int'>
+Database <type 'str'>
+commit_to_gf <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+565932 <type 'int'>
+Database <type 'str'>
+execute <type 'str'>
+2 <type 'int'>
+(('select * from Players',), {}) <type 'tuple'>
+None <type 'NoneType'>
+571293 <type 'int'>
+Database <type 'str'>
+_commit <type 'str'>
+2 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+572027 <type 'int'>
+Database <type 'str'>
+close <type 'str'>
+1 <type 'int'>
+((), {}) <type 'tuple'>
+None <type 'NoneType'>
+descr: 
+ seed: [{'function': '_gf_init', 'args': ((), {}), 'results': None, 'len': 1, 'time': 392691, 'super': 'Database', 'class': 'Football'}, {'function
+': 'table', 'args': ((<class '__main__.Grounds'>,), {}), 'results': <class '__main__.Grounds'>, 'len': 1, 'time': 464592, 'super': 'Database', 'cla
+ss': 'Football'}, {'function': 'table', 'args': ((<class '__main__.Players'>,), {}), 'results': <class '__main__.Players'>, 'len': 1, 'time': 46501
+4, 'super': 'Database', 'class': 'Football'}, {'function': 'execute', 'args': (("select count(*) from __table_names__ where table_name = 'PLAYERS'"
+,), {}), 'results': None, 'len': 4, 'time': 470888, 'super': 'Database', 'class': 'Football'}, {'function': 'table_exists_in_gf', 'args': (('Player
+s',), {}), 'results': True, 'len': 3, 'time': 471455, 'super': 'Database', 'class': 'Football'}, {'function': 'execute', 'args': (('select * from P
+layers',), {}), 'results': None, 'len': 3, 'time': 473302, 'super': 'Database', 'class': 'Football'}, {'function': '_set_schema', 'args': ((), {}),
+ 'results': None, 'len': 3, 'time': 475501, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'load_from_gf', 'args': ((), {}), 'results'
+: None, 'len': 2, 'time': 475932, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'execute', 'args': (("select count(*) from __table_na
+mes__ where table_name = 'GROUNDS'",), {}), 'results': None, 'len': 4, 'time': 478532, 'super': 'Database', 'class': 'Football'}, {'function': 'tab
+le_exists_in_gf', 'args': (('Grounds',), {}), 'results': True, 'len': 3, 'time': 479069, 'super': 'Database', 'class': 'Football'}, {'function': 'e
+xecute', 'args': (('select * from Grounds',), {}), 'results': None, 'len': 3, 'time': 480758, 'super': 'Database', 'class': 'Football'}, {'function
+': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 482257, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function': 'load_fr
+om_gf', 'args': ((), {}), 'results': None, 'len': 2, 'time': 482692, 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function': 'init_objects_in_d
+b', 'args': ((), {}), 'results': 2, 'len': 1, 'time': 483091, 'super': 'Database', 'class': 'Football'}, {'function': 'add', 'args': ((), {'capacit
+y': 100000, 'ground_name': 'bernabau'}), 'results': <class 'db_util.DatabaseRecord'>, 'len': 2, 'time': 483548, 'super': 'DatabaseTable', 'class': 
+'Grounds'}, {'function': 'add_list', 'args': (([{'capacity': 100000, 'ground_name': 'bernabau'}],), {}), 'results': None, 'len': 1, 'time': 483980,
+ 'super': 'DatabaseTable', 'class': 'Grounds'}, {'function': 'add', 'args': ((), {'last_name': 'neymar', 'debut': '1/10/11', 'goals': 50}), 'result
+s': <class 'db_util.DatabaseRecord'>, 'len': 2, 'time': 484418, 'super': 'DatabaseTable', 'class': 'Players'}, {'function': 'add_list', 'args': (([
+{'debut': '1/10/11', 'last_name': 'neymar', 'goals': 50}],), {}), 'results': None, 'len': 1, 'time': 484821, 'super': 'DatabaseTable', 'class': 'Pl
+ayers'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 485239, 'super': 'DatabaseTable', 'class': 'Players'}, {'
+function': 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x102ca2820>,
+ 'len': 4, 'time': 485660, 'super': 'object', 'class': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Players set id__='2341763' wher
+e last_name='neymar'",), {}), 'results': None, 'len': 4, 'time': 488042, 'super': 'Database', 'class': 'Football'}, {'function': 'upd_rec_in_gf', '
+args': ((<class 'db_util.DatabaseRecord'>,), {}), 'results': None, 'len': 3, 'time': 488332, 'super': 'DatabaseTable', 'class': 'Players'}, {'funct
+ion': 'find_changed_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'time': 488628, 'super': 'DatabaseTable', 'c
+lass': 'Players'}, {'function': '_set_schema', 'args': ((), {}), 'results': None, 'len': 3, 'time': 488974, 'super': 'DatabaseTable', 'class': 'Gro
+unds'}, {'function': 'compare_records', 'args': ((<class 'db_util.DatabaseRecord'>, True), {}), 'results': <generator object compare_records at 0x1
+02ca2a50>, 'len': 4, 'time': 489423, 'super': 'object', 'class': 'DatabaseRecord'}, {'function': 'execute', 'args': (("update Grounds set id__='219
+4156' where ground_name='bernabau'",), {}), 'results': None, 'len': 4, 'time': 562460, 'super': 'Database', 'class': 'Football'}, {'function': 'upd
+_rec_in_gf', 'args': ((<class 'db_util.DatabaseRecord'>,), {}), 'results': None, 'len': 3, 'time': 563182, 'super': 'DatabaseTable', 'class': 'Grou
+nds'}, {'function': 'find_changed_records', 'args': ((<class '__main__.Football'>,), {}), 'results': None, 'len': 2, 'time': 563624, 'super': 'Data
+baseTable', 'class': 'Grounds'}, {'function': 'commit_to_gf', 'args': ((), {}), 'results': None, 'len': 1, 'time': 564035, 'super': 'Database', 'cl
+ass': 'Football'}, {'function': 'execute', 'args': (('select * from Players',), {}), 'results': None, 'len': 2, 'time': 565932, 'super': 'Database'
+, 'class': 'Football'}, {'function': '_commit', 'args': ((), {}), 'results': None, 'len': 2, 'time': 571293, 'super': 'Database', 'class': 'Footbal
+l'}, {'function': 'close', 'args': ((), {}), 'results': None, 'len': 1, 'time': 572027, 'super': 'Database', 'class': 'Football'}]  depth: 0  max_d
+epth: 10  start_depth: 0  show_summary: False  show_summry: False  prefix:                                                                        
+******LIST:32:{'FUNCTION': '_GF_INIT', 'ARGS': ((), {}), 'RESULTS': NONE, 'LEN': 1, 'TIME': 392691, 'SUPER': 'DATABASE', 'CLASS': 'FOOTBALL'}******
+ | time   | super         | function             | len | args                                | results                             |
+ | 392691 | Database      | _gf_init             | 1   | ((), {})                            | None                                |
+ | 464592 | Database      | table                | 1   | ((<class '__main__.Grounds'>,), {}) | <class '__main__.Grounds'>          |
+ | 465014 | Database      | table                | 1   | ((<class '__main__.Players'>,), {}) | <class '__main__.Players'>          |
+ | 470888 | Database      | execute              | 4   | (("select count(*) from __table_nam | None                                |
+ |        |               |                      |     | es__ where table_name = 'PLAYERS'", |                                     |
+ |        |               |                      |     | ), {})                              |                                     |
+ | 471455 | Database      | table_exists_in_gf   | 3   | (('Players',), {})                  | True                                |
+ | 473302 | Database      | execute              | 3   | (('select * from Players',), {})    | None                                |
+ | 475501 | DatabaseTable | _set_schema          | 3   | ((), {})                            | None                                |
+ | 475932 | DatabaseTable | load_from_gf         | 2   | ((), {})                            | None                                |
+ | 478532 | Database      | execute              | 4   | (("select count(*) from __table_nam | None                                |
+ |        |               |                      |     | es__ where table_name = 'GROUNDS'", |                                     |
+ |        |               |                      |     | ), {})                              |                                     |
+ | 479069 | Database      | table_exists_in_gf   | 3   | (('Grounds',), {})                  | True                                |
+ | 480758 | Database      | execute              | 3   | (('select * from Grounds',), {})    | None                                |
+ | 482257 | DatabaseTable | _set_schema          | 3   | ((), {})                            | None                                |
+ | 482692 | DatabaseTable | load_from_gf         | 2   | ((), {})                            | None                                |
+ | 483091 | Database      | init_objects_in_db   | 1   | ((), {})                            | 2                                   |
+ | 483548 | DatabaseTable | add                  | 2   | ((), {'capacity': 100000, 'ground_n | <class 'db_util.DatabaseRecord'>    |
+ |        |               |                      |     | ame': 'bernabau'})                  |                                     |
+ | 483980 | DatabaseTable | add_list             | 1   | (([{'capacity': 100000, 'ground_nam | None                                |
+ |        |               |                      |     | e': 'bernabau'}],), {})             |                                     |
+ | 484418 | DatabaseTable | add                  | 2   | ((), {'last_name': 'neymar', 'debut | <class 'db_util.DatabaseRecord'>    |
+ |        |               |                      |     | ': '1/10/11', 'goals': 50})         |                                     |
+ | 484821 | DatabaseTable | add_list             | 1   | (([{'debut': '1/10/11', 'last_name' | None                                |
+ |        |               |                      |     | : 'neymar', 'goals': 50}],), {})    |                                     |
+ | 485239 | DatabaseTable | _set_schema          | 3   | ((), {})                            | None                                |
+ | 485660 | object        | compare_records      | 4   | ((<class 'db_util.DatabaseRecord'>, | <generator object compare_records a |
+ |        |               |                      |     |  True), {})                         | t 0x102ca2820>                      |
+ | 488042 | Database      | execute              | 4   | (("update Players set id__='2341763 | None                                |
+ |        |               |                      |     | ' where last_name='neymar'",), {})  |                                     |
+ | 488332 | DatabaseTable | upd_rec_in_gf        | 3   | ((<class 'db_util.DatabaseRecord'>, | None                                |
+ |        |               |                      |     | ), {})                              |                                     |
+ | 488628 | DatabaseTable | find_changed_records | 2   | ((<class '__main__.Football'>,), {} | None                                |
+ |        |               |                      |     | )                                   |                                     |
+ | 488974 | DatabaseTable | _set_schema          | 3   | ((), {})                            | None                                |
+ | 489423 | object        | compare_records      | 4   | ((<class 'db_util.DatabaseRecord'>, | <generator object compare_records a |
+ |        |               |                      |     |  True), {})                         | t 0x102ca2a50>                      |
+ | 562460 | Database      | execute              | 4   | (("update Grounds set id__='2194156 | None                                |
+ |        |               |                      |     | ' where ground_name='bernabau'",),  |                                     |
+ |        |               |                      |     | {})                                 |                                     |
+ | 563182 | DatabaseTable | upd_rec_in_gf        | 3   | ((<class 'db_util.DatabaseRecord'>, | None                                |
+ |        |               |                      |     | ), {})                              |                                     |
+ | 563624 | DatabaseTable | find_changed_records | 2   | ((<class '__main__.Football'>,), {} | None                                |
+ |        |               |                      |     | )                                   |                                     |
+ | 564035 | Database      | commit_to_gf         | 1   | ((), {})                            | None                                |
+ | 565932 | Database      | execute              | 2   | (('select * from Players',), {})    | None                                |
+ | 571293 | Database      | _commit              | 2   | ((), {})                            | None                                |
+ | 572027 | Database      | close                | 1   | ((), {})                            | None                                |
+bash-3.2$ 

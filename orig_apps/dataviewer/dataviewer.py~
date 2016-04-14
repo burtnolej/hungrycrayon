@@ -1,0 +1,75 @@
+#!/usr/bin/python
+
+from sys import path
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+from misc_util import Singleton, get_time_hms, in_method_log, Logger, file2list
+from ui_util import ListBox,EntryBox,TextBox,WindowManager,Window
+from db_util import Database, DatabaseTable, DatabaseRecord, DatabaseView
+import thread_util 
+import curses
+
+class Finance(Database):
+    pass
+
+def main(screen):
+
+    logger = Logger("/tmp/log.txt")
+    l = file2list("./list.txt")
+    
+    screen.keypad(1)
+    curses.mousemask(1)
+
+    finance = Finance("~/Downloads/gadflyZip/gadfly/scripts/",'use')
+    cn = finance.view(CounterpartyNames())
+    tv = finance.view(TransactionView())
+    
+    finance.loadviews()
+
+    wm = WindowManager()
+    lb = ListBox.dbcontent(wm,"lb1",30,30,10,10,cn)
+    lb.daemon = True
+    lb.start()
+    lb.name = "lb1"
+    lb.parent = None
+    lb2 = ListBox.dbcontent(wm,"lb2",30,30,10,40,tv)
+    lb2.daemon = True
+    lb2.start()
+    lb2.name = "lb2"
+    lb2.parent = "lb1"
+
+    wm.mainloop()
+    del logger
+
+class CounterpartyNames(DatabaseView):
+    load_qry  = "select name "
+    load_qry += "from   counterpartys "
+    load_qry += "order by name"
+
+    def load(self,qry,db,arg=None,re=None):
+        db.execute(qry)
+        for col1 in db.fetchall():
+            self.add(cpy_name = str(col1))
+
+    def add(self,**kwargs):
+        dr = DatabaseRecord(**kwargs)
+        self[dr.cpy_name] = dr
+        
+class TransactionView(DatabaseView):
+    load_qry  = "select debit_amt "
+    load_qry += "from   transactions "
+    load_qry += "where  debit_amt < -200.00"
+
+    def load(self,qry,db,arg=None,re=None):
+        db.execute(qry)
+        for col1 in db.fetchall():
+            self.add(debit_amt = col1)
+
+    def add(self,**kwargs):
+        dr = DatabaseRecord(**kwargs)
+        self[dr._id] = dr
+
+try:
+    curses.wrapper(main)
+except KeyboardInterrupt:
+    print "Got KeyboardInterrupt exception. Exiting..."
+    exit()

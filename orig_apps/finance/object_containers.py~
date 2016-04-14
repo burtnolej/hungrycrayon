@@ -1,0 +1,54 @@
+#!/usr/bin/python
+
+from sys import path, argv, stdout
+path.append("/Users/burtnolej/Dev/pythonapps/util")
+from misc_util import file2list, switch, pprint_exception, Logger
+from counterparty import CounterpartyCollection, Counterparty
+from transaction import TransactionCollection, Transaction
+from operator import mod
+from collections import OrderedDict
+import subprocess
+import re
+
+cc = CounterpartyCollection()
+tt = TransactionCollection()
+l = Logger("/private/tmp/log.txt")
+
+coutts_trans = file2list(argv[1])
+
+if coutts_trans[0].split(",")[0] == 'Sort code':
+    coutts_trans.pop(0) # remove header
+
+for record in coutts_trans:
+    # find any , between " " like "fdfsdf,ddf"
+    p = re.compile('["][^"]*["]|[^,]*')
+    y = p.findall(record)
+    # re creates empty strings so need to remove them and keep real one 
+    x = [y[i] for i in range(0,len(y)-1) if y[i+1] == '']
+    # now remove the , from within the strings
+    record = ",".join(z.replace(",","") for z in x)
+    
+    fields = record.split(",")
+    cpy_mangle = re.sub("\"","",fields[3])
+    tran_amt = fields[6] + fields[5] # credit + debit as 1 will be ''
+    try:
+        cpy = cc.counterparty(_cpy_mangle = cpy_mangle,
+                              _tran_amt = tran_amt)
+
+        tt.transaction(_credit_amt = fields[6],
+                       _debit_amt  = fields[5],
+                       _cpy        = cpy,
+                       _tran_date  = fields[2],
+                       _balance    = fields[7])
+    except:
+        pprint_exception(record)
+
+del l
+
+input_file_len = subprocess.check_output(['wc','-l',argv[1]]).split()[0]
+out_str =  "input file : " + str(argv[1]) + "\n"
+out_str += "input lines : " + input_file_len + "\n"
+out_str += "# counterparty records: " + str(len(cc.keys())) + "\n"
+out_str += "# transaction records: " + str(len(tt.keys())) + "\n"
+
+stdout.write(out_str)
