@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Database>
+    <Name>"Food"</Name>
+    <Table Name="FOOD_DES">
+        <IDColumn>"NDB_No"</IDColumn>
+        <Column Name="NDB_No">
+            <DBType>"INTEGER"</DBType>
+            <Nullable>0</Nullable>
+            <FileType>"A"</FileType>
+            <FileTypeLen>5</FileTypeLen>
+            <Description>"5-digit Nutrient Databank number that uniquely identifies a food item.If this field is defined as numeric, 
+            the leading zero will be lost."</Description>
+        </Column>
+        <Column Name="FdGrp_Cd">
+            <DBType>"TEXT"</DBType>
+            <Nullable>0</Nullable>
+            <FileType>"A"</FileType>
+            <FileTypeLen>4</FileTypeLen>
+            <Description>"4-digit code indicating food group to which a food item belongs"</Description>
+        </Column>
+        <Column Name="Long_Desc">
+            <DBType>"TEXT"</DBType>
+            <Nullable>0</Nullable>
+            <FileType>"A"</FileType>
+            <FileTypeLen>200</FileTypeLen>
+            <Description>"200-character description of food item."</Description>
+        </Column>
+        <Column Name="Shrt_Desc">
+            <DBType>"A"</DBType>
+            <Nullable>0</Nullable>
+            <FileType>"TEXT"</FileType>
+            <FileTypeLen>60</FileTypeLen>
+            <Description>"60-character abbreviated description of food item. Generated from the .200-character description using abbreviations in Appendix A. If short description is longer than 60 characters, additional abbreviations are made."</Description>
+        </Column>
+    </Table>
+</Database>
