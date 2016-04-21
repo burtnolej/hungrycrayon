@@ -1,19 +1,24 @@
 import sqlite3
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
-from xml_utils import get_xml_elements,get_xml_child_elements,get_xml_element
+from xml_utils import get_xml_elements,get_xml_element,get_xml_child_elements, get_xml_root
 
 db_schema_file="./schema.xml"
+NAME_ATTRIB='Name'
 
-tables = get_xml_elements(db_schema_file,".//Table")
+databases = get_xml_elements(db_schema_file,".//Database")
+for database in databases:
+    print "database=",database.attrib[NAME_ATTRIB]
 
-for table in tables:
-    print "table=",table.attrib
-    idcolumn_name=get_xml_element(db_schema_file,".//IDColumn",table).text
-    print "idcol=",idcolumn_name
-    columns = get_xml_elements(db_schema_file,".//Column",table)
-    for column in columns:
-        print "col=",get_xml_child_elements(column)
+    tables = get_xml_elements(db_schema_file,".//Table")
+    for table in tables:
+        print "table=",table.attrib[NAME_ATTRIB]
+        idcolumn_name=get_xml_element(db_schema_file,".//IDColumn",table).text
+        print "idcol=",idcolumn_name
+        columns = get_xml_elements(db_schema_file,".//Column",table)
+        for column in columns:
+            print "colname=",column.attrib[NAME_ATTRIB],
+            print "fields=",get_xml_child_elements(column)
 exit()
 
 sqlite_file = "food.sqlite"

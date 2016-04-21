@@ -13,4 +13,10 @@ def read_delim_text_from_file(filename,delim):
     'returns a list of lists'
     l=[]
     fh = open(filename, 'r+')
-    return [l.append(line.rstrip().split(delim) for line in fh)]
+    
+    #for line in fh:
+    #    l.append(line.rstrip().split(delim))
+    #        
+    #return l
+
+    return [l.append(line.rstrip().split(delim)) for line in fh]

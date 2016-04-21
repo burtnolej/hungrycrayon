@@ -1,36 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Database>
-    <Name>"Food"</Name>
-    <Table Name="FOOD_DES">
-        <IDColumn>"NDB_No"</IDColumn>
-        <Column Name="NDB_No">
-            <DBType>"INTEGER"</DBType>
-            <Nullable>0</Nullable>
-            <FileType>"A"</FileType>
-            <FileTypeLen>5</FileTypeLen>
-            <Description>"5-digit Nutrient Databank number that uniquely identifies a food item.If this field is defined as numeric, 
-            the leading zero will be lost."</Description>
-        </Column>
-        <Column Name="FdGrp_Cd">
-            <DBType>"TEXT"</DBType>
-            <Nullable>0</Nullable>
-            <FileType>"A"</FileType>
-            <FileTypeLen>4</FileTypeLen>
-            <Description>"4-digit code indicating food group to which a food item belongs"</Description>
-        </Column>
-        <Column Name="Long_Desc">
-            <DBType>"TEXT"</DBType>
-            <Nullable>0</Nullable>
-            <FileType>"A"</FileType>
-            <FileTypeLen>200</FileTypeLen>
-            <Description>"200-character description of food item."</Description>
-        </Column>
-        <Column Name="Shrt_Desc">
-            <DBType>"A"</DBType>
-            <Nullable>0</Nullable>
-            <FileType>"TEXT"</FileType>
-            <FileTypeLen>60</FileTypeLen>
-            <Description>"60-character abbreviated description of food item. Generated from the .200-character description using abbreviations in Appendix A. If short description is longer than 60 characters, additional abbreviations are made."</Description>
-        </Column>
-    </Table>
-</Database>
+<Root>
+    <Database Name="food">
+        <Table Name="FOOD_DES">
+            <IDColumn>"NDB_No"</IDColumn>
+            <Column Name="NDB_No">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>5</FileTypeLen>
+                <Description>"5-digit Nutrient Databank number that uniquely identifies a food item.If this field is defined as numeric, 
+                the leading zero will be lost."</Description>
+            </Column>
+            <Column Name="FdGrp_Cd">
+                <DBType>"TEXT"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>4</FileTypeLen>
+                <Description>"4-digit code indicating food group to which a food item belongs"</Description>
+            </Column>
+            <Column Name="Long_Desc">
+                <DBType>"TEXT"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>200</FileTypeLen>
+                <Description>"200-character description of food item."</Description>
+            </Column>
+            <Column Name="Shrt_Desc">
+                <DBType>"A"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"TEXT"</FileType>
+                <FileTypeLen>60</FileTypeLen>
+                <Description>"60-character abbreviated description of food item. Generated from the .200-character description using abbreviations in Appendix A. If short description is longer than 60 characters, additional abbreviations are made."</Description>
+            </Column>
+            <Column Name="ComName">
+                <DBType>"A"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"TEXT"</FileType>
+                <FileTypeLen>100</FileTypeLen>
+                <Description>"Other names commonly used to describe a food, including local or regional names for various foods, for example, “soda” or “pop” for “carbonated beverages."</Description>
+            </Column>
+            <Column Name="ManufacName">
+                <DBType>"A"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"TEXT"</FileType>
+                <FileTypeLen>65</FileTypeLen>
+                <Description>"Indicates the company that manufactured the product, when appropriate."</Description>
+            </Column>
+            <Column Name="Survey">
+                <DBType>"A"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"TEXT"</FileType>
+                <FileTypeLen>1</FileTypeLen>
+                <Description>"Indicates if the food item is used in the USDA Food and Nutrient Database for Dietary Studies (FNDDS) and thus has a complete nutrient profile for the 65 FNDDS nutrients"</Description>
+            </Column>
+            <Column Name="Ref_desc">
+                <DBType>"A"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"TEXT"</FileType>
+                <FileTypeLen>135</FileTypeLen>
+                <Description>"Description of inedible parts of a food item (refuse) such as seeds or bone"</Description>
+            </Column>
+           <Column Name="Refuse">
+                <DBType>"N"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"INTEGER"</FileType>
+                <FileTypeLen>2</FileTypeLen>
+                <Description>"Percentage of refuse."</Description>
+            </Column>
+            <Column Name="SciName">
+                <DBType>"A"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"TEXT"</FileType>
+                <FileTypeLen>65</FileTypeLen>
+                <Description>"Scientific name of the food item. Given for the least processed form of the food (usually raw), if applicable"</Description>
+            </Column>
+            <Column Name="N_Factor">
+                <DBType>"N"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"INTEGER"</FileType>
+                <FileTypeLen>4.2</FileTypeLen>
+                <Description>"Factor for converting nitrogen to protein"</Description>
+            </Column>
+            <Column Name="Pro_Factor">
+                <DBType>"N"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"INTEGER"</FileType>
+                <FileTypeLen>4.2</FileTypeLen>
+                <Description>"Factor for calculating calories from protein"</Description>
+            </Column>
+            <Column Name="Fat_Factor">
+                <DBType>"N"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"INTEGER"</FileType>
+                <FileTypeLen>4.2</FileTypeLen>
+                <Description>"Factor for calculating calories from fat"</Description>
+            </Column>
+            <Column Name="CHO_Factor">
+                <DBType>"N"</DBType>
+                <Nullable>1</Nullable>
+                <FileType>"INTEGER"</FileType>
+                <FileTypeLen>4.2</FileTypeLen>
+                <Description>"Factor for calculating calories from carbohydrate("</Description>
+            </Column>
+        </Table>
+    </Database>
+</Root>
