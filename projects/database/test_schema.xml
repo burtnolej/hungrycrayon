@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+    <Database Name="test_db">
+        <Table Name="test_table">
+            <Column Name="test_column1">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>5</FileTypeLen>
+                <Description>"blah blah"</Description>
+            </Column>
+            <Column Name="test_column2">
+                <DBType>"TEXT"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>4</FileTypeLen>
+                <Description>"blah blah"</Description>
+            </Column>
+            <Row Table="test_table">
+                <Field>
+                    <Key>test_column1</Key>
+                    <Value>123</Value>
+                </Field>
+                <Field>
+                    <Key>test_column2</Key>
+                    <Value>FOO</Value>
+                </Field>
+            </Row>
+            <Row Table="test_table">
+                <Field>
+                    <Key>test_column1</Key>
+                    <Value>456</Value>
+                </Field>
+                <Field>
+                    <Key>test_column2</Key>
+                    <Value>BAR</Value>
+                </Field>
+            </Row>
+        </Table>
+    </Database>
+    <Database Name="test_db2">
+        <Table Name="test_table2">
+            <Column Name="test_column1">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>5</FileTypeLen>
+                <Description>"blah blah"</Description>
+            </Column>
+            <Row Table="test_table">
+                <Field>
+                    <Key>test_column3</Key>
+                    <Value>123</Value>
+                </Field>
+            </Row>
+            <Row Table="test_table">
+                <Field>
+                    <Key>test_column3</Key>
+                    <Value>456</Value>
+                </Field>
+            </Row>
+        </Table>
+    </Database>
+</Root>

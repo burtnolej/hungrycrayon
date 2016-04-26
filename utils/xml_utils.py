@@ -1,6 +1,10 @@
 #!/usr/bin/python
 import xml.etree.ElementTree as xmltree
 
+def get_xml_root(filen, ns=None):
+    ''' return the root node '''
+    return(xmltree.parse(filen))
+
 def get_xml_elements(filen, tag, root=None,ns=None):
     ''' starting at the root, search for any elements where tag=tag
     and return a list of those xmlelement objects. root will default
@@ -33,7 +37,7 @@ def get_xml_child_elements(parent):
     ''' for a given xml element, return all children as a list of tuples of the form
     (name,value)'''
     
-    l=[]
+    d={}
     for child in parent._children:
-        l.append((child.tag,child.text))
-    return(l)
+        d[child.tag]=child.text
+    return(d)

@@ -1,0 +1,33 @@
+,,field type,,,,,,,,,,,,,,,,
+,,food,food,food,food,food,food,food,food,food,food,food,food,food,vitamins,vitamins,minerals,minerals
+record_type,id,name,mfr,serving,calories,total-fat,saturated-fat>,cholesterol,sodium,carb,fiber,protein,vitamins,minerals,a,c,ca,fe
+food,0001,Avocado Dip,Sunnydale,units=g;29,"total=110,fat=100",11,3,5,210,2,0,1,lookup,lookup,,,,
+vitamins,0001,,,,,,,,,,,,,,0,0,,
+minerals,0001,,,,,,,,,,,,,,,,0,0
+food,0002,Bagels New York Style,Thompson,units=g;104,"Total=350,fat=35",4,1,0,510,54,3,11,lookup,lookup,,,,
+vitamins,0002,,,,,,,,,,,,,,0,0,,
+minerals,0002,,,,,,,,,,,,,,,,8,20
+food,0003,"Beef Frankfurter, Quarter Pound",Armitage,units=g;115,"Total=370,fat=290",32,15,65,1100,8,0,13,lookup,lookup,,,,
+vitamins,0003,,,,,,,,,,,,,,0,2,,
+minerals,0003,,,,,,,,,,,,,,,,1,6
+food,0004,Chicken Pot Pie,Lakeson,units=g;198,"Total=410,fat=200",22,9,25,810,42,2,10,lookup,lookup,,,,
+vitamins,0004,,,,,,,,,,,,,,20,2,,
+minerals,0004,,,,,,,,,,,,,,,,2,10
+food,0005,Cole Slaw,Fresh Quick,units=cup;1.5,"Total=20,fat=0",0,0,0,15,5,2,1,lookup,lookup,,,,
+vitamins,0005,,,,,,,,,,,,,,30,45,,
+minerals,0005,,,,,,,,,,,,,,,,4,2
+food,0006,Eggs,Goodpath,units=g;50,"Total=70,fat=40",4.5,1.5,215,65,1,0,6,lookup,lookup,,,,
+vitamins,0006,,,,,,,,,,,,,,6,0,,
+minerals,0006,,,,,,,,,,,,,,,,2,4
+food,0007,Hazelnut Spread,Ferreira,units=tbsp;2,"Total=200,fat=90",10,2,0,20,23,2,3,lookup,lookup,,,,
+vitamins,0007,,,,    ,,,,,,,,,,0,0,,
+minerals,0007,,,,,,,,,,,,,,,,6,4
+food,0008,Potato Chips,Lees,units=g;28,"Total=150,fat=90",10,3,0,190,15,1,2,lookup,lookup,,,,
+vitamins,0008,,,,,,,,,,,,,,0,10,,
+minerals,0008,,,,,,,,,,,,,,,,0,0
+food,0009,"Soy Patties, Grilled",Gardenproducts,units=g;96,"Total=160,fat=45",5,0,0,420,10,4,9,lookup,lookup,,,,
+vitamins,0009,,,,,,,,,,,,,,0,0,,
+minerals,0009,,,,,,,,,,,,,,,,0,0
+food,0010,"Truffles, Dark Chocolate",Lyndon's,units=g;39,"Total=220,fat=170",19,14,25,10,16,1,1,lookup,lookup,,,,
+vitamins,0010,,,,,,,,,,,,,,0,0,,
+minerals,0010,,,,,,,,,,,,,,,,0,0

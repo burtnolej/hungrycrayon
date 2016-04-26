@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+    <Database Name="tmp_test_db">
+        <Table Name="test_table">
+            <Column Name="test_column1">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>5</FileTypeLen>
+                <Description>"blah blah"</Description>
+            </Column>
+        </Table>
+    </Database>
+</Root>
