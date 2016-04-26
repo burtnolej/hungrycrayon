@@ -1,33 +1,41 @@
-,,field type,,,,,,,,,,,,,,,,
-,,food,food,food,food,food,food,food,food,food,food,food,food,food,vitamins,vitamins,minerals,minerals
-record_type,id,name,mfr,serving,calories,total-fat,saturated-fat>,cholesterol,sodium,carb,fiber,protein,vitamins,minerals,a,c,ca,fe
-food,0001,Avocado Dip,Sunnydale,units=g;29,"total=110,fat=100",11,3,5,210,2,0,1,lookup,lookup,,,,
-vitamins,0001,,,,,,,,,,,,,,0,0,,
-minerals,0001,,,,,,,,,,,,,,,,0,0
-food,0002,Bagels New York Style,Thompson,units=g;104,"Total=350,fat=35",4,1,0,510,54,3,11,lookup,lookup,,,,
-vitamins,0002,,,,,,,,,,,,,,0,0,,
-minerals,0002,,,,,,,,,,,,,,,,8,20
-food,0003,"Beef Frankfurter, Quarter Pound",Armitage,units=g;115,"Total=370,fat=290",32,15,65,1100,8,0,13,lookup,lookup,,,,
-vitamins,0003,,,,,,,,,,,,,,0,2,,
-minerals,0003,,,,,,,,,,,,,,,,1,6
-food,0004,Chicken Pot Pie,Lakeson,units=g;198,"Total=410,fat=200",22,9,25,810,42,2,10,lookup,lookup,,,,
-vitamins,0004,,,,,,,,,,,,,,20,2,,
-minerals,0004,,,,,,,,,,,,,,,,2,10
-food,0005,Cole Slaw,Fresh Quick,units=cup;1.5,"Total=20,fat=0",0,0,0,15,5,2,1,lookup,lookup,,,,
-vitamins,0005,,,,,,,,,,,,,,30,45,,
-minerals,0005,,,,,,,,,,,,,,,,4,2
-food,0006,Eggs,Goodpath,units=g;50,"Total=70,fat=40",4.5,1.5,215,65,1,0,6,lookup,lookup,,,,
-vitamins,0006,,,,,,,,,,,,,,6,0,,
-minerals,0006,,,,,,,,,,,,,,,,2,4
-food,0007,Hazelnut Spread,Ferreira,units=tbsp;2,"Total=200,fat=90",10,2,0,20,23,2,3,lookup,lookup,,,,
-vitamins,0007,,,,    ,,,,,,,,,,0,0,,
-minerals,0007,,,,,,,,,,,,,,,,6,4
-food,0008,Potato Chips,Lees,units=g;28,"Total=150,fat=90",10,3,0,190,15,1,2,lookup,lookup,,,,
-vitamins,0008,,,,,,,,,,,,,,0,10,,
-minerals,0008,,,,,,,,,,,,,,,,0,0
-food,0009,"Soy Patties, Grilled",Gardenproducts,units=g;96,"Total=160,fat=45",5,0,0,420,10,4,9,lookup,lookup,,,,
-vitamins,0009,,,,,,,,,,,,,,0,0,,
-minerals,0009,,,,,,,,,,,,,,,,0,0
-food,0010,"Truffles, Dark Chocolate",Lyndon's,units=g;39,"Total=220,fat=170",19,14,25,10,16,1,1,lookup,lookup,,,,
-vitamins,0010,,,,,,,,,,,,,,0,0,,
-minerals,0010,,,,,,,,,,,,,,,,0,0
+_id,_parent,_type,root-food,food-name,food-mfr,food-serving,food-calories,food-total-fat,food-saturated-fat>,food-cholesterol,food-sodium,food-carb,food-fiber,food-protein,food-vitamin,food-mineral,vitamin-a,vitamin-c,mineral-ca,mineral-fe
+1,,root,id=1,#2,,,,,,,,,,,,,,,,
+2,1,food,,Avocado Dip,Sunnydale,29;units=g,"total=110,fat=100",11,3,5,210,2,0,1,#3,#4,,,,
+3,2,mineral,,,,,,,,,,,,,,,0,0,,
+4,2,vitamin,,,,,,,,,,,,,,,,,0,0
+5,,root,id=5,#6,,,,,,,,,,,,,,,,
+6,5,food,,Bagels New York Style,Thompson,104;units=g,"total=t350,fat=35",4,1,0,510,54,3,11,#7,#8,,,,
+7,6,mineral,,,,,,,,,,,,,,,0,0,,
+8,6,vitamin,,,,,,,,,,,,,,,,,8,20
+9,,root,id=9,#10,,,,,,,,,,,,,,,,
+10,9,food,,"Beef Frankfurter, Quarter Pound",Armitage,115;units=g,"total=370,fat=290",32,15,65,1100,8,0,13,#11,#12,,,,
+11,10,mineral,,,,,,,,,,,,,,,0,2,,
+12,10,vitamin,,,,,,,,,,,,,,,,,1,6
+13,,root,id=13,#14,,,,,,,,,,,,,,,,
+14,13,food,,Chicken Pot Pie,Lakeson,198;units=g,"total=410,fat=200",22,9,25,810,42,2,10,#15,#16,,,,
+15,14,mineral,,,,,,,,,,,,,,,20,2,,
+16,14,vitamin,,,,,,,,,,,,,,,,,2,10
+17,,root,id=17,#18,,,,,,,,,,,,,,,,
+18,17,food,,Cole Slaw,Fresh Quick,1.5;units=cup,"total=20,fat=0",0,0,0,15,5,2,1,#19,#20,,,,
+19,18,mineral,,,,,,,,,,,,,,,30,45,,
+20,18,vitamin,,,,,,,,,,,,,,,,,4,2
+21,,root,id=21,#22,,,,,,,,,,,,,,,,
+22,21,food,,Eggs,Goodpath,50;units=g,"total=70,fat=40",4.5,1.5,215,65,1,0,6,#23,#24,,,,
+23,22,mineral,,,,,,,,,,,,,,,6,0,,
+24,22,vitamin,,,,,,,,,,,,,,,,,2,4
+25,,root,id=25,#26,,,,,,,,,,,,,,,,
+26,25,food,,Hazelnut Spread,Ferreira,2;units=tbsp,"total=200,fat=90",10,2,0,20,23,2,3,#27,#28,,,,
+27,26,mineral,,,,,,,,,,,,,,,0,0,,
+28,26,vitamin,,,,,,,,,,,,,,,,,6,4
+29,,root,id=29,#30,,,,,,,,,,,,,,,,
+30,29,food,,Potato Chips,Lees,28;units=g,"total=150,fat=90",10,3,0,190,15,1,2,#31,#32,,,,
+31,30,mineral,,,,,,,,,,,,,,,0,10,,
+32,30,vitamin,,,,,,,,,,,,,,,,,0,0
+33,,root,id=33,#34,,,,,,,,,,,,,,,,
+34,33,food,,"Soy Patties, Grilled",Gardenproducts,96;units=g,"total=160,fat=45",5,0,0,420,10,4,9,#34,#35,,,,
+35,34,mineral,,,,,,,,,,,,,,,0,0,,
+36,34,vitamin,,,,,,,,,,,,,,,,,0,0
+37,,root,id=37,#38,,,,,,,,,,,,,,,,
+38,37,food,,"Truffles, Dark Chocolate",Lyndon's,39;units=g,"total=220,fat=170",19,14,25,10,16,1,1,#38,#39,,,,
+39,38,mineral,,,,,,,,,,,,,,,0,0,,
+40,38,vitamin,,,,,,,,,,,,,,,,,0,0

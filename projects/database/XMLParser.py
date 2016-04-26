@@ -39,12 +39,14 @@ class XMLCreator():
         # divide table vertically into 2. left side defines parent tags; right side defines child
         # tags; values and attributes
         
-        table = [["tag","id","field_name","field_mfr","field_serving","field_calories"],
-                 ["food","0001","Avocado Dip","Sunnydale","units=g;29","total=110,fat=100"]	,		
-                 ["food","0002","Bagels New York Style","Thompson","units=g;104","total=350,fat=35"],
-                 ["food","0003","Beef Frankfurter, Quarter Pound","Armitage","units=g;115","total=370,fat=290"],
-                 ["food","0004","Chicken Pot Pie","Lakeson","units=g;198","total=410,fat=200"]]
-        
+        table = [["_id","_parent","_type","root-food","food-name","food-mfr","food-serving","food-calories"],
+                 [1,"","root","#2;id=1","","","",""],
+                 [2,1,"food","","Avocado Dip","Sunnydale","29;units=g","total=110,fat=100"],
+                 [5,"","root","#6;id=5","","","",""],
+                 [6,5,"food","","Bagels New York Style","Thompson","104;units=g","total=t350,fat=35"],
+                 [9,"","root","#10;id=9","","","",""],
+                 [10,9,"food","","Beef Frankfurter, Quarter Pound","Armitage","115;units=g","total=370,fat=290"]]
+
         parent_defn = zip(*table)[0:2]
         child_defn = zip(*table)[3:len(table[0])]
         

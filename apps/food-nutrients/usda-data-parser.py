@@ -48,17 +48,6 @@ FOOD_DES_FILE = ospath.join(DATADIR,"FOOD_DES.txt")
 
 data = read_delim_text_from_file(FOOD_DES_FILE,"^")
 
-      A 5*  N 
-    A 4   N 
-   A 200 N 
-   A 60  N 
-     A 100 Y
- A 65  Y 
-      A 1   Y 
-    A 135 Y 
-      N 2   Y 
-     A 65  Y 
-    N 4.2 Y 
 
 field_enum = [
                {field:"NDB_No",     datatype:,nullable:},
