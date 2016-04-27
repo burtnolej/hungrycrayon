@@ -36,8 +36,58 @@ class XMLCreator():
         
     def table2xml(self):
         
-        # divide table vertically into 2. left side defines parent tags; right side defines child
-        # tags; values and attributes
+        def _contains(source_str,search_char):
+            try:
+                source_str.index(search_char)
+                return True
+            except:
+                return False
+            
+        def _isvalidheader(value):
+            # so value #3 means this tag has children represented in row 3
+            if _contains("-"):
+                return True
+            return(False)
+        
+        def _getheaderinfo(value):
+            items = value.split("-")
+            if len(items)>2:
+                raise Exception("must be of the form 'eek-eek'")
+            return((items[0],items[1]))  
+        
+        def _isref(value):
+            # so value #3 means this tag has children represented in row 3
+            if value.startswith("#"):
+                return True
+            return(False)
+    
+        def _containsattr(value):
+            # so 24;"unit=g" represents an element tag has an attribute
+            if _contains(value,";"):
+                return True
+            return False
+
+        def _getattr(value):
+            items = value.split(";")
+            if len(items)>2:
+                raise Exception("must be of the form 'blah;blah'")
+            return(items[0],items[1])
+
+        def _getattr_value(value):
+            items = value.split("=")
+            if len(items)>2:
+                raise Exception("must be of the form 'yeh=yeh'")
+            return(items[0],items[1])    
+
+        def _notset(value):    
+            if value<>"":
+                return True
+            return False
+
+        def _gettagname(value,header):
+            # get the corresponding header for this column
+            # index 0 contains the record_type which is not required for processing
+            return(header[1])
         
         table = [["_id","_parent","_type","root-food","food-name","food-mfr","food-serving","food-calories"],
                  [1,"","root","#2;id=1","","","",""],
@@ -47,30 +97,91 @@ class XMLCreator():
                  [9,"","root","#10;id=9","","","",""],
                  [10,9,"food","","Beef Frankfurter, Quarter Pound","Armitage","115;units=g","total=370,fat=290"]]
 
-        parent_defn = zip(*table)[0:2]
-        child_defn = zip(*table)[3:len(table[0])]
-        
-        # get the number of rows that are to be processed
-        num_rows = len(parent_defn[0])
-        
-        # parent tag defns: column headers must be 'tag' and 'tag_id'
-        
-        for i in range(1,num_rows):
-            # set parent tag
-            tag=parent_defn[0][i]
-            
-            # set attr and attr_val
-            attr=parent_defn[1][i]
-            attr_val=parent_defn[1][i]
-            
-            # create element
-            element = self.add_child_tag(self.tree,tag)
-            
-            # add id attribute to the element
-            self.add_attr(element,"id",attr_val)
-        
-        print self.dump()
+        # split the columns 1,2&3 (fixed ref) from the remaining n columns (variable data)
+        ref_table = zip(*table)[:3]
+        data_table = zip(*table)[3:]
 
+        ref_table = zip(*ref_table)
+        data_table = zip(*data_table)
+        
+        # separate out the headers
+        data_table_headers = data_table[0]
+        
+        # remove the header rows
+        ref_table = ref_table[1:]
+        data_table = data_table[1:]
+        
+        root_rows=[] # list of ids containing the root rows
+        data_table_width = len(data_table[0])
+        table_depth = len(data_table)
+        
+        # process headers to classify as sub types
+        # assume that column 1,2,3 are id,parent,type
+        i=0
+        _data_table_headers = data_table_headers
+        data_table_headers = []
+        
+        for data_table_header in _data_table_headers:
+            if _isvalidheader(data_table_header):
+                # its a column description (token1-token2) where token2 is a field 
+                # in record token 1 
+                data_table_headers.append(_getheaderinfo(data_table_header))
+            else:
+                raise exception("header needs to be in the form 'token-token'")
+            
+        # pre process data rows
+        records = {} # key is ID; value is dict with keys (parent,type,list(values)
+        for ref_row in ref_table:
+            _id,_parent,_type = ref_row
+            
+            # store root ids separately
+            # to process table and build xml; we take each root row and follow all lookups
+            # until root is row is complete
+            if _type == "root":
+                root_rows.append(_id)
+                
+            d = {}
+            # remove the empty columns; probably their because of a spreadsheet export to csv
+            data_values = [value for value in data_table[i] if value<> ""]
+            d['parent'] = _parent
+            d['type'] = _type
+            d['values'] = data_values
+            records[_id] = d
+        
+        def _process_record(record_id):            
+            
+            values = records[record_id]['values']
+            
+            for value in values:
+                if _containsattr(value):
+                    # element contains attribute
+                    tag_value,attr=_getattr(value)
+                else:
+                    tag_value = fields[value]
+                    attr = ""
+                    
+                index = values.index(value)
+                tag = _gettagname(data_table_headers[index])
+                element = self.add_child_tag(self.tree,tag)
+                
+                if _notset(attr):
+                    attr_name,attr_value=_getattr_value(attr)
+                    
+                    # add id attribute to the element
+                    self.add_attr(element,attr_name,attr_value)
+                    
+                if _isref(tag_value):
+                    # then element has children; process child
+                    process_record(tag_value[1:])
+                else:
+                    # no children so just set text
+                    self.update_element(element,tag_value)
+
+        for root_id in root_rows:
+            _process_record(root_id)
+
+       # print self.dump()
+        
 
      
 class TestXMLCreator(unittest.TestCase):     
