@@ -10,6 +10,74 @@ class XMLCreator():
         self.filen = filen
         self.tree = xmltree.Element(root_tag)
 
+    @staticmethod
+    def _isroottype(value):
+        if value == "root":
+            return True
+        return False
+
+    @staticmethod
+    def _contains(source_str,search_char):
+        try:
+            source_str.index(search_char)
+            return True
+        except:
+            return False
+    
+    @staticmethod
+    def _gettagname(value):
+        # get the corresponding header for this column
+        # index 0 contains the record_type which is not required for processing
+        return(value[1])
+
+    @staticmethod
+    def _isvalidheader(value):
+        # so value #3 means this tag has children represented in row 3
+        if XMLCreator._contains(value,"-"):
+            return True
+        return(False)
+    
+    @staticmethod
+    def _getheaderinfo(value):
+        items = value.split("-")
+        if len(items)>2:
+            raise Exception("must be of the form 'eek-eek'")
+        return((items[0],items[1]))  
+
+    @staticmethod
+    def _isref(value):
+        # so value #3 means this tag has children represented in row 3
+        if value.startswith("#"):
+            return True
+        return(False)
+
+    @staticmethod
+    def _containsattr(value):
+        # so 24;"unit=g" represents an element tag has an attribute
+        if XMLCreator._contains(value,";"):
+            return True
+        return False
+
+    @staticmethod
+    def _getattr(value):
+        items = value.split(";")
+        if len(items)>2:
+            raise Exception("must be of the form 'blah;blah'")
+        return(items[0],items[1])
+
+    @staticmethod
+    def _getattr_value(value):
+        items = value.split("=")
+        if len(items)>2:
+            raise Exception("must be of the form 'yeh=yeh'")
+        return(items[0],items[1])    
+
+    @staticmethod
+    def _notset(value):    
+        if value<>"":
+            return True
+        return False
+
     @classmethod
     def table(cls, root_tag,table, filen=None, ns=None):
         self.tree = xmltree.Element(root_tag)
@@ -35,60 +103,7 @@ class XMLCreator():
         element.text = text
         
     def table2xml(self):
-        
-        def _contains(source_str,search_char):
-            try:
-                source_str.index(search_char)
-                return True
-            except:
-                return False
-            
-        def _isvalidheader(value):
-            # so value #3 means this tag has children represented in row 3
-            if _contains("-"):
-                return True
-            return(False)
-        
-        def _getheaderinfo(value):
-            items = value.split("-")
-            if len(items)>2:
-                raise Exception("must be of the form 'eek-eek'")
-            return((items[0],items[1]))  
-        
-        def _isref(value):
-            # so value #3 means this tag has children represented in row 3
-            if value.startswith("#"):
-                return True
-            return(False)
     
-        def _containsattr(value):
-            # so 24;"unit=g" represents an element tag has an attribute
-            if _contains(value,";"):
-                return True
-            return False
-
-        def _getattr(value):
-            items = value.split(";")
-            if len(items)>2:
-                raise Exception("must be of the form 'blah;blah'")
-            return(items[0],items[1])
-
-        def _getattr_value(value):
-            items = value.split("=")
-            if len(items)>2:
-                raise Exception("must be of the form 'yeh=yeh'")
-            return(items[0],items[1])    
-
-        def _notset(value):    
-            if value<>"":
-                return True
-            return False
-
-        def _gettagname(value,header):
-            # get the corresponding header for this column
-            # index 0 contains the record_type which is not required for processing
-            return(header[1])
-        
         table = [["_id","_parent","_type","root-food","food-name","food-mfr","food-serving","food-calories"],
                  [1,"","root","#2;id=1","","","",""],
                  [2,1,"food","","Avocado Dip","Sunnydale","29;units=g","total=110,fat=100"],
@@ -122,22 +137,23 @@ class XMLCreator():
         data_table_headers = []
         
         for data_table_header in _data_table_headers:
-            if _isvalidheader(data_table_header):
+            if self._isvalidheader(data_table_header):
                 # its a column description (token1-token2) where token2 is a field 
                 # in record token 1 
-                data_table_headers.append(_getheaderinfo(data_table_header))
+                data_table_headers.append(self._getheaderinfo(data_table_header))
             else:
                 raise exception("header needs to be in the form 'token-token'")
             
         # pre process data rows
         records = {} # key is ID; value is dict with keys (parent,type,list(values)
+        i=0
         for ref_row in ref_table:
             _id,_parent,_type = ref_row
             
             # store root ids separately
             # to process table and build xml; we take each root row and follow all lookups
             # until root is row is complete
-            if _type == "root":
+            if self._isroottype(_type):
                 root_rows.append(_id)
                 
             d = {}
@@ -147,40 +163,42 @@ class XMLCreator():
             d['type'] = _type
             d['values'] = data_values
             records[_id] = d
+            i+=1
         
         def _process_record(record_id):            
             
-            values = records[record_id]['values']
+            values = records[int(record_id)]['values']
             
             for value in values:
-                if _containsattr(value):
+                if self._containsattr(value):
                     # element contains attribute
-                    tag_value,attr=_getattr(value)
+                    tag_value,attr=self._getattr(value)
                 else:
-                    tag_value = fields[value]
+                    tag_value = value
                     attr = ""
                     
                 index = values.index(value)
-                tag = _gettagname(data_table_headers[index])
+                tag = self._gettagname(data_table_headers[index])
                 element = self.add_child_tag(self.tree,tag)
                 
-                if _notset(attr):
-                    attr_name,attr_value=_getattr_value(attr)
+                if self._notset(attr):
+                    attr_name,attr_value=self._getattr_value(attr)
                     
                     # add id attribute to the element
                     self.add_attr(element,attr_name,attr_value)
                     
-                if _isref(tag_value):
+                if self._isref(tag_value):
                     # then element has children; process child
-                    process_record(tag_value[1:])
+                    _process_record(tag_value[1:])
                 else:
                     # no children so just set text
                     self.update_element(element,tag_value)
+                    
 
         for root_id in root_rows:
             _process_record(root_id)
 
-       # print self.dump()
+        print self.dump()
         
 
      
