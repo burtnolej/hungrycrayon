@@ -1,0 +1,46 @@
+<nutrition>
+    <food id="1">
+        <name>Avocado Dip</name>
+        <mfr>Sunnydale</mfr>
+        <serving units="g">29</serving>
+        <calories fat="100" total="110" />
+    </food>
+    <food id="5">
+        <name>Bagels New York Style</name>
+        <mfr>Thompson</mfr>
+        <serving units="g">104</serving>
+        <calories fat="35" total="350" />
+    </food>
+    <food id="9">
+        <name>Beef Frankfurter, Quarter Pound</name>
+        <mfr>Armitage</mfr>
+        <serving units="g">115</serving>
+        <calories fat="290" total="370" />
+    </food>
+</nutrition>
+
+
+['<nutrition>', open
+'<food id="1">', open
+'<name>', open
+'Avocado Dip</name>' close
+'<mfr>', open
+'Sunnydale</mfr>',
+'<serving units="g">', 
+'29</serving>',
+'<calories fat="100" total="110" />',
+'</food>', '<food id="5">', 
+'<name>', 'Bagels New York Style</name>',
+'<mfr>', 'Thompson</mfr>',
+'<serving units="g">',
+'104</serving>',
+'<calories fat="35" total="350" />', 
+'</food>', '<food id="9">',
+'<name>', 'Beef Frankfurter, Quarter Pound</name>',
+'<mfr>', 'Armitage</mfr>', 
+'<serving units="g">', '115</serving>', 
+'<calories fat="290" total="370" />',
+'</food>',
+'</nutrition>', '']
+
+

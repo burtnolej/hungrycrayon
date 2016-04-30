@@ -12,10 +12,19 @@ def file_exists(filename):
         return(False)
      
 def read_text_from_file(filename):
-    'returns a list of strings'
+    '''returns a list of strings'''
     l=[]
     fh = open(filename, 'r+')
     return [line.rstrip() for line in fh]
+
+def file2string(filename):
+    '''returns a string'''
+    s=""
+    fh = open(filename, 'r+')
+    
+    for line in fh:
+        s+=line
+    return s
 
 def read_delim_text_from_file(filename,delim):
     'returns a list of lists'

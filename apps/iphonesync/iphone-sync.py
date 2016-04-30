@@ -29,7 +29,7 @@ def exec_cmd(cmd,log):
     return(commands.getstatusoutput(cmd))
     
 def parse_output(output):
-    search_result = re.search("SUCCESS",text)
+    search_result = re.search("SUCCESS",output)
 
     if hasattr(search_result,"pos"):
         return(0)
@@ -69,6 +69,7 @@ code,text = exec_cmd(cmd_iphone_ls,log)
 #exec_cmd(cmd_iphone_unmount,log)
 
 
+print text
 exit()
 
 #cp -r /media/iPhone/DCIM/* ~/Pictures/iPhones-sync/"DCIM-" + [phone name]

@@ -1,0 +1,11 @@
+<device udid="990c2407137d91ea7c7553bb8cb529f76610fd6b">
+    <name>Tarantula</name>
+    <type>iPhone6s</type>
+    <mount_point>/media/iPhone</mount>
+    <images>
+        <source_dir>DCIM</souce_dir>
+        <target_path_prefix>/home/burtnolej/Pictures/iPhone-sync-</target_path_prefix>
+    </images>
+    <documents/>
+    <videos/>
+</device>
