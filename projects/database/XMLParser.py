@@ -50,6 +50,75 @@ class XMLParser():
             
         return values
     
+    def _get_child_tags(self,parent_element,parent_tag,child_tags):
+        ''' append any children to the child tag list'''
+        if len(parent_element._children)>0:
+            for child in parent_element._children:
+                child_tags.append(parent_tag + "-" + child.tag)
+                self._get_child_tags(child,child.tag,child_tags)
+        
+    def get_child_tags_by_attr(self,tag,attr,attr_val,ns=None):
+        ''' for a given attribute value; return a list of all the child tags 
+        expects to get 1 record back; works recursively down the tree '''
+        parent_element = self.get_elements_by_attr(tag,attr,attr_val,"equal")
+        
+        if len(parent_element)>1:
+            raise Exception("expected to only get 1 record returned; got",len(element))
+        else:
+            parent_element = parent_element[0]
+            
+        child_tags = []
+        self._get_child_tags(parent_element,tag,child_tags)
+            
+        return(child_tags)
+
+    @staticmethod
+    def _has_children(element):
+        if len(element._children)>0:
+            return True
+        return False
+            
+    def _get_child_values(self,parent,parent_tag,child_values,row_id,col_id):
+        ''' append any children to the child tag list'''
+        row_id += 1
+        if XMLParser._has_children(parent):
+            for child in parent._children:
+                col_id += 1
+                
+                if XMLParser._has_children(child):
+                    child_values[row_id][col_id] = "#" + (row_id+1) + ";" child.attrib
+                    self._get_child_values(child,child.tag,child_tags)
+                else:
+                    child_values[row_id][col_id] = child.text + ";" child.attrib
+        
+    def get_child_values_by_attr(self,tag,attr,attr_val,ns=None):
+        ''' for a given attribute value; return a list of all the child tags 
+        expects to get 1 record back; works recursively down the tree '''
+        parent_element = self.get_elements_by_attr(tag,attr,attr_val,"equal")
+        row_id = 1
+        col_id = 0
+        
+        if len(parent_element)>1:
+            raise Exception("expected to only get 1 record returned; got",len(element))
+        else:
+            parent_element = parent_element[0]
+            
+        child_tags = []
+        self._get_child_tags(parent_element,tag,child_tags,row_id,col_id)
+            
+        return(child_tags)
+    
+    def get_child_tagvalue_by_attr(self,tag,attr,attr_val,ns=None):
+        ''' for a given attribute value; return a list of tuples of the form (tag,value)  
+        expects to get 1 record back '''
+        element = self.get_elements_by_attr(tag,attr,attr_val,"equal")
+        
+        if len(element)>1:
+            raise Exception("expected to only get 1 record returned; got",len(element))
+        
+        return [(child.tag,child.text) for child in element[0]._children]
+    
+    
     # Operator methods
     @staticmethod
     def gtequal(val1,val2):
@@ -321,13 +390,143 @@ class TestXMLParser(unittest.TestCase):
             
         # assert correctness
         self.assertEquals(values,expected_results)
+            
+class TestXMLParserMulti(unittest.TestCase):
+    ''' tests the ability to parse entire branches of trees and return data in
+    tabular form'''
     
+    def setUp(self):
+        self.xmlparser = XMLParser("food.xml")
+        
+        self.expected_header_results = ["food-name",\
+                                        "food-mfr",\
+                                        "food-serving",\
+                                        "food-calories",\
+                                        "food-total-fat",\
+                                        "food-saturated-fat",\
+                                        "food-cholesterol",\
+                                        "food-sodium",\
+                                        "food-carb",\
+                                        "food-fiber",\
+                                        "food-protein",\
+                                        "food-vitamins",\
+                                        "vitamins-a",\
+                                        "vitamins-c",\
+                                        "food-minerals",\
+                                        "minerals-ca",\
+                                        "minerals-fe"]
+        
+        table_0002[0] = ["_id","_parent","_type","root-food"]+self.expected_header_results
+        table_0002[1] = [1,"","root","#2;id=0001","","","","","","","","","","","","","","","","",""],
+        table_0002[2] = [2,
+                         1,
+                         "food",
+                         "",
+                         "Bagels New York Style",\
+                         "Thompson",\
+                         "104;g",\
+                         ";total=\"300\",fat=\"35\"",\
+                         "4",\
+                         "1",\
+                         "0",\
+                         "510",\
+                         "54",\
+                         "3",\
+                         "11",\
+                         "#3",\
+                         "",\
+                         "",\
+                         "#4",\
+                         "",\
+                         ""]
+        table_0002[3] = [3,
+                         2,
+                         "vitamins",
+                         "",
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "0",\
+                         "0",\
+                         "",\
+                         "",\
+                         ""]
+        table_0002[4] = [4,
+                         3,
+                         "minerals",
+                         "",
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "",\
+                         "8"
+                         "2"]
+                     
+
+    
+
+    def test_get_child_tags_by_attr(self):
+        
+        # test parameters
+        test_tag="food"
+        test_attr="id"
+        test_attr_val="0002"
+        test_attr_val_pred="equal"
+        
+        # execute test
+        values = self.xmlparser.get_child_tags_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)
+            
+        # assert correctness
+        self.assertEquals(values,self.expected_header_results)
+        
+    def test_get_child_tagvalues_by_attr(self):
+        
+        # test parameters
+        test_tag="food"
+        test_attr="id"
+        test_attr_val="0002"
+        test_attr_val_pred="equal"
+        
+        # set expected results: the number of elements returned 
+        
+
+
+        '''expected_results = [("name","Bagels New York Style"),\
+                             ("mfr","Thompson"),\
+                             ("serving","calories","total-fat","saturated-fat","cholesterol","sodium","carb","fiber","protein","vitamins","minerals"]
+        '''
+        # execute test
+        values = self.xmlparser.get_child_tagvalue_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)
+            
+        # assert correctness
+        self.assertEquals(values,expected_results)
+        
 if __name__ == "__main__":
     
 
     suite = unittest.TestSuite()
-    '''
-    suite.addTest(TestXMLParser("test_get_elements"))
+
+    '''suite.addTest(TestXMLParser("test_get_elements"))
     suite.addTest(TestXMLParser("test_get_elements_fail"))
     suite.addTest(TestXMLParser("test_get_elements_invalid_tag"))
     suite.addTest(TestXMLParser("test_get_elements_by_attr_gtequal"))
@@ -336,18 +535,10 @@ if __name__ == "__main__":
     suite.addTest(TestXMLParser("test_get_values"))
     suite.addTest(TestXMLParser("test_get_values_fail"))    
     suite.addTest(TestXMLParser("test_get_values_invalid_tag"))    
-    suite.addTest(TestXMLParser("test_get_values_by_attr_gtequal"))  
-
+    suite.addTest(TestXMLParser("test_get_values_by_attr_gtequal"))  '''
     
-    suite.addTest(TestXMLCreator("test_init_tree")) 
-    suite.addTest(TestXMLCreator("test_add_child_tag")) 
-    suite.addTest(TestXMLCreator("test_update_element"))
-    suite.addTest(TestXMLCreator("test_add_attr"))
-    suite.addTest(TestXMLCreator("test_add_child_element"))
-    '''
+    suite.addTest(TestXMLParser("test_get_child_tags_by_attr"))
 
-    suite.addTest(TestXMLCreatorTable2XML("test_table_to_xml_single_child_tag"))
-    suite.addTest(TestXMLCreatorTable2XML("test_table_to_xml_single_grandchild"))
-    
+
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)    
