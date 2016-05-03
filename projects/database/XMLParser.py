@@ -77,19 +77,37 @@ class XMLParser():
         if len(element._children)>0:
             return True
         return False
-            
+           
+    @staticmethod 
+    def _init_row(table,width,init_value):
+        _new_row = []
+        for i in range(width):
+            _new_row.append(init_value)
+        table.append(_new_row)
+        return(len(table)-1)
+        
     def _get_child_values(self,parent,parent_tag,child_values,row_id,col_id):
         ''' append any children to the child tag list'''
-        row_id += 1
+        
+        # initialize a new row
+        row_id = XMLParser._init_row(child_values,50,"")
+            
         if XMLParser._has_children(parent):
             for child in parent._children:
                 col_id += 1
                 
                 if XMLParser._has_children(child):
-                    child_values[row_id][col_id] = "#" + (row_id+1) + ";" child.attrib
-                    self._get_child_values(child,child.tag,child_tags)
+                    new_row_id, col_id = self._get_child_values(child,child.tag,child_values,\
+                                                       row_id,col_id)
+                    child_values[row_id][col_id] = "#" + str(new_row_id) + ";" "attrib"
+                    
                 else:
-                    child_values[row_id][col_id] = child.text + ";" child.attrib
+                    value = child.text
+                    if value==None:
+                        value="None"
+                    child_values[row_id][col_id] = value + ";" + "attrib"
+                    
+        return(row_id,col_id)
         
     def get_child_values_by_attr(self,tag,attr,attr_val,ns=None):
         ''' for a given attribute value; return a list of all the child tags 
@@ -103,10 +121,17 @@ class XMLParser():
         else:
             parent_element = parent_element[0]
             
-        child_tags = []
-        self._get_child_tags(parent_element,tag,child_tags,row_id,col_id)
+        child_values = []
+        
+        # create root record
+        row_id = XMLParser._init_row(child_values,50,"")
+        child_values[row_id][0]=row_id
+        child_values[row_id][2]=tag
+        child_values[row_id][3]="#"+str(row_id+1)+";"
+
+        self._get_child_values(parent_element,tag,child_values,row_id,col_id)
             
-        return(child_tags)
+        return(child_values)
     
     def get_child_tagvalue_by_attr(self,tag,attr,attr_val,ns=None):
         ''' for a given attribute value; return a list of tuples of the form (tag,value)  
@@ -415,75 +440,72 @@ class TestXMLParserMulti(unittest.TestCase):
                                         "food-minerals",\
                                         "minerals-ca",\
                                         "minerals-fe"]
-        
-        table_0002[0] = ["_id","_parent","_type","root-food"]+self.expected_header_results
-        table_0002[1] = [1,"","root","#2;id=0001","","","","","","","","","","","","","","","","",""],
-        table_0002[2] = [2,
-                         1,
-                         "food",
-                         "",
-                         "Bagels New York Style",\
-                         "Thompson",\
-                         "104;g",\
-                         ";total=\"300\",fat=\"35\"",\
-                         "4",\
-                         "1",\
-                         "0",\
-                         "510",\
-                         "54",\
-                         "3",\
-                         "11",\
-                         "#3",\
-                         "",\
-                         "",\
-                         "#4",\
-                         "",\
-                         ""]
-        table_0002[3] = [3,
-                         2,
-                         "vitamins",
-                         "",
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "0",\
-                         "0",\
-                         "",\
-                         "",\
-                         ""]
-        table_0002[4] = [4,
-                         3,
-                         "minerals",
-                         "",
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "",\
-                         "8"
-                         "2"]
-                     
-
-    
+        self.table_0002 = []
+        #self.table_0002.append(["_id","_parent","_type","root-food"]+self.expected_header_results)
+        self.table_0002.append([0,"","root","#2;id=0001","","","","","","","","","","","","","","","","",""]),
+        self.table_0002.append([1,
+                                0,
+                                "food",
+                                "",
+                                "Bagels New York Style",\
+                                "Thompson",\
+                                "104;g",\
+                                ";total=\"300\",fat=\"35\"",\
+                                "4",\
+                                "1",\
+                                "0",\
+                                "510",\
+                                "54",\
+                                "3",\
+                                "11",\
+                                "#3",\
+                                "",\
+                                "",\
+                                "#4",\
+                                "",\
+                                ""])
+        self.table_0002.append([2,
+                                1,
+                                "vitamins",
+                                "",
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "0",\
+                                "0",\
+                                "",\
+                                "",\
+                                ""])
+        self.table_0002.append([3,
+                                2,
+                                "minerals",
+                                "",
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "",\
+                                "8"
+                                "2"])
 
     def test_get_child_tags_by_attr(self):
         
@@ -499,7 +521,7 @@ class TestXMLParserMulti(unittest.TestCase):
         # assert correctness
         self.assertEquals(values,self.expected_header_results)
         
-    def test_get_child_tagvalues_by_attr(self):
+    def test_get_child_values_by_attr(self):
         
         # test parameters
         test_tag="food"
@@ -508,15 +530,10 @@ class TestXMLParserMulti(unittest.TestCase):
         test_attr_val_pred="equal"
         
         # set expected results: the number of elements returned 
+        expected_results = self.table_0002
         
-
-
-        '''expected_results = [("name","Bagels New York Style"),\
-                             ("mfr","Thompson"),\
-                             ("serving","calories","total-fat","saturated-fat","cholesterol","sodium","carb","fiber","protein","vitamins","minerals"]
-        '''
         # execute test
-        values = self.xmlparser.get_child_tagvalue_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)
+        values = self.xmlparser.get_child_values_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)
             
         # assert correctness
         self.assertEquals(values,expected_results)
@@ -537,7 +554,7 @@ if __name__ == "__main__":
     suite.addTest(TestXMLParser("test_get_values_invalid_tag"))    
     suite.addTest(TestXMLParser("test_get_values_by_attr_gtequal"))  '''
     
-    suite.addTest(TestXMLParser("test_get_child_tags_by_attr"))
+    suite.addTest(TestXMLParserMulti("test_get_child_values_by_attr"))
 
 
     runner = unittest.TextTestRunner(verbosity=2)
