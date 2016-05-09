@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/css" href="nutrition.css"?>
+<nutrition>
+    <food id="0002">
+        <name>Bagels New York Style</name>
+        <mfr>Thompson</mfr>
+        <serving units="g">104</serving>
+        <calories total="300" fat="35"/>
+        <total-fat>4</total-fat>
+        <saturated-fat>1</saturated-fat>
+        <cholesterol>0</cholesterol>
+        <sodium>510</sodium>
+        <carb>54</carb>
+        <fiber>3</fiber>
+        <protein>11</protein>
+        <vitamins>
+            <a>0</a>
+            <c>0</c>
+        </vitamins>
+        <minerals>
+            <ca>8</ca>
+            <fe>20</fe>
+        </minerals>
+    </food>
+</nutrition>
+
+<!--
+<food>
+    <name></name>
+    <mfr></mfr>
+    <serving units="g"></serving>
+    <calories total="" fat=""/>
+    <total-fat></total-fat>
+    <saturated-fat></saturated-fat>
+    <cholesterol></cholesterol>
+    <sodium></sodium>
+    <carb></carb>
+    <fiber></fiber>
+    <protein></protein>
+    <vitamins>
+        <a></a>
+        <c></c>
+    </vitamins>
+    <minerals>
+        <ca></ca>
+        <fe></fe>
+    </minerals>
+</food>
+-->
