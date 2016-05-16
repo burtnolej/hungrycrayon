@@ -4,18 +4,113 @@ import xml.etree.ElementTree as xmltree
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
 from misc_utils import write_text_to_file, file2string
+from XMLTableRepr import XMLTableRepr
 
 class XMLParser():
+    
+    '''
+    sample xml for used for illustrative purposes in the documentation:
+    
+    xml form :
+    
+    <tag>
+      <child id="blah blah">
+        <gchild attrib="hmmm">FOO</gchild1>
+        <gchild1>BAR</gchild2>
+      </child>
+      <child id="yeh yeh">
+        <gchild> attrib="oooo">FOO2</gchild1>
+        <gchild1>BAR2</gchild2>
+      </child>
+    </tag>
+    
+    
+    table form:
+    
+    | _id | _parent | _type | root-tag | tag-child         | child-gchild       | child-gchild2
+    ------------------------ ----------------------------- -----------------------------------------------
+    |  0  | -1      |       | #1       |                   |                    |
+    |  1  | 0       | tag   |          | #2;id="blah blah" |                    |
+    |  2  | 1       | child |          |                   | FOO;attrib="hmmm"  | BAR;
+    |  2  | 1       | child |          |                   | FOO2;attrib="oooo" | BAR2;
+    -----------------------------------------------------------------------------------------------------
+    
+    
+    ----------------------------------------------------------------------------------------------------
+    | Glossary of terms
+    ----------------------------------------------------------------------------------------------------
+    | name    | type    | class                | Notes                        | Examples
+    ----------------------------------------------------------------------------------------------------
+    | element | object  | ElementTree.Element  |                              | Element("<tag><child id="X">Y
+    |         |         |                      |                              | </child></tag>")
+    | value   | str     |                      | 'tag' value (Element.Text)   | Y
+    | tag     | str     |                      | 'tag' name  (Element.Tag)    | child
+    | attr    | str     |                      | 'attrib' name (.Attrib[??]   | id
+    | attr_val| str     |                      | 'attrib' value (.Attrib[name]| X
+    | table   | 2d array| List                 | table representation of Tree | see table above
+    -----------------------------------------------------------------------------------------------------
+    
+    ----------------------------------------------------------------------------------------------------
+    | Public Member Functions
+    --------------------------------------------------------------------------------------------------------------------------
+    | name        | args                | description                                                    | tests
+    ---------------------------------------------------------------------------------------------------------------------------
+    | get_values  |                     | returns a list containing all the values found in the tree for | test_get_values
+    |             |                     | tag=tag.For example : get_values("child") would return:        | test_get_values_fail
+    |             |                     |               ["FOO","FOO2"]                                   | test_get_values_invalid_tag
+    |-------------|---------------------|----------------------------------------------------------------|----------------------
+    | get_elements|                     | returns a list containing all the elements found in the tree   | test_get_elements
+    |             |                     | for tag=tag. For example get_elements("gchild") would return:  | test_get_elements_fail
+    |             |                     |               Element("<gchild attrib="hmmm">FOO</gchild1>"),  | test_get_elements_invalid_tag
+    |             |                     |               Element("<gchild> attrib="oooo">FOO2</gchild1>')]| 
+    |-------------|---------------------|----------------------------------------------------------------|---------------------
+    | get_        |                     | returns a list containing all the elements found in the tree   | test_get_elements_by_attr_gtequal
+    | elements_   |                     | where tag=tag & attr_val=attr_val.                             | test_get_elements_by_attr_ltequal
+    | by_attr     |                     | For exmple get_elements_by_attr("gchild","attrib","hmmm")retrns| test_get_elements_by_attr_equal 
+    |             |                     |               [Element("<gchild attrib="hmmm">FOO</gchild1>")] | 
+    |---------------------------------- |----------------------------------------------------------------|---------------------
+    | get_values_ |                     | returns a list containing all the values found in the tree whre| test_get_values_by_attr_gtequal
+    | by_attr     |                     | tag=tag & attr_val=attr_val                                    |
+    |             |                     | For example get_values_by_attr("gchild","attrib","hmmm")returns| 
+    |             |                     |               ["FOO"]                                          |
+    |---------------------------------- |----------------------------------------------------------------|---------------------
+    | get_        | parent_element=None:| returns a list of the form parent_tag-child_tag for each child | test_get_tags
+    | tags        | defaults to root    | tag of the element passed in as an arg. defaults to the tree   |
+    |             |                     | root if nothing passed. must be passed elem,ents that only     |
+    |             |                     | have single offspring throughout the tree to avoid dupes       |
+    |---------------------------------- |----------------------------------------------------------------|---------------------
+    | get_table   |                     | for a given attribute value; return a table, with a tags       | test_get_table
+    |             |                     | children on 1 row with references to other rows that represent |
+    |             |                     | other descendents                                              |
+    |---------------------------------- |----------------------------------------------------------------|---------------------
+    
+    ----------------------------------------------------------------------------------------------------
+    | To Do
+    --------------------------------------------------------------------------------------------------------------------------
+    | Take out the _by_attr functions for elements and values and add them as parameters to the  regular methods, like in get_tags
+    --------------------------------------------------------------------------------------------------------------------------
+    
+    '''
     
     def __init__(self,schema, ns=None):
         self.tree = xmltree.parse(schema)
         
+    @classmethod
+    def table(cls,schema,ns=None):  
+        cls1 = cls(schema,ns)
+        cls1.xmltablerepr = XMLTableRepr(cls1)
+        cls1.table = cls1.xmltablerepr.table
+        
+        return(cls1)
+    
     def get_xml_root(self):
         ''' return the root node '''
         return(self.tree)
     
     def get_values(self,tag,ns=None):
-        
+        ''' returns a list containing all the values found in the tree
+        for tag=tag. For example : get_values("gchild") would return ["FOO","FOO2"]
+        '''
         values=[]               
         for element in self.tree.iter(tag):
                 values.append(element.text) 
@@ -23,7 +118,11 @@ class XMLParser():
         return values
     
     def get_elements(self,tag, attr=None,attr_val=None,attr_val_pred=None,ns=None):
-        
+        ''' returns a list containing all the elements found in the tree for tag=tag.
+        For example get_elements("gchild") would return: 
+           [Element("<gchild attrib="hmmm">FOO</gchild1>"),
+            Element("<gchild> attrib="oooo">FOO2</gchild1>')] 
+        '''
         elements=[]               
         for element in self.tree.iter(tag):
                 elements.append(element) 
@@ -31,7 +130,10 @@ class XMLParser():
         return elements
     
     def get_elements_by_attr(self,tag, attr,attr_val,attr_val_pred,ns=None):
-        
+        ''' returns a list containing all the elements found in the tree where tag=tag & attr_val=attr_val
+        For example get_elements_by_attr("gchild","attrib","hmmm") would return: 
+           [Element("<gchild attrib="hmmm">FOO</gchild1>")] 
+        '''       
         elements=[]               
         for element in self.tree.iter(tag):
                 if element.attrib.has_key(attr):
@@ -41,7 +143,10 @@ class XMLParser():
         return elements
     
     def get_values_by_attr(self,tag, attr,attr_val,attr_val_pred,ns=None):
-        
+        ''' returns a list containing all the values found in the tree where tag=tag & attr_val=attr_val
+        For example get_values_by_attr("gchild","attrib","hmmm") would return: 
+           ["FOO"] 
+        '''       
         values=[]               
         for element in self.tree.iter(tag):
                 if element.attrib.has_key(attr):
@@ -49,101 +154,29 @@ class XMLParser():
                         values.append(element.attrib[attr])
             
         return values
-    
-    def _get_child_tags(self,parent_element,parent_tag,child_tags):
+        
+    def _get_tags(self,parent_element,parent_tag,child_tags):
         ''' append any children to the child tag list'''
         if len(parent_element._children)>0:
             for child in parent_element._children:
                 child_tags.append(parent_tag + "-" + child.tag)
-                self._get_child_tags(child,child.tag,child_tags)
+                self._get_tags(child,child.tag,child_tags)
         
-    def get_child_tags_by_attr(self,tag,attr,attr_val,ns=None):
-        ''' for a given attribute value; return a list of all the child tags 
-        expects to get 1 record back; works recursively down the tree '''
-        parent_element = self.get_elements_by_attr(tag,attr,attr_val,"equal")
+    def get_tags(self,parent_element=None,ns=None):
+        ''' returns a list of the form parent_tag-child_tag for each child tag of the element passed 
+        in as an arg. defaults to the tree root if nothing passed. DOES NOT HANDLE DUPE TAGS'''
+        if parent_element==None:
+            parent_element = self.tree.getroot()
         
-        if len(parent_element)>1:
-            raise Exception("expected to only get 1 record returned; got",len(element))
-        else:
-            parent_element = parent_element[0]
-            
         child_tags = []
-        self._get_child_tags(parent_element,tag,child_tags)
-            
+        self._get_tags(parent_element,parent_element.tag,child_tags)
+
         return(child_tags)
 
-    @staticmethod
-    def _has_children(element):
-        if len(element._children)>0:
-            return True
-        return False
-           
-    @staticmethod 
-    def _init_row(table,width,init_value):
-        _new_row = []
-        for i in range(width):
-            _new_row.append(init_value)
-        table.append(_new_row)
-        return(len(table)-1)
         
-    def _get_child_values(self,parent,parent_tag,child_values,row_id,col_id):
-        ''' append any children to the child tag list'''
+    def get_table(self,parent=None,parent_tag="root",parent_row_id=-1):  
+        self.xmltablerepr.get_table(parent,parent_tag,parent_row_id)
         
-        # initialize a new row
-        row_id = XMLParser._init_row(child_values,50,"")
-            
-        if XMLParser._has_children(parent):
-            for child in parent._children:
-                col_id += 1
-                
-                if XMLParser._has_children(child):
-                    new_row_id, col_id = self._get_child_values(child,child.tag,child_values,\
-                                                       row_id,col_id)
-                    child_values[row_id][col_id] = "#" + str(new_row_id) + ";" "attrib"
-                    
-                else:
-                    value = child.text
-                    if value==None:
-                        value="None"
-                    child_values[row_id][col_id] = value + ";" + "attrib"
-                    
-        return(row_id,col_id)
-        
-    def get_child_values_by_attr(self,tag,attr,attr_val,ns=None):
-        ''' for a given attribute value; return a list of all the child tags 
-        expects to get 1 record back; works recursively down the tree '''
-        parent_element = self.get_elements_by_attr(tag,attr,attr_val,"equal")
-        row_id = 1
-        col_id = 0
-        
-        if len(parent_element)>1:
-            raise Exception("expected to only get 1 record returned; got",len(element))
-        else:
-            parent_element = parent_element[0]
-            
-        child_values = []
-        
-        # create root record
-        row_id = XMLParser._init_row(child_values,50,"")
-        child_values[row_id][0]=row_id
-        child_values[row_id][2]=tag
-        child_values[row_id][3]="#"+str(row_id+1)+";"
-
-        self._get_child_values(parent_element,tag,child_values,row_id,col_id)
-            
-        return(child_values)
-    
-    def get_child_tagvalue_by_attr(self,tag,attr,attr_val,ns=None):
-        ''' for a given attribute value; return a list of tuples of the form (tag,value)  
-        expects to get 1 record back '''
-        element = self.get_elements_by_attr(tag,attr,attr_val,"equal")
-        
-        if len(element)>1:
-            raise Exception("expected to only get 1 record returned; got",len(element))
-        
-        return [(child.tag,child.text) for child in element[0]._children]
-    
-    
     # Operator methods
     @staticmethod
     def gtequal(val1,val2):
@@ -163,7 +196,53 @@ class XMLParser():
             return True
         return False
     
-    
+    @staticmethod
+    def _num_children(element):
+        return(len(element._children))
+
+    @staticmethod
+    def _has_children(element):
+        if len(element._children)>0:
+            return True
+        return False
+
+    @staticmethod
+    def _num_children(element):
+        return(len(element._children))
+
+    @staticmethod
+    def _get_attr_value(element,attr):
+        ''' return the value of a specific attr '''
+        if XMLParser._attr_exists(attr):
+            return element.attrib[attr]
+
+    @staticmethod
+    def _attr_exists(element,attr):
+        ''' check if a specific attr exists '''
+        if element.attrib.has_key(attr):
+            return True
+        return False
+
+    @staticmethod
+    def _attrs_exist(element):
+        ''' check if any attrs exists '''
+        if len(element.attrib.keys()) > 0:
+            return True
+        return False
+
+    @staticmethod
+    def _get_attrs(element):
+        ''' return a list of tuples (key,value) '''
+        return [(key,value) for key, value in element.attrib.iteritems()]
+
+    @staticmethod
+    def _get_attrs_str(element):
+        ''' return a string of the form ;key='value',key='value' etc '''
+        _attr = XMLParser._get_attrs(element)
+
+        if XMLParser._attrs_exist(element):
+            return(";" + ",".join(key+"=\""+str(value)+"\"" for key,value in _attr))
+        return("") 
     
 class TestXMLParser(unittest.TestCase):
     
@@ -415,6 +494,7 @@ class TestXMLParser(unittest.TestCase):
             
         # assert correctness
         self.assertEquals(values,expected_results)
+        
             
 class TestXMLParserMulti(unittest.TestCase):
     ''' tests the ability to parse entire branches of trees and return data in
@@ -422,8 +502,11 @@ class TestXMLParserMulti(unittest.TestCase):
     
     def setUp(self):
         self.xmlparser = XMLParser("food.xml")
-        
-        self.expected_header_results = ["food-name",\
+                
+        self.expected_header_results = ["_id",\
+                                        "_parent",\
+                                        "_type",\
+                                        "food-name",\
                                         "food-mfr",\
                                         "food-serving",\
                                         "food-calories",\
@@ -442,14 +525,14 @@ class TestXMLParserMulti(unittest.TestCase):
                                         "minerals-fe"]
         self.table_0002 = []
         #self.table_0002.append(["_id","_parent","_type","root-food"]+self.expected_header_results)
-        self.table_0002.append([0,"","root","#2;id=0001","","","","","","","","","","","","","","","","",""]),
+        self.table_0002.append([0,"","root","#1;id=\"0002\"","","","","","","","","","","","","","","","","",""]),
         self.table_0002.append([1,
                                 0,
                                 "food",
                                 "",
                                 "Bagels New York Style",\
                                 "Thompson",\
-                                "104;g",\
+                                "104;units=\"g\"",\
                                 ";total=\"300\",fat=\"35\"",\
                                 "4",\
                                 "1",\
@@ -458,10 +541,10 @@ class TestXMLParserMulti(unittest.TestCase):
                                 "54",\
                                 "3",\
                                 "11",\
+                                "#2",\
+                                "",\
+                                "",\
                                 "#3",\
-                                "",\
-                                "",\
-                                "#4",\
                                 "",\
                                 ""])
         self.table_0002.append([2,
@@ -486,7 +569,7 @@ class TestXMLParserMulti(unittest.TestCase):
                                 "",\
                                 ""])
         self.table_0002.append([3,
-                                2,
+                                1,
                                 "minerals",
                                 "",
                                 "",\
@@ -504,24 +587,33 @@ class TestXMLParserMulti(unittest.TestCase):
                                 "",\
                                 "",\
                                 "",\
-                                "8"
-                                "2"])
+                                "8",\
+                                "20"])
 
-    def test_get_child_tags_by_attr(self):
-        
+    def test_get_tags(self):
+
         # test parameters
         test_tag="food"
         test_attr="id"
         test_attr_val="0002"
         test_attr_val_pred="equal"
-        
+
+        self.xmlparser = XMLParser("food_tmp.xml")
+
+        # set expected results: the number of elements returned 
+        # ignore the first three reference tags
+        expected_results = self.expected_header_results[3:]
+
         # execute test
-        values = self.xmlparser.get_child_tags_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)
-            
+        element = self.xmlparser.get_elements_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)[0]        
+        values = self.xmlparser.get_tags(element)
+
         # assert correctness
-        self.assertEquals(values,self.expected_header_results)
+        self.assertEquals(values,expected_results)
+
+    def test_get_table(self):
         
-    def test_get_child_values_by_attr(self):
+        self.xmlparser = XMLParser.table("food.xml")
         
         # test parameters
         test_tag="food"
@@ -532,11 +624,34 @@ class TestXMLParserMulti(unittest.TestCase):
         # set expected results: the number of elements returned 
         expected_results = self.table_0002
         
-        # execute test
-        values = self.xmlparser.get_child_values_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)
+        # execute test        
+        element = self.xmlparser.get_elements_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)[0] 
+        values = self.xmlparser.get_table(element)
             
         # assert correctness
         self.assertEquals(values,expected_results)
+        
+    def test_get_table_root(self):
+        
+        self.xmlparser = XMLParser.table("food_tmp.xml")
+                
+        # set expected results: the number of elements returned 
+        expected_results = self.table_0002
+        
+        # execute test        
+        values = self.xmlparser.get_table()
+        
+        print
+        
+        for row in self.xmlparser.table:
+            print row
+        
+        # assert correctness
+        #self.assertEquals(values,expected_results)
+
+
+    def test_test_get_all_tagvalues_by_unique_tag(self):
+        pass
         
 if __name__ == "__main__":
     
@@ -552,9 +667,10 @@ if __name__ == "__main__":
     suite.addTest(TestXMLParser("test_get_values"))
     suite.addTest(TestXMLParser("test_get_values_fail"))    
     suite.addTest(TestXMLParser("test_get_values_invalid_tag"))    
-    suite.addTest(TestXMLParser("test_get_values_by_attr_gtequal"))  '''
-    
-    suite.addTest(TestXMLParserMulti("test_get_child_values_by_attr"))
+    suite.addTest(TestXMLParser("test_get_values_by_attr_gtequal"))
+    suite.addTest(TestXMLParserMulti("test_get_tags"))
+    suite.addTest(TestXMLParserMulti("test_get_table"))'''
+    suite.addTest(TestXMLParserMulti("test_get_table_root"))
 
 
     runner = unittest.TextTestRunner(verbosity=2)
