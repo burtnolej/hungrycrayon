@@ -1,3 +1,14 @@
+
+
+def gettype(string):
+    try:
+        return(int(string))
+    except:
+        try:
+            return(float(string))
+        except:
+            return(string)
+    
 def write_text_to_file(filename,text):
     fh = open(filename,'w+')
     fh.write(text)
@@ -10,12 +21,18 @@ def file_exists(filename):
         return(True)
     else:
         return(False)
-     
-def read_text_from_file(filename):
-    '''returns a list of strings'''
-    l=[]
+
+def read_text_from_file(filename,delim=","):
+    '''returns a list of elements; converts to int if it can'''
+    filel=[]
     fh = open(filename, 'r+')
-    return [line.rstrip() for line in fh]
+    for line in fh:
+        l=[]
+        for element in line.rstrip().split(delim):
+            l.append(gettype(element))
+
+        filel.append(l)
+    return(filel)
 
 def file2string(filename):
     '''returns a string'''

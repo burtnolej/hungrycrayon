@@ -3,7 +3,7 @@ import xml.etree.ElementTree as xmltree
 
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
-from misc_utils import write_text_to_file, file2string
+from misc_utils import write_text_to_file, file2string, gettype
 from XMLTableRepr import XMLTableRepr
 
 class XMLParser():
@@ -98,7 +98,7 @@ class XMLParser():
     @classmethod
     def table(cls,schema,ns=None):  
         cls1 = cls(schema,ns)
-        cls1.xmltablerepr = XMLTableRepr(cls1)
+        cls1.xmltablerepr = XMLTableRepr.fromxml(cls1)
         cls1.table = cls1.xmltablerepr.table
         
         return(cls1)
@@ -113,7 +113,7 @@ class XMLParser():
         '''
         values=[]               
         for element in self.tree.iter(tag):
-                values.append(element.text) 
+                values.append(gettype(element.text)) 
             
         return values
     
@@ -176,6 +176,9 @@ class XMLParser():
         
     def get_table(self,parent=None,parent_tag="root",parent_row_id=-1):  
         self.xmltablerepr.get_table(parent,parent_tag,parent_row_id)
+        
+    def print_table(self):  
+        self.xmltablerepr.print_table()
         
     # Operator methods
     @staticmethod
@@ -495,114 +498,21 @@ class TestXMLParser(unittest.TestCase):
         # assert correctness
         self.assertEquals(values,expected_results)
         
-            
-class TestXMLParserMulti(unittest.TestCase):
-    ''' tests the ability to parse entire branches of trees and return data in
-    tabular form'''
-    
-    def setUp(self):
-        self.xmlparser = XMLParser("food.xml")
-                
-        self.expected_header_results = ["_id",\
-                                        "_parent",\
-                                        "_type",\
-                                        "food-name",\
-                                        "food-mfr",\
-                                        "food-serving",\
-                                        "food-calories",\
-                                        "food-total-fat",\
-                                        "food-saturated-fat",\
-                                        "food-cholesterol",\
-                                        "food-sodium",\
-                                        "food-carb",\
-                                        "food-fiber",\
-                                        "food-protein",\
-                                        "food-vitamins",\
-                                        "vitamins-a",\
-                                        "vitamins-c",\
-                                        "food-minerals",\
-                                        "minerals-ca",\
-                                        "minerals-fe"]
-        self.table_0002 = []
-        #self.table_0002.append(["_id","_parent","_type","root-food"]+self.expected_header_results)
-        self.table_0002.append([0,"","root","#1;id=\"0002\"","","","","","","","","","","","","","","","","",""]),
-        self.table_0002.append([1,
-                                0,
-                                "food",
-                                "",
-                                "Bagels New York Style",\
-                                "Thompson",\
-                                "104;units=\"g\"",\
-                                ";total=\"300\",fat=\"35\"",\
-                                "4",\
-                                "1",\
-                                "0",\
-                                "510",\
-                                "54",\
-                                "3",\
-                                "11",\
-                                "#2",\
-                                "",\
-                                "",\
-                                "#3",\
-                                "",\
-                                ""])
-        self.table_0002.append([2,
-                                1,
-                                "vitamins",
-                                "",
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "0",\
-                                "0",\
-                                "",\
-                                "",\
-                                ""])
-        self.table_0002.append([3,
-                                1,
-                                "minerals",
-                                "",
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "",\
-                                "8",\
-                                "20"])
-
     def test_get_tags(self):
+        ''' represent the tag names as field headers '''
 
+        # test input
+        self.xmlparser = XMLParser("food_tmp.xml")
+        
         # test parameters
         test_tag="food"
         test_attr="id"
         test_attr_val="0002"
         test_attr_val_pred="equal"
-
-        self.xmlparser = XMLParser("food_tmp.xml")
-
+        
         # set expected results: the number of elements returned 
-        # ignore the first three reference tags
-        expected_results = self.expected_header_results[3:]
+        self.xmltablerepr = XMLTableRepr.fromfile("test_get_tags.csv")
+        expected_results = self.xmltablerepr.table_header
 
         # execute test
         element = self.xmlparser.get_elements_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)[0]        
@@ -610,9 +520,16 @@ class TestXMLParserMulti(unittest.TestCase):
 
         # assert correctness
         self.assertEquals(values,expected_results)
-
-    def test_get_table(self):
         
+            
+class TestXMLParserTableRepr(unittest.TestCase):
+    ''' tests the ability to parse entire branches of trees and return data in
+    tabular form'''
+        
+    def test_get_table(self):
+        ''' represent a subset of the xml tree as a table'''
+        
+        # test input
         self.xmlparser = XMLParser.table("food.xml")
         
         # test parameters
@@ -622,32 +539,33 @@ class TestXMLParserMulti(unittest.TestCase):
         test_attr_val_pred="equal"
         
         # set expected results: the number of elements returned 
-        expected_results = self.table_0002
+        self.xmltablerepr = XMLTableRepr.fromfile("test_get_table.csv")
+        expected_results = self.xmltablerepr.table
         
         # execute test        
         element = self.xmlparser.get_elements_by_attr(test_tag,test_attr,test_attr_val,test_attr_val_pred)[0] 
-        values = self.xmlparser.get_table(element)
+        self.xmlparser.get_table(element)
+        values = self.xmlparser.table
             
         # assert correctness
         self.assertEquals(values,expected_results)
         
     def test_get_table_root(self):
+        '''represent the entire xml tree as a table'''
         
+        # test input
         self.xmlparser = XMLParser.table("food_tmp.xml")
                 
         # set expected results: the number of elements returned 
-        expected_results = self.table_0002
+        self.xmltablerepr = XMLTableRepr.fromfile("test_get_table_root.csv")
+        expected_results = self.xmltablerepr.table
         
         # execute test        
-        values = self.xmlparser.get_table()
-        
-        print
-        
-        for row in self.xmlparser.table:
-            print row
+        self.xmlparser.get_table()
+        values = self.xmlparser.table
         
         # assert correctness
-        #self.assertEquals(values,expected_results)
+        self.assertEquals(values,expected_results)
 
 
     def test_test_get_all_tagvalues_by_unique_tag(self):
@@ -655,10 +573,9 @@ class TestXMLParserMulti(unittest.TestCase):
         
 if __name__ == "__main__":
     
-
     suite = unittest.TestSuite()
 
-    '''suite.addTest(TestXMLParser("test_get_elements"))
+    suite.addTest(TestXMLParser("test_get_elements"))
     suite.addTest(TestXMLParser("test_get_elements_fail"))
     suite.addTest(TestXMLParser("test_get_elements_invalid_tag"))
     suite.addTest(TestXMLParser("test_get_elements_by_attr_gtequal"))
@@ -668,10 +585,9 @@ if __name__ == "__main__":
     suite.addTest(TestXMLParser("test_get_values_fail"))    
     suite.addTest(TestXMLParser("test_get_values_invalid_tag"))    
     suite.addTest(TestXMLParser("test_get_values_by_attr_gtequal"))
-    suite.addTest(TestXMLParserMulti("test_get_tags"))
-    suite.addTest(TestXMLParserMulti("test_get_table"))'''
-    suite.addTest(TestXMLParserMulti("test_get_table_root"))
-
+    suite.addTest(TestXMLParser("test_get_tags"))
+    suite.addTest(TestXMLParserTableRepr("test_get_table"))
+    suite.addTest(TestXMLParserTableRepr("test_get_table_root"))
 
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)    
