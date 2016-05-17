@@ -1,0 +1,4 @@
+_id^_parent^_type^food-name^food-mfr^food-serving^food-calories^food-total-fat^food-saturated-fat^food-cholesterol^food-sodium^food-carb^food-fiber^food-protein^food-vitamins^vitamins-a^vitamins-c^food-minerals^minerals-ca^minerals-fe
+0^-1^root^Bagels New York Style^Thompson^104;units="g"^;total="300",fat="35"^4^1^0^510^54^3^11^#1^^^#2
+1^0^vitamins^^^^^^^^^^^^^0^0
+2^0^minerals^^^^^^^^^^^^^^^^8^20

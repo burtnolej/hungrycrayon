@@ -590,4 +590,7 @@ if __name__ == "__main__":
     suite.addTest(TestXMLParserTableRepr("test_get_table_root"))
 
     runner = unittest.TextTestRunner(verbosity=2)
-    runner.run(suite)    
+    runner.run(suite)
+    
+    
+    need to change non table tests to expects ints/floats where possible
