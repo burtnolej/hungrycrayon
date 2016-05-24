@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from sys import path
-path.append("/Users/burtnolej/Dev/pythonapps/util")
+path.append("../orig_utils")
 import threading
 import Queue
 import time
@@ -42,11 +42,9 @@ class WinQListener(Win):
         self.end = 10
         self.q = myQueue
 
-    @in_method_log
     def add_to_q(self,item):
         self.q.put(item)
 
-    @in_method_log
     def counter(self):
         if self.num != self.end:
             self.num += 1
@@ -82,7 +80,7 @@ def main(screen):
     wc2.join()
     
 if __name__ == '__main__':
-    l = Logger()
+    #l = Logger()
     try:
         curses.wrapper(main)
     except:

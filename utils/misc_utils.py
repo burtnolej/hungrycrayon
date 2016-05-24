@@ -110,3 +110,16 @@ def print_dict_of_dict(d):
     
     # ensure blanl line between table and any additional output
     print
+    
+    
+class Singleton(type):
+    '''
+    this is to be used as a __metaclass__
+    __metaclass__ = Singleton
+    '''
+    _instances = {}
+    def __call__(cls,*args,**kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args,**kwargs)
+
+        return cls._instances[cls]

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from sys import path
-path.append("/Users/burtnolej/Dev/pythonapps/util")
+path.append("../orig_utils")
 import threading
 import Queue
 import time
@@ -34,16 +34,14 @@ class WinQListener(threading.Thread):
         self.q = q
         self.win_ref = win
 
-    @in_method_log
+
     def add_to_q(self,item):
         self.q.put(item)
 
-    @in_method_log
     def write_to_win(self,y,x,text):
         self.win_ref.addstr(y,x,text)
         self.win_ref.refresh()
 
-    @in_method_log
     def counter(self):
         if self.num != self.end:
             self.num += 1
@@ -79,7 +77,7 @@ class WinChr(Win):
         wcl.start()
 
 def main(screen):
-    l = Logger()
+    #l = Logger()
     
     screen.keypad(1)
     curses.mousemask(1)

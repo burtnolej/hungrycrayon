@@ -1,16 +1,12 @@
-#!/usr/bin/python
-
 from sys import path
-path.append("../orig_utils")
-from misc_util import Singleton, in_method_log, Logger
-import curses
+path.append("/home/burtnolej/Development/pythonapps3/utils/")
+from misc_utils import Singleton
+from curses import wrapper, newwin, A_REVERSE, A_NORMAL, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, COLS, mousemask
 from collections import OrderedDict
 import time
 import threading
-from table_print import SimpleTable
 
 lock = threading.Lock()
-logger = Logger("/tmp/log.txt")
     
 def _lock(func):
     def _tmp(*args, **kw):
@@ -49,7 +45,7 @@ class Window(threading.Thread):
         self._sx = sx -2 # (take off 2 for the borders)
        
         self._name = name
-        self._win_ref = curses.newwin(sy,sx,y,x)
+        self._win_ref = newwin(sy,sx,y,x)
         self.draw_name(y,x)
                 
         self._win_ref.border()
@@ -74,7 +70,7 @@ class Window(threading.Thread):
 
 
     def draw_name(self,y,x):
-        win = curses.newwin(3,self._sx+2,y-2,x) # add 2 back on for borders
+        win = newwin(3,self._sx+2,y-2,x) # add 2 back on for borders
         win.border()
         win.addstr(1,2,self._name)
         win.refresh()
@@ -229,54 +225,54 @@ class ListBox(Window):
         ie list will want to change attribute to highight new focussed element
         '''
         self._win_ref.move(self._oy,self._ox)
-        self.set_row_attribute(self._win_ref,self._oy,self._ox,curses.A_REVERSE)
+        self.set_row_attribute(self._win_ref,self._oy,self._ox,A_REVERSE)
 
     def set_focus_bottom(self):
         '''
         as set focus origin
         '''
         self._win_ref.move(self._oy+self._sy-1,self._ox+self._sx)
-        self.set_row_attribute(self._win_ref,self._oy+self._sy-1,self._ox,curses.A_REVERSE)
+        self.set_row_attribute(self._win_ref,self._oy+self._sy-1,self._ox,A_REVERSE)
 
     def event_handler(self,event):
         
         y, x = self.get_yx() # get current pos of cursor
         
-        if event == curses.KEY_LEFT:
+        if event == KEY_LEFT:
             if x>0:
                 self._win_ref.move(y,x-1)
-        elif event == curses.KEY_RIGHT:
-            if x<curses.COLS-1:
+        elif event == KEY_RIGHT:
+            if x<COLS-1:
                 self._win_ref.move(y,x+1)
-        elif event == curses.KEY_UP:
+        elif event == KEY_UP:
             if self._content_selection_idx == 0: # first element in content list
-                self.set_row_attribute(self._win_ref,y,x,curses.A_NORMAL)
+                self.set_row_attribute(self._win_ref,y,x,A_NORMAL)
                 new_top = (len(self._contents)//self._sy) * self._sy # calculate top of last list content ( that contains the last element)
                 self._content_selection_idx = new_top
                 self.draw_content(new_top)
             elif y == 1: # highest visible element
-                self.set_row_attribute(self._win_ref,y,x,curses.A_NORMAL)
+                self.set_row_attribute(self._win_ref,y,x,A_NORMAL)
                 self.draw_content(self._content_selection_idx - self._sy,True)
                 self._content_selection_idx -= 1 
             else:  # just move
-                self.set_row_attribute(self._win_ref,y,x,curses.A_NORMAL)
-                self.set_row_attribute(self._win_ref,y-1,x,curses.A_REVERSE)
+                self.set_row_attribute(self._win_ref,y,x,A_NORMAL)
+                self.set_row_attribute(self._win_ref,y-1,x,A_REVERSE)
                 self._content_selection_idx -= 1
-        elif event == curses.KEY_DOWN:
+        elif event == KEY_DOWN:
             if self._content_selection_idx == len(self._contents)-1: # last element in content list
-                self.set_row_attribute(self._win_ref,y,x,curses.A_NORMAL)
+                self.set_row_attribute(self._win_ref,y,x,A_NORMAL)
                 self._content_selection_idx = 0
                 self.draw_content(0)
             elif y == self._sy: # lowest visible element
-                self.set_row_attribute(self._win_ref,y,x,curses.A_NORMAL)
+                self.set_row_attribute(self._win_ref,y,x,A_NORMAL)
                 self._content_selection_idx = self._contents_bottom
                 self.draw_content(self._content_selection_idx)
             else: # just move 
-                self.set_row_attribute(self._win_ref,y,x,curses.A_NORMAL)
-                self.set_row_attribute(self._win_ref,y+1,x,curses.A_REVERSE)
+                self.set_row_attribute(self._win_ref,y,x,A_NORMAL)
+                self.set_row_attribute(self._win_ref,y+1,x,A_REVERSE)
                 self._content_selection_idx += 1
         elif event == 4: # CTRL-d
-            self.set_row_attribute(self._win_ref,y,x,curses.A_NORMAL)
+            self.set_row_attribute(self._win_ref,y,x,A_NORMAL)
             if self._contents_bottom -1 < len(self._contents):
                 self._content_selection_idx = self._contents_bottom - 1
                 self.draw_content(self._content_selection_idx-1)
@@ -286,7 +282,7 @@ class ListBox(Window):
         elif event == 21: # CTRL-u
             pass
         elif event == 10:
-            text_at_row = self._win_ref.instr(y,0,curses.COLS) # get string at xy
+            text_at_row = self._win_ref.instr(y,0,COLS) # get string at xy
         else:
             return(False)
         
@@ -356,15 +352,15 @@ class EntryBox(Window):
         if event == 263: # delete
             if self._x >0:
                 self.delch(self._y,self._x-1)
-        elif event == curses.KEY_LEFT:
+        elif event == KEY_LEFT:
             if self._x>0:
                 self.move(self._y,self._x-1)
-        elif event == curses.KEY_RIGHT:
-            if self._x<curses.COLS-1:
+        elif event == KEY_RIGHT:
+            if self._x<COLS-1:
                 self.move(self._y,self._x+1)
-        elif event == curses.KEY_UP:
+        elif event == KEY_UP:
             pass
-        elif event == curses.KEY_DOWN:
+        elif event == KEY_DOWN:
             pass
         elif event == 10:
             pass
@@ -445,7 +441,7 @@ def main(screen):
     l = file2list("./list.txt")
     
     screen.keypad(1)
-    curses.mousemask(1)
+    mousemask(1)
 
     wm = WindowManager()
     db = DebugBox(wm,"db1",10,50,26,5,None,True)
@@ -479,7 +475,7 @@ def main(screen):
 
 if __name__ == '__main__':
     try:
-        curses.wrapper(main)
+        wrapper(main)
     except KeyboardInterrupt:
         print "Got KeyboardInterrupt exception. Exiting..."
         exit()
