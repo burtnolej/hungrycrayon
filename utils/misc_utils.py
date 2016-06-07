@@ -75,7 +75,7 @@ def print_dict_of_dict(d):
         out_str= VZ_BORDER
         for i in range(num_cols):
                 out_str += ULINE.ljust(PAD,ULINE)+VZ_BORDER
-        print out_str
+        print(out_str)
         
     PAD=20
     VZ_BORDER="|"
@@ -93,7 +93,7 @@ def print_dict_of_dict(d):
     out_str = VZ_BORDER
     for key in d[d.keys()[0]].keys():
         out_str += str(key).center(PAD) + VZ_BORDER
-    print out_str
+    print(out_str)
         
     # print bottom VZ_BORDER for column names
     _print_hz_BORDER(num_keys)
@@ -103,7 +103,7 @@ def print_dict_of_dict(d):
         out_str= VZ_BORDER
         for key2,val2 in d[key1].iteritems():
             out_str += str(val2).center(PAD)+VZ_BORDER
-        print out_str
+        print(out_str)
     
     # print bottom VZ_BORDER for table
     _print_hz_BORDER(num_keys)
