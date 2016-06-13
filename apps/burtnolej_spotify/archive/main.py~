@@ -1,0 +1,31 @@
+import sys
+import spotipy
+import spotipy.util as util
+#spotipy = spotipy.Spotify()
+
+scope = 'user-library-read'
+user='burtnolejusa'
+
+token = util.prompt_for_user_token(user,scope)
+
+if token:
+    sp = spotipy.Spotify(auth=token)
+
+    name = 'Daft Punk'
+    results = sp.search(q='artist:' + name,type='artist')
+
+    items = results['artists']['items']
+    for item in items:
+        if item['name'] == name:
+            print item['name'],item['id']
+        #if len(items) > 0:
+        #artist = items[0]
+        #print artist['name'], artist['images'][0]['url']
+
+    # list saved tracks
+    #token = sp.current_user_saved_tracks()
+    #for item in results['items']:
+    #    track = item['track']
+    #    print track['name'] + '-' + track['artists'][0]['name']
+else:
+    print "Can't get token for",user

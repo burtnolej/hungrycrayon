@@ -1,0 +1,16 @@
+Madonna,10
+Massive Attack,5
+Michael Jackson,10
+Adele,5
+Coldplay,5
+Oasis,10
+U2,5
+Whitney Houston,5
+Take That,5
+Erasure,10
+The Smiths,10
+Pet Shop Boys,10
+Lady Gaga,5
+Phil Collins,3
+Police,5
+George Michael,3

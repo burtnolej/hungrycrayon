@@ -1,0 +1,19 @@
+AC/DC,5
+Bee Gees,5
+Meat Loaf,5
+David Bowie,10
+Elton John,10
+Genisis,5
+Neil Diamond,10
+Simon & Garfunkel,5
+Queen,15
+The Who,10
+Bon Jovi,5
+Pink Floyd,5
+The Beatles,10
+The Rolling Stones,5
+Bruce Springsteen,3
+Def Leppard, 3
+Aerosmith,5
+Journey,2
+The Clash,3

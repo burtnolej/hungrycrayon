@@ -1,0 +1,17 @@
+Primal Scream,3
+The Prodigy,5
+Skrillex,3
+Daft Punk,5
+The Black Eyed Peas,3
+JAY Z,5
+Frank Sinatra,3
+Elvis Presley,5
+Foreigner,3
+Survivor,3
+Cameo,2
+Vanilla Ice,1
+Chaka Khan,2
+Prince,5
+The Bangles, 3
+Beastie Boys,3
+Wham!,5

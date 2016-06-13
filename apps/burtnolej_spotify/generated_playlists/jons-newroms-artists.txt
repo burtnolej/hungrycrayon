@@ -1,0 +1,21 @@
+Duran Duran,5
+A Flock Of Seagulls,3
+Spandau Ballet,3
+Visage,3
+Orchestral Manoeuvres In The Dark,5
+The Human League,5
+Ultravox,3
+Heaven 17,3
+Yazoo,3
+China Crisis,2
+Tears For Fears,3
+Simple Minds,3
+Culture Club,5
+Soft Cell,3
+Thompson Twins,3
+Depeche Mode,5
+Eurythmics,5
+Frankie Goes To Hollywood,5
+Fine Young Cannibals,3
+Talking Heads,2
+INXS,3
