@@ -95,14 +95,15 @@ class SpotifyConnector():
     def unfollow_playlist(self,playlist_id):
         self.sp.user_playlist_unfollow(self.user,playlist_id)
         
-    def get_artist_related_artist(self,artist):
-        _related_artists = self.sp.artist_related_artists(artist)
-        
-        _d ={}
-        for _related_artist in _related_artists['artists']:
-            _d[_related_artist['id']] = _related_artist['name']
+    def get_artist_related_artist(self,artist_id):
+        related_artists = self.sp.artist_related_artists(artist_id)['artists']
+
+        _related_artists = []
+        for related_artist in related_artists:
+            _related_artists.append({'id':related_artist['id'],
+                                     'name':related_artist['name']})
             
-        return(_d)
+        return(_related_artists)
             
     def get_playlist_tracks(self,playlist_id):
         results = self.sp.user_playlist(self.user, playlist_id, fields="tracks,next")
@@ -119,10 +120,56 @@ class SpotifyConnector():
     def add_track_to_playlist(self,playlist_id, track_ids):
         results = self.sp.user_playlist_add_tracks(self.user, playlist_id, track_ids)
                 
+    def get_artist_top_tracks(self,artist_id):
+        _top_tracks=[]
+        top_tracks = self.sp.artist_top_tracks(artist_id)
+        
+        for track in top_tracks['tracks']:
+            _top_tracks.append({'id':track['id'],
+                                'name':track['name']})    
+        return(_top_tracks)
+    
+    def get_track_popularity(self,track_id):
+        return self.sp.track(track_id)['popularity']
 
-def get_track_info(sp):
-    pass
+    def get_artist_top_n_tracks(self,artist_id,num_tracks):
+        _top_tracks=[]
+        top_tracks = self.get_artist_top_tracks(artist_id)
+        
+        # need to change this to be a dict like get_artist_top_tracks
+        # and then return the id of the top tracks not the popularity
+        
+        track_by_popularity = []
+        for track in top_tracks:
+            track_by_popularity.append(self.get_track_popularity(track['id']))
 
+        return(sorted(track_by_popularity,reverse=True)[:num_tracks])
+    
+    def get_track_info(self,track_id):
+                
+        _track =  self.sp.track(track_id)
+        return({'album':_track['album']['name'],
+                'popularity':_track['popularity'], 
+                'duration_ms':_track['duration_ms'],
+                'name':_track['name'],
+                'artist':_track['artists'][0]['name']})
+        
+    def get_audio_features(self,track_id):
+        return(self.sp.audio_features(track_id))
+    
+    def search_spotify_tracks(self,track,artist=None):
+
+        if artist==None:
+            tracks = self.sp.search(q='track:'+track,type='track', limit=50)['tracks']['items']
+            
+        _tracks = []
+        for track in tracks:
+            _tracks.append({'id':track['id'],
+                            'name':track['name'],
+                            'artist':track['artists'][0]['name']})       
+            
+        return(_tracks)
+                
 def search_tracks(sp,track_name,artist):
     
     
@@ -159,7 +206,6 @@ def search_tracks(sp,track_name,artist):
 
 
 
-
 def get_most_popular_list(sp,track_ids,num_tracks=10):
     d={}
     for track_id in track_ids:
@@ -174,28 +220,9 @@ def get_most_popular_list(sp,track_ids,num_tracks=10):
         top_d.append(d[_popularity])
     return(top_d)
 
-def print_track_id_meta(sp,track_id_csv):
+
     
-    l = track_id_csv.split(",")
-    
-    for track_id in l:
-        track_urn = "spotify:track:"+track_id
-        _track =  sp.track(track_urn)
-        
-        print track_id.ljust(10),_track['name'].ljust(20)[:15],str(_track['popularity']).ljust(10)
-        
-def get_popularity(sp,track_id):
-    
-    track_urn = "spotify:track:"+track_id
-    return sp.track(track_urn)['popularity']
-    
-def get_artist_top_tracks(sp,artist):
-    l=[]
-    response = sp.artist_top_tracks(artist['uri'])
-    
-    for track in response['tracks']:
-        l.append(track['id'])    
-    return(l)
+
 
 
 

@@ -25,7 +25,40 @@ class TestSpotifyConnectorRead(unittest.TestCase):
         user='1165431378'
         scope = ''
         self.test_playlist_id='656pr766V8K4DRlHWQRXRU' # Mini Tracks
+        self.test_artist = 'Michael Jackson'
+        self.test_artist_id = '3fMbdgg4jU18AjLCKBhRSm'
+        self.test_related_artists = ['Whitney Houston','Prince','Diana Ross','Madonna',
+                                     'Lionel Richie','Janet Jackson','Jermaine Jackson',
+                                     'Tina Turner','The Pointer Sisters','George Michael',
+                                     'Stevie Wonder','Donna Summer','Billy Ocean','Barry White',
+                                     'Justin Timberlake','Philip Bailey','Terence Trent D\'Arby',
+                                     'Bee Gees','Chaka Khan','Cyndi Lauper']
         
+        self.test_artist_top_tracks = ['Billie Jean - Single Version',
+                                       'Love Never Felt so Good',
+                                       'Beat It - Single Version',
+                                       'P.Y.T. (Pretty Young Thing)',
+                                       'Don\'t Stop \'Til You Get Enough - Single Version',
+                                       'Black or White - Single Version',
+                                       'The Way You Make Me Feel - 2012 Remaster',
+                                       'Love Never Felt so Good',
+                                       'Man in the Mirror - 2012 Remaster',
+                                       'Rock with You - Single Version']
+        
+        
+        self.test_artist_top_n_tracks = ['Billie Jean - Single Version',
+                                         'Beat It - Single Version',
+                                         'Man in the Mirror - 2012 Remaster']
+        
+        self.test_artist_track_id = '5ChkMS8OtdzJeqyybCc9R5' #Billie Jean - Single Version
+        self.test_artist_track_popularity = 78 #Billie Jean - Single Version
+           
+        self.test_track_info = {'album': u'Thriller 25 Super Deluxe Edition', 
+                                'duration_ms': 293826, 
+                                'popularity': 78, 
+                                'name': u'Billie Jean - Single Version', 
+                                'artist': u'Michael Jackson'}
+     
         self.sc = SpotifyConnector(user,scope)
 
     def tearDown(self):
@@ -39,9 +72,9 @@ class TestSpotifyConnectorRead(unittest.TestCase):
        
     def test_get_artist_info(self):
         
-        _artist_info = self.sc.get_artist_info('Michael Jackson',True)
-        self.assertEqual(_artist_info['name'],'Michael Jackson')
-        self.assertEqual(_artist_info['id'],'3fMbdgg4jU18AjLCKBhRSm')
+        _artist_info = self.sc.get_artist_info(self.test_artist,True)
+        self.assertEqual(_artist_info['name'],self.test_artist)
+        self.assertEqual(_artist_info['id'], self.test_artist_id)
         
     def test_get_user_playlists_info(self):
         results = self.sc.get_user_playlists_info()
@@ -56,6 +89,46 @@ class TestSpotifyConnectorRead(unittest.TestCase):
         for result in results:
             _display_dict(result,2)
             print
+            
+    def test_get_related_artists(self):
+        related_artists = self.sc.get_artist_related_artist(self.test_artist_id)
+        _related_artists = [related_artist['name'] for related_artist in related_artists]
+        
+        self.assertListEqual(_related_artists, self.test_related_artists)
+        
+    def test_get_artist_top_tracks(self):
+        top_tracks = self.sc.get_artist_top_tracks(self.test_artist_id)
+        _top_tracks = [top_track['name'] for top_track in top_tracks]
+        
+        self.assertListEqual(self.test_artist_top_tracks,_top_tracks)
+        
+    def test_get_artist_top_n_tracks(self):
+        top_tracks = self.sc.get_artist_top_n_tracks(self.test_artist_id,3)
+        print top_tracks 
+        
+    def test_get_track_info(self):
+        
+        track_info = self.sc.get_track_info(self.test_artist_track_id)
+        self.assertDictEqual(self.test_track_info,track_info)
+            
+    def test_get_audio_features(self):
+        audio_features = self.sc.get_audio_features([self.test_artist_track_id])
+        
+        for audio_feature in audio_features:
+            _display_dict(audio_feature,1)
+            print
+        
+    def test_search_spotify_tracks(self):
+        tracks = self.sc.search_spotify_tracks("Easy to Love")
+        
+        for track in tracks:
+            _display_dict(track,2)
+            print
+        
+    def test_get_track_popularity(self):
+        self.assertEqual(self.sc.get_track_popularity(self.test_artist_track_id),
+                         self.test_artist_track_popularity)
+        
             
 class TestSpotifyConnectorWrite(unittest.TestCase):
 
@@ -113,12 +186,21 @@ if __name__ == '__main__':
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestSpotifyConnectorRead("test_get_user_playlists_info")) 
-    suite.addTest(TestSpotifyConnectorRead("test_get_playlist_tracks")) 
-    suite.addTest(TestSpotifyConnectorRead("test_get_user_info")) 
-    suite.addTest(TestSpotifyConnectorRead("test_get_artist_info")) 
-    suite.addTest(TestSpotifyConnectorWrite("test_create_public_playlist")) 
-    suite.addTest(TestSpotifyConnectorWrite("test_add_tracks_to_playlist")) 
+    #suite.addTest(TestSpotifyConnectorRead("test_get_user_playlists_info")) 
+    #suite.addTest(TestSpotifyConnectorRead("test_get_playlist_tracks")) 
+    #suite.addTest(TestSpotifyConnectorRead("test_get_user_info")) 
+    #suite.addTest(TestSpotifyConnectorRead("test_get_artist_info")) 
+    suite.addTest(TestSpotifyConnectorRead("test_get_related_artists")) 
+    suite.addTest(TestSpotifyConnectorRead("test_get_artist_top_tracks"))
+    suite.addTest(TestSpotifyConnectorRead("test_get_track_info"))
+    suite.addTest(TestSpotifyConnectorRead("test_get_audio_features"))
+    suite.addTest(TestSpotifyConnectorRead("test_search_spotify_tracks"))
+    suite.addTest(TestSpotifyConnectorRead("test_get_track_popularity"))
+    suite.addTest(TestSpotifyConnectorRead("test_get_artist_top_n_tracks"))
+    
+    
+    #suite.addTest(TestSpotifyConnectorWrite("test_create_public_playlist")) 
+    #suite.addTest(TestSpotifyConnectorWrite("test_add_tracks_to_playlist")) 
 
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)    
