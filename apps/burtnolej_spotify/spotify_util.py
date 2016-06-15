@@ -1,6 +1,7 @@
 import sys
 import spotipy
 import spotipy.util as util
+
 #spotipy = spotipy.Spotify()
 
 #scope = 'user-library-read'
@@ -41,6 +42,47 @@ class SpotifyConnector():
         else:
             raise Exception("connection failed")
    
+    def extractor(*myargs):
+        def _extractor(func):
+            def wrapper(*args, **kwargs):
+                _results = func(*args,**kwargs)
+                return(SpotifyConnector.extract_fields(_results,myargs[0],myargs[1]))
+            return wrapper
+        return _extractor
+    
+    @staticmethod
+    def extract_fields(records,fields,unique_key):
+        
+        ''' default action is to return a list of dicts but if fields is only
+        1 attribute in length, returns a list of values. Also removes duplicates based
+        on unique_key '''
+        unique_records = set()
+        
+        _records = []
+        for record in records:
+            if record[unique_key].lower() not in unique_records:
+                unique_records.add(record[unique_key].lower())
+                d={}
+
+                for field in fields:
+                    if field=='artist':
+                        d[field] = record['artists'][0]['name']
+                    elif field=='album':
+                        d[field] = record['album']['name']
+                    elif field=='num_tracks':
+                        d[field] = record['tracks']['total']
+                    elif field=='owner':
+                        d[field] = record['owner']['id']
+                    else:
+                        d[field] = record[field]
+                _records.append(d)
+
+        
+        if len(fields)==1:
+            return [_record[fields[0]] for _record in _records]
+                    
+        return(_records)
+
     def get_current_user_info(self):
         
         _user = self.sp.current_user()
@@ -49,25 +91,14 @@ class SpotifyConnector():
                 'id':_user['id'],
                 'followers':_user['followers']['total']})
     
+    @extractor(['collaborative','public','name','id','num_tracks','owner'],'name')
     def get_user_playlists_info(self,playlist_id=None):
+        return(self.sp.user_playlists(self.user)['items'])
+    
+        #f playlist_id==None:
         
-        if playlist_id==None:
-            results = self.sp.user_playlists(self.user)['items']
-        else:
-            results = [self.sp.user_playlist(self.user,playlist_id)]
-        
-        _playlists = []
-        for _playlist in results:
-            
-
-            _playlists.append({'collaborative':_playlist['collaborative'],
-                               'public':_playlist['public'],
-                               'owner':_playlist['owner']['id'],
-                               'name':_playlist['name'],
-                               'tracks':_playlist['tracks']['total'],
-                               'id':_playlist['id']})
-            
-        return(_playlists)        
+        #else:
+            #return([self.sp.user_playlist(self.user,playlist_id)])  
         
     def get_artist_info(self,name,match=False):
         
@@ -132,44 +163,60 @@ class SpotifyConnector():
     def get_track_popularity(self,track_id):
         return self.sp.track(track_id)['popularity']
 
+    def get_track_name(self,track_id):
+        return(self.sp.track(track_id)['name'])
+    
+    def _sort_tracks_by_popularity(self,track_ids,num_tracks=3):
+        
+        track_by_popularity = {}
+        for track in track_ids:
+            track_by_popularity[self.get_track_popularity(track['id'])] = track['id']
+
+        sorted_popularity = sorted(track_by_popularity,reverse=True)[:num_tracks]
+        
+        return([track_by_popularity[popularity] for popularity in sorted_popularity])
+    
     def get_artist_top_n_tracks(self,artist_id,num_tracks):
         _top_tracks=[]
         top_tracks = self.get_artist_top_tracks(artist_id)
         
-        # need to change this to be a dict like get_artist_top_tracks
-        # and then return the id of the top tracks not the popularity
-        
-        track_by_popularity = []
-        for track in top_tracks:
-            track_by_popularity.append(self.get_track_popularity(track['id']))
-
-        return(sorted(track_by_popularity,reverse=True)[:num_tracks])
+        return(self._sort_tracks_by_popularity(top_tracks,3))
     
+    @extractor(['album','popularity','duration_ms','name','artist'],'name')
     def get_track_info(self,track_id):
-                
-        _track =  self.sp.track(track_id)
-        return({'album':_track['album']['name'],
-                'popularity':_track['popularity'], 
-                'duration_ms':_track['duration_ms'],
-                'name':_track['name'],
-                'artist':_track['artists'][0]['name']})
+        return([self.sp.track(track_id)])
         
     def get_audio_features(self,track_id):
         return(self.sp.audio_features(track_id))
     
+    
+    # complete using the extractor decorator
+    # make search simple by track or by album - will always retreive a lot
+    # use get_artist_albums() for more specific searches
+    # search test should be simple (did we get stuff)
+    
+    @extractor(['id','name','artist'],'name')
     def search_spotify_tracks(self,track,artist=None):
+        return(self.sp.search(q='track:'+track,type='track', limit=50)['tracks']['items'])
+    
+    @extractor(['id','name','artist'],'name')
+    def search_spotify_tracks_by_artist(self,track,artist):
+        return(self.sp.search(q='track:'+track+' artist:'+artist,type='track', limit=50)['tracks']['items'])
+    
+    @extractor(['id','name','artist'],'name')
+    def search_spotify_tracks_by_album(self,track,album):
+        return(self.sp.search(q='track:'+track+' album:'+album,type='track', limit=50)['tracks']['items'])
+        
+    def get_album_tracks(self,album_id):
+        tracks = self.sp.album_tracks(album_id)['items']
+        return(self._extract_fields(tracks,['id','name','artist'],'name'))
+        
+    def get_artist_albums(self,artist_id,fields):
+        albums = self.sp.artist_albums(artist_id, album_type='album',country='US')['items']
+        return(self._extract_fields(albums,fields,'name'))
 
-        if artist==None:
-            tracks = self.sp.search(q='track:'+track,type='track', limit=50)['tracks']['items']
-            
-        _tracks = []
-        for track in tracks:
-            _tracks.append({'id':track['id'],
-                            'name':track['name'],
-                            'artist':track['artists'][0]['name']})       
-            
-        return(_tracks)
-                
+
+
 def search_tracks(sp,track_name,artist):
     
     
@@ -233,32 +280,9 @@ def get_most_popular_list(sp,track_ids,num_tracks=10):
 
 
 
-def show_album_tracks(album):
-    tracks = []
-    results = sp.album_tracks(album['id'])
-    tracks.extend(results['items'])
-    while results['next']:
-        results = sp.next(results)
-        tracks.extend(results['items'])
-    for track in tracks:
-        print(track['id'], track['name'])
+
         
-def get_artist_albums(artist):
-    albums = []
-    results = sp.artist_albums(artist['id'], album_type='album')
-    albums.extend(results['items'])
-    while results['next']:
-        results = sp.next(results)
-        albums.extend(results['items'])
-    print ('Total albums:', len(albums))
-    seen = set() # to avoid dups
-    #albums.sort(key=lambda album:album['name'].lower())
-    for album in albums:
-        name = album['name']
-        if name not in seen:
-            print(name)
-            seen.add(name)
-            show_album_tracks(album)
+
 
 def create_playlist_from_file(sp,filename,playlist_name):
     l=[]
