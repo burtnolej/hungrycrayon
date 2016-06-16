@@ -46,43 +46,122 @@ class SpotifyConnector():
         def _extractor(func):
             def wrapper(*args, **kwargs):
                 _results = func(*args,**kwargs)
-                return(SpotifyConnector.extract_fields(_results,myargs[0],myargs[1]))
+                return(SpotifyConnector.extract_fields(_results,*myargs))
             return wrapper
         return _extractor
     
     @staticmethod
-    def extract_fields(records,fields,unique_key):
+    def extract_fields(records,fields,unique_key=None):
         
         ''' default action is to return a list of dicts but if fields is only
         1 attribute in length, returns a list of values. Also removes duplicates based
         on unique_key '''
+        
+        assert isinstance(fields,list)
+        
+        # if only one record is sent not as a list; create a list
+        if not isinstance(records,list):
+            records = [records]
+            
         unique_records = set()
         
         _records = []
         for record in records:
-            if record[unique_key].lower() not in unique_records:
-                unique_records.add(record[unique_key].lower())
-                d={}
+            d={}
+            if unique_key != None:
+                # if there is more than 1 record in the return set
+                if record[unique_key].lower() not in unique_records:
+                    # add unique key if not seen before
+                    unique_records.add(record[unique_key].lower())
+                else: # otherwise exit
+                    next  
 
-                for field in fields:
-                    if field=='artist':
-                        d[field] = record['artists'][0]['name']
-                    elif field=='album':
-                        d[field] = record['album']['name']
-                    elif field=='num_tracks':
-                        d[field] = record['tracks']['total']
-                    elif field=='owner':
-                        d[field] = record['owner']['id']
-                    else:
-                        d[field] = record[field]
-                _records.append(d)
+            for field in fields:
+                if field=='artist':
+                    d[field] = record['artists'][0]['name']
+                elif field=='album':
+                    d[field] = record['album']['name']
+                elif field=='num_tracks':
+                    d[field] = record['tracks']['total']
+                elif field=='owner':
+                    d[field] = record['owner']['id']
+                elif field=='tid':
+                    d[field] = record['track']['id']
+                else:
+                    d[field] = record[field]
+            _records.append(d)
 
         
         if len(fields)==1:
             return [_record[fields[0]] for _record in _records]
                     
         return(_records)
-
+    
+    
+    # user playlists: gets
+    # ------------------------------------------------------------------------------
+    @extractor(['id'],'name')
+    def get_user_playlist_ids(self):
+        ''' return a list of playlist id's '''
+        return(self.sp.user_playlists(self.user)['items'])
+        
+    def get_user_playlist_count(self):
+        ''' return the number of playlists a user has. remember max number that can be returned is 50 '''
+        return(len(self.get_user_playlist_ids()))
+    
+    @extractor(['collaborative','public','name','num_tracks','owner','followers'])
+    def get_user_playlist_info(self,playlist_id):
+        ''' given a playlist id; return useful info '''
+        return self.sp.user_playlist(self.user,playlist_id)
+    
+    @extractor(['tid'])
+    def get_user_playlist_tracks(self,playlist_id):
+        ''' given a playlist id; return track ids'''
+        return(self.sp.user_playlist(self.user,playlist_id)['tracks']['items'])
+    
+    # user playlists: checks
+    # ------------------------------------------------------------------------------
+    def playlist_exists(self,playlist_id):
+        ''' given a playlist id; return useful info, check if the playlist id
+        is a member of the list of returned playlist id's. This is to get around the issue
+        where nothing is really deleted and "unfollowed" playlists are not visible
+        on the spotify app but are still retreivable via the api'''
+        try:
+            self.get_user_playlist_ids().index(playlist_id)
+            return True
+        except:
+            return False
+        
+    # user playlists: delete
+    # ------------------------------------------------------------------------------
+    def unfollow_playlist(self,playlist_id):
+        self.sp.user_playlist_unfollow(self.user,playlist_id)
+        
+    def delete_test_playlist(self):
+        ''' get list of playlist id's, detect ones used for testing by checking if the
+        string can be converted from hex to a base10 int'''
+        
+        playlists = SpotifyConnector.extract_fields(self.sp.user_playlists(self.user)['items'],
+                                                    ['id','name'])
+        
+        test_playlist = []
+        for playlist in playlists:
+            try:
+                int(playlist['name'],16)
+                test_playlist.append(playlist['id'])
+            except:
+                print "cannot convert from hex",playlist['name'][2:]
+        
+        for pid in test_playlist:
+            self.unfollow_playlist(pid) 
+        
+    # user playlists: create
+    # ------------------------------------------------------------------------------
+    def create_playlist(self,playlist_name,public=False):
+        playlists = self.sp.user_playlist_create(self.user, playlist_name, public)
+        return(playlists['id'])
+    
+        
     def get_current_user_info(self):
         
         _user = self.sp.current_user()
@@ -91,15 +170,6 @@ class SpotifyConnector():
                 'id':_user['id'],
                 'followers':_user['followers']['total']})
     
-    @extractor(['collaborative','public','name','id','num_tracks','owner'],'name')
-    def get_user_playlists_info(self,playlist_id=None):
-        return(self.sp.user_playlists(self.user)['items'])
-    
-        #f playlist_id==None:
-        
-        #else:
-            #return([self.sp.user_playlist(self.user,playlist_id)])  
-        
     def get_artist_info(self,name,match=False):
         
         results = self.sp.search(q='artist:' + name,type='artist')
@@ -119,13 +189,15 @@ class SpotifyConnector():
         return _artists
     
         
-    def create_private_playlist(self,playlist_name,public=False):
-        playlists = self.sp.user_playlist_create(self.user, playlist_name, True)
-        return(playlists['id'])
+
    
-    def unfollow_playlist(self,playlist_id):
-        self.sp.user_playlist_unfollow(self.user,playlist_id)
-        
+    def get_available_genre_seeds(self):
+        return self.sp.available_genre_seeds()['genres']
+    
+    @extractor(['id'])
+    def get_recommendations(self,**kwargs):
+        return self.sp.recommendation(**kwargs)['tracks']
+            
     def get_artist_related_artist(self,artist_id):
         related_artists = self.sp.artist_related_artists(artist_id)['artists']
 
@@ -135,18 +207,8 @@ class SpotifyConnector():
                                      'name':related_artist['name']})
             
         return(_related_artists)
-            
-    def get_playlist_tracks(self,playlist_id):
-        results = self.sp.user_playlist(self.user, playlist_id, fields="tracks,next")
-        tracks = results['tracks']
-        
-        _tracks = []
-        for item in tracks['items']:
-            _tracks.append({'id':item['track']['id'],
-                            'name':item['track']['name'],
-                            'artist':item['track']['artists'][0]['name']})
-            
-        return(_tracks)
+    
+
 
     def add_track_to_playlist(self,playlist_id, track_ids):
         results = self.sp.user_playlist_add_tracks(self.user, playlist_id, track_ids)
@@ -186,8 +248,13 @@ class SpotifyConnector():
     def get_track_info(self,track_id):
         return([self.sp.track(track_id)])
         
-    def get_audio_features(self,track_id):
-        return(self.sp.audio_features(track_id))
+    def get_audio_features_for_playlist(self,playlist_id):
+        audio_features=[]
+
+        print SpotifyConnector.extract_fields(self.get_playlist_tracks(playlist_id),['id'])
+                
+            
+        #return(self.sp.audio_features(track_id))
     
     
     # complete using the extractor decorator
@@ -214,43 +281,6 @@ class SpotifyConnector():
     def get_artist_albums(self,artist_id,fields):
         albums = self.sp.artist_albums(artist_id, album_type='album',country='US')['items']
         return(self._extract_fields(albums,fields,'name'))
-
-
-
-def search_tracks(sp,track_name,artist):
-    
-    
-    try:
-        tracks = sp.search(q='track:'+track_name,type='track', limit=20)['tracks']['items']
-    except:
-        return(("_error","_error","_error"))
-        
-    _d = {}
-    _most_popular_id=-1
-    _most_popular_value=-1
-    
-    for track in tracks:
-        _artist = track['artists'][0]['name']
-        _popularity = track['popularity']
-        _album_name=track['album']['name']
-        _track_name=track['name']
-        _id = track['id']
-        _d[_popularity] = (_track_name,_artist,_id)
-        #print artist, _artist,_popularity
-        #if _artist.lower()==artist.lower():
-        #    if _popularity>_most_popular_value:
-        #        _most_popular_id=_id
-        #        _most_popular_value=_popularity
-        
-    _d_sorted= sorted(_d.keys())
-    _most_popular_value = _d_sorted[len(_d_sorted)-1]
-     
-    #_artist,_track_name,_id = _d[_most_popular_value]
-
-        
-    return _d[_most_popular_value]
-
-
 
 
 def get_most_popular_list(sp,track_ids,num_tracks=10):
@@ -321,22 +351,8 @@ def create_playlist_from_artist_file(sp,filename,playlist_name):
 if __name__ == '__main__':
     
     user='1165431378'
-    #scope = 'playlist-modify-private'
-    scope = 'playlist-modify-public'
-    
-    scope = 'playlist-read-collaborative'
-    
+    scope = ''
     
     sc = SpotifyConnector(user,scope)
     
-    #sc.get_playlist_tracks('43YCKjl65PD2MiiuwgUzk7')
-    #sc.show_user_playlists()
-    
-    #print sc.get_artist('Michael Jackson',True)
-    
-    #print sc.get_artist_related_artist('3fMbdgg4jU18AjLCKBhRSm')
-    #sc.unfollow_playlist('30KDF9AxgfV4Zs64FBy1Cv')
-    #sc.create_playlist("foobar_public",True)
-    
-
-    
+    sc.delete_test_playlist()

@@ -20,12 +20,13 @@ def _display_dict(d,orient=1):
                 print str(value)[:8].ljust(8),
 
     
-class TestSpotifyConnectorRead(unittest.TestCase):
+class TestSpotifyConnector(unittest.TestCase):
 
     def setUp(self):
         user='1165431378'
         scope = ''
-        self.test_playlist_id='656pr766V8K4DRlHWQRXRU' # Mini Tracks
+        self.test_playlist_id_perm ='656pr766V8K4DRlHWQRXRU' # Mini Tracks
+        self.test_playlist_name='MiniTracks' # Mini Tracks
         self.test_artist = 'Michael Jackson'
         self.test_artist_id = '3fMbdgg4jU18AjLCKBhRSm'
         self.test_related_artists = ['Whitney Houston','Prince','Diana Ross','Madonna',
@@ -91,10 +92,123 @@ class TestSpotifyConnectorRead(unittest.TestCase):
                                 'name': u'Billie Jean - Single Version', 
                                 'artist': u'Michael Jackson'}]
      
+        # real track id to play with "Whitney, One Moment in time;Sinatra, My Way"
+        self.test_track_ids = ['3S3dZXxNGghLtOqehzHtii', '5iOnSrG79MzrCaq0I8Lpv6']     
+
+        # create a random name for test playlist
+        self.test_create_playlist_name = hex(int(random.random()*pow(10,10))) 
+        
         self.sc = SpotifyConnector(user,scope)
 
     def tearDown(self):
         del self.sc
+        
+    
+    # user playlists
+    # ------------------------------------------------------------------------------
+    def test_get_user_playlist_ids(self):
+        results = self.sc.get_user_playlist_ids()
+        
+        # number of playlists will so just check that a large number was returned
+        self.assertGreater(len(results),20)
+        
+        # check that its returned an actual id
+        self.assertEquals(len(results[0]),22)
+        
+    def test_get_user_playlist_info(self):
+        results = self.sc.get_user_playlist_info(self.test_playlist_id_perm)
+            
+        # check some specifics of 1 record
+        self.assertTrue(results[0].has_key('collaborative'))
+        self.assertTrue(results[0].has_key('num_tracks'))   
+        self.assertIsInstance(results[0]['num_tracks'],IntType) 
+
+        self.assertEquals(self.test_playlist_name,results[0]['name'])
+        
+    def test_get_user_playlist_tracks(self):
+        
+        # create a dummy private playlist
+        _playlist_id = self.sc.create_playlist(self.test_create_playlist_name)
+        
+        # add test tracks to playlist
+        self.sc.add_track_to_playlist(_playlist_id, self.test_track_ids)
+        
+        self.assertEqual(self.sc.get_user_playlist_tracks(_playlist_id),self.test_track_ids)
+        
+        # unfollow the playlist
+        self.sc.unfollow_playlist(_playlist_id)        
+
+    def test_add_tracks_to_playlist(self):
+    
+        # create a dummy private playlist
+        _playlist_id = self.sc.create_playlist(self.test_create_playlist_name)
+        
+        # add test tracks to playlist
+        self.sc.add_track_to_playlist(_playlist_id, self.test_track_ids)
+    
+        # get from spotify the tracks associated with the test playlist
+        _result_ids = self.sc.get_user_playlist_tracks(_playlist_id)
+        
+        self.assertListEqual(_result_ids,self.test_track_ids)
+        
+        # unfollow the playlist
+        self.sc.unfollow_playlist(_playlist_id)
+        
+    def test_delete_playlist(self):
+    
+        # create a dummy private playlist
+        _playlist_id = self.sc.create_playlist(self.test_create_playlist_name)
+        
+        # unfollow the playlist
+        self.sc.unfollow_playlist(_playlist_id)
+        
+        # unfollow the playlist
+        self.assertFalse(self.sc.playlist_exists('foobar_playlist_id'))
+        
+    def test_playlist_exists(self):
+        # create a dummy private playlist
+        
+        _playlist_id = self.sc.create_playlist(self.test_create_playlist_name)
+        
+        self.assertTrue(self.sc.playlist_exists(_playlist_id))
+                        
+        # unfollow the playlist
+        self.sc.unfollow_playlist(_playlist_id)
+        
+    def test_playlist_does_not_exists(self):
+        self.assertFalse(self.sc.playlist_exists('foobar_playlist_id'))
+                        
+   
+        
+    # ------------------------------------------------------------------------------
+    
+    def test_create_playlist(self):
+        
+        # create a dummy private playlist
+        _playlist_id = self.sc.create_playlist(self.test_create_playlist_name)
+        
+        # assert playlist exists by searching for it and comparing ids
+        self.assertEquals(_playlist_id,self.sc.get_user_playlist(_playlist_id)[0]['id'])
+        
+        # unfollow the playlist
+        self.sc.unfollow_playlist(_playlist_id)
+
+        
+    def test_available_genre_seeds(self):
+        
+        genres = self.sc.get_available_genre_seeds()
+        
+        self.assertIsInstance(genres.index('dubstep'),IntType)
+        self.assertIsInstance(genres.index('edm'),IntType)
+        self.assertIsInstance(genres.index('electro'),IntType)                     
+        self.assertIsInstance(genres.index('electronic'),IntType)
+
+    def test_recommendations(self):
+
+        tuneables={'energy':0.9,'tempo':120}
+        print self.sc.get_recommendations(seed_genres=['dubstep'],
+                                          seed_artists=["5he5w2lnU9x7JFhnwcekXX"],
+                                          tuneables=tuneables)
         
     def test_get_user_info(self):   
         _user_info = self.sc.get_current_user_info()
@@ -103,30 +217,10 @@ class TestSpotifyConnectorRead(unittest.TestCase):
         self.assertIsInstance(_user_info['followers'],int)
        
     def test_get_artist_info(self):
-        
         _artist_info = self.sc.get_artist_info(self.test_artist,True)
         self.assertEqual(_artist_info['name'],self.test_artist)
         self.assertEqual(_artist_info['id'], self.test_artist_id)
-        
-    def test_get_user_playlists_info(self):
-        results = self.sc.get_user_playlists_info()
-        
-        # number of playlists will so just check that a large number was returned
-        self.assertGreater(len(results),20)
-        
-        # check some specifics of 1 record
-        self.assertTrue(results[0].has_key('collaborative'))
-        self.assertTrue(results[0].has_key('num_tracks'))   
-        self.assertIsInstance(results[0]['num_tracks'],IntType)   
 
-            
-    def test_get_playlist_tracks(self):
-        results = self.sc.get_playlist_tracks(self.test_playlist_id)
-        
-        for result in results:
-            _display_dict(result,2)
-            print
-            
     def test_get_related_artists(self):
         related_artists = self.sc.get_artist_related_artist(self.test_artist_id)
         _related_artists = [related_artist['name'] for related_artist in related_artists]
@@ -180,83 +274,71 @@ class TestSpotifyConnectorRead(unittest.TestCase):
     def test_get_album_tracks(self):
         print self.sc.get_album_tracks('1C2h7mLntPSeVYciMRTF4a')
         
+    def test_get_audio_features_for_playlist(self):
+        self.sc.get_audio_features_for_playlist('0FiSiu1g2mL66GmKGozKsc')
             
-class TestSpotifyConnectorWrite(unittest.TestCase):
+            
+class TestSpotifyConnectorGenerator(unittest.TestCase):
 
     def setUp(self):
         user='1165431378'
-        scope = 'playlist-modify-public'
+        scope = ''
         
         # create a random name for test playlist
         self.test_playlist_name = hex(int(random.random()*pow(10,10))) 
-       
-        # real track id to play with "Whitney, One Moment in time;Sinatra, My Way"
-        self.test_track_ids = ['3S3dZXxNGghLtOqehzHtii', '5iOnSrG79MzrCaq0I8Lpv6']
         
-        # create connection object
         self.sc = SpotifyConnector(user,scope)
         
-        # create the test playlist
-        self.test_playlist_id = self.sc.create_private_playlist(self.test_playlist_name) 
-
-    def tearDown(self):
+    def test_create_recommended_playlist(self):
         
-        # "delete" the test playlist
-        self.sc.unfollow_playlist(self.test_playlist_id)        
-
-        del self.sc    
+        # create a dummy private playlist
+        _playlist_id = self.sc.create_playlist(self.test_playlist_name)
         
-    def test_create_public_playlist(self):
+        tuneables={'energy':0.9,'tempo':120}
+        track_ids =  self.sc.get_recommendations(seed_genres=['dubstep'],
+                                                    seed_artists=["5he5w2lnU9x7JFhnwcekXX"],
+                                                    seed_tracks=['1LV5G400jD3Ytvyv6Dlkym'],
+                                                    tuneables=tuneables)
         
-        # fetch info from spotify for that playlist
-        results = self.sc.get_user_playlists_info(self.test_playlist_id)
-        
-        # assert correctness
-        self.assertEqual(results[0]['name'],self.test_playlist_name)
-        
-    def test_add_tracks_to_playlist(self):
-    
-        # add test tracks to playlist
-        self.sc.add_track_to_playlist(self.test_playlist_id,
-                                      self.test_track_ids)
-    
-        # get from spotify the tracks associated with the test playlist
-        results = self.sc.get_playlist_tracks(self.test_playlist_id)
-
-        # extract the track id's to compare with test tracks
-        _result_ids = [result['id'] for result in results]
-        
-        self.assertListEqual(_result_ids,self.test_track_ids)
-
-            
-    def test_unfollow_playlist(self):
-    
-        print self.sc.unfollow_playlist("0lxfj5ZUmPMtAF43PmI4QY")
-
-            
+        self.sc.add_track_to_playlist(_playlist_id, track_ids)
+       
 if __name__ == '__main__':
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestSpotifyConnectorRead("test_get_user_playlists_info")) 
-    #suite.addTest(TestSpotifyConnectorRead("test_get_playlist_tracks")) 
-    #suite.addTest(TestSpotifyConnectorRead("test_get_user_info")) 
-    #suite.addTest(TestSpotifyConnectorRead("test_get_artist_info")) 
-    #suite.addTest(TestSpotifyConnectorRead("test_get_related_artists")) 
-    #suite.addTest(TestSpotifyConnectorRead("test_get_artist_top_tracks"))
-    #suite.addTest(TestSpotifyConnectorRead("test_get_track_info"))
-    #suite.addTest(TestSpotifyConnectorRead("test_get_audio_features"))
-    #suite.addTest(TestSpotifyConnectorRead("test_search_spotify_tracks"))
-    #suite.addTest(TestSpotifyConnectorRead("test_search_spotify_artist"))
-    #suite.addTest(TestSpotifyConnectorRead("test_search_spotify_album"))
-    #suite.addTest(TestSpotifyConnectorRead("test_get_track_popularity"))
-    #suite.addTest(TestSpotifyConnectorRead("test_get_artist_top_n_tracks"))
-    #suite.addTest(TestSpotifyConnectorRead("test_get_artist_albums"))
-    #uite.addTest(TestSpotifyConnectorRead("test_get_album_tracks"))
+    suite.addTest(TestSpotifyConnector("test_get_user_playlist_ids")) 
+    suite.addTest(TestSpotifyConnector("test_get_user_playlist_info")) 
+    suite.addTest(TestSpotifyConnector("test_get_user_playlist_tracks"))
+    suite.addTest(TestSpotifyConnector("test_add_tracks_to_playlist"))
+    suite.addTest(TestSpotifyConnector("test_playlist_exists"))
+    suite.addTest(TestSpotifyConnector("test_playlist_does_not_exists"))
+    suite.addTest(TestSpotifyConnector("test_delete_playlist"))
+    #suite.addTest(TestSpotifyConnector("test_create_playlist")) 
     
+    #suite.addTest(TestSpotifyConnector('test_get_audio_features_for_playlist'))
+    #suite.addTest(TestSpotifyConnector("test_get_user_info")) 
+    #suite.addTest(TestSpotifyConnector("test_get_artist_info")) 
+    #suite.addTest(TestSpotifyConnector("test_get_related_artists")) 
+    #suite.addTest(TestSpotifyConnector("test_get_artist_top_tracks"))
+    #suite.addTest(TestSpotifyConnector("test_get_track_info"))
+    #suite.addTest(TestSpotifyConnector("test_get_audio_features"))
+    #suite.addTest(TestSpotifyConnector("test_get_track_popularity"))
+    #suite.addTest(TestSpotifyConnector("test_get_artist_top_n_tracks"))
+    #suite.addTest(TestSpotifyConnector("test_get_artist_albums"))
+    #suite.addTest(TestSpotifyConnector("test_get_album_tracks"))
     
-    #suite.addTest(TestSpotifyConnectorWrite("test_create_public_playlist")) 
-    #suite.addTest(TestSpotifyConnectorWrite("test_add_tracks_to_playlist")) 
 
+
+    #suite.addTest(TestSpotifyConnector("test_available_genre_seeds")) 
+
+    #suite.addTest(TestSpotifyConnectorGenerator('test_create_recommended_playlist'))
+    
+    #suite.addTest(TestSpotifyConnector("test_recommendations"))
+
+    #suite.addTest(TestSpotifyConnector("test_search_spotify_tracks"))
+    #suite.addTest(TestSpotifyConnector("test_search_spotify_artist"))
+    #suite.addTest(TestSpotifyConnector("test_search_spotify_album"))
+
+    
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)    
