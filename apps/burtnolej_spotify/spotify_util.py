@@ -62,7 +62,7 @@ class SpotifyConnector():
 
         # if only one record is sent not as a list; create a list
         if not isinstance(records,list): records = [records]
-            
+        
         unique_records = set()
         
         _records = []
@@ -161,18 +161,50 @@ class SpotifyConnector():
     # ------------------------------------------------------------------------------ 
     # tracks : read
     # ------------------------------------------------------------------------------
-    @enrich_kwargs({'track_ids':ListType})
-    @extractor(['album','duration_ms','name','artist'],'name')
-    def get_track_info(self,**kwargs):
-        ''' given a single track_id or a list of track_id's, returns a list of dicts containing additional fields
+        
+    # tracks : info
+    def get_track_info_all(self,**kwargs):
+        ''' given a single track_id or a list of track_id's, returns a list of dicts containing all available fields
 
             Parameters:
                 - track_ids - the id of the tracks - can be either a list or single value
                             if a single value then the decorator will force it into a single item list
         '''
- 
         return ([self.sp.track(track_id) for track_id in kwargs['track_ids']])
+   
+    @enrich_kwargs({'track_ids':ListType})
+    @extractor(['album','duration_ms','name','artist'])
+    def get_track_info(self,**kwargs):
+        ''' given a single track_id or a list of track_id's, return the popularity field only
+            this just uses the extractor to limit the returned fields
+        '''
+        return(self.get_track_info_all(**kwargs))
+        
+    @enrich_kwargs({'track_ids':ListType})
+    @extractor(['popularity'])
+    def get_track_popularity(self,**kwargs):
+        ''' given a single track_id or a list of track_id's, return the popularity field only
+            this just uses the extractor to limit the returned fields
+        '''
+        return(self.get_track_info_all(**kwargs))
     
+    # tracks : audio features
+    def get_track_audio_features_all(self,**kwargs):
+        return(self.sp.audio_features(kwargs['track_ids']))
+
+    @enrich_kwargs({'track_ids':ListType})
+    @extractor(["danceability","energy","loudness","tempo"])
+    def get_key_track_audio_features(self,**kwargs):
+        return(self.get_track_audio_features_all(**kwargs))
+          
+    # tracks : albums
+    def get_album_tracks(self,album_id):
+        return(self.sp.album_tracks(album_id)['items'])
+        
+    @extractor(["name"])      
+    def get_album_track_names(self,album_id):
+        return(self.sp.album_tracks(album_id)['items'])
+
     def get_artist_top_tracks(self,artist_id):
         _top_tracks=[]
         top_tracks = self.sp.artist_top_tracks(artist_id)
@@ -182,15 +214,10 @@ class SpotifyConnector():
                                 'name':track['name']})    
         return(_top_tracks)
     
-    def get_track_popularity(self,track_id):
-        return self.sp.track(track_id)['popularity']
-
     def get_track_name(self,track_id):
         return(self.sp.track(track_id)['name'])
     
-    def get_album_tracks(self,album_id):
-        tracks = self.sp.album_tracks(album_id)['items']
-        return(self._extract_fields(tracks,['id','name','artist'],'name'))
+
     
     def _sort_tracks_by_popularity(self,track_ids,num_tracks=3):
         
@@ -208,10 +235,7 @@ class SpotifyConnector():
         
         return(self._sort_tracks_by_popularity(top_tracks,3))
         
-    def get_audio_features_for_playlist(self,playlist_id):
-        audio_features=[]
 
-        print SpotifyConnector.extract_fields(self.get_playlist_tracks(playlist_id),['id'])
 
     # ------------------------------------------------------------------------------ 
     # tracks : misc

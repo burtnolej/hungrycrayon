@@ -43,15 +43,15 @@ class TestSpotifyConnector(unittest.TestCase):
         self.test_artist_top_n_tracks = [u'Billie Jean - Single Version',u'Love Never Felt so Good',
                                          u'Beat It - Single Version']
         
-        self.test_album_tracks = ['Wanna Be Startin\' Somethin\'','Baby Be Mine',
-                                  'The Girl is Mine - Paul McCartney',
-                                  'Thriller','Beat It - Single Version',
-                                  'Billie Jean - Single Version','Human Nature',
-                                  'P.Y.T.(Pretty Young Thing)','The Lady in My Life']
+        self.test_album_tracks = [u'Wanna Be Startin\' Somethin\'',u'Baby Be Mine',
+                                  u'The Girl Is Mine',
+                                  u'Thriller',u'Beat It - Single Version',
+                                  u'Billie Jean - Single Version',u'Human Nature',
+                                  u'P.Y.T. (Pretty Young Thing)',u'The Lady in My Life']
         
         self.test_album = 'Thriller'
         
-        self.test_album_id = '1C2h7mLntPSeVYciMRTF4a'
+        self.test_album_id = '2ANVost0y2y52ema1E9xAZ'
         
         self.test_artist_albums = ['XSCAPE','XSCAPE - Track by Track Commentary',
                                    'Michael','Invincible',
@@ -62,31 +62,44 @@ class TestSpotifyConnector(unittest.TestCase):
                                    'Thriller 25 Super Deluxe Edition',
                                    'Off the Wall','Forever, Michael',
                                    'Music and Me','Ben','Got To Be There']
-                                   
-        self.test_artist_track_name = 'Billie Jean - Single Version'
+
+     
+        # ------------------------------------------------------------------------------
+        # single track id and results created from it
+        # ------------------------------------------------------------------------------
         self.test_artist_track_id = '5ChkMS8OtdzJeqyybCc9R5' #Billie Jean - Single Version
-        self.test_artist_track_popularity = 78 #Billie Jean - Single Version
-           
+
         self.test_track_info = [{'album': u'Thriller 25 Super Deluxe Edition', 
                                  'duration_ms': 293826,
                                  'name': u'Billie Jean - Single Version', 
                                  'artist': u'Michael Jackson'}]
+
+        self.test_artist_track_popularity = 78 #Billie Jean - Single Version
+        
+        self.test_artist_track_name = 'Billie Jean - Single Version'
+    
+        # ------------------------------------------------------------------------------
+        # list of track ids and various result sets created from them
+        # ------------------------------------------------------------------------------
+        self.test_track_ids = ['3S3dZXxNGghLtOqehzHtii', '5iOnSrG79MzrCaq0I8Lpv6']
         
         self.test_track_info_list = [{"album":"I Will Always Love You: The Best Of Whitney Houston",
-                                     "duration_ms" : 285000,
-                                     "name" : "One Moment in Time",
-                                     "artist" : "Whitney Houston"},
+                                      "duration_ms" : 285000,
+                                      "name" : "One Moment in Time",
+                                      "artist" : "Whitney Houston"},
                                      {"duration_ms" : 276653,
                                       "album" : "Sinatra: Best Of The Best",
                                       "artist" : "Frank Sinatra",
                                       "name" : "My Way"}]
-     
-        # real track id to play with "Whitney, One Moment in time;Sinatra, My Way"
-        self.test_track_ids = ['3S3dZXxNGghLtOqehzHtii', '5iOnSrG79MzrCaq0I8Lpv6']
-        
-        
 
+        self.test_tracks_popularity = [51, 6]
+        
+        self.test_tracks_audio_features = [{"danceability":0.266,"energy":0.539,"loudness":-6.738,"tempo":155.484},
+                                           {"danceability":0.277,"energy":0.464,"loudness":-7.643,"tempo":150.067}]
+        
+        # ------------------------------------------------------------------------------
         # create a random name for test playlist
+        # ------------------------------------------------------------------------------
         self.test_create_playlist_name = hex(int(random.random()*pow(10,10))) 
         
         self.sc = SpotifyConnector(user,scope)
@@ -185,11 +198,12 @@ class TestSpotifyConnectorPlaylists(TestSpotifyConnector):
     
 class TestSpotifyConnectorTracks(TestSpotifyConnector):
     
-    def test_get_track_popularity(self):
-        #check popularity here not in get_track_info because we can usa assertAlmostEquals
-        self.assertAlmostEqual(self.sc.get_track_popularity(self.test_artist_track_id),
-                               self.test_artist_track_popularity,delta=2)    
-
+    
+    def test_get_track_info_all(self):
+        # not checking popularity because it changes !!
+        # pass in a list
+        print self.sc.get_track_info_all(track_ids = self.test_track_ids)
+    
     def test_get_track_info(self):
         # not checking popularity because it changes !!
         # pass in a list
@@ -202,13 +216,30 @@ class TestSpotifyConnectorTracks(TestSpotifyConnector):
         track_info = self.sc.get_track_info(track_ids = self.test_artist_track_id)
         self.assertListEqual(self.test_track_info,track_info)
         
-    def test_get_audio_features(self):
-        audio_features = self.sc.get_audio_features([self.test_artist_track_id])
+    def test_get_track_popularity_nonlist_arg(self):
+        #check popularity here not in get_track_info because we can usa assertAlmostEquals
+        tpops = self.sc.get_track_popularity(track_ids =self.test_artist_track_id)
         
-        for audio_feature in audio_features:
-            _display_dict(audio_feature,1)
-            print
+        for i in range(0,len(tpops)):
+            self.assertAlmostEqual(tpops[i],self.test_artist_track_popularity,delta=2)    
+
+    def test_get_track_popularity(self):
+        #check popularity here not in get_track_info because we can usa assertAlmostEquals
+        tpops = self.sc.get_track_popularity(track_ids =self.test_track_ids)
         
+        for i in range(0,len(tpops)):
+            self.assertAlmostEqual(tpops[i],self.test_tracks_popularity[i],delta=2)
+        
+    def test_get_key_track_audio_features(self):
+        tracks = self.sc.get_key_track_audio_features(track_ids = self.test_track_ids)
+
+        for i in range(len(tracks)):
+            self.assertDictEqual(self.test_tracks_audio_features[i],tracks[i])    
+        
+    def test_get_album_track_names(self):
+        self.assertListEqual(self.sc.get_album_track_names(self.test_album_id),
+                             self.test_album_tracks)
+    
     def test_get_artist_top_tracks(self):
         top_tracks = self.sc.get_artist_top_tracks(self.test_artist_id)
         _top_tracks = [top_track['name'] for top_track in top_tracks]
@@ -322,15 +353,17 @@ if __name__ == '__main__':
     #suite.addTest(TestSpotifyConnectorPlaylists("test_create_playlist")) 
     
     # track based tests
+    
+    #suite.addTest(TestSpotifyConnectorTracks("test_get_track_info_all"))
     suite.addTest(TestSpotifyConnectorTracks("test_get_track_info"))
     suite.addTest(TestSpotifyConnectorTracks("test_get_track_info_nonlist_arg"))
-    #suite.addTest(TestSpotifyConnectorTracks("test_get_track_popularity"))
+    suite.addTest(TestSpotifyConnectorTracks("test_get_track_popularity"))
+    suite.addTest(TestSpotifyConnectorTracks("test_get_track_popularity_nonlist_arg"))
+    suite.addTest(TestSpotifyConnectorTracks('test_get_key_track_audio_features'))
+    suite.addTest(TestSpotifyConnectorTracks("test_get_album_track_names"))
+    
     #suite.addTest(TestSpotifyConnectorTracks("test_get_artist_top_tracks"))
-    
     #suite.addTest(TestSpotifyConnectorTracks("test_get_artist_top_n_tracks"))
-    #suite.addTest(TestSpotifyConnectorTracks("test_get_album_tracks"))
-    #suite.addTest(TestSpotifyConnectorTracks('test_get_audio_features_for_playlist'))
-    
     #suite.addTest(TestSpotifyConnector("test_get_user_info")) 
     #suite.addTest(TestSpotifyConnector("test_get_artist_info")) 
     #suite.addTest(TestSpotifyConnector("test_get_related_artists"))     
