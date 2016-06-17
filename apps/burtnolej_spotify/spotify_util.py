@@ -1,28 +1,8 @@
 import sys
 import spotipy
 import spotipy.util as util
+from types import ListType
 
-#spotipy = spotipy.Spotify()
-
-#scope = 'user-library-read'
-#scope = 'user-library-modify'
-
-#user='burtnolejusa'
-
-DISPLAYNAME='display_name'
-USERID='id'
-
-PLAYLISTNAME='name'
-PLAYLISTID='id'
-PLAYLISTTRACKS='tracks'
-
-TRACKNAME='name'
-TRACKID='id'
-TRACKARTISTS='artists'
-TRACKITEMS='items'
-TRACK='track'
-
-ARTISTNAME='name'
 
 
 class SpotifyConnector():
@@ -30,6 +10,8 @@ class SpotifyConnector():
     def __init__(self,user,scope=None):
         if scope==None:
             scope = 'user-library-read'
+            #scope = 'user-library-read'
+            #scope = 'user-library-modify'            
         
         token = util.prompt_for_user_token(user,scope)
                 
@@ -50,6 +32,25 @@ class SpotifyConnector():
             return wrapper
         return _extractor
     
+    def enrich_kwargs(*myargs):
+        ''' checks that the correct parameters are passed in and forces single items to lists of 1 item where appropriate
+        
+            parameters:
+                 - dict of the form {arg_name:arg_value}
+        '''
+        def _extractor(func):
+            def wrapper(*args, **kwargs):                    
+                for arg_name in myargs[0].keys():
+                    if not kwargs.has_key(arg_name): raise Exception('must pass arg',arg_name)
+                    
+                    if not isinstance(kwargs[arg_name],myargs[0][arg_name]):
+                        if myargs[0][arg_name] == ListType:
+                            kwargs[arg_name] = [kwargs[arg_name]]
+            
+                return func(*args,**kwargs)
+            return wrapper
+        return _extractor
+
     @staticmethod
     def extract_fields(records,fields,unique_key=None):
         
@@ -58,10 +59,9 @@ class SpotifyConnector():
         on unique_key '''
         
         assert isinstance(fields,list)
-        
+
         # if only one record is sent not as a list; create a list
-        if not isinstance(records,list):
-            records = [records]
+        if not isinstance(records,list): records = [records]
             
         unique_records = set()
         
@@ -94,10 +94,10 @@ class SpotifyConnector():
         
         if len(fields)==1:
             return [_record[fields[0]] for _record in _records]
-                    
+                 
         return(_records)
     
-    
+    # ------------------------------------------------------------------------------
     # user playlists: gets
     # ------------------------------------------------------------------------------
     @extractor(['id'],'name')
@@ -120,7 +120,6 @@ class SpotifyConnector():
         return(self.sp.user_playlist(self.user,playlist_id)['tracks']['items'])
     
     # user playlists: checks
-    # ------------------------------------------------------------------------------
     def playlist_exists(self,playlist_id):
         ''' given a playlist id; return useful info, check if the playlist id
         is a member of the list of returned playlist id's. This is to get around the issue
@@ -133,7 +132,6 @@ class SpotifyConnector():
             return False
         
     # user playlists: delete
-    # ------------------------------------------------------------------------------
     def unfollow_playlist(self,playlist_id):
         self.sp.user_playlist_unfollow(self.user,playlist_id)
         
@@ -156,12 +154,68 @@ class SpotifyConnector():
             self.unfollow_playlist(pid) 
         
     # user playlists: create
-    # ------------------------------------------------------------------------------
     def create_playlist(self,playlist_name,public=False):
         playlists = self.sp.user_playlist_create(self.user, playlist_name, public)
         return(playlists['id'])
     
+    # ------------------------------------------------------------------------------ 
+    # tracks : read
+    # ------------------------------------------------------------------------------
+    @enrich_kwargs({'track_ids':ListType})
+    @extractor(['album','duration_ms','name','artist'],'name')
+    def get_track_info(self,**kwargs):
+        ''' given a single track_id or a list of track_id's, returns a list of dicts containing additional fields
+
+            Parameters:
+                - track_ids - the id of the tracks - can be either a list or single value
+                            if a single value then the decorator will force it into a single item list
+        '''
+ 
+        return ([self.sp.track(track_id) for track_id in kwargs['track_ids']])
+    
+    def get_artist_top_tracks(self,artist_id):
+        _top_tracks=[]
+        top_tracks = self.sp.artist_top_tracks(artist_id)
         
+        for track in top_tracks['tracks']:
+            _top_tracks.append({'id':track['id'],
+                                'name':track['name']})    
+        return(_top_tracks)
+    
+    def get_track_popularity(self,track_id):
+        return self.sp.track(track_id)['popularity']
+
+    def get_track_name(self,track_id):
+        return(self.sp.track(track_id)['name'])
+    
+    def get_album_tracks(self,album_id):
+        tracks = self.sp.album_tracks(album_id)['items']
+        return(self._extract_fields(tracks,['id','name','artist'],'name'))
+    
+    def _sort_tracks_by_popularity(self,track_ids,num_tracks=3):
+        
+        track_by_popularity = {}
+        for track in track_ids:
+            track_by_popularity[self.get_track_popularity(track['id'])] = track['id']
+
+        sorted_popularity = sorted(track_by_popularity,reverse=True)[:num_tracks]
+        
+        return([track_by_popularity[popularity] for popularity in sorted_popularity])
+    
+    def get_artist_top_n_tracks(self,artist_id,num_tracks):
+        _top_tracks=[]
+        top_tracks = self.get_artist_top_tracks(artist_id)
+        
+        return(self._sort_tracks_by_popularity(top_tracks,3))
+        
+    def get_audio_features_for_playlist(self,playlist_id):
+        audio_features=[]
+
+        print SpotifyConnector.extract_fields(self.get_playlist_tracks(playlist_id),['id'])
+
+    # ------------------------------------------------------------------------------ 
+    # tracks : misc
+    # ------------------------------------------------------------------------------      
     def get_current_user_info(self):
         
         _user = self.sp.current_user()
@@ -189,8 +243,6 @@ class SpotifyConnector():
         return _artists
     
         
-
-   
     def get_available_genre_seeds(self):
         return self.sp.available_genre_seeds()['genres']
     
@@ -213,54 +265,32 @@ class SpotifyConnector():
     def add_track_to_playlist(self,playlist_id, track_ids):
         results = self.sp.user_playlist_add_tracks(self.user, playlist_id, track_ids)
                 
-    def get_artist_top_tracks(self,artist_id):
-        _top_tracks=[]
-        top_tracks = self.sp.artist_top_tracks(artist_id)
-        
-        for track in top_tracks['tracks']:
-            _top_tracks.append({'id':track['id'],
-                                'name':track['name']})    
-        return(_top_tracks)
-    
-    def get_track_popularity(self,track_id):
-        return self.sp.track(track_id)['popularity']
 
-    def get_track_name(self,track_id):
-        return(self.sp.track(track_id)['name'])
-    
-    def _sort_tracks_by_popularity(self,track_ids,num_tracks=3):
-        
-        track_by_popularity = {}
-        for track in track_ids:
-            track_by_popularity[self.get_track_popularity(track['id'])] = track['id']
 
-        sorted_popularity = sorted(track_by_popularity,reverse=True)[:num_tracks]
-        
-        return([track_by_popularity[popularity] for popularity in sorted_popularity])
-    
-    def get_artist_top_n_tracks(self,artist_id,num_tracks):
-        _top_tracks=[]
-        top_tracks = self.get_artist_top_tracks(artist_id)
-        
-        return(self._sort_tracks_by_popularity(top_tracks,3))
-    
-    @extractor(['album','popularity','duration_ms','name','artist'],'name')
-    def get_track_info(self,track_id):
-        return([self.sp.track(track_id)])
-        
-    def get_audio_features_for_playlist(self,playlist_id):
-        audio_features=[]
+    def get_artist_albums(self,artist_id,fields):
+        albums = self.sp.artist_albums(artist_id, album_type='album',country='US')['items']
+        return(self._extract_fields(albums,fields,'name'))
 
-        print SpotifyConnector.extract_fields(self.get_playlist_tracks(playlist_id),['id'])
-                
-            
-        #return(self.sp.audio_features(track_id))
+
+    def get_most_popular_list(sp,track_ids,num_tracks=10):
+        d={}
+        for track_id in track_ids:
+            popularity = get_popularity(sp,track_id)
+            d[popularity] = track_id
     
+        d_sorted= sorted(d.keys(),reverse=True)
+        top_d_sorted = d_sorted[:num_tracks]
     
-    # complete using the extractor decorator
-    # make search simple by track or by album - will always retreive a lot
-    # use get_artist_albums() for more specific searches
-    # search test should be simple (did we get stuff)
+        top_d = []
+        for _popularity in top_d_sorted:
+            top_d.append(d[_popularity])
+        return(top_d)
+    
+
+    
+    # ------------------------------------------------------------------------------ 
+    # tracks : search
+    # ------------------------------------------------------------------------------ 
     
     @extractor(['id','name','artist'],'name')
     def search_spotify_tracks(self,track,artist=None):
@@ -274,45 +304,6 @@ class SpotifyConnector():
     def search_spotify_tracks_by_album(self,track,album):
         return(self.sp.search(q='track:'+track+' album:'+album,type='track', limit=50)['tracks']['items'])
         
-    def get_album_tracks(self,album_id):
-        tracks = self.sp.album_tracks(album_id)['items']
-        return(self._extract_fields(tracks,['id','name','artist'],'name'))
-        
-    def get_artist_albums(self,artist_id,fields):
-        albums = self.sp.artist_albums(artist_id, album_type='album',country='US')['items']
-        return(self._extract_fields(albums,fields,'name'))
-
-
-def get_most_popular_list(sp,track_ids,num_tracks=10):
-    d={}
-    for track_id in track_ids:
-        popularity = get_popularity(sp,track_id)
-        d[popularity] = track_id
-        
-    d_sorted= sorted(d.keys(),reverse=True)
-    top_d_sorted = d_sorted[:num_tracks]
-        
-    top_d = []
-    for _popularity in top_d_sorted:
-        top_d.append(d[_popularity])
-    return(top_d)
-
-
-    
-
-
-
-
-
-
-   
-
-
-
-
-
-        
-
 
 def create_playlist_from_file(sp,filename,playlist_name):
     l=[]
