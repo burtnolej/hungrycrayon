@@ -36,12 +36,23 @@ class TestSpotifyConnector(unittest.TestCase):
         self.test_artist_top_tracks = ['Billie Jean - Single Version','Love Never Felt so Good',
                                        'Beat It - Single Version','P.Y.T. (Pretty Young Thing)',
                                        'Don\'t Stop \'Til You Get Enough - Single Version',
-                                       'Black or White - Single Version','The Way You Make Me Feel - 2012 Remaster',
-                                       'Love Never Felt so Good','Man in the Mirror - 2012 Remaster',
+                                       'Black or White - Single Version','Love Never Felt so Good',
+                                       'The Way You Make Me Feel - 2012 Remaster','Man in the Mirror - 2012 Remaster',
                                        'Rock with You - Single Version']
         
         self.test_artist_top_n_tracks = [u'Billie Jean - Single Version',u'Love Never Felt so Good',
                                          u'Beat It - Single Version']
+        
+        self.test_artist_top_track_ids = ['5ChkMS8OtdzJeqyybCc9R5',
+                                          '48td6xvpokdYwvbl3JIiXP',
+                                          '1OOtq8tRnDM8kG2gqUPjAj',
+                                          '5lA3pwMkBdd24StM90QrNR',
+                                          '46eu3SBuFCXWsPT39Yg3tJ',
+                                          '2Cy7QY8HPLk925AyNAt6OG',
+                                          '0S5EEpFAHcT7cm5XOASc29',
+                                          '0sKlV58cODrjxGFOyf9IXY',
+                                          '1kiNatIrwDusOZfR29W0LJ',
+                                          '7oOOI85fVQvVnK5ynNMdW7']
         
         self.test_album_tracks = [u'Wanna Be Startin\' Somethin\'',u'Baby Be Mine',
                                   u'The Girl Is Mine',
@@ -62,6 +73,13 @@ class TestSpotifyConnector(unittest.TestCase):
                                    'Thriller 25 Super Deluxe Edition',
                                    'Off the Wall','Forever, Michael',
                                    'Music and Me','Ben','Got To Be There']
+        
+        self.test_track_info_keys = [u'album', u'name', u'uri', u'external_urls', 
+                                     u'popularity', u'explicit', u'preview_url', 
+                                     u'track_number', u'disc_number', u'href', 
+                                     u'artists', u'duration_ms', u'external_ids', 
+                                     u'type', u'id', u'available_markets']
+
 
      
         # ------------------------------------------------------------------------------
@@ -197,13 +215,11 @@ class TestSpotifyConnectorPlaylists(TestSpotifyConnector):
     # ------------------------------------------------------------------------------
     
 class TestSpotifyConnectorTracks(TestSpotifyConnector):
-    
-    
     def test_get_track_info_all(self):
         # not checking popularity because it changes !!
-        # pass in a list
-        print self.sc.get_track_info_all(track_ids = self.test_track_ids)
-    
+        track_info = self.sc.get_track_info_all(track_ids = self.test_track_ids)
+        self.assertListEqual(self.test_track_info_keys,track_info[0].keys())
+
     def test_get_track_info(self):
         # not checking popularity because it changes !!
         # pass in a list
@@ -241,18 +257,23 @@ class TestSpotifyConnectorTracks(TestSpotifyConnector):
                              self.test_album_tracks)
     
     def test_get_artist_top_tracks(self):
-        top_tracks = self.sc.get_artist_top_tracks(self.test_artist_id)
-        _top_tracks = [top_track['name'] for top_track in top_tracks]
-        
-        self.assertListEqual(self.test_artist_top_tracks,_top_tracks)
+        self.assertListEqual(self.sc.get_artist_top_tracks(self.test_artist_id),
+                              self.test_artist_top_track_ids)
         
     def test_get_artist_top_n_tracks(self):
         top_tracks = self.sc.get_artist_top_n_tracks(self.test_artist_id,3)
         self.assertListEqual(self.test_artist_top_n_tracks, 
                              [self.sc.get_track_name(track_id) for track_id in top_tracks ])
     
+        
+    def test_get_track_name(self):
+        self.assertListEqual( self.sc.get_track_name(track_ids = self.test_artist_top_track_ids),
+                              self.test_artist_top_tracks)
+         
     def test_get_album_tracks(self):
         print self.sc.get_album_tracks('1C2h7mLntPSeVYciMRTF4a')
+     
+    
         
 class TestSpotifyConnectorMisc(TestSpotifyConnector):
     
@@ -343,27 +364,30 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
 
     # playlist based tests
-    #uite.addTest(TestSpotifyConnectorPlaylists("test_get_user_playlist_ids")) 
-    #suite.addTest(TestSpotifyConnectorPlaylists("test_get_user_playlist_info")) 
-    #suite.addTest(TestSpotifyConnectorPlaylists("test_get_user_playlist_tracks"))
-    #suite.addTest(TestSpotifyConnectorPlaylists("test_add_tracks_to_playlist"))
-    #suite.addTest(TestSpotifyConnectorPlaylists("test_playlist_exists"))
-    #suite.addTest(TestSpotifyConnectorPlaylists("test_playlist_does_not_exists"))
-    #suite.addTest(TestSpotifyConnectorPlaylists("test_delete_playlist"))
-    #suite.addTest(TestSpotifyConnectorPlaylists("test_create_playlist")) 
+    suite.addTest(TestSpotifyConnectorPlaylists("test_get_user_playlist_ids")) 
+    suite.addTest(TestSpotifyConnectorPlaylists("test_get_user_playlist_info")) 
+    suite.addTest(TestSpotifyConnectorPlaylists("test_get_user_playlist_tracks"))
+    suite.addTest(TestSpotifyConnectorPlaylists("test_add_tracks_to_playlist"))
+    suite.addTest(TestSpotifyConnectorPlaylists("test_playlist_exists"))
+    suite.addTest(TestSpotifyConnectorPlaylists("test_playlist_does_not_exists"))
+    suite.addTest(TestSpotifyConnectorPlaylists("test_delete_playlist"))
+    suite.addTest(TestSpotifyConnectorPlaylists("test_create_playlist")) 
     
     # track based tests
     
-    #suite.addTest(TestSpotifyConnectorTracks("test_get_track_info_all"))
+    suite.addTest(TestSpotifyConnectorTracks("test_get_track_info_all"))
     suite.addTest(TestSpotifyConnectorTracks("test_get_track_info"))
     suite.addTest(TestSpotifyConnectorTracks("test_get_track_info_nonlist_arg"))
     suite.addTest(TestSpotifyConnectorTracks("test_get_track_popularity"))
     suite.addTest(TestSpotifyConnectorTracks("test_get_track_popularity_nonlist_arg"))
     suite.addTest(TestSpotifyConnectorTracks('test_get_key_track_audio_features'))
     suite.addTest(TestSpotifyConnectorTracks("test_get_album_track_names"))
+    suite.addTest(TestSpotifyConnectorTracks("test_get_track_name"))
+    suite.addTest(TestSpotifyConnectorTracks("test_get_artist_top_tracks"))
     
-    #suite.addTest(TestSpotifyConnectorTracks("test_get_artist_top_tracks"))
     #suite.addTest(TestSpotifyConnectorTracks("test_get_artist_top_n_tracks"))
+    
+    
     #suite.addTest(TestSpotifyConnector("test_get_user_info")) 
     #suite.addTest(TestSpotifyConnector("test_get_artist_info")) 
     #suite.addTest(TestSpotifyConnector("test_get_related_artists"))     

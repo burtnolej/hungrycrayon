@@ -205,17 +205,14 @@ class SpotifyConnector():
     def get_album_track_names(self,album_id):
         return(self.sp.album_tracks(album_id)['items'])
 
+    @extractor(["id"])
     def get_artist_top_tracks(self,artist_id):
-        _top_tracks=[]
-        top_tracks = self.sp.artist_top_tracks(artist_id)
-        
-        for track in top_tracks['tracks']:
-            _top_tracks.append({'id':track['id'],
-                                'name':track['name']})    
-        return(_top_tracks)
+        return self.sp.artist_top_tracks(artist_id)['tracks']
     
-    def get_track_name(self,track_id):
-        return(self.sp.track(track_id)['name'])
+    @enrich_kwargs({'track_ids':ListType})
+    @extractor(["name"]) 
+    def get_track_name(self,**kwargs):
+        return self.sp.tracks(kwargs['track_ids'])['tracks']
     
 
     
