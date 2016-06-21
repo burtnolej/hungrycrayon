@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="PHARS">
+        <CLASSES>
+          <root url="phar://$MODULE_DIR$/composer.phar/" />
+        </CLASSES>
+        <SOURCES>
+          <root url="phar://$MODULE_DIR$/composer.phar/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="PHP">
+        <CLASSES>
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/audeio/spotify-web-api" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/composer" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/container-interop/container-interop" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/doctrine/collections" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/doctrine/instantiator" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/guzzle/guzzle" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/league/oauth2-client" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpdocumentor/reflection-common" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpdocumentor/reflection-docblock" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpdocumentor/type-resolver" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpspec/prophecy" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-code-coverage" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-file-iterator" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-text-template" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-timer" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-token-stream" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/phpunit" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/phpunit-mock-objects" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/comparator" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/diff" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/environment" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/exporter" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/global-state" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/recursion-context" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/version" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/symfony/event-dispatcher" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/symfony/yaml" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/webmozart/assert" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-eventmanager" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-filter" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-hydrator" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-servicemanager" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-stdlib" />
+          <root url="file:///usr/local/bin/pear" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/audeio/spotify-web-api" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/composer" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/container-interop/container-interop" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/doctrine/collections" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/doctrine/instantiator" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/guzzle/guzzle" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/league/oauth2-client" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpdocumentor/reflection-common" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpdocumentor/reflection-docblock" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpdocumentor/type-resolver" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpspec/prophecy" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-code-coverage" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-file-iterator" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-text-template" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-timer" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/php-token-stream" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/phpunit" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/phpunit/phpunit-mock-objects" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/comparator" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/diff" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/environment" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/exporter" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/global-state" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/recursion-context" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/sebastian/version" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/symfony/event-dispatcher" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/symfony/yaml" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/webmozart/assert" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-eventmanager" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-filter" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-hydrator" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-servicemanager" />
+          <root url="file://$USER_HOME$/Downloads/composer/vendor/zendframework/zend-stdlib" />
+          <root url="file:///usr/local/bin/pear" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>

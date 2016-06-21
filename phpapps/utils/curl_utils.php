@@ -21,10 +21,8 @@ curl_close($curl);
 
 echo '{ "token": "'.$token.'" }';
 
-foreach ($stats as $key => $value)
-{
-    printf().':'.$value;
+foreach ($stats as $key => $value) {
+    echo $key, $value;
 }
-
 exit();
 ?>
