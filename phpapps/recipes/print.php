@@ -1,5 +1,9 @@
 <?php
 
+
+	print("$errno, $errstr, $errfile, $errline\n");
+	
+	
 class print_recipe
 {
     function padding()

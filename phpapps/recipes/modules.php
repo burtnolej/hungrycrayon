@@ -1,11 +1,6 @@
+
 <?php
 
-/*
-This works - the namespace PHPUnit_Framework_TestCase seems to work after 
-we have recreated autoload from composer.
-
-to run tests - phpunit unittest.php
-*/
 require_once __DIR__ . '/composer/vendor/autoload.php';
 
 class StackTest extends PHPUnit_Framework_TestCase
@@ -20,9 +15,10 @@ class StackTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($stack));
 
         $this->assertEquals('foo', array_pop($stack));
+        $this->assertEquals(0, count($stack));
     }
 }
 
 $st = new StackTest();
-
+$st->testPushAndPop();
 ?>

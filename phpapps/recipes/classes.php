@@ -1,68 +1,50 @@
 <?php
 
-class Mineral
+class BaseClass
 {
-    // property declaration
-    private $var_name = Null;
-    public $sources = Null;
-    public $daily_requirement = Null;
-
-    function __construct($var_name,$sources,$daily_requirement)
-    {
-
-        if (gettype($sources) != "array")
-        {
-            echo "Error";
-        }
-
-        $this->var_name = $var_name;
-        $this->sources = $sources;
-        $this->daily_requirement = $daily_requirement;
-    }
-
-    public function dump(){
-        echo $this->var_name;
-
-    }
+	function __construct()
+	{
+		// prints out the current function name
+		echo __FUNCTION__;
+	}
 }
 
-/*class A
+class Mineral extends BaseClass
 {
-    function foo()
-    {
-        if (isset($this)) {
-            echo '$this is defined (';
-            echo get_class($this);
-            echo ")\n";
-        } else {
-            echo "\$this is not defined.\n";
-        }
-    }
+	private $var_name = Null;
+	public $sources = Null;
+	public $daily_requirement = Null;
+	
+	function __construct($var_name,$sources,$daily_requirement)
+	{
+		parent::__construct();
+			 	
+		if (gettype($sources) != "array")
+		{
+			echo "Error";
+		}
+	
+	$this->var_name = $var_name;
+	$this->sources = $sources;
+	$this->daily_requirement = $daily_requirement;
+	}
+
+	public function dump()
+	{
+		echo $this->var_name;
+	}
 }
 
-class B
+
+function print_power($base,$exp)
 {
-    function bar()
-    {
-        // Note: the next line will issue a warning if E_STRICT is enabled.
-        A::foo();
-    }
+	printf("\n%d to the power %d = %d\n",$base,$exp,pow($base,$exp));
 }
 
-$a = new A();
-$a->foo();
+//print_power(12,4);
 
-// Note: the next line will issue a warning if E_STRICT is enabled.
-A::foo();
-$b = new B();
-$b->bar();
-
-// Note: the next line will issue a warning if E_STRICT is enabled.
-B::bar();
-?>
-*/
-
-$mnl = new Mineral("calcium",array("milk"=>"10mg/8oz"),15);
-
-$mnl->dump();
+call_user_func("print_power",12,4);
+	
+//$mnl = new Mineral("calcium",array("milk"=>"10mg/8oz"),15);
+//$mnl->dump();
 ?>
