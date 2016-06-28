@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/css" href="menu.css"?>
+<item id="0">
+	<items>
+		<item id="1">
+			<label>PHP</label>
+			<items>
+				<source>build-install.php</source>
+				<item id="4">
+					<tag>phpdependencies</tag>
+					<label>PHP Dependencies</label>
+				</item>
+				<item id="5">
+					<tag>configurephp</tag>
+					<label>Configure PHP</label>
+				</item>
+				<item id="6">
+					<tag>troubleshootingphp</tag>
+					<label>Troubleshooting PHP</label>
+				</item>
+			</items>
+		</item>
+		<item id="2">
+			<label>Apache</label>
+		</item>
+		<item id="3">
+			<source>html-html.php</source>
+			<tag>false</tag>
+			<label>HTML</label>
+			<items>
+				<item id="7">
+					<tag>httpdconf</tag>
+					<label>httpdconf</label>
+				</item>
+				<item id="8">
+					<tag>htmllists</tag>
+					<label>htmllists</label>
+				</item>
+				<item id="9">
+					<tag>htmltable</tag>
+					<label>htmltable</label>
+				</item>
+				<item id="10">
+					<tag>htmllinks</tag>
+					<label>htmllinks</label>
+				</item>
+				<item id="11">
+					<tag>htmlescaping</tag>
+					<label>htmlescaping</label>
+				</item>
+			</items>
+		</item>
+	</items>
+</item>
