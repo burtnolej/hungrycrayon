@@ -20,5 +20,6 @@ php > echo implode(",", $a);
 
 var_dump($a["a"]);
 
-
+$i=1;
+while ($i < 10) { echo $i++;}
 ?>

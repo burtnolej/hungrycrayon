@@ -39,5 +39,26 @@ $array = array(
 /* basic associative */
 
 
+
+print join($array,",");
+
+
+// array comprehension
+
+$out=array_map(function($x) {return $x*$x;}, range(0, 9))
+
+// array operators
+
+
+if (array("foo","bar") == array("foo","bar")){
+}
 ?>
 
+	
+	setattr
+	getattr
+	
+	$array=array();
+	foreach ($attrs as $attr) {
+		$array[$attr] = $menu_item[$attr];
+	}

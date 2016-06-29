@@ -1,62 +1,19 @@
+
 <?php
-$file = "menu.xml";
-$depth = array();
 
-function startElement($parser, $name, $attrs)
-{
-	
+include 'menu.php';
 
-	print_r($parser);
-	print_r($name);
-	print_r($attrs);
-	
-    global $depth;
+$xml = new SimpleXMLElement($xmlstr);
 
-    if (!isset($depth[$parser])) {
-        $depth[$parser] = 0;
-    }
+// output all of 10000 item and children
+//print_r($xml->items->{'item'});
 
-    for ($i = 0; $i < $depth[$parser]; $i++) {
-        echo "  ";
-    }
-    echo "$name($depth[$parser])\n";
-    $depth[$parser]++;
+// print all the labels
+foreach ($xml->items->{'item'} as $item) {
+	print_r($item->label);
+	$parent = $item->xpath(".."); 
+	print_r($parent->{'label'});
 }
+#print_r($xml);
 
-function endElement($parser, $name)
-{
-    global $depth;
-    $depth[$parser]--;
-}
-
-$xml_parser = xml_parser_create();
-xml_set_element_handler($xml_parser, "startElement", "endElement");
-if (!($fp = fopen($file, "r"))) {
-    die("could not open XML input");
-}
-
-$data = fread($fp, 4096);
-
- if (!xml_parse($xml_parser, $data, feof($fp))) {
-     die(sprintf("XML error: %s at line %d",
-                 xml_error_string(xml_get_error_code($xml_parser)),
-                 xml_get_current_line_number($xml_parser)));
- }
- 
-
-exit
-?>
-
-while ($data = fread($fp, 4096)) {
-
-	
-	echo $data;
-    if (!xml_parse($xml_parser, $data, feof($fp))) {
-        die(sprintf("XML error: %s at line %d",
-                    xml_error_string(xml_get_error_code($xml_parser)),
-                    xml_get_current_line_number($xml_parser)));
-    }
-}
-
-//xml_parser_free($xml_parser);
 ?>

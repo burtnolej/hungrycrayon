@@ -46,19 +46,54 @@ abstract class menu_item {
 
 class menu_handler
 {
-   public function draw_menu($menu_array,$parent)
-   {
-   	echo '<div id="nav">';
-   	echo '<ul id="lvl'.$level.'">';
+	public function __construct($menu_array) {
+		$this->menu_array = $menu_array;
+		
+		
    	foreach ($menu_array as $menu) {
-
-			if ($parent == $menu[menu_item::parnt]) {
+			if ($parent == $menu[menu_item::id]) {
 				echo '<li><a href="'.$menu[menu_item::source].
 						'?name='.$menu[menu_item::tag].
 						'?level='.$menu[menu_item::level].
 						'">'.$menu[menu_item::label].'</a></li>';   
             }
         	}
+        	
+	}
+	
+	private function build_menu_tree(){
+		
+	}
+   public function draw_menu($menu_array,$parent,$level){
+   	// start nav panel
+   	echo '<div id="nav">';   	
+   	
+   	// start list using parent style
+   	echo '<ul id="lvl'.$level.'">';
+   	
+   	// draw parent list item and siblings
+
+		$parent_level =
+   	foreach ($menu_array as $menu) {
+			if ($parent == $menu[menu_item::id]) {
+				echo '<li><a href="'.$menu[menu_item::source].
+						'?name='.$menu[menu_item::tag].
+						'?level='.$menu[menu_item::level].
+						'">'.$menu[menu_item::label].'</a></li>';   
+            }
+        	}
+ 
+		// if item has children draw them
+		
+		
+ 			if ($parent == $menu[menu_item::parnt]) {
+				echo '<li><a href="'.$menu[menu_item::source].
+						'?name='.$menu[menu_item::tag].
+						'?level='.$menu[menu_item::level].
+						'">'.$menu[menu_item::label].'</a></li>';   
+            }
+        	}
+        	
     	echo '</ul>';
     	echo '</div>';
 	}
@@ -86,11 +121,13 @@ $menu_items = array(
    array(11,2,5,3,'html-html.php','htmlescaping','htmlescaping')  
 );
 
+
+
 $mnu = new menu_handler;
 
 
 // level change can be calculated easilly as +/- 1 from current
 #$mnu->draw_menu($menu_items,'0','1');
-$mnu->draw_menu($menu_items,'3');
+$mnu->draw_menu($menu_items,3,1);
 ?>
 
