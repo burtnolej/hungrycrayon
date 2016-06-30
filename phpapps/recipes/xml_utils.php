@@ -50,16 +50,15 @@ class XMLUtils extends SimpleXMLElement {
 		return($ancestors);
 	}
 	
-	function get_child_nodes($item) {
+	function get_child_details($item) {
 		$item = $this->__clean_args($item);
-		
-		print_r($item);
-		
+				
 		$child_nodes=array();
-		foreach ($item->$this->xpath_node as $child) {
-				$child_nodes[] = $child;
+		foreach ($item->{$this->xpath_node} as $child) {
+			$child_nodes[] = $this->get_menuitem_details($child->tag,
+									array('tag'),array('source'));
+			
 		}
-	
 		return($child_nodes);
 	}
 	
@@ -79,11 +78,15 @@ class XMLUtils extends SimpleXMLElement {
 	
 	function get_menuitem($menuitemid) {
 		
+		if (is_string($menuitemid)) {
+			$menuitemid = sprintf("'%s'",$menuitemid);
+		}
+		
 		$xpath_str = sprintf("//%s[%s=%s]",
 					$this->xpath_node,
 					$this->xpath_node_id,
 					$menuitemid);
-		
+
 		$menu_item = $this->xpath($xpath_str)[0];
 	
 		return($menu_item);
