@@ -1,118 +1,122 @@
 <?php
 
-function __clean_args($item, $tree) {
-	
-	if (gettype($item) == 'object') {
-		if (get_class($item) != 'SimpleXMLElement') {
-			//error
-		}
-		else {
-			return($item);
-		}
-	}
-	else {
-		if ($tree != null) {
-			return(get_menuitem($tree,$item));
-		}
-		else {
-			// error
-		}
-	}
-}
+class XMLUtils extends SimpleXMLElement {
 
-function get_parent($item,$tree=null) {
-	
-	$item = __clean_args($item,$tree);
+	function configure($root_tag, $root_tag_val,
+								$xpath_node,$path_node_id) {
 		
-	return($item->xpath("parent::*")[0]);
-}
-
-function get_ancestors($item,$root_tag,$tree=null) {
-	
-	$item = __clean_args($item,$tree);
-	
-	$ancestors=array();
-	while ($item->label != $root_tag) {
-		$item= get_parent($item);
-		$ancestors[]=(string)$item->label;
+		// the unique tag and tag value that the root node will have
+		// i.e. <label>root</label>
+		$this->root_tag = $root_tag;
+		$this->root_tag_val = $root_tag_val;
+		
+		// the tag name for the core tree node and the id tag that uniquely identifys it
+		// i.e. <item><tag>foobar</tag></item>
+		$this->xpath_node = $xpath_node;
+		$this->xpath_node_id = $path_node_id;	
 	}
-	return($ancestors);
-}
-
-
-function get_child_nodes($item,$tree=null) {
-	$item = __clean_args($item,$tree);
 	
-	print_r($item);
-	
-	//$child_nodes=array();
-	//foreach ($item->item as $child) {
-	//		$child_nodes[] = $child;
-	//}
-
-	//return($child_nodes);
-}
-
-
-function get_siblings($item, $tree=null) {
-	
-	$item = __clean_args($item,$tree);
-
-	$p_item = get_parent($item);
-	$siblings=array();
-
-	foreach ($p_item->menuitem as $item) {
-		$siblings[]=(string)$item->label;
+	function __clean_args($item) {
+		
+		if (gettype($item) == 'object') {
+			if (get_class($item) != 'XMLUtils') {
+				//error
+			}
+			else {
+				return($item);
+			}
+		}
+		else {
+			return($this->get_menuitem($item));
+		}
 	}
-	return($siblings);
-}
-
-function get_menuitem($tree,$menuitemid,$xpath_node=null,$xpath_node_id=null) {
 	
-	if (isset($xpath_node) and isset($xpath_node_id)) {
+	function get_parent($item) {
+		
+		$item = $this->__clean_args($item);
+					
+		return($item->xpath("parent::*")[0]);
+	}
+	
+	function get_ancestors($item) {
+		
+		$item = $this->__clean_args($item);
+		
+		$ancestors=array();
+		while ($item->{$this->root_tag} != $this->root_tag_val) {
+			$item= $this->get_parent($item);
+			$ancestors[]=(string)$item->label;
+		}
+		return($ancestors);
+	}
+	
+	function get_child_nodes($item) {
+		$item = $this->__clean_args($item);
+		
+		print_r($item);
+		
+		$child_nodes=array();
+		foreach ($item->$this->xpath_node as $child) {
+				$child_nodes[] = $child;
+		}
+	
+		return($child_nodes);
+	}
+	
+	function get_siblings($item) {
+		
+		$item = $this->__clean_args($item);
+	
+		$p_item = $this->get_parent($item);
+		$siblings=array();
+	
+		
+		foreach ($p_item->{$this->xpath_node} as $item) {
+			$siblings[]=(string)$item->label;
+		}
+		return($siblings);
+	}
+	
+	function get_menuitem($menuitemid) {
 		
 		$xpath_str = sprintf("//%s[%s=%s]",
-					$xpath_node,
-					$xpath_node_id,
+					$this->xpath_node,
+					$this->xpath_node_id,
 					$menuitemid);
-	}
-	else {
-		$xpath_str = sprintf("//menuitem[menuitemid=%s]",$menuitemid);
-	}
-	
-	$menu_item = $tree->xpath($xpath_str)[0];
-
-	return($menu_item);
-	
-}
-
-function get_menuitem_depth($tree,$menuitemid,$root_node,$root_node_val,$xpath_node=null,$xpath_node_id=null) {
-	$item = get_menuitem($tree,$menuitemid,$xpath_node,$xpath_node_id);
-
-	$depth=0;
-	while ($item->$root_node != $root_node_val) {
-		$item= get_parent($item);
-		$depth++;
-	}
-	return($depth);
-}
-
-function get_menuitem_details($tree,$menuitemid,$attrs,$parent_attrs,
-					$xpath_node=null,$xpath_node_id=null) {
-
-	$menu_item = get_menuitem($tree,$menuitemid,$xpath_node,$xpath_node_id);
-	$parent_menu_item = get_parent($menu_item);
-	
-	$array=array();
-	foreach ($attrs as $attr) {
 		
-		$array[$attr] = (string)$menu_item->$attr;
+		$menu_item = $this->xpath($xpath_str)[0];
+	
+		return($menu_item);
 	}
 	
-	foreach ($parent_attrs as $attr) {
-		$array[$attr] = (string)$parent_menu_item->$attr;
-	}	
-	return($array);	
+	function get_menuitem_depth($menuitemid) {
+		$item = $this->get_menuitem($menuitemid);
 	
+		$depth=0;
+		while ($item->{$this->root_tag} != $this->root_tag_val) {
+			$item= $this->get_parent($item);
+			$depth++;
+		}
+		return($depth);
+	}
+	
+	function get_menuitem_details($menuitemid,$attrs,$parent_attrs) {
+	
+		$menu_item = $this->get_menuitem($menuitemid);
+		
+		$parent_menu_item = $this->get_parent($menu_item);
+		
+		$array=array();
+		foreach ($attrs as $attr) {
+			
+			$array[$attr] = (string)$menu_item->$attr;
+		}
+		
+		foreach ($parent_attrs as $attr) {
+			$array[$attr] = (string)$parent_menu_item->$attr;
+		}	
+		return($array);	
+		
+	}
 }
 ?>
