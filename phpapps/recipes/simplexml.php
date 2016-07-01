@@ -64,6 +64,78 @@ XML;
 //include 'samplexml.php';
 include 'xml_utils.php';
 
+function assert_arrays_equal($array1, $array2,
+									&$result_bool,&$result_str) {
+	
+	$result_bool=true;
+	$result_str="";
+		
+	$sa1 = sizeof($array1);
+	$sa2 = sizeof($array2);
+	
+	if ($sa1 != $sa2) {
+		$result_bool = false;
+		$result_str = sprintf("array1 len=%d != array2: len=%d",
+								$sa1,$sa2);
+	}
+	else {
+		foreach ($array1 as $key => $val) {
+			
+		   if ($array1[$key] != $array2[$key]) {
+		   	$result_bool = false;
+				$_result_str = sprintf(">>> array1[%d]=>%s != array2[%d]=>%s",
+											$key, $array1[$key],$key, $array2[$key]);
+											
+		    	$result_str = $result_str.$_result_str.PHP_EOL;
+		    }
+		}
+	}
+	
+	if (!$result_bool==true) {
+		$result_str = $result_str.">>> [".join($array1,",")."]".PHP_EOL;
+		$result_str = $result_str.">>> [".join($array2,",")."]".PHP_EOL;
+		
+	}
+}
+
+function output_results($result_bool,$result_str) {
+	if ($result_bool) {
+	echo "PASSED".PHP_EOL;
+	}
+	else {
+		echo "FAILED:".$result_str.PHP_EOL;
+	}
+}
+
+/*
+$array1 = array('a','b','c');
+$array2 = array('a','b','c','d');
+$array3 = array('a','b','e');
+$array4 = array('a'=>1,'b'=>2,'e'=>3);
+$array5 = array('a'=>1,'b'=>4,'e'=>3);
+
+
+$result_bool=true;
+$result_str="";
+
+// Test 1
+assert_arrays_equal($array1,$array1,$result_bool,$result_str);
+output_results($result_bool,$result_str);
+
+// Test 2
+assert_arrays_equal($array1,$array2,$result_bool,$result_str);
+output_results($result_bool,$result_str);
+
+// Test 3
+assert_arrays_equal($array1,$array3,$result_bool,$result_str);
+output_results($result_bool,$result_str);
+
+// Test 4
+assert_arrays_equal($array4,$array5,$result_bool,$result_str);
+output_results($result_bool,$result_str);
+
+*/
+
 $xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
 $xmlutils->configure('label','root','menuitem','menuitemid');
 
@@ -106,7 +178,7 @@ if ($parent_label == $expected_label) {
 echo $result."\n";
 
 // Test 2
-$test="et label of parent node from menuid";
+$test="get label of parent node from menuid";
 $result = "PASSED:".$test;
 
 $parent_label = $xmlutils->get_parent(31);
@@ -128,12 +200,18 @@ $expected_results = array('thelowermiddle','thelowermiddle-sibling1',
 
 // Test 1
 $item = $xmlutils->get_menuitem(3);
-$siblings = $xmlutils->get_siblings($item);
+$siblings = $xmlutils->get_siblings($item,'label');
 
-if ($siblings != $expected_results) {
-	$result = "FAILED:".$test;
-}
-echo $result."\n";
+assert_arrays_equal($siblings,$expected_results,$result_bool,$result_str);
+output_results($result_bool,$result_str);
+
+//if ($siblings != $expected_results) {
+//	echo "FAILED:".$test."\n";
+	
+//}
+//else {
+//	echo "PASSED:".$test."\n";
+//}
 
 // Test 2
 $test="get siblings of node from menuid";
@@ -144,6 +222,8 @@ if ($siblings != $expected_results) {
 	$result = "FAILED:".$test;
 }
 echo $result."\n";
+
+
 
 // --------------------------------------------
 // --------------------------------------------
@@ -269,4 +349,5 @@ if ($child_details  != $expected_array) {
 	$result = "FAILED:".$test;
 }
 echo $result."\n";
+
 ?>

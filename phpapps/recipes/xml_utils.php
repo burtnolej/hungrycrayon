@@ -75,25 +75,28 @@ class XMLUtils extends SimpleXMLElement {
 	}
 	
 	
-	need to add an optional arg here to provide tag to put in 
-	results if $xpath_node_id not wanted	
+	//need to add an optional arg here to provide tag to put in 
+	//results if $xpath_node_id not wanted	
 	
-	need to take out other references to a specific schema
+	//need to take out other references to a specific schema
 	
-	need to provide functions that return whole node rather than
-	specific fields in nodes
+	//need to provide functions that return whole node rather than
+	//specific fields in nodes
 	
 	
-	function get_siblings($item) {
+	function get_siblings($item,$tag=null) {
 		
 		$item = $this->__clean_args($item);
 	
 		$p_item = $this->get_parent($item);
 		$siblings=array();
-	
-		
+
+		if (!isset($tag)) {
+			$tag = $this->xpath_node_id;
+		}
+			
 		foreach ($p_item->{$this->xpath_node} as $item) {
-			$siblings[]=(string)$item->label;
+			$siblings[]=(string)$item->{$tag};
 		}
 		return($siblings);
 	}
