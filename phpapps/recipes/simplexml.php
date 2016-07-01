@@ -61,6 +61,40 @@ $xmlstr = <<<XML
 </menu>
 XML;
 
+$xmlstr_alternate = <<<XML
+<menu>
+	<menuitem>
+		<menuitemid>1</menuitemid>
+		<name>jack</name>
+		<menuitem>
+			<menuitemid>1.1</menuitemid>
+			<name>ben</name>
+			<menuitem>	
+				<menuitemid>1.1.1</menuitemid>
+				<name>jane</name>
+			</menuitem>
+			<menuitem>
+				<menuitemid>1.1.2</menuitemid>
+				<name>jim</name>
+			</menuitem>
+			<menuitem>
+				<menuitemid>1.1.3</menuitemid>
+				<name>jamie</name>
+			</menuitem>
+		</menuitem>
+	</menuitem>
+	<menuitem>
+		<menuitemid>2</menuitemid>
+		<name>justin</name>
+		<menuitem>
+			<id>2.1</id>
+			<name>joan</name>
+		</menuitem>
+	</menuitem>
+</menu>
+XML;
+				
+
 //include 'samplexml.php';
 include 'xml_utils.php';
 
@@ -98,12 +132,12 @@ function assert_arrays_equal($array1, $array2,
 	}
 }
 
-function output_results($result_bool,$result_str) {
+function output_results($result_bool,$result_str,$test_name) {
 	if ($result_bool) {
-	echo "PASSED".PHP_EOL;
+	echo "PASSED:".$test_name.PHP_EOL;
 	}
 	else {
-		echo "FAILED:".$result_str.PHP_EOL;
+		echo "FAILED:".$test_name.PHP_EOL.$result_str.PHP_EOL;
 	}
 }
 
@@ -139,8 +173,9 @@ output_results($result_bool,$result_str);
 $xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
 $xmlutils->configure('label','root','menuitem','menuitemid');
 
-// --------------------------------------------
-// --------------------------------------------
+// ------------------------------------------------------------------
+// search tests -----------------------------------------------------
+// ------------------------------------------------------------------
 $test="search tree for specific item";
 $result = "PASSED:".$test;
 $expected_label = 'thelowermiddle-sibling1';
@@ -188,42 +223,38 @@ if ($parent_label == $expected_label) {
 }
 echo $result."\n";
 
-// --------------------------------------------
-// --------------------------------------------
-$test="get siblings of node";
-$result = "PASSED:".$test;
+// ------------------------------------------------------------------
+// siblings tests ---------------------------------------------------
+// ------------------------------------------------------------------
+
+// Test 1 -----------------------------------------------------------
+$test="get siblings of node - overide xnode";
 $expected_results = array('thelowermiddle','thelowermiddle-sibling1',
 						'thelowermiddle-sibling2','thelowermiddle-sibling3',
 						'foobar-sibling');
-
-//$xml = new SimpleXMLElement($xmlstr_siblings);
-
-// Test 1
 $item = $xmlutils->get_menuitem(3);
 $siblings = $xmlutils->get_siblings($item,'label');
 
 assert_arrays_equal($siblings,$expected_results,$result_bool,$result_str);
-output_results($result_bool,$result_str);
+output_results($result_bool,$result_str,$test);
 
-//if ($siblings != $expected_results) {
-//	echo "FAILED:".$test."\n";
-	
-//}
-//else {
-//	echo "PASSED:".$test."\n";
-//}
+// Test 2 -----------------------------------------------------------
+$test="get siblings of node";
+$expected_results = array('3','4','5','6','foobar');
+						
+$item = $xmlutils->get_menuitem(3);
+$siblings = $xmlutils->get_siblings($item);
 
-// Test 2
+assert_arrays_equal($siblings,$expected_results,$result_bool,$result_str);
+output_results($result_bool,$result_str,$test);					
+
+// Test 3 -----------------------------------------------------------
 $test="get siblings of node from menuid";
 $result = "PASSED:".$test;
 $siblings = $xmlutils->get_siblings(3);
 
-if ($siblings != $expected_results) {
-	$result = "FAILED:".$test;
-}
-echo $result."\n";
-
-
+assert_arrays_equal($siblings,$expected_results,$result_bool,$result_str);
+output_results($result_bool,$result_str,$test);					
 
 // --------------------------------------------
 // --------------------------------------------
@@ -250,21 +281,22 @@ if ($ancestors != $expected_results) {
 }
 echo $result."\n";
 
-// --------------------------------------------
-// --------------------------------------------
+// ------------------------------------------------------------------
+// item details tests -----------------------------------------------
+// ------------------------------------------------------------------
+
+// test 1 -----------------------------------------------------------
 $test="get all details of node";
-$result = "PASSED:".$test;
 $expected_results = array('tag' => 'foobar','label'=>'thelowermiddle');
 
 $details = $xmlutils->get_menuitem_details(31,array('tag'),array('label'));
 
-if ($details != $expected_results) {
-	$result = "FAILED:".$test;
-}
-echo $result."\n";
+assert_arrays_equal($details,$expected_results,$result_bool,$result_str);
+output_results($result_bool,$result_str,$test);	
 
-// --------------------------------------------
-// --------------------------------------------
+// ------------------------------------------------------------------
+// item depth tests -------------------------------------------------
+// ------------------------------------------------------------------
 $test="get depth of node";
 $result = "PASSED:".$test;
 $expected_results = 3;

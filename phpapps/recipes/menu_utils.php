@@ -36,29 +36,28 @@ include 'menu.php';
 
 function get_menuitem_html($xmlutils,$menuid,$mi_depth=null) {
 	
-	// get node children
-	
-	$mi_details = $xmlutils->get_menuitem_details($menuid,
-							array('tag','label'),array('source'));
-	
 	if (!isset($mi_depth)) {
 		$mi_depth = $xmlutils->get_menuitem_depth($menuid);
 	}
+	
+	$mi_children = $xmlutils->get_child_details($menuid,
+					array('label','tag'),array('source'));
 
-	$html = sprintf("<li><a href='%s?arg=%s'>%s</a></li>",					
-							$mi_details['source'],
-							$mi_details['tag'],
-							$mi_details['label']);	
-							
+	$html="";
+	
+	foreach ($mi_children as $child) {
+		$html = $html.sprintf("<li><a href='%s?arg=%s'>%s</a></li>",					
+							$child['source'],
+							$child['tag'],
+							$child['label']).PHP_EOL;	
+	}
+				
 	return($html);
 }
 
 $xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
 $xmlutils->configure('label','root','item','tag');
 
-//print(get_menuitem_html($xmlutils,"'configurephp'"));
+print(get_menuitem_html($xmlutils,"buildingconfiguring"));
 
-$item = $xmlutils->get_menuitem('buildingconfiguring');
-
-print_r($xmlutils->get_child_details($item));
 ?>
