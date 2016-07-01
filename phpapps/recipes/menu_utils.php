@@ -34,18 +34,15 @@
 include 'xml_utils.php';
 include 'menu.php';
 
-function get_menuitem_html($menuid,$xml,$mi_depth=null) {
+function get_menuitem_html($xmlutils,$menuid,$mi_depth=null) {
 	
 	// get node children
 	
-	$mi_details = get_menuitem_details($xml,$menuid,
-							array('tag','label'),array('source'),
-							'item','tag');
+	$mi_details = $xmlutils->get_menuitem_details($menuid,
+							array('tag','label'),array('source'));
 	
 	if (!isset($mi_depth)) {
-		$mi_depth = get_menuitem_depth($xml,$menuid,
-								'label','root',
-								'item','tag');
+		$mi_depth = $xmlutils->get_menuitem_depth($menuid);
 	}
 
 	$html = sprintf("<li><a href='%s?arg=%s'>%s</a></li>",					
@@ -56,12 +53,12 @@ function get_menuitem_html($menuid,$xml,$mi_depth=null) {
 	return($html);
 }
 
-$xml = new SimpleXMLElement($xmlstr);
+$xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
+$xmlutils->configure('label','root','item','tag');
 
-print(get_menuitem_html("'configurephp'",$xml));
+//print(get_menuitem_html($xmlutils,"'configurephp'"));
 
-$item = get_menuitem($xml,"'configurephp'",
-							'item','tag');
+$item = $xmlutils->get_menuitem('buildingconfiguring');
 
-get_child_nodes($item,$xml);
+print_r($xmlutils->get_child_details($item));
 ?>

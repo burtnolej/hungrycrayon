@@ -4,24 +4,20 @@ $xmlstr = <<<XML
 <menu>
 	<label>root</label>
 	<item>
+		<tag>buildingconfiguring</tag>
 		<label>Building and Configuring</label>
+		<source>build-install.php</source>
 		<item>
+			<tag>php</tag>
 			<label>PHP</label>
 			<source>build-install.php</source>
 			<item>
 				<tag>phpdependencies</tag>
 				<label>PHP Dependencies</label>
-				<item>
-					<tag>foobar</tag>
-					<label>blah blah</label>
-				</item>
 			</item>
 			<item>
 				<tag>configurephp</tag>
 				<label>Configure PHP</label>
-				<item>
-					<tag>foobare</tag>
-				</item>
 			</item>
 			<item>
 				<tag>troubleshootingphp</tag>
@@ -37,6 +33,7 @@ $xmlstr = <<<XML
 			</item>
 		</item>
 		<item>
+			<tag>apache</tag>
 			<label>Apache</label>
 			<source>build-install.php</source>
 			<item>
@@ -74,6 +71,7 @@ $xmlstr = <<<XML
 			<source>build-install.php</source>
 		</item>
 		<item>
+			<tag>phpdebugger</tag>
 			<label>PHP Debugger (php)</label>
 			<source>build-install.php</source>
 			<item>

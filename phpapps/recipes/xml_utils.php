@@ -34,8 +34,14 @@ class XMLUtils extends SimpleXMLElement {
 	function get_parent($item) {
 		
 		$item = $this->__clean_args($item);
-					
-		return($item->xpath("parent::*")[0]);
+			
+		$results = ($item->xpath("parent::*"));
+		
+		if (sizeof($results) > 1) {
+			throw new Exception("more than 1 match found");
+		}
+				
+		return($results[0]);
 	}
 	
 	function get_ancestors($item) {
@@ -50,17 +56,33 @@ class XMLUtils extends SimpleXMLElement {
 		return($ancestors);
 	}
 	
-	function get_child_details($item) {
+	function get_child_details($item,$attrs,$parent_attrs) {
 		$item = $this->__clean_args($item);
 				
 		$child_nodes=array();
-		foreach ($item->{$this->xpath_node} as $child) {
-			$child_nodes[] = $this->get_menuitem_details($child->tag,
-									array('tag'),array('source'));
+		
+		// extract children from the item 
+		$children = $item->{$this->xpath_node};
+				
+		// iterate over each child
+		foreach ($children as $child) {
+
+			$child_nodes[] = $this->get_menuitem_details((string)$child->{$this->xpath_node_id},
+									$attrs,$parent_attrs);
 			
 		}
 		return($child_nodes);
 	}
+	
+	
+	need to add an optional arg here to provide tag to put in 
+	results if $xpath_node_id not wanted	
+	
+	need to take out other references to a specific schema
+	
+	need to provide functions that return whole node rather than
+	specific fields in nodes
+	
 	
 	function get_siblings($item) {
 		
@@ -87,9 +109,13 @@ class XMLUtils extends SimpleXMLElement {
 					$this->xpath_node_id,
 					$menuitemid);
 
-		$menu_item = $this->xpath($xpath_str)[0];
+		$results = ($this->xpath($xpath_str));
+		
+		if (sizeof($results) > 1) {
+			throw new Exception("more than 1 match found");
+		}
 	
-		return($menu_item);
+		return($results[0]);
 	}
 	
 	function get_menuitem_depth($menuitemid) {
@@ -111,7 +137,6 @@ class XMLUtils extends SimpleXMLElement {
 		
 		$array=array();
 		foreach ($attrs as $attr) {
-			
 			$array[$attr] = (string)$menu_item->$attr;
 		}
 		
