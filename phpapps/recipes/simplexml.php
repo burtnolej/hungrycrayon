@@ -2,6 +2,7 @@
 
 $xmlstr = <<<XML
 <menu>
+	<menuitemid>1</menuitemid>
 	<label>root</label>
 	<menuitem>
 		<menuitemid>2</menuitemid>
@@ -98,6 +99,30 @@ XML;
 //include 'samplexml.php';
 include 'xml_utils.php';
 
+function assert_strs_equal($str1, $str2,
+									&$result_bool,&$result_str) {
+	
+	$result_bool=true;
+	$result_str="";
+				
+   if ($str1 != $str2) {
+   	$result_bool = false;
+		$result_str = sprintf(">>> %s != %s",$str1,$str2).PHP_EOL;
+    }
+}
+
+function assert_ints_equal($int1, $int2,
+									&$result_bool,&$result_str) {
+	
+	$result_bool=true;
+	$result_str="";
+				
+   if ($int1 != $int2) {
+   	$result_bool = false;
+		$result_str = sprintf(">>> %d != %d",$int1,$int2).PHP_EOL;
+    }
+}
+
 function assert_arrays_equal($array1, $array2,
 									&$result_bool,&$result_str) {
 	
@@ -115,10 +140,23 @@ function assert_arrays_equal($array1, $array2,
 	else {
 		foreach ($array1 as $key => $val) {
 			
-		   if ($array1[$key] != $array2[$key]) {
+			if (gettype($array1[$key]) == 'array') {
+				// assume this an array of array comparison
+				if (!gettype($array2[$key]) == 'array') {
+					throw new Exception('both objects need to be array of arrays');
+				}
+				$item1 = join(",",$array1[$key]);
+				$item2 = join(",",$array2[$key]);
+			}
+			else {
+				$item1 = $array1[$key];
+				$item2 = $array2[$key];
+			}
+			
+		   if ($item1 != $item2) {
 		   	$result_bool = false;
 				$_result_str = sprintf(">>> array1[%d]=>%s != array2[%d]=>%s",
-											$key, $array1[$key],$key, $array2[$key]);
+											$key, $item1,$key, $item2);
 											
 		    	$result_str = $result_str.$_result_str.PHP_EOL;
 		    }
@@ -170,216 +208,188 @@ output_results($result_bool,$result_str);
 
 */
 
-$xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
-$xmlutils->configure('label','root','menuitem','menuitemid');
-
 // ------------------------------------------------------------------
 // search tests -----------------------------------------------------
 // ------------------------------------------------------------------
-$test="search tree for specific item";
-$result = "PASSED:".$test;
-$expected_label = 'thelowermiddle-sibling1';
 
-$item = $xmlutils->get_menuitem(4);
-
-if ($item->label != $expected_label) {
-	$result = "FAILED:".$test;
+function test_search($xmlutils) {
+	$expected_label = 'thelowermiddle-sibling1';
+	$test="search tree for specific item - new style";
+	
+	$item = $xmlutils->get_item(4);
+	
+	assert_strs_equal($item->label,$expected_label,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);
 }
-echo $result."\n";
 
-$test="search tree for specific item passing in xpath_expr";
-$result = "PASSED:".$test;
-$expected_label = 'thelowermiddle-sibling1';
-
-$item = $xmlutils->get_menuitem(4);
-
-if ($item->label != $expected_label) {
-	$result = "FAILED:".$test;
+function test_search_int_as_string($xmlutils) {
+	$test="search tree for specific item - int as a string";
+	$expected_label = 'thelowermiddle-sibling1';
+	
+	$item = $xmlutils->get_item('4');
+	
+	assert_strs_equal($item->label,$expected_label,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);
 }
-echo $result."\n";
-// --------------------------------------------
-// --------------------------------------------
-$test="get label of parent node";
-$result = "PASSED:".$test;
-$expected_label = 'thelowermiddle';
 
-// Test 1
-$item = $xmlutils->get_menuitem(31);
-$parent_label = $xmlutils->get_parent($item);
-
-if ($parent_label == $expected_label) {
-	$result = "FAILED:".$test;
+function test_search_string($xmlutils) {
+	$test="search tree for specific item - string";
+	$expected_label = 'foobar-sibling';
+	
+	$item = $xmlutils->get_item('foobar');
+	
+	assert_strs_equal($item->label,$expected_label,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);
 }
-echo $result."\n";
 
-// Test 2
-$test="get label of parent node from menuid";
-$result = "PASSED:".$test;
-
-$parent_label = $xmlutils->get_parent(31);
-
-if ($parent_label == $expected_label) {
-	$result = "FAILED:".$test;
+function test_search_top_item($xmlutils) {
+	$test="search tree for top item";
+	$expected_label = 'theuppermiddle';
+	
+	$item = $xmlutils->get_item(2);
+	
+	assert_strs_equal($item->label,$expected_label,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);
 }
-echo $result."\n";
 
 // ------------------------------------------------------------------
-// siblings tests ---------------------------------------------------
+// parent tests -----------------------------------------------------
 // ------------------------------------------------------------------
 
-// Test 1 -----------------------------------------------------------
-$test="get siblings of node - overide xnode";
-$expected_results = array('thelowermiddle','thelowermiddle-sibling1',
-						'thelowermiddle-sibling2','thelowermiddle-sibling3',
-						'foobar-sibling');
-$item = $xmlutils->get_menuitem(3);
-$siblings = $xmlutils->get_siblings($item,'label');
-
-assert_arrays_equal($siblings,$expected_results,$result_bool,$result_str);
-output_results($result_bool,$result_str,$test);
-
-// Test 2 -----------------------------------------------------------
-$test="get siblings of node";
-$expected_results = array('3','4','5','6','foobar');
-						
-$item = $xmlutils->get_menuitem(3);
-$siblings = $xmlutils->get_siblings($item);
-
-assert_arrays_equal($siblings,$expected_results,$result_bool,$result_str);
-output_results($result_bool,$result_str,$test);					
-
-// Test 3 -----------------------------------------------------------
-$test="get siblings of node from menuid";
-$result = "PASSED:".$test;
-$siblings = $xmlutils->get_siblings(3);
-
-assert_arrays_equal($siblings,$expected_results,$result_bool,$result_str);
-output_results($result_bool,$result_str,$test);					
-
-// --------------------------------------------
-// --------------------------------------------
-$test="get all ancestors of node";
-$result = "PASSED:".$test;
-$expected_results = array('thelowermiddle-sibling1','theuppermiddle','root');
-
-// Test 1
-$item = $xmlutils->get_menuitem(41);
-$ancestors=$xmlutils->get_ancestors($item);
-
-if ($ancestors != $expected_results) {
-	$result = "FAILED:".$test;
+function test_parent($xmlutils) {
+	$test="get label of parent node";
+	$expected_label = 'thelowermiddle';
+	
+	$item = $xmlutils->get_item(31);
+	$parent_label = $xmlutils->get_parent($item)->label;
+	
+	assert_strs_equal($parent_label,$expected_label,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);
 }
-echo $result."\n";
-
-// Test 2
-$test="get all ancestors of node from menuid";
-$result = "PASSED:".$test;
-$ancestors=$xmlutils->get_ancestors(41);
-
-if ($ancestors != $expected_results) {
-	$result = "FAILED:".$test;
-}
-echo $result."\n";
 
 // ------------------------------------------------------------------
 // item details tests -----------------------------------------------
 // ------------------------------------------------------------------
 
-// test 1 -----------------------------------------------------------
-$test="get all details of node";
-$expected_results = array('tag' => 'foobar','label'=>'thelowermiddle');
-
-$details = $xmlutils->get_menuitem_details(31,array('tag'),array('label'));
-
-assert_arrays_equal($details,$expected_results,$result_bool,$result_str);
-output_results($result_bool,$result_str,$test);	
+function test_item_details($xmlutils) {
+	$test="get all details of node";
+	$expected_results = array('tag' => 'foobar','label'=>'thelowermiddle');
+	
+	$item = $xmlutils->get_item(31);
+	$details = $xmlutils->get_item_details($item,array('tag'),array('label'));
+	
+	assert_arrays_equal($details,$expected_results,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);	
+}
 
 // ------------------------------------------------------------------
 // item depth tests -------------------------------------------------
 // ------------------------------------------------------------------
-$test="get depth of node";
-$result = "PASSED:".$test;
-$expected_results = 3;
 
-$depth = $xmlutils->get_menuitem_depth(41);
+function test_item_depth($xmlutils) {
+	
+	$test="get depth of node";
+	$result = "PASSED:".$test;
+	$expected_results = 3;
 
-if ($depth != $expected_results) {
-	$result = "FAILED:".$test;
+	$depth = $xmlutils->get_item_depth(41);
+	
+	assert_ints_equal($depth,$expected_results,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);
 }
-echo $result."\n";
 
-// --------------------------------------------
-// --------------------------------------------
-$test="search tree for specific item - int as a string";
-$result = "PASSED:".$test;
-$expected_label = 'thelowermiddle-sibling1';
 
-$item = $xmlutils->get_menuitem('4');
+// ------------------------------------------------------------------
+// ancestor tests ---------------------------------------------------
+// ------------------------------------------------------------------
 
-if ($item->label != $expected_label) {
-	$result = "FAILED:".$test;
+function test_get_ancestor_details($xmlutils) {
+	$test="get all ancestors of node from menuid";
+	$result = "PASSED:".$test;
+	$expected_results = array(array('menuitemid'=>4,'label'=>'theuppermiddle'),
+									  array('menuitemid'=>2,'label'=>'root'),
+									  array('menuitemid'=>1,'label'=>''));
+
+	//$ancestors=$xmlutils->get_ancestors(41);
+	
+	$ancestor_details = $xmlutils->get_ancestor_details(41, 
+															array('menuitemid'),
+															array('label'));
+	
+	assert_arrays_equal($ancestor_details,$expected_results,
+								$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);;
 }
-echo $result."\n";
 
-// --------------------------------------------
-// --------------------------------------------
-$test="search tree for specific item - string";
-$result = "PASSED:".$test;
-$expected_label = 'foobar-sibling';
+// ------------------------------------------------------------------
+// siblings tests ---------------------------------------------------
+// ------------------------------------------------------------------
 
-$item = $xmlutils->get_menuitem('foobar');
+function test_get_sibling_details($xmlutils) {
 
-if ($item->label != $expected_label) {
-	$result = "FAILED:".$test;
+	$test="get siblings of node - overide xnode";
+	$expected_results = array(array('menuitemid'=>3,'label'=>'theuppermiddle'),
+									  array('menuitemid'=>4,'label'=>'theuppermiddle'),
+									  array('menuitemid'=>5,'label'=>'theuppermiddle'),
+									  array('menuitemid'=>6,'label'=>'theuppermiddle'),
+									  array('menuitemid'=>'foobar','label'=>'theuppermiddle'));
+
+	$sibling_details = $xmlutils->get_sibling_details(3, 
+															array('menuitemid'),
+															array('label'));
+	
+	assert_arrays_equal($sibling_details,$expected_results,
+								$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);
+}	
+
+// ------------------------------------------------------------------
+// children tests -------------------------------------------------
+// ------------------------------------------------------------------
+
+function test_get_children_details($xmlutils) {
+	$test="get children - new style functions";
+	$expected_array = array(array('menuitemid'=>3,'label' => 'theuppermiddle'),
+									array('menuitemid'=>4,'label' => 'theuppermiddle'),
+									array('menuitemid'=>5,'label' => 'theuppermiddle'),
+									array('menuitemid'=>6,'label' => 'theuppermiddle'),
+									array('menuitemid'=>'foobar','label' => 'theuppermiddle'));
+													
+	$child_details = $xmlutils->get_children_details(2, array('menuitemid'),
+													array('label'));
+	
+	assert_arrays_equal($expected_array,$child_details,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);	
 }
-echo $result."\n";
 
-// --------------------------------------------
-// --------------------------------------------
-$test="search tree for top item";
-$result = "PASSED:".$test;
-$expected_label = 'theuppermiddle';
-
-$item = $xmlutils->get_menuitem(2);
-
-if ($item->label != $expected_label) {
-	$result = "FAILED:".$test;
+function test_children_no_child() {
+	$test="get children - no child";
+	$result = "PASSED:".$test;
+	$expected_array = array();
+	
+	//print_r($expected_array);
+	
+	$child_details = $xmlutils->get_child_details(5111,array('menuitemid'),
+												array('label'));
+	
+	if ($child_details  != $expected_array) {
+		$result = "FAILED:".$test;
+	}
+	echo $result."\n";
 }
-echo $result."\n";
-// --------------------------------------------
-// --------------------------------------------
-$test="get children";
-$result = "PASSED:".$test;
-$expected_array = array(array('label' => 'theuppermiddle','menuitemid'=>3),
-								array('label' => 'theuppermiddle','menuitemid'=>4),
-								array('label' => 'theuppermiddle','menuitemid'=>5),
-								array('label' => 'theuppermiddle','menuitemid'=>6),
-								array('label' => 'theuppermiddle','menuitemid'=>'foobar'));
 
+$xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
+$xmlutils->configure('menuitemid',1,'menuitem','menuitemid');
 
-//print_r($expected_array);
-
-$child_details = $xmlutils->get_child_details(2,array('menuitemid'),
-											array('label'));
-
-if ($child_details  != $expected_array) {
-	$result = "FAILED:".$test;
-}
-echo $result."\n";
-// --------------------------------------------
-// --------------------------------------------
-$test="get children - no child";
-$result = "PASSED:".$test;
-$expected_array = array();
-
-//print_r($expected_array);
-
-$child_details = $xmlutils->get_child_details(5111,array('menuitemid'),
-											array('label'));
-
-if ($child_details  != $expected_array) {
-	$result = "FAILED:".$test;
-}
-echo $result."\n";
+test_get_sibling_details($xmlutils);
+test_get_children_details($xmlutils);
+test_get_ancestor_details($xmlutils);
+test_item_details($xmlutils);
+test_parent($xmlutils);
+test_search($xmlutils);
+test_search_int_as_string($xmlutils);
+test_search_string($xmlutils);
+test_search_top_item($xmlutils);
+test_item_depth($xmlutils);
 
 ?>

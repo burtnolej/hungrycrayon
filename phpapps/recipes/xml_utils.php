@@ -1,5 +1,19 @@
 <?php
 
+/*
+	get_child_details($item,$attrs,$parent_attrs)
+	get_menuitem($menuitemid)
+	get_menuitem_depth($menuitemid)
+	get_menuitem_details($menuitemid,$attrs,$parent_attrs)
+
+	get_siblings($item,$tag=null)	
+	get_children($item)
+	get_parent($item)
+	get_ancestors($item)
+	get_item
+	get_item_details
+	get_details
+*/
 class XMLUtils extends SimpleXMLElement {
 
 	function configure($root_tag, $root_tag_val,
@@ -27,7 +41,7 @@ class XMLUtils extends SimpleXMLElement {
 			}
 		}
 		else {
-			return($this->get_menuitem($item));
+			return($this->get_item($item));
 		}
 	}
 	
@@ -40,9 +54,19 @@ class XMLUtils extends SimpleXMLElement {
 		if (sizeof($results) > 1) {
 			throw new Exception("more than 1 match found");
 		}
-				
+			
 		return($results[0]);
 	}
+	
+	function get_ancestor_details($item,$attrs,$parent_attrs) {
+	
+		$ancestors = $this->get_ancestors($item);
+
+		$ancestor_details = $this->get_details($ancestors,$attrs,$parent_attrs);
+													
+		return($ancestor_details);
+	}
+	
 	
 	function get_ancestors($item) {
 		
@@ -51,78 +75,173 @@ class XMLUtils extends SimpleXMLElement {
 		$ancestors=array();
 		while ($item->{$this->root_tag} != $this->root_tag_val) {
 			$item= $this->get_parent($item);
-			$ancestors[]=(string)$item->label;
+			$ancestors[]=$item;
 		}
 		return($ancestors);
 	}
 	
-	function get_child_details($item,$attrs,$parent_attrs) {
-		$item = $this->__clean_args($item);
-				
-		$child_nodes=array();
+	function get_sibling_details($item,$attrs,$parent_attrs) {
+	
+		$siblings = $this->get_siblings($item);
 		
-		// extract children from the item 
-		$children = $item->{$this->xpath_node};
-				
-		// iterate over each child
-		foreach ($children as $child) {
-
-			$child_nodes[] = $this->get_menuitem_details((string)$child->{$this->xpath_node_id},
-									$attrs,$parent_attrs);
-			
-		}
-		return($child_nodes);
+		$sibling_details = $this->get_details($siblings,$attrs,$parent_attrs);
+													
+		return($sibling_details);
 	}
 	
-	
-	//need to add an optional arg here to provide tag to put in 
-	//results if $xpath_node_id not wanted	
-	
-	//need to take out other references to a specific schema
-	
-	//need to provide functions that return whole node rather than
-	//specific fields in nodes
-	
-	
-	function get_siblings($item,$tag=null) {
+	function get_siblings($item) {
+		
+		// func    : by comparing the parent id of each subitem to the id of $item
+		//         : gets all of the siblings. Does return itself in siblings.
+		//
+		// args    : $item - the unique id for the item or the item itself
+		//         : as an object.
+		//
+		// returns : array of arrays 
+		//		     : i.e. array[0] => array('attr1' => 'attr1val',
+		//			  : 								'pattr1' => 'pattr1val')
 		
 		$item = $this->__clean_args($item);
 	
 		$p_item = $this->get_parent($item);
-		$siblings=array();
+		
+		$siblings = $this->get_children($p_item);
 
-		if (!isset($tag)) {
-			$tag = $this->xpath_node_id;
-		}
-			
-		foreach ($p_item->{$this->xpath_node} as $item) {
-			$siblings[]=(string)$item->{$tag};
-		}
 		return($siblings);
 	}
 	
-	function get_menuitem($menuitemid) {
+	function get_children_details($p_item,$attrs,$parent_attrs) {
+	
+		$children = $this->get_children($p_item);
 		
-		if (is_string($menuitemid)) {
-			$menuitemid = sprintf("'%s'",$menuitemid);
+		$child_details = $this->get_details($children,$attrs,$parent_attrs);
+													
+		return($child_details);
+	}
+	
+	function get_children($p_item) {
+		
+		// func    : gets all of the children nodes of a particular item
+		//
+		// args    : $itemid - the unique id for the item or the item itself
+		//         : as an object.
+		//
+		// returns : array of objects
+		
+		$p_item = $this->__clean_args($p_item);
+		$children=array();
+		
+		$items = $this->xpath("//menuitem");
+		
+		foreach ($items as $item) {
+			$_parent = $this->get_parent($item);
+
+			if ($_parent->{$this->xpath_node_id} == 
+			  		$p_item->{$this->xpath_node_id}) {
+			  			$children[] = $item;  
+			}
+		}
+		
+		return($children);
+	}
+	
+	function get_details($items,$attrs,$parent_attrs) {
+		
+		// func    : loops over array of items, retreiving the details
+		//  	     : where details are the tags specified in $attrs/$parent_attrs
+		//			  : a request for just 1 item is implemented as passing in an 
+		//         : array of size 1
+		//
+		// args    : $items - array of objects
+		//		     : $attrs - tags to extract from item
+		//		     : $parent_attrs - tags to extract from parent
+		//
+		// returns : array of arrays 
+		//		     : i.e. array[0] => array('attr1' => 'attr1val',
+		//			  : 								'pattr1' => 'pattr1val')
+		
+		$items_detail=array();
+				
+		foreach ($items as $itemid=>$item) {
+
+			$items_detail[] = $this->get_item_details($item,
+												$attrs,$parent_attrs);										
+		}
+
+		return($items_detail);
+	}
+	
+	function get_item_details($item,$attrs,$parent_attrs) {
+
+		// func    : gets the detail for a particular item
+		//  	     : where details are the tags specified in $attrs/$parent_attrs
+		//
+		// args    : $item - the item object 
+		//		     : $attrs - tags to extract from item
+		//		     : $parent_attrs - tags to extract from parent
+		//
+		// returns : array 
+		//		     : i.e. array('attr1' => 'attr1val',
+		//			  : 			   'pattr1' => 'pattr1val')
+
+		$root=false;
+
+		if ($item->{$this->root_tag} == $this->root_tag_val) {
+			$root=true;
+		}
+		
+		if (!$root==true) {
+			$parent_item = $this->get_parent($item);
+		}
+		
+		$details=array();
+		foreach ($attrs as $attr) {
+			$details[$attr] = (string)$item->$attr;
+		}
+		
+		if (!$root==true) {
+			foreach ($parent_attrs as $attr) {
+				$details[$attr] = (string)$parent_item->$attr;
+			}
+		}
+		else {
+			foreach ($parent_attrs as $attr) {
+				$details[$attr] = "";
+			}
+		}
+		
+		return($details);		
+	}
+
+	function get_item($itemid) {
+		
+		// func    : gets the object for a particular item using the 
+		//         : the unique id to search by
+		//
+		// args    : $itemid - the unique id for the item or the item itself
+		//
+		// returns : object 
+		
+		if (is_string($itemid)) {
+			$itemid = sprintf("'%s'",$itemid);
 		}
 		
 		$xpath_str = sprintf("//%s[%s=%s]",
 					$this->xpath_node,
 					$this->xpath_node_id,
-					$menuitemid);
+					$itemid);
 
-		$results = ($this->xpath($xpath_str));
+		$items = ($this->xpath($xpath_str));
 		
-		if (sizeof($results) > 1) {
+		if (sizeof($items) > 1) {
 			throw new Exception("more than 1 match found");
 		}
 	
-		return($results[0]);
+		return($items[0]);
 	}
 	
-	function get_menuitem_depth($menuitemid) {
-		$item = $this->get_menuitem($menuitemid);
+	function get_item_depth($menuitemid) {
+		$item = $this->get_item($menuitemid);
 	
 		$depth=0;
 		while ($item->{$this->root_tag} != $this->root_tag_val) {
@@ -130,24 +249,7 @@ class XMLUtils extends SimpleXMLElement {
 			$depth++;
 		}
 		return($depth);
-	}
-	
-	function get_menuitem_details($menuitemid,$attrs,$parent_attrs) {
-	
-		$menu_item = $this->get_menuitem($menuitemid);
-		
-		$parent_menu_item = $this->get_parent($menu_item);
-		
-		$array=array();
-		foreach ($attrs as $attr) {
-			$array[$attr] = (string)$menu_item->$attr;
-		}
-		
-		foreach ($parent_attrs as $attr) {
-			$array[$attr] = (string)$parent_menu_item->$attr;
-		}	
-		return($array);	
-		
-	}
+	}	
+
 }
 ?>
