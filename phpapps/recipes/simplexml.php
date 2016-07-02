@@ -381,15 +381,58 @@ function test_children_no_child() {
 $xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
 $xmlutils->configure('menuitemid',1,'menuitem','menuitemid');
 
-test_get_sibling_details($xmlutils);
-test_get_children_details($xmlutils);
-test_get_ancestor_details($xmlutils);
-test_item_details($xmlutils);
-test_parent($xmlutils);
-test_search($xmlutils);
-test_search_int_as_string($xmlutils);
-test_search_string($xmlutils);
-test_search_top_item($xmlutils);
-test_item_depth($xmlutils);
+try {
+	test_get_sibling_details($xmlutils);
+	test_get_children_details($xmlutils);
+	test_get_ancestor_details($xmlutils);
+	test_item_details($xmlutils);
+	test_parent($xmlutils);
+	test_search($xmlutils);
+	test_search_int_as_string($xmlutils);
+	test_search_string($xmlutils);
+	test_search_top_item($xmlutils);
+	test_item_depth($xmlutils);
+} catch (Exception $e) {
+	
+	//[0] => #0 /home/burtnolej/Development/pythonapps3/phpapps/recipes/xml_utils.php(113): XMLUtils->__check_args(3, Array, Array)
+
+
+	echo 'Caught: ',$e->getMessage(),"\n";
+	$stack_as_array = split("\n",$e->getTraceAsString());
+	$i=0;
+	foreach ($stack_as_array as $frame) {
+		
+		// make sure full frame output line
+		if (strpos($frame,':') !== false) {
+			
+				// split frame by colon into 3 vars
+				list($fullpath, $rest) = explode(":",substr($frame,3));
+				
+				// find the start of the args in the non path section
+				$open_bracket_posn = strpos($rest,'(');
+					
+				// put args into an array
+				$args_str = substr($rest,$open_bracket_posn+1,-1);
+				$args_str = str_replace(" ","",$args_str);
+				$args = explode(",",$args_str);
+				
+				
+				// get the func name 
+				$func_name = substr($rest,1,$open_bracket_posn-1);
+								
+				// get the lineno
+				$open_bracket_posn = strpos(basename($fullpath),'(');
+				$lineno = substr(basename($fullpath),$open_bracket_posn+1,-1);
+				
+				// output stuff
+				echo "filename:".substr(basename($fullpath),0,$open_bracket_posn).PHP_EOL;
+				echo "args    :".join(",",$args).PHP_EOL;
+				echo "funcname:".$func_name.PHP_EOL;
+				echo "lineno  :".$lineno.PHP_EOL;
+		}
+	}
+	
+	
+}
 
 ?>

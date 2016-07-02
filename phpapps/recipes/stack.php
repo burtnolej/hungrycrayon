@@ -10,12 +10,11 @@ $STACKTRACELEVEL = Null;
 function __print_frame($frame,$frame_no) {	
 	// clean up the frame for output
 	printf("frame:%d function:%s\n",$frame_no,$frame["function"]);
-	printf("frame:%d args:%s\n",$frame_no,implode(",",$frame["args"]));	
+	printf("frame:%d args:%s\n",$frame_no,implode(",",$frame["args"]));
 }	
 	
 function get_args_inscope($stacktrace,$frame_no=-1){
 
-	
 	switch($frame_no) {
 		case StackTraceLevel::AllFrames: // print whole stack
 			$frame_no=0;
@@ -53,7 +52,7 @@ function dummyfunc($arg1,$arg2){
 // expected results
 // frame:1 function:dummyfunc
 // frame:1 args:123,foobar
-$GLOBALS['STACKTRACELEVEL'] = StackTraceLevel::LastFrame;
+$GLOBALS['STACKTRACELEVEL'] = StackTraceLevl:LastFrame;
 dummyfunc(123,"foobar");
 
 // all frames

@@ -45,6 +45,30 @@ class XMLUtils extends SimpleXMLElement {
 		}
 	}
 	
+	function __check_args($item,$attrs,$parent_attrs) {
+		if (!$this->__is_SimpleXMLElement($item) == true) {
+			throw new Exception(sprintf("1st parameter must implement SimpleXMLElement"));
+		}
+
+		if ((!is_array($attrs)) or (!is_array($parent_attrs))) {
+			throw new Exception("Paramter 2 & 3 must be arrays");
+		}
+		return true;
+	}
+	
+	function __is_SimpleXMLElement($item) {
+	
+		if (!gettype($item) == 'object') {
+			return false;
+		}
+		
+		if ((!method_exists($item,'xpath') == true) or 
+				(!method_exists($item,'registerXPathNamespace') == true)) {
+					return false;					
+		}
+		return true;
+	}
+	
 	function get_parent($item) {
 		
 		$item = $this->__clean_args($item);
@@ -60,6 +84,9 @@ class XMLUtils extends SimpleXMLElement {
 	
 	function get_ancestor_details($item,$attrs,$parent_attrs) {
 	
+		// check args
+		$this->__check_args($item,$attrs,$parent_attrs);
+		
 		$ancestors = $this->get_ancestors($item);
 
 		$ancestor_details = $this->get_details($ancestors,$attrs,$parent_attrs);
@@ -82,6 +109,9 @@ class XMLUtils extends SimpleXMLElement {
 	
 	function get_sibling_details($item,$attrs,$parent_attrs) {
 	
+		// check args
+		$this->__check_args($item,$attrs,$parent_attrs);
+		
 		$siblings = $this->get_siblings($item);
 		
 		$sibling_details = $this->get_details($siblings,$attrs,$parent_attrs);
@@ -112,6 +142,9 @@ class XMLUtils extends SimpleXMLElement {
 	
 	function get_children_details($p_item,$attrs,$parent_attrs) {
 	
+		// check args
+		$this->__check_args($item,$attrs,$parent_attrs);
+		
 		$children = $this->get_children($p_item);
 		
 		$child_details = $this->get_details($children,$attrs,$parent_attrs);
@@ -131,7 +164,8 @@ class XMLUtils extends SimpleXMLElement {
 		$p_item = $this->__clean_args($p_item);
 		$children=array();
 		
-		$items = $this->xpath("//menuitem");
+		$xpath_str = sprintf("//%s",$this->xpath_node);
+		$items = $this->xpath($xpath_str);
 		
 		foreach ($items as $item) {
 			$_parent = $this->get_parent($item);
@@ -160,6 +194,9 @@ class XMLUtils extends SimpleXMLElement {
 		//		     : i.e. array[0] => array('attr1' => 'attr1val',
 		//			  : 								'pattr1' => 'pattr1val')
 		
+		// check args
+		$this->__check_args($item,$attrs,$parent_attrs);
+		
 		$items_detail=array();
 				
 		foreach ($items as $itemid=>$item) {
@@ -185,7 +222,11 @@ class XMLUtils extends SimpleXMLElement {
 		//			  : 			   'pattr1' => 'pattr1val')
 
 		$root=false;
-
+		
+		// check args
+		$this->__check_args($item,$attrs,$parent_attrs);
+		
+		// is this the root node ?		
 		if ($item->{$this->root_tag} == $this->root_tag_val) {
 			$root=true;
 		}
@@ -231,6 +272,8 @@ class XMLUtils extends SimpleXMLElement {
 					$this->xpath_node_id,
 					$itemid);
 
+		echo $xpath_str.PHP_EOL;
+		
 		$items = ($this->xpath($xpath_str));
 		
 		if (sizeof($items) > 1) {
