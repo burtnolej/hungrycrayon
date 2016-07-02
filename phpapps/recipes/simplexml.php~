@@ -454,7 +454,7 @@ $xmlutils->configure('menuitemid',1,'menuitem','menuitemid');
 
 set_error_handler('\\XMLUtils::my_error_handler');
 
-//try {
+try {
 	test_get_sibling_details_arg1_int($xmlutils);
 	test_get_sibling_details_arg2_int($xmlutils);
 	test_get_sibling_details($xmlutils);
@@ -468,8 +468,8 @@ set_error_handler('\\XMLUtils::my_error_handler');
 	test_search_string($xmlutils);
 	test_search_top_item($xmlutils);
 	test_item_depth($xmlutils);
-//} catch (Exception $e) {
+} catch (Exception $e) {
 	//$this->my_error_handler($e);
-//}
+}
 
 ?>

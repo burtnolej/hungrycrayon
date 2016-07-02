@@ -1,0 +1,36 @@
+<?php
+$xmlstr = <<<XML
+<menu>
+	<label>root</label>
+	<menuitem>
+		<menuitemid>2</menuitemid>
+		<label>theuppermiddle</label>
+		<menuitem>
+			<menuitemid>3</menuitemid>
+			<label>thelowermiddle</label>
+			<menuitem>
+				<menuitemid>31</menuitemid>
+				<label>thebottom</label>
+			</menuitem>
+		</menuitem>
+		<menuitem>
+			<menuitemid>4</menuitemid>
+			<label>thelowermiddle-sibling1</label>
+			<menuitem>
+				<menuitemid>41</menuitemid>
+				<label>thelowermiddle-cousin1</label>
+			</menuitem>
+		</menuitem>
+		<menuitem>
+			<menuitemid>5</menuitemid>
+			<label>thelowermiddle-sibling2</label>
+		</menuitem>
+		<menuitem>
+			<menuitemid>6</menuitemid>
+			<label>thelowermiddle-sibling3</label>
+		</menuitem>
+	</menuitem>
+</menu>
+XML;
+
+?>

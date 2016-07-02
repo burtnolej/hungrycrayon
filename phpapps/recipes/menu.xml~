@@ -1,5 +1,4 @@
-<?xml version='1.0' standalone='yes'?>
-<item>
+<item id="0">
 	<items>
 		<item id="10000">
 			<label>Building and Configuring</label>

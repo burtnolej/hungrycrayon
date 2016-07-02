@@ -1,9 +1,14 @@
+<?php
+$xmlstr = <<<XML
 <?xml version='1.0' standalone='yes'?>
 <item>
+	<label>Root</label>
 	<items>
+		<label>Root</label>
 		<item id="10000">
 			<label>Building and Configuring</label>
 			<items>
+				<label>Root</label>
 				<item id="10100">
 					<label>PHP</label>
 					<source>build-install.php</source>
@@ -172,8 +177,30 @@
 					</items>
 				</item>
 				<item id="30400">
-					<label>foobar</label>
-					<tag>foobar</tag>
+					<label>Packaging Tools</label>
+					<tag>packagingtools</tag>
+				</item>
+				<item id="30300">
+					<label>Packaging Tools</label>
+					<tag>packagingtools</tag>
+					<items>
+						<item id="30301">
+							<label>apt</label>
+							<tag>apt</tag>
+						</item>
+						<item id="30302">
+							<label>dpkg</label>
+							<tag>dpkg</tag>
+						</item>
+						<item id="30303">
+							<label>pkg-config</label>
+							<tag>pkg-config</tag>
+						</item>
+						<item id="30304">
+							<label>configure</label>
+							<tag>configure</tag>
+						</item>	
+					</items>					
 				</item>
 			</items>
 		</item>
@@ -181,6 +208,71 @@
 			<source>html-html.php</source>
 			<label>HTML</label>
 			<tag>false</tag>
+			<items>
+				<item id="40100">
+					<tag>httpdconf</tag>
+					<label>httpdconf</label>
+				</item>
+				<item id="40200">
+					<tag>htmllists</tag>
+					<label>htmllists</label>
+				</item>
+				<item id="40300">
+					<tag>htmltable</tag>
+					<label>htmltable</label>
+				</item>
+				<item id="40400">
+					<tag>htmllinks</tag>
+					<label>htmllinks</label>
+				</item>
+				<item id="40500">
+					<tag>htmlescaping</tag>
+					<label>htmlescaping</label>
+				</item>
+			</items>
+		</item>
+		<item id="50000">
+			<label>Web Frameworks</label>
+			<items>
+				<item id="50100">
+					<label>WordPress</label>
+					<items>
+						<item id="50101">
+							<tag>wpsetup</tag>
+							<label>Setup</label>
+						</item>
+					</items>
+				</item>
+			</items>
+		</item>
+		<item id="60000">
+			<label>UNIX Tools</label>
+			<items>
+				<item id="60100">
+					<label>Shared Libraries</label>
+					<items>
+						<item id="60101">
+							<tag>ldconfig</tag>
+							<label>ldconfig</label>
+						</item>
+					</items>
+				</item>
+			</items>
+		</item>
+		<item id="70000">
+			<label>Config</label>
+			<items>
+				<item id="70100">
+					<label>php.ini</label>
+					<tag>php.ini</tag>
+				</item>
+				<item id="70200">
+					<label>httpdconf</label>
+					<tag>phttpdconf</tag>
+				</item>
+			</items>
 		</item>
 	</items>
 </item>
+XML;
+?>

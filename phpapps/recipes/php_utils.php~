@@ -12,7 +12,7 @@ function pprint_stack($basename,$funcname,$lineno,$args,$fulltrace,$padstr=" ") 
 function exception_handler($e) {
 
 	echo PHP_EOL.'Exception: ',$e->getMessage(),"\n\n";
-	$stack_as_array = explode("\n",$e->getTraceAsString());
+	$stack_as_array = split("\n",$e->getTraceAsString());
 	$i=0;
 	pprint_stack('basename','funcname','lineno','args','fulltrace');
 	pprint_stack('','','','','','-');

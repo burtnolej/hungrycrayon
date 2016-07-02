@@ -33,7 +33,6 @@
 
 include 'xml_utils.php';
 include 'menu.php';
-include 'php_utils.php';
 
 function get_menu_html($xmlutils,$item) {
 	
@@ -82,12 +81,9 @@ $xmlutils->configure('label','root','item','tag');
 
 set_error_handler('\\XMLUtils::my_error_handler');
 
-try {
-	print(get_menu_all_above_html($xmlutils,"buildingconfiguring"));
-	//print(get_menu_html($xmlutils,"buildingconfiguring"));
-	print(get_menu_next_level_down_html($xmlutils,"buildingconfiguring"));
-} catch (Exception $e) {
-	exception_handler($e);
-}
+
+print(get_menu_all_above_html($xmlutils,"buildingconfiguring"));
+//print(get_menu_html($xmlutils,"buildingconfiguring"));
+print(get_menu_next_level_down_html($xmlutils,"buildingconfiguring"));
 
 ?>
