@@ -60,3 +60,33 @@ $multiplier=4.8;
 test_multiply_by_weaktype($base_val,$multiplier);
 
 ?>
+
+
+try {
+	test_get_sibling_details($xmlutils);
+	test_get_children_details($xmlutils);
+	test_get_ancestor_details($xmlutils);
+	test_item_details($xmlutils);
+	test_parent($xmlutils);
+	test_search($xmlutils);
+	test_search_int_as_string($xmlutils);
+	test_search_string($xmlutils);
+	test_search_top_item($xmlutils);
+	test_item_depth($xmlutils);
+} catch (Exception $e) {
+	echo 'Caught: ',$e->getMessage(),"\n";
+	echo $e->getTraceAsString(),"\n";
+	
+	
+	function my_error_handler($errno, $errstr, $errfile, $errline) {
+		
+	if (strpos($errstr,'must be of the type array, string given') == false) {
+		throw new Exception("1st parameter must be integer");
+	}
+	else {
+		trigger_error("Fatal error", E_USER_ERROR);
+	}
+}
+
+set_error_handler("my_error_handler");
+	

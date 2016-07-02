@@ -44,24 +44,9 @@ class XMLUtils extends SimpleXMLElement {
 			return($this->get_item($item));
 		}
 	}
-	
-	function __check_args($item,$attrs,$parent_attrs) {
-		if (!$this->__is_SimpleXMLElement($item) == true) {
-			throw new Exception(sprintf("1st parameter must implement SimpleXMLElement: got %s",gettype($item)));
-		}
-
-		if ((!is_array($attrs)) or (!is_array($parent_attrs))) {
-			throw new Exception("Paramter 2 & 3 must be arrays");
-		}
-		return true;
-	}
-	
-	function __is_SimpleXMLElement($item) {
-	
-		if (!gettype($item) == 'object') {
-			return false;
-		}
 		
+	function is_SimpleXMLElement($item) {
+			
 		if ((!method_exists($item,'xpath') == true) or 
 				(!method_exists($item,'registerXPathNamespace') == true)) {
 					return false;					
@@ -73,25 +58,25 @@ class XMLUtils extends SimpleXMLElement {
 	// get details for specific groups of family members ----------------
 	// ------------------------------------------------------------------
 
-	function get_children_details($p_item,$attrs,$parent_attrs) {
+	function get_children_details($p_itemid,array $attrs, array $parent_attrs) {
 	
-
-		if (gettype($p_item) != 'integer') {
+		// func    : get details for all of the children of a given parent
+		//
+		// args    : $p_itemid - the unique id for the item
+		//		     : $attrs - tags to extract from item
+		//		     : $parent_attrs - tags to extract from parent
+		//
+		// returns : array of arrays 
+		//		     : i.e. array[0] => array('attr1' => 'attr1val',
+		//			  : 								'pattr1' => 'pattr1val')
+		
+		// cannot hint at non object type so test directly
+		if (gettype($p_itemid) != 'integer') {
 			throw new Exception(sprintf("1st parameter must be integer: got %s",
-				gettype($p_item)));
+				gettype($p_itemid)));
 		}
 		    
-		if (gettype($attrs) != 'array') {
-			throw new Exception(sprintf("2nd parameter must be array: got %s",
-				gettype($item)));
-		}
-		
-		if (gettype($parent_attrs) != 'array') {
-			throw new Exception(sprintf("3rd parameter must be array: got %s",
-				gettype($item)));
-		}
-		          		
-		$p_item = $this->__clean_args($p_item);
+		$p_item = $this->get_item($p_itemid);
 		
 		$children = $this->get_children($p_item);
 		
@@ -100,24 +85,24 @@ class XMLUtils extends SimpleXMLElement {
 		return($child_details);
 	}
 	
-	function get_ancestor_details($item,$attrs,$parent_attrs) {
+	function get_ancestor_details($itemid,array $attrs,array $parent_attrs) {
+
+		// func    : get details for all of the children of a given parent
+		//
+		// args    : $p_itemid - the unique id for the item
+		//		     : $attrs - tags to extract from item
+		//		     : $parent_attrs - tags to extract from parent
+		//
+		// returns : array of arrays 
+		//		     : i.e. array[0] => array('attr1' => 'attr1val',
+		//			  : 								'pattr1' => 'pattr1val')
 	
-		if (gettype($item) != 'integer') {
+		if (gettype($itemid) != 'integer') {
 			throw new Exception(sprintf("1st parameter must be integer: got %s",
-				gettype($item)));
+				gettype($itemid)));
 		}
-		    
-		if (gettype($attrs) != 'array') {
-			throw new Exception(sprintf("2nd parameter must be array: got %s",
-				gettype($item)));
-		}
-		
-		if (gettype($parent_attrs) != 'array') {
-			throw new Exception(sprintf("3rd parameter must be array: got %s",
-				gettype($item)));
-		}
-		
-		$item = $this->__clean_args($item);
+				
+		$item = $this->get_item($itemid);
 		
 		$ancestors = $this->get_ancestors($item);
 
@@ -126,25 +111,24 @@ class XMLUtils extends SimpleXMLElement {
 		return($ancestor_details);
 	}
 	
-	function get_sibling_details($item,$attrs,$parent_attrs) {
+	function get_sibling_details($itemid,array $attrs,array $parent_attrs) {
 	
-		if (gettype($item) != 'integer') {
+		// func    : get details for all of the children of a given parent
+		//
+		// args    : $p_itemid - the unique id for the item
+		//		     : $attrs - tags to extract from item
+		//		     : $parent_attrs - tags to extract from parent
+		//
+		// returns : array of arrays 
+		//		     : i.e. array[0] => array('attr1' => 'attr1val',
+		//			  : 								'pattr1' => 'pattr1val')
+		
+		if (!is_int($itemid) == true) {
 			throw new Exception(sprintf("1st parameter must be integer: got %s",
-				gettype($item)));
+				gettype($itemid)));
 		}
 		    
-		if (gettype($attrs) != 'array') {
-			throw new Exception(sprintf("2nd parameter must be array: got %s",
-				gettype($item)));
-		}
-		
-		if (gettype($parent_attrs) != 'array') {
-			throw new Exception(sprintf("3rd parameter must be array: got %s",
-				gettype($item)));
-		}
-		
-		// clean args
-		$item = $this->__clean_args($item);
+		$item = $this->get_item($itemid);
 		
 		$siblings = $this->get_siblings($item);
 		
@@ -157,15 +141,14 @@ class XMLUtils extends SimpleXMLElement {
 	// get objects for specific groups of family members ----------------
 	// ------------------------------------------------------------------
 
-	function get_parent($item) {
+	function get_parent(SimpleXMLElement $item) {
 		
-		// check args
-		if (!$this->__is_SimpleXMLElement($item) == true) {
-			throw new Exception(sprintf("1st parameter must implement SimpleXMLElement: got %s",gettype($item)));
-		}
-
-		$item = $this->__clean_args($item);
-			
+		// func    : get the parent for a particular object
+		//
+		// args    : $item - object of class SimpleXMLElement
+		//
+		// returns : a SimpleXMLElement object
+		
 		$results = ($item->xpath("parent::*"));
 		
 		if (sizeof($results) > 1) {
@@ -174,14 +157,15 @@ class XMLUtils extends SimpleXMLElement {
 			
 		return($results[0]);
 	}
-
 	
-	function get_ancestors($item) {
-		// check args
-		if (!$this->__is_SimpleXMLElement($item) == true) {
-			throw new Exception(sprintf("1st parameter must implement SimpleXMLElement: got %s",gettype($item)));
-		}
+	function get_ancestors(SimpleXMLElement $item) {
 
+		// func    : get the ancestors for a particular object
+		//
+		// args    : $item - object of class SimpleXMLElement
+		//
+		// returns : an array of SimpleXMLElement object
+		
 		$ancestors=array();
 		while ($item->{$this->root_tag} != $this->root_tag_val) {
 			$item= $this->get_parent($item);
@@ -190,23 +174,16 @@ class XMLUtils extends SimpleXMLElement {
 		return($ancestors);
 	}
 	
-	function get_siblings($item) {
+	function get_siblings(SimpleXMLElement $item) {
 		
-		// func    : by comparing the parent id of each subitem to the id of $item
-		//         : gets all of the siblings. Does return itself in siblings.
+		// func    : gets the siblings for a particular object
 		//
-		// args    : $item - the unique id for the item or the item itself
-		//         : as an object.
+		// args    : $item - object of class SimpleXMLElement
 		//
 		// returns : array of arrays 
 		//		     : i.e. array[0] => array('attr1' => 'attr1val',
 		//			  : 								'pattr1' => 'pattr1val')
 
-		// check args
-		if (!$this->__is_SimpleXMLElement($item) == true) {
-			throw new Exception(sprintf("1st parameter must implement SimpleXMLElement: got %s",gettype($item)));
-		}
-	
 		$p_item = $this->get_parent($item);
 		
 		$siblings = $this->get_children($p_item);
@@ -214,19 +191,14 @@ class XMLUtils extends SimpleXMLElement {
 		return($siblings);
 	}
 	
-	function get_children($p_item) {
+	function get_children(SimpleXMLElement $p_item) {
 		
 		// func    : gets all of the children nodes of a particular item
 		//
 		// args    : $itemid - the unique id for the item or the item itself
 		//         : as an object.
 		//
-		// returns : array of objects
-		
-		// check args
-		if (!$this->__is_SimpleXMLElement($p_item) == true) {
-			throw new Exception(sprintf("1st parameter must implement SimpleXMLElement: got %s",gettype($item)));
-		}
+		// returns : array of SimpleXMLElement objects
 		
 		$children=array();
 		
@@ -248,7 +220,7 @@ class XMLUtils extends SimpleXMLElement {
 	// ------------------------------------------------------------------
 	// low level accessors-----------------------------------------------
 	// ------------------------------------------------------------------
-	function get_details($items,$attrs,$parent_attrs) {
+	function get_details(array $items,array $attrs,array $parent_attrs) {
 		
 		// func    : loops over array of items, retreiving the details
 		//  	     : where details are the tags specified in $attrs/$parent_attrs
@@ -262,25 +234,7 @@ class XMLUtils extends SimpleXMLElement {
 		// returns : array of arrays 
 		//		     : i.e. array[0] => array('attr1' => 'attr1val',
 		//			  : 								'pattr1' => 'pattr1val')
-		
-		// check args
-		
-
-		if (gettype($items) != 'array') {
-			throw new Exception(sprintf("1st parameter must be array: got %s",
-				gettype($item)));
-		}
-		    
-		if (gettype($attrs) != 'array') {
-			throw new Exception(sprintf("2nd parameter must be array: got %s",
-				gettype($item)));
-		}
-		
-		if (gettype($parent_attrs) != 'array') {
-			throw new Exception(sprintf("3rd parameter must be array: got %s",
-				gettype($item)));
-		}
-		          		
+				
 		$items_detail=array();
 				
 		foreach ($items as $itemid=>$item) {
@@ -292,7 +246,7 @@ class XMLUtils extends SimpleXMLElement {
 		return($items_detail);
 	}
 	
-	function get_item_details($item,$attrs,$parent_attrs) {
+	function get_item_details(SimpleXMLElement $item,array $attrs,array $parent_attrs) {
 
 		// func    : gets the detail for a particular item
 		//  	     : where details are the tags specified in $attrs/$parent_attrs
@@ -306,10 +260,7 @@ class XMLUtils extends SimpleXMLElement {
 		//			  : 			   'pattr1' => 'pattr1val')
 
 		$root=false;
-		
-		// check args
-		$this->__check_args($item,$attrs,$parent_attrs);
-		
+
 		// is this the root node ?		
 		if ($item->{$this->root_tag} == $this->root_tag_val) {
 			$root=true;

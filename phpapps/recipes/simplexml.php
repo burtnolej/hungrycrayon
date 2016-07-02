@@ -112,6 +112,19 @@ function assert_strs_equal($str1, $str2,
     }
 }
 
+function assert_str_contains($contains, $str,
+									&$result_bool,&$result_str) {
+	
+	$result_bool=true;
+	$result_str="";
+					
+   if (is_int(strpos($str,$contains)) == false) {
+   	$result_bool = false;
+		$result_str = sprintf(">>> [%s]  not contain [%s]",$str,$contains).PHP_EOL;
+    }
+}
+
+
 function assert_ints_equal($int1, $int2,
 									&$result_bool,&$result_str) {
 	
@@ -344,6 +357,57 @@ function test_get_sibling_details($xmlutils) {
 	output_results($result_bool,$result_str,$test);
 }	
 
+
+function test_get_sibling_details_arg1_int($xmlutils) {
+
+	$test="get siblings details - bad 1st arg";
+	$expected_results = "1st parameter must be integer";
+	
+	$result_bool = false;
+	
+	try {
+		$sibling_details = $xmlutils->get_sibling_details("foobar", 
+																array('menuitemid'),
+																array('label'));
+	} catch (Exception $e) {
+			assert_str_contains($expected_results,$e->getMessage(),
+							$result_bool,$result_str);
+	}
+	
+	output_results($result_bool,$result_str,$test);
+}
+
+function my_error_handler($errno, $errstr, $errfile, $errline) {
+
+	if (strpos($errstr,'must be of the type array') == true) {
+		throw new Exception("parameter must be array");
+	}
+	else {
+		trigger_error("Fatal error", E_USER_ERROR);
+	}
+}
+
+set_error_handler("my_error_handler");
+
+function test_get_sibling_details_arg2_int($xmlutils) {
+
+	$test="get siblings details - bad 2nd arg";
+	$expected_results = "parameter must be array";
+	
+	$result_bool = false;
+	
+	try {
+		$sibling_details = $xmlutils->get_sibling_details(3, 
+																"foobar",
+																array('label'));
+	} catch (Exception $e) {
+			assert_str_contains($expected_results,$e->getMessage(),
+							$result_bool,$result_str);
+	}
+	
+	output_results($result_bool,$result_str,$test);
+}	
+
 // ------------------------------------------------------------------
 // children tests -------------------------------------------------
 // ------------------------------------------------------------------
@@ -383,6 +447,8 @@ $xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
 $xmlutils->configure('menuitemid',1,'menuitem','menuitemid');
 
 try {
+	test_get_sibling_details_arg1_int($xmlutils);
+	test_get_sibling_details_arg2_int($xmlutils);
 	test_get_sibling_details($xmlutils);
 	test_get_children_details($xmlutils);
 	test_get_ancestor_details($xmlutils);
