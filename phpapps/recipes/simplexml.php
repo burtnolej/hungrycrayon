@@ -98,7 +98,19 @@ XML;
 
 //include 'samplexml.php';
 include 'xml_utils.php';
-include 'php_utils.php';
+//include 'php_utils.php';
+
+function assert_true($bool1, $bool2,
+									&$result_bool,&$result_str) {
+	
+	$result_bool=true;
+	$result_str="";
+				
+   if ($bool1 != $bool2) {
+   	$result_bool = false;
+		$result_str = sprintf(">>> %b != %b",$bool1,$bool2).PHP_EOL;
+    }
+}
 
 function assert_strs_equal($str1, $str2,
 									&$result_bool,&$result_str) {
@@ -326,6 +338,18 @@ function test_item_depth($xmlutils) {
 	output_results($result_bool,$result_str,$test);
 }
 
+function test_item_depth_root($xmlutils) {
+	
+	$test="get depth of node";
+	$result = "PASSED:".$test;
+	$expected_results = 0;
+
+	$depth = $xmlutils->get_item_depth(1);
+	
+	assert_ints_equal($depth,$expected_results,$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);
+}
+
 
 // ------------------------------------------------------------------
 // ancestor tests ---------------------------------------------------
@@ -444,6 +468,23 @@ function test_children_no_child() {
 	echo $result."\n";
 }
 
+// ------------------------------------------------------------------
+// item tests -------------------------------------------------------
+// ------------------------------------------------------------------
+
+function test_item($xmlutils) {
+	$test="get item";
+	$expected_result = true;
+														
+	$item = $xmlutils->get_item(5111);
+	
+	//if (!is_SimpleXMLElement($item) == true) {	}
+	
+	//print_r($item);	
+	assert_true($expected_result,$xmlutils->is_SimpleXMLElement($item),
+							$result_bool,$result_str);
+	output_results($result_bool,$result_str,$test);	
+}
 
 // ------------------------------------------------------------------
 // main -------------------------------------------------------------
@@ -454,22 +495,24 @@ $xmlutils->configure('menuitemid',1,'menuitem','menuitemid');
 
 set_error_handler('\\XMLUtils::my_error_handler');
 
-//try {
-	test_get_sibling_details_arg1_int($xmlutils);
-	test_get_sibling_details_arg2_int($xmlutils);
-	test_get_sibling_details($xmlutils);
-	test_get_children_details($xmlutils);
-	test_get_ancestor_details($xmlutils);
-	test_item_details($xmlutils);
-	test_parent($xmlutils);
-	test_parent_bad_arg($xmlutils);
-	test_search($xmlutils);
-	test_search_int_as_string($xmlutils);
-	test_search_string($xmlutils);
-	test_search_top_item($xmlutils);
-	test_item_depth($xmlutils);
-//} catch (Exception $e) {
-	//$this->my_error_handler($e);
-//}
+test_item_depth($xmlutils);
+test_item_depth_root($xmlutils);
+
+/* 
+test_item($xmlutils);
+test_get_sibling_details_arg1_int($xmlutils);
+test_get_sibling_details_arg2_int($xmlutils);
+test_get_sibling_details($xmlutils);
+test_get_children_details($xmlutils);
+test_get_ancestor_details($xmlutils);
+test_item_details($xmlutils);
+test_parent($xmlutils);
+test_parent_bad_arg($xmlutils);
+test_search($xmlutils);
+test_search_int_as_string($xmlutils);
+test_search_string($xmlutils);
+test_search_top_item($xmlutils);
+*/
+
 
 ?>

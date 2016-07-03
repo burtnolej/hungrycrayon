@@ -2,7 +2,9 @@
 
 $xmlstr = <<<XML
 <menu>
-	<label>root</label>
+	<label>Documentation</label>
+	<source>build-install.php</source>
+	<tag>root</tag>
 	<item>
 		<tag>buildingconfiguring</tag>
 		<label>Building and Configuring</label>

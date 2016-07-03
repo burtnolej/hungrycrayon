@@ -13,18 +13,21 @@
     <!margin: auto;>   
 }
 
-
-#lvl1 {
+#lvl0 {
     list-style:none;
     padding-left:0;
 }
-#lvl2 {
+#lvl1 {
     list-style:none;
     padding-left:1em;
 }
-#lvl3 {
+#lvl2 {
     list-style:none;
     padding-left:2em;
+}
+#lvl3 {
+    list-style:none;
+    padding-left:3em;
 }
 </style>
 </html>
@@ -33,36 +36,45 @@
 
 include 'xml_utils.php';
 include 'menu.php';
-include 'php_utils.php';
+
 
 function get_menu_html($xmlutils,$item) {
 	
-	//$item = $xmlutils->__clean_args($item);
-			
-	$html = sprintf("<li><a href='%s?arg=%s'>%s</a></li>",					
-					$item['source'],
-					$item['tag'],
-					$item['label']).PHP_EOL;	
+	$item = $xmlutils->get_item($item);
+	
+	$html = sprintf("<li><a href='%s?arg=%s'>%s</a></li>",	
+					$item->{'source'},
+					$item->{'tag'},
+					$item->{'label'}).PHP_EOL;					
 					
 	return($html);
 }
 
-function get_menu_level_html($xmlutils,$items){
+function get_menu_level_html($xmlutils,$items,$item_depth){
 
-	$html="";
-	
-	foreach ($items as $_items) {
-		$html = $html.get_menu_html($xmlutils,$_items);
+	$html="<ul id='ul".$item_depth."'>".PHP_EOL;
+			      
+	foreach ($items as $_item) {
+		$html = $html.sprintf("<li><a href='%s?arg=%s'>%s</a></li>",					
+							$_item['source'],
+							$_item['tag'],
+							$_item['label']).PHP_EOL;
 	}
+	
+	$html=$html."</ul>".PHP_EOL;
 	
 	return($html);
 }
 function get_menu_all_above_html($xmlutils,$menuid,$mi_depth=null) {
 	
+	if (!isset($mi_depth)) {
+		$mi_depth = $xmlutils->get_item_depth($menuid);
+	}
+	
 	$ancestor_details = $xmlutils->get_ancestor_details($menuid,
 						array('label','tag'),array('source'));
 
-	return(get_menu_level_html($xmlutils,$ancestor_details));	
+	return(get_menu_level_html($xmlutils,$ancestor_details,$mi_depth));	
 }
 
 function get_menu_next_level_down_html($xmlutils,$menuid,$mi_depth=null) {
@@ -74,17 +86,17 @@ function get_menu_next_level_down_html($xmlutils,$menuid,$mi_depth=null) {
 	$child_details = $xmlutils->get_children_details($menuid,
 							array('label','tag'),array('source'));
 
-	return(get_menu_level_html($xmlutils,$child_details));		
+	return(get_menu_level_html($xmlutils,$child_details,$mi_depth));		
 }
 
 $xmlutils = simplexml_load_string($xmlstr, 'XMLUtils');
-$xmlutils->configure('label','root','item','tag');
+$xmlutils->configure('tag','root','item','tag');
 
 set_error_handler('\\XMLUtils::my_error_handler');
 
 try {
 	print(get_menu_all_above_html($xmlutils,"buildingconfiguring"));
-	//print(get_menu_html($xmlutils,"buildingconfiguring"));
+	print(get_menu_html($xmlutils,"buildingconfiguring"));
 	print(get_menu_next_level_down_html($xmlutils,"buildingconfiguring"));
 } catch (Exception $e) {
 	exception_handler($e);

@@ -14,6 +14,9 @@
 	get_item_details
 	get_details
 */
+
+include 'php_utils.php';
+
 class XMLUtils extends SimpleXMLElement {
 
 	function configure($root_tag, $root_tag_val,
@@ -64,6 +67,12 @@ class XMLUtils extends SimpleXMLElement {
 		}
 		else {
 			echo $errstr.PHP_EOL;
+			
+			$stackframes= debug_backtrace();
+			foreach ($stackframes as $frame) {
+				echo $frame['function'],$frame['line'].PHP_EOL;
+			}
+			
 			trigger_error("Fatal error", E_USER_ERROR);
 		}
 	}
@@ -85,8 +94,8 @@ class XMLUtils extends SimpleXMLElement {
 		//			  : 								'pattr1' => 'pattr1val')
 		
 		// cannot hint at non object type so test directly
-		if (gettype($p_itemid) != 'integer') {
-			throw new Exception(sprintf("1st parameter must be integer: got %s",
+		if (!in_array(gettype($p_itemid),array('integer','string')) == true) {
+			throw new Exception(sprintf("1st parameter must be integer or string: got %s",
 				gettype($p_itemid)));
 		}
 		    
@@ -111,8 +120,8 @@ class XMLUtils extends SimpleXMLElement {
 		//		     : i.e. array[0] => array('attr1' => 'attr1val',
 		//			  : 								'pattr1' => 'pattr1val')
 	
-		if (gettype($itemid) != 'integer') {
-			throw new Exception(sprintf("1st parameter must be integer: got %s",
+		if (!in_array(gettype($itemid),array('integer','string')) == true) {
+			throw new Exception(sprintf("1st parameter must be integer or string: got %s",
 				gettype($itemid)));
 		}
 				
@@ -137,8 +146,8 @@ class XMLUtils extends SimpleXMLElement {
 		//		     : i.e. array[0] => array('attr1' => 'attr1val',
 		//			  : 								'pattr1' => 'pattr1val')
 		
-		if (!is_int($itemid) == true) {
-			throw new Exception(sprintf("1st parameter must be integer: got %s",
+		if (!in_array(gettype($itemid),array('integer','string')) == true) {
+			throw new Exception(sprintf("1st parameter must be integer or string: got %s",
 				gettype($itemid)));
 		}
 		    
