@@ -62,3 +62,32 @@ if (array("foo","bar") == array("foo","bar")){
 	foreach ($attrs as $attr) {
 		$array[$attr] = $menu_item[$attr];
 	}
+	
+	
+	
+for ($i = 1; $i <= 10; $i++) {
+    echo $i;
+}
+
+
+if (in_array($b,array(1,2,3,4)) == true) { echo "true"; }
+
+
+hp > $a = array(1,2,3,4,5,6);
+php > 
+php > 
+php > array_shift($a);
+php > print_r($a);
+Array
+(
+    [0] => 2
+    [1] => 3
+    [2] => 4
+    [3] => 5
+    [4] => 6
+)
+php > $a = array(1,2,3,4,5,6);
+php > $a1 = array_shift($a);
+php > print_r($a1);
+1
+

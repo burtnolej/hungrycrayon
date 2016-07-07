@@ -36,6 +36,12 @@ class Mineral extends BaseClass
 }
 
 
+		print_r(get_class_methods($item));
+		
+				//method_exists($item;
+		
+		
+
 function print_power($base,$exp)
 {
 	printf("\n%d to the power %d = %d\n",$base,$exp,pow($base,$exp));

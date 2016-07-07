@@ -32,21 +32,6 @@ class XMLUtils extends SimpleXMLElement {
 		$this->xpath_node = $xpath_node;
 		$this->xpath_node_id = $path_node_id;	
 	}
-	
-	function __clean_args($item) {
-		
-		if (gettype($item) == 'object') {
-			if (get_class($item) != 'XMLUtils') {
-				//error
-			}
-			else {
-				return($item);
-			}
-		}
-		else {
-			return($this->get_item($item));
-		}
-	}
 		
 	function is_SimpleXMLElement($item) {
 			
@@ -55,26 +40,6 @@ class XMLUtils extends SimpleXMLElement {
 					return false;					
 		}
 		return true;
-	}
-	
-	function my_error_handler($errno, $errstr, $errfile, $errline) {
-	
-		if (strpos($errstr,'must be of the type array') == true) {
-			throw new Exception("parameter must be array");
-		}
-		elseif (strpos($errstr,'must be an instance of SimpleXMLElement') == true) {
-			throw new Exception("parameter must be as instance of SimpleXMLElement");
-		}
-		else {
-			echo $errstr.PHP_EOL;
-			
-			$stackframes= debug_backtrace();
-			foreach ($stackframes as $frame) {
-				echo $frame['function'],$frame['line'].PHP_EOL;
-			}
-			
-			trigger_error("Fatal error", E_USER_ERROR);
-		}
 	}
 	
 	// ------------------------------------------------------------------
