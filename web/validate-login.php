@@ -1,3 +1,14 @@
+
+<html>
+<style>
+
+#menu {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2em;
+}
+</style>
+</html>
+
 <?php
 
 include "login.php";
@@ -6,8 +17,8 @@ function draw_menu($un,$pw) {
 
 	if (($un=='guest') and ($pw=='welcome')) {
 		echo "<div><center><br><br><br>";
-                echo "<a href='business-plan.php'>The Business Plan</a><br>";
-		echo "<a href='quad-visit.php'>Potential Projects for The Quad</a>";
+                echo "<a id=menu href='business-plan.php'>The Business Plan</a><br>";
+		echo "<a id=menu href='quad-visit.php'>Potential Projects for The Quad</a>";
 		echo "</center></div>";
 	}
 	else {

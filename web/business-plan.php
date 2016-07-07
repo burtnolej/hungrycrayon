@@ -1,12 +1,33 @@
+<html>
+<style type="text/css">
+
+#content {
+    font-size: 150%;
+    line-height:1.5;
+    margin-top:50;
+    margin-left:200;
+    margin-right:200;
+}
+
+#table {
+    font-size:100%;
+}
+
+</style>
+</html>
+
+
 <?php
 
-function draw_hungrycrayon1 () {
+function draw_businessplan () {
 
 ?>
 
 <html>
 
-<button onclick="history.go(-1);">Back </button>
+<button id=content onclick="history.go(-1);">Back </button>
+
+<div id=content>
 
 <h3>Hungry Crayon - The General Business plan</h3>
 
@@ -17,8 +38,8 @@ function draw_hungrycrayon1 () {
 <li>Open Source Software provides a very powerful and free library of software that has been developed over many years and is used in industry by many large Tech multi-national firms to provide mission-critical services<br>
 <p text-indent: 100px><i>"Open Source : Programmers can charge money for the open source software they create or to which they contribute. But because most open source licenses require them to release their source code when they sell software to others, many open source software programmers find that charging users money for software services and support (rather than for the software itself) is more lucrative. This way, their software remains free of charge and they make money helping others install, use, and troubleshoot it"</i></p>
 
-<h5> Potential Open Source Software Solutions</h5>
-<table border="2">
+<h4> Potential Open Source Software Solutions</h5>
+<table id=table border="2">
 <tr>
     <td>Operating System (Desktop)</td>
     <td><a href=http://www.ubuntu.com>Ubuntu</a></td>
@@ -101,5 +122,5 @@ function draw_hungrycrayon1 () {
 <?php
 }
 
-draw_hungrycrayon1();
+draw_businessplan();
 ?>

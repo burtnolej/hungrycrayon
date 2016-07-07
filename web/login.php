@@ -14,56 +14,61 @@ function draw_login() {
 }
 
 #login {
-    width:192px;
+    width:420px;
     margin:0px auto;
     border:none;
     margin-top:10px;
-    margin-bottom:10px;
+    margin-bottom:0px;
 }
 
 #input {
     display:inline-block;
     vertical-align:middle;
-    margin-left:20px
+    margin-bottom:10px;
+    margin-top:10px;;
+    <!margin-left:260px>;
     <!fpadding:10px;>
     <!line-height:30px;>
     <!background-color:#eeeeee;>
     <!height:228px;>
-    float:left;
+    float:right;
     text-align:middle;
-    width: 20px
+    width: 120px
     <!border: 3px solid #73AD21;>
     <!margin: auto;>   
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1em;
+    font-size: 2em;
 }
 
 #label {
     border:none;
     vertical-align:middle;
     display:inline-block;
+    margin-left:10px;
+    margin-bottom:10px;
+    margin-top:10px;
     float: left;
     text-align: left;
-    width: 80px;
+    width: 180px;
     font-family:Arial, Helvetic, sans-serif;
-    font-size: 1em;
+    font-size: 2em;
 </style>
 
 <body>
 <div id=pic>
 <center>
-<img src="hungrycrayon.png" alt="hUnGrYcRaYoN" style="width:314px;height:228px;">
+<img src="hungrycrayon.png" alt="hUnGrYcRaYoN" style=""width:628px;height:456px;">
 </center>
 </div>
 
 </body>
 
+<br><br>
 <form style="border:none" id=login action='validate-login.php?dummyfunc' method='post' accept-charset='UTF-8'>
 
 <fieldset >
 
 <input type='hidden' name='submitted' id='submitted' value='1'/>
-
 <div id=login>
 <div >
 <label id=label for='username' >username</label>
@@ -76,7 +81,9 @@ function draw_login() {
 </div>
  
 <div>
-<input id=label type='submit' name='submit' value='submit' />
+<center>
+<input id=input type='submit' name='submit' value='enter site' />
+</center>
 </div>
 </div>
  

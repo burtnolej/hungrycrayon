@@ -1,3 +1,19 @@
+<html>
+<style type="text/css">
+
+#content {
+
+    margin-top:50;
+    margin-left:200;
+    margin-right:200;
+    font-size: 150%;
+    line-height: 1.5;
+}
+
+</style>
+</html>
+
+
 <?php
 
 function draw_quadvisit () {
@@ -6,15 +22,17 @@ function draw_quadvisit () {
 
 <html>
 
-<button onclick="history.go(-1);">Back </button>
+<button id=content onclick="history.go(-1);">Back </button>
+
+<div id=content>
 
 <h3>Hungry Crayon - Quad Visit</h3>
 
-<p>In the context of our business plan, here are a few ideas of the types of things HungryCrayon may be able to help the Quad with</p>
+<p >In the context of our business plan, here are a few ideas of the types of things HungryCrayon may be able to help the Quad with</p>
 
 <h4>Small Business Automation</h4>
 
-<ul><li>Digitization and automation of the schools class scheduling and homework assignments to improve school efficiency and reduce annual running costs by ?? $/yr</li>
+<ul><li><span>Digitization and automation of the schools class scheduling and homework assignments to improve school efficiency and reduce annual running costs by ?? $/yr</li>
 <li> Solution could be in the form of an electronic version of the 'Binder', that has recently been unsuccessfully piloted</li>
 <li>Goal would be to make the 'eBinder' available on school provided personal electronic devices so that 'remembering to bring it' would not be an issue</li>
 <li> eBinder would use a central database and synchronize regularly throughout the day, making it easy to update scheduling information as needed</li>
@@ -72,6 +90,7 @@ function draw_quadvisit () {
     <li>http://www.alf.dk/media/Denmark_March_2013.pdf</li>
     <li>http://www.disabled-world.com/artman/publish/article_2086.shtml</li>
 </ul></ul>
+</div>
 </html>
 
 <?php
