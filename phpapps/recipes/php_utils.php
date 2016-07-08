@@ -288,7 +288,7 @@ function test_exception_handler_1level_fatal() {
 	//output_results($result_bool,$result_str,$test);	
 }
 
-//function run_tests($testname = null) {
+
 function __run_tests(array $args) {
 	
 	
@@ -313,77 +313,6 @@ function __run_tests(array $args) {
 		}
 	}
 }
-
-function __usage() {
-	echo "usage : --all-tests | --test <testname>".PHP_EOL;
-}
-
-if (sizeof($argv) == 1) {
-	__usage();
-	exit;
-}
-
-function __clean_argv(array $myargv = null) {
-	
-	// if own arg array not passed in then use system detected args
-	if (!isset($myargv)) {
-		$myargv = array_shift($argv); // take off first param containing filename
-	}
-	
-	for ($i=1;$i<sizeof($myargv);$i++) {
-		
-		// special case - if --usage passed in then display uage info and stop
-		if ($myargv[$i] == run_switch::usage) {
-			__usage();
-			exit('exiting');
-		}
-	
-		// single directive no value
-		if ($myargv[$i] == run_switch::listtests) {
-			$args[run_switch::listtests] = true;
-			continue;
-		}
-
-		// names of specific tests to run
-		if ($myargv[$i] == run_switch::testname) {
-			
-			keep processing until come to next -- flag and put tests to run in array();
-			//$args[run_switch::listtests] = true;
-			continue;
-		}
-
-	
-		// directive with value - i.e. --test-name = <test-name>
-		// so skip the next element inargv array
-		$args[$myargv[$i]] = $myargv[$i+1];
-		$i++;
-	}
-	
-	return($myargv);
-}
-
-function test_foobar() {
-}
-// Test 1 ------------------------------------------------------------
-
-$test_name = 'test --list-tests on own';
-
-assert_arrays_equal(array('--list-tests'=>null),
-						 __clean_argv(array('--list-tests'=>null)),
-						 $bool_result,$result_str);
-						 
-output_results($bool_result,$result_str,$test_name)
-
-// Test 2 ------------------------------------------------------------
-$test_name = 'test --list-tests - 1 test - no other test';
-
-assert_arrays_equal(array('--test-name'=>'foobar'),
-						 __clean_argv(array('--list-tests'=>null)),
-						 $bool_result,$result_str);
-						 
-output_results($bool_result,$result_str,$test_name)
-
-
 //__run_tests($args);
 	
 	
