@@ -145,16 +145,28 @@ class utils_test {
 		}
 	}
 	
-	function assert_raises($func,$exception_cls_name) {
+	function assert_raises($func,$exception_cls_name='Exception',$msg_contains=null) {
 		$test = utils_test::$current_test;
 		$test->result = boolstr(false);
 	
 		try  {
 				call_user_func(array($this,$func));
+			   $test->result = boolstr(false);
+				$test->message = sprintf("failed:%s not raised",$exception_cls_name);
 		}
 		catch (Exception $e) {
 			if (get_class($e) == $exception_cls_name) {
-				$test->result = boolstr(true);
+				if (!isset($msg_contains)) {
+					$test->result = boolstr(true);
+				}
+				elseif (is_int(strpos($e->getMessage(),$msg_contains)) == true) {
+					$test->result = boolstr(true);
+				}
+				else {
+					$test->result = boolstr(false);
+					$test->message = sprintf("failed:ex_msg %s does not contain %s",
+														$e->getMessage(),$msg_contains);
+				}
 			}
 		}	
 	}

@@ -196,16 +196,21 @@ __check_results('test_array_equal',$tests,$expected_results);
 class test_raises extends utils_test {
 	
 	function test_raises_1() {
-		$this->assert_raises(raise_ex,"Exception");
+		$this->assert_raises(raise_ex);
 	}	
-	
+
 	function test_raises_2() {
-		$this->assert_raises($this->a1,$this->a2);
+		$this->assert_raises(do_nothing);
 	}	
 	
 	function raise_ex() {
 		throw new Exception();
 	}
+	
+	function do_nothing() {
+		pass;
+	}
+
 }
 
 // Expected results
@@ -214,14 +219,50 @@ $_tmp = array('test_raises_1' => array('name'=>'test_raises_1',
 																							
 					'test_raises_2' => array('name'=>'test_raises_2',
 											'result'=>'false',
-											'message'=>'failed:4 len != 3 len'));
+											'message'=>'failed:Exception not raised'));
 
 $expected_results = __get_expected_results($_tmp);
 
 // Run test
-$tests = new test_array_equal;
+$tests = new test_raises;
 $tests->runner();
 $tests->get_results();
 
-__check_results('test_array_equal',$tests,$expected_results);
+__check_results('test_raises',$tests,$expected_results);
+
+// -----------------------------------------------------------
+// Test exception raised contains string 
+// -----------------------------------------------------------
+class test_raise_contains extends utils_test {
+	
+	function test_raise_contains_1() {
+		$this->assert_raises(raise_ex,'Exception','foobar');
+	}	
+
+	function test_raise_contains_2() {
+		$this->assert_raises(raise_ex,'Exception','blahblah');
+	}	
+	
+	function raise_ex() {
+		throw new Exception('foobar');
+	}
+}
+
+// Expected results
+$_tmp = array('test_raise_contains_1' => array('name'=>'test_raise_contains_1',
+											'result'=>'true'),
+																							
+					'test_raise_contains_2' => array('name'=>'test_raise_contains_2',
+											'result'=>'false',
+											'message'=>'failed:ex_msg foobar does not contain blahblah'));
+
+$expected_results = __get_expected_results($_tmp);
+
+// Run test
+$tests = new test_raise_contains;
+$tests->runner();
+$tests->get_results();
+
+__check_results('test_raise_contains',$tests,$expected_results);
+
 ?>
