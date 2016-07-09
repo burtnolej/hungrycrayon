@@ -1,31 +1,33 @@
 <?php
 
+error_reporting(E_STRICT);
+
 include "utils_utils.php";
 
 class utils_test {
 
 	// create store for results
 	private static $tests = array();
-	private static $results = array();
-	private static $message = array();
-		
-	// holds the id of the current test being executed by runner
-	private static $lasttestid=-1;  
+	private static $current_test = null;
 		
 	private function __register($test_name) {
-		utils_test::$lasttestid++;
+		//utils_test::$lasttestid++;
 		
-		utils_test::$tests[utils_test::$lasttestid] =$test_name;
-		utils_test::$results[utils_test::$lasttestid] = boolstr(true);
-		utils_test::$message[utils_test::$lasttestid] = '';
+		$test = new StdClass();
+		$test->name = $test_name;
+		$test->result = boolstr(true);
+		$test->message = '';
+		utils_test::$tests[] = $test;
+		utils_test::$current_test = $test;
 	}
 	
-	private function __setmessage($message){
-		utils_test::$message[utils_test::$lasttestid] = $message;
-	}
-	
-	private function __setresult($result){
-		utils_test::$results[utils_test::$lasttestid] = $result;
+	private function __formatmessage($test) {
+		$msg = sprintf("%s|%s|%s",
+					str_pad($test->name,20," "),
+					str_pad($test->result,5," "),
+					str_pad($test->message,30," "));
+
+		return($msg);
 	}
 	
 	function runner() {
@@ -36,25 +38,28 @@ class utils_test {
 
 			if (substr($func,0,5) == "test_") {
 				$this->__register($func);
-				call_user_func(get_class($this).'::'.$func);
+				call_user_func(array($this,$func));
 			}
 		}
 	}
 	
+	function output_results() {
+
+		foreach (utils_test::$tests as $test) {
+			echo $this->__formatmessage($test).PHP_EOL;
+		}	
+	}
+
 	function assert_true($actual_result) {
+		
+		$test = utils_test::$current_test;
+		
 	   if ($actual_result == false) {
-	   	$this->__setresult(boolstr(false));
-	   	$this->__setmessage(sprintf(">>> %s != %s",boolstr($actual_result), 								boolstr(true)));
+	   	$test->result = boolstr(false);
+	   	$test->message = sprintf(">>> %s != %s",boolstr($actual_result), 										boolstr(true));
 	   } 
 	}
 	
-	function output_results() {
-
-		for ($i=0;$i<=utils_test::$lasttestid+1;$i++) {
-			echo utils_test::$tests[$i]."  ".utils_test::$results[$i]. "  ".
-				utils_test::$message[$i].PHP_EOL;
-		}
-	}
 	
 	function assert_strs_equal($str1, $str2,
 										&$result_bool,&$result_str) {
