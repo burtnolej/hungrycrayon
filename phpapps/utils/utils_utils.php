@@ -24,3 +24,11 @@ function is_printable($element) {
 function boolstr($bool_val) {
 	return($bool_val ? 'true' : 'false');
 }
+
+function get_stdobject(array $vars) {
+	$_object = new StdClass();
+	foreach ($vars as $key=>$val) {
+		$_object->{$key} = $val;
+	}
+	return($_object);
+}

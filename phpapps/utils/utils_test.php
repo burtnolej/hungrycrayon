@@ -1,6 +1,6 @@
 <?php
 
-error_reporting(E_STRICT);
+//error_reporting(E_STRICT);
 
 include "utils_utils.php";
 
@@ -16,8 +16,8 @@ class utils_test {
 		$test = new StdClass();
 		$test->name = $test_name;
 		$test->result = boolstr(true);
-		$test->message = '';
-		utils_test::$tests[] = $test;
+		$test->message = 'passed';
+		utils_test::$tests[$test_name] = $test;
 		utils_test::$current_test = $test;
 	}
 	
@@ -30,10 +30,30 @@ class utils_test {
 		return($msg);
 	}
 	
+	function compare_results(array $expected_results,$verbose=false) {
+		// used when testing utils_test
+		// pass in an array of StdClass with name,result,message set
+		// array is indexed by testname
+		// compares all properties that exist on the expected_results passed in
+		foreach ($expected_results as $exp_name => $exp_test) {
+			
+			$test = utils_test::$tests[$exp_name];
+			
+			foreach (get_object_vars($exp_test) as $varname => $exp_val) {	
+				if ($exp_val != $test->{$varname}) {
+						$msg = sprintf("var:%s %s != %s",$varname,$exp_val, $test->{$varname});
+						return array(false,$msg);
+				}
+				elseif ($verbose == true) {
+					printf("func:%s var:%s %s == %s\n",$exp_name,$varname,$exp_val, $test->{$varname});
+				}
+			}
+		}
+		return array(true);
+	}
+	
 	function runner() {
-		
 		$class_name=get_class($this);
-		
 		foreach (get_class_methods(get_class($this)) as $func) {
 
 			if (substr($func,0,5) == "test_") {
@@ -43,38 +63,44 @@ class utils_test {
 		}
 	}
 	
-	function output_results() {
-
+	function print_results() {
+		// print test results to screen
+		$this->get_results();
 		foreach (utils_test::$tests as $test) {
-			echo $this->__formatmessage($test).PHP_EOL;
+			echo $test->formatmessage.PHP_EOL;
+		}
+	}
+		
+	function get_results() {
+		// creates the formatted output message. separated from the print screen
+		// so can be supressed at runtime. one use being to make testing the test harness easier
+		foreach (utils_test::$tests as $test) {
+			$test->formatmessage = $this->__formatmessage($test);
 		}	
 	}
 
 	function assert_true($actual_result) {
-		
 		$test = utils_test::$current_test;
-		
-	   if ($actual_result == false) {
+	   //if ($actual_result == false) {
+
+	   if ($actual_result != $this->expected_result) {
 	   	$test->result = boolstr(false);
-	   	$test->message = sprintf(">>> %s != %s",boolstr($actual_result), 										boolstr(true));
+	   	$test->message = sprintf("failed:%s != %s",boolstr($actual_result), 														$this->expected_result);
 	   } 
 	}
-	
-	
-	function assert_strs_equal($str1, $str2,
-										&$result_bool,&$result_str) {
 		
-		$result_bool=true;
-		$result_str="";
-					
-	   if ($str1 != $str2) {
-	   	$result_bool = false;
-			$result_str = sprintf(">>> %s != %s",$str1,$str2).PHP_EOL;
+	function assert_str_equal($actual_result) {
+		$test = utils_test::$current_test;
+		
+	   if ($actual_result != $this->expected_result) {
+	   	$test->result = boolstr(false);
+			$test->message = sprintf("failed:%s != %s",$actual_result,
+													$this->expected_result);
 	    }
 	}
 	
-	function assert_str_contains($contains, $str,
-										&$result_bool,&$result_str) {
+	function assert_str_contains($actual_result) {
+		$test = utils_test::$current_test;
 		
 		$result_bool=true;
 		$result_str="";
@@ -86,8 +112,8 @@ class utils_test {
 	}
 	
 	
-	function assert_ints_equal($int1, $int2,
-										&$result_bool,&$result_str) {
+	function assert_ints_equal($actual_result) {
+		$test = utils_test::$current_test;
 		
 		$result_bool=true;
 		$result_str="";
@@ -98,8 +124,8 @@ class utils_test {
 	    }
 	}
 	
-	function assert_arrays_equal($array1, $array2,
-										&$result_bool,&$result_str) {
+	function assert_arrays_equal($actual_result) {
+		$test = utils_test::$current_test;
 		
 		$result_bool=true;
 		$result_str="";
