@@ -27,24 +27,12 @@ function __check_results($func,$tests,$expected_results) {
 // -----------------------------------------------------------
 class test_asserttrue extends utils_test {
 	
-	public $expected_result = 'true';
-	
 	function test_asserttrue_1() {
-		// positive test
-		$this->assert_true($this->mytruefunc());
+		$this->assert_true(true);
 	}	
 
 	function test_asserttrue_2() {
-		// negative test
-		$this->assert_true($this->myfalsefunc());	
-	}
-	
-	function myfalsefunc() {
-		return false;
-	}
-	
-	function mytruefunc() {
-		return true;
+		$this->assert_true(false);	
 	}
 }
 
@@ -64,37 +52,27 @@ $tests->get_results();
 
 __check_results('test_asserttrue',$tests,$expected_results);
 
+
+
 // -----------------------------------------------------------
-// Test str_equal; 'foobar'='foobar' and 'foobar'='barfoo'
+// Test equal for str 'foobar'='foobar' and 'foobar'='barfoo'
 // -----------------------------------------------------------
 class test_str_equal extends utils_test {
 	
-	public $expected_result = 'foobar';
-	
-	function test_str_1() {
-		// positive test
-		$this->assert_str_equal($this->mytruefunc());
+	function test_str_equal_1() {
+		$this->assert_equal('foobar','foobar');
 	}	
 
-	function test_str_2() {
-		// negative test
-		$this->assert_str_equal($this->myfalsefunc());	
-	}
-	
-	function myfalsefunc() {
-		return 'barfoo';
-	}
-	
-	function mytruefunc() {
-		return 'foobar';
+	function test_str_equal_2() {
+		$this->assert_equal('barfoo','foobar');	
 	}
 }
 
 // Expected results
-$_tmp = array('test_str_1' => array('name'=>'test_str_1',
+$_tmp = array('test_str_equal_1' => array('name'=>'test_str_equal_1',
 											'result'=>'true'),
 														
-					'test_str_2' => array('name'=>'test_str_2',
+					'test_str_equal_2' => array('name'=>'test_str_equal_2',
 											'result'=>'false',
 											'message'=>'failed:barfoo != foobar'));
 $expected_results = __get_expected_results($_tmp);
@@ -106,5 +84,144 @@ $tests->get_results();
 
 __check_results('test_str_equal',$tests,$expected_results);
 
+// -----------------------------------------------------------
+// Test equal for int 100=100 and 100=666
+// -----------------------------------------------------------
+class test_int_equal extends utils_test {
+	
+	function test_int_equal_1() {
+		$this->assert_equal(100,100);
+	}	
 
+	function test_int_equal_2() {
+		$this->assert_equal(100,666);	
+	}
+}
+
+// Expected results
+$_tmp = array('test_int_equal_1' => array('name'=>'test_int_equal_1',
+											'result'=>'true'),
+														
+					'test_int_equal_2' => array('name'=>'test_int_equal_2',
+											'result'=>'false',
+											'message'=>'failed:100 != 666'));
+$expected_results = __get_expected_results($_tmp);
+
+// Run test
+$tests = new test_int_equal;
+$tests->runner();
+$tests->get_results();
+
+__check_results('test_int_equal',$tests,$expected_results);
+
+
+// -----------------------------------------------------------
+// Test str contains x in xyz = true ; a not in xyz = false
+// -----------------------------------------------------------
+class test_str_contains extends utils_test {
+
+	function test_str_contains_1() {
+		$this->assert_str_contains('xyz','x');
+	}	
+
+	function test_str_contains_2() {
+		$this->assert_str_contains('xyz','a');	
+	}
+}
+
+// Expected results
+$_tmp = array('test_str_contains_1' => array('name'=>'test_str_contains_1',
+											'result'=>'true'),
+														
+					'test_str_contains_2' => array('name'=>'test_str_contains_2',
+											'result'=>'false',
+											'message'=>'failed:xyz does not contain a'));
+$expected_results = __get_expected_results($_tmp);
+
+// Run test
+$tests = new test_str_contains;
+$tests->runner();
+$tests->get_results();
+
+__check_results('test_str_contains',$tests,$expected_results);
+
+
+// -----------------------------------------------------------
+// Test array_equals 
+// -----------------------------------------------------------
+class test_array_equal extends utils_test {
+	
+	public $a1 = array(1,2,3,4);
+	public $a2 = array(2,3,4);
+	public $a3 = array(1,2,3,5);
+	
+	function test_array_equal_1() {
+		$this->assert_array_equal($this->a1,$this->a1);
+	}	
+	
+	function test_array_equal_2() {
+		$this->assert_array_equal($this->a1,$this->a2);
+	}	
+
+	function test_array_equal_3() {
+		$this->assert_array_equal($this->a1,$this->a3);
+	}
+
+}
+
+// Expected results
+$_tmp = array('test_array_equal_1' => array('name'=>'test_array_equal_1',
+											'result'=>'true'),
+																							
+					'test_array_equal_2' => array('name'=>'test_array_equal_2',
+											'result'=>'false',
+											'message'=>'failed:4 len != 3 len'),
+											
+					'test_array_equal_3' => array('name'=>'test_array_equal_3',
+											'result'=>'false',
+											'message'=>'failed:[3]=>4 != [3]=>5'));
+
+$expected_results = __get_expected_results($_tmp);
+
+// Run test
+$tests = new test_array_equal;
+$tests->runner();
+$tests->get_results();
+
+__check_results('test_array_equal',$tests,$expected_results);
+
+// -----------------------------------------------------------
+// Test raises exception 
+// -----------------------------------------------------------
+class test_raises extends utils_test {
+	
+	function test_raises_1() {
+		$this->assert_raises(raise_ex,"Exception");
+	}	
+	
+	function test_raises_2() {
+		$this->assert_raises($this->a1,$this->a2);
+	}	
+	
+	function raise_ex() {
+		throw new Exception();
+	}
+}
+
+// Expected results
+$_tmp = array('test_raises_1' => array('name'=>'test_raises_1',
+											'result'=>'true'),
+																							
+					'test_raises_2' => array('name'=>'test_raises_2',
+											'result'=>'false',
+											'message'=>'failed:4 len != 3 len'));
+
+$expected_results = __get_expected_results($_tmp);
+
+// Run test
+$tests = new test_array_equal;
+$tests->runner();
+$tests->get_results();
+
+__check_results('test_array_equal',$tests,$expected_results);
 ?>
