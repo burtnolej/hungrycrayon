@@ -20,3 +20,7 @@ function is_printable($element) {
 	}
 	return false;
 }
+
+function boolstr($bool_val) {
+	return($bool_val ? 'true' : 'false');
+}
