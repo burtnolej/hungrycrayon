@@ -97,117 +97,13 @@ XML;
 				
 
 // ------------------------------------------------------------------
-// search tests -----------------------------------------------------
 // ------------------------------------------------------------------
 
-include '../utils/utils_xml.php';
-include '../utils/utils_error.php';
-include '../utils/utils_test.php';
+include_once '../utils/utils_xml.php';
+include_once '../utils/utils_error.php';
+include_once '../utils/utils_test.php';
 
-function test_search($utilsxml) {
-	$expected_label = 'thelowermiddle-sibling1';
-	$test="search tree for specific item - new style";
-	
-	$result_bool = false;
-	$result_str="";
-	
-	$item = $utilsxml->get_item(4);
-	
-	assert_strs_equal($item->label,$expected_label,$result_bool,$result_str);
-	output_results($result_bool,$result_str,$test);
-}
 
-function test_search_int_as_string($utilsxml) {
-	$test="search tree for specific item - int as a string";
-	$expected_label = 'thelowermiddle-sibling1';
-	
-	$result_bool = false;
-	$result_str="";
-	
-	$item = $utilsxml->get_item('4');
-	
-	assert_strs_equal($item->label,$expected_label,$result_bool,$result_str);
-	output_results($result_bool,$result_str,$test);
-}
-
-function test_search_string($utilsxml) {
-	$test="search tree for specific item - string";
-	$expected_label = 'foobar-sibling';
-
-	$result_bool = false;
-	$result_str="";
-	
-	$item = $utilsxml->get_item('foobar');
-	
-	assert_strs_equal($item->label,$expected_label,$result_bool,$result_str);
-	output_results($result_bool,$result_str,$test);
-}
-
-function test_search_top_item($utilsxml) {
-	$test="search tree for top item";
-	$expected_label = 'theuppermiddle';
-	
-	$result_bool = false;
-	$result_str="";
-	
-	$item = $utilsxml->get_item(2);
-	
-	assert_strs_equal($item->label,$expected_label,$result_bool,$result_str);
-	output_results($result_bool,$result_str,$test);
-}
-
-// ------------------------------------------------------------------
-// parent tests -----------------------------------------------------
-// ------------------------------------------------------------------
-
-function test_parent($utilsxml) {
-	$test="get label of parent node";
-	$expected_label = 'thelowermiddle';
-
-	$result_bool = false;
-	$result_str="";
-	
-	$item = $utilsxml->get_item(31);
-	$parent_label = $utilsxml->get_parent($item)->label;
-	
-	assert_strs_equal($parent_label,$expected_label,$result_bool,$result_str);
-	output_results($result_bool,$result_str,$test);
-}
-
-function test_parent_bad_arg($utilsxml) {
-	$test="get label of parent node - bad arg";
-	$expected_results = "parameter must be as instance of SimpleXMLElement";
-
-	$result_bool = false;
-	$result_str="";
-	
-	try {
-		$parent_label = $utilsxml->get_parent(31)->label;
-	} catch (Exception $e) {
-		assert_str_contains($expected_results,$e->getMessage(),
-										$result_bool,$result_str);
-	}
-	
-	output_results($result_bool,$result_str,$test);
-}
-
-// ------------------------------------------------------------------
-// item details tests -----------------------------------------------
-// ------------------------------------------------------------------
-
-function test_item_details($utilsxml) {
-	$test="get all details of node";
-	$expected_results = array('tag' => 'foobar','label'=>'thelowermiddle');
-	
-	$result_bool = false;
-	$result_str="";
-	
-	$item = $utilsxml->get_item(31);
-	$details = $utilsxml->get_item_details($item,array('tag'),array('label'));
-	
-	assert_arrays_equal($details,$expected_results,$result_bool,$result_str);
-	output_results($result_bool,$result_str,$test);	
-}
 
 // ------------------------------------------------------------------
 // item depth tests -------------------------------------------------
@@ -380,39 +276,131 @@ function test_children_no_child() {
 // item tests -------------------------------------------------------
 // ------------------------------------------------------------------
 
-function test_item($utilsxml) {
-	$test="get item";
-	$expected_result = true;
 
-	$result_bool = false;
-	$result_str="";
-														
-	$item = $utilsxml->get_item(5111);
+class test_item extends utils_test {
 	
-	//if (!is_SimpleXMLElement($item) == true) {	}
+	function __construct() {
+		global $utilsxml;
+		$this->utilsxml = $utilsxml;
+	}
 	
-	//print_r($item);	
-	assert_true($expected_result,$utilsxml->is_SimpleXMLElement($item),
-							$result_bool,$result_str);
-	output_results($result_bool,$result_str,$test);	
+	function test_item_1() {
+		$this->assert_true($this->utilsxml->get_item(5111));
+	}
+	
+	// search tests -----------------------------------------------------
+	function test_search() {
+		//search tree for specific item - new style
+		$expected_label = 'thelowermiddle-sibling1';
+		
+		$item = $this->utilsxml->get_item(4);
+		$this->assert_equal($item->label,$expected_label);
+	}
+	
+	function test_search_int_as_string() {
+		//search tree for specific item - int as a string
+		$expected_label = 'thelowermiddle-sibling1';
+		
+		$item = $this->utilsxml->get_item('4');
+		$this->assert_equal($item->label,$expected_label);
+	}
+	
+	function test_search_string() {
+		//search tree for specific item - string
+		$expected_label = 'foobar-sibling';
+	
+		$item = $this->utilsxml->get_item('foobar');
+		$this->assert_equal($item->label,$expected_label);
+	}
+	
+	function test_search_top_item() {
+		//search tree for top item
+		$expected_label = 'theuppermiddle';
+
+		$item = $this->utilsxml->get_item(2);
+		$this->assert_equal($item->label,$expected_label);
+	}
+	
+	// parent tests -----------------------------------------------------
+	function test_parent() {
+		//get label of parent node
+		$expected_label = 'thelowermiddle';
+
+		$item = $this->utilsxml->get_item(31);
+		$parent_label = $this->utilsxml->get_parent($item)->label;
+		
+		$this->assert_equal($parent_label,$expected_label);
+	}
+
+	function test_parent_bad_arg() {
+			//get label of parent node - bad arg
+			$expected_results = "parameter must be an instance of SimpleXMLElement";
+	
+			//try{
+			//$this->utilsxml->get_parent(31)->label;
+			//}
+			//catch (Exception $e) {
+			//	echo "caught";
+
+			//$this->assert_raises('$utilsxml->get_parent(31)->label','Exception',
+			//$expected_results);
+			
+			$this->assert_raises($utilsxml,'get_parent(31)','Exception',
+			$expected_results);
+	
+		
+		
+			//$this->assert_raises($this->utilsxml->get_parent(31)->label,'Exception',
+			//$expected_results);
+			//}
+					
+		//try {
+		//	$parent_label = $utilsxml->get_parent(31)->label;
+		//} catch (Exception $e) {
+		//	assert_str_contains($expected_results,$e->getMessage(),
+		//									$result_bool,$result_str);
+		//}
+		
+		//output_results($result_bool,$result_str,$test);
+	}
+
+	// item details tests -----------------------------------------------
+	
+	function test_item_details() {
+		//get all details of node
+		$expected_results = array('tag' => 'foobar','label'=>'thelowermiddle');
+		
+		$item = $this->utilsxml->get_item(31);
+		$details = $this->utilsxml->get_item_details($item,array('tag'),array('label'));
+		
+		$this->assert_array_equal($details,$expected_results);
+	}
+
 }
-
 // ------------------------------------------------------------------
 // main -------------------------------------------------------------
 // ------------------------------------------------------------------
 
-$utilsxml = simplexml_load_string($xmlstr, 'UtilsXML');
+set_error_handler('\\UtilsError::error_handler');
+
+$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');		
 $utilsxml->configure('menuitemid',1,'menuitem','menuitemid');
 
-$e = new UtilsError();
+// Run test
+$tests = new test_item;
+$tests->runner();
+$tests->print_results();
 
-set_error_handler('\\UtilsError::error_handler');
+
+//$e = new UtilsError();
+
+
 
 /*test_item_depth($utilsxml);
 test_item_depth_root($utilsxml);*/
 
-test_item($utilsxml);
-test_get_sibling_details_arg1_int($utilsxml);
+//test_item($utilsxml);
+/*test_get_sibling_details_arg1_int($utilsxml);
 test_get_sibling_details_arg2_int($utilsxml);
 test_get_sibling_details($utilsxml);
 test_get_children_details($utilsxml);
@@ -423,6 +411,6 @@ test_parent_bad_arg($utilsxml);
 test_search($utilsxml);
 test_search_int_as_string($utilsxml);
 test_search_string($utilsxml);
-test_search_top_item($utilsxml);
+test_search_top_item($utilsxml);*/
 
 ?>

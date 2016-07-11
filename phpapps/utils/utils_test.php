@@ -2,7 +2,9 @@
 
 //error_reporting(E_STRICT);
 
-include "utils_utils.php";
+include_once "utils_utils.php";
+
+set_error_handler('\\UtilsError::error_handler');
 
 class utils_test {
 
@@ -145,12 +147,17 @@ class utils_test {
 		}
 	}
 	
-	function assert_raises($func,$exception_cls_name='Exception',$msg_contains=null) {
+	function assert_raises($obj,$func,$exception_cls_name='Exception',$msg_contains=null) {
+	//function assert_raises($func,$exception_cls_name='Exception',$msg_contains=null) {
 		$test = utils_test::$current_test;
 		$test->result = boolstr(false);
 	
 		try  {
-				call_user_func(array($this,$func));
+				call_user_func_array(array($moc,'printme'),array(3));
+			
+				//call_user_func(array($this,$func));
+				call_user_func(array($obj,$func));
+
 			   $test->result = boolstr(false);
 				$test->message = sprintf("failed:%s not raised",$exception_cls_name);
 		}

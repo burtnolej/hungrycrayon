@@ -17,7 +17,7 @@
 
 //include 'utils.php';
 
-class UtilsXML extends SimpleXMLElement {
+class utils_xml extends SimpleXMLElement {
 
 	function configure($root_tag, $root_tag_val,
 								$xpath_node,$path_node_id) {

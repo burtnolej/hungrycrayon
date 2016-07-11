@@ -196,11 +196,15 @@ __check_results('test_array_equal',$tests,$expected_results);
 class test_raises extends utils_test {
 	
 	function test_raises_1() {
-		$this->assert_raises(raise_ex);
+		//$this->assert_raises(raise_ex);
+		$this->assert_raises($this,raise_ex);
+
 	}	
 
 	function test_raises_2() {
-		$this->assert_raises(do_nothing);
+		//$this->assert_raises($this,do_nothing);
+		$this->assert_raises($this,do_nothing);
+
 	}	
 	
 	function raise_ex() {
@@ -236,11 +240,15 @@ __check_results('test_raises',$tests,$expected_results);
 class test_raise_contains extends utils_test {
 	
 	function test_raise_contains_1() {
-		$this->assert_raises(raise_ex,'Exception','foobar');
+		//$this->assert_raises(raise_ex,'Exception','foobar');
+		$this->assert_raises($this,raise_ex,'Exception','foobar');
+
 	}	
 
 	function test_raise_contains_2() {
-		$this->assert_raises(raise_ex,'Exception','blahblah');
+		//$this->assert_raises(raise_ex,'Exception','blahblah');
+		$this->assert_raises($this,raise_ex,'Exception','blahblah');
+
 	}	
 	
 	function raise_ex() {

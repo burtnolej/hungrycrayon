@@ -1,5 +1,6 @@
 <?php
 
+/*
 class BaseClass
 {
 	function __construct()
@@ -54,3 +55,25 @@ call_user_func("print_power",12,4);
 //$mnl = new Mineral("calcium",array("milk"=>"10mg/8oz"),15);
 //$mnl->dump();
 ?>
+
+*/
+
+class MyClass {
+	
+	function runner() {
+		foreach (get_class_methods(get_class($this)) as $func) {
+			echo $func.PHP_EOL;
+		}
+	}	
+}
+
+
+class MyDerivedClass extends MyClass {
+
+	function amethod() {
+	}
+}
+
+$mdc = new MyDerivedClass;
+$mdc->runner();
+

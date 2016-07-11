@@ -1,7 +1,7 @@
 
 <?php
 
-include 'utils_utils.php';
+include_once 'utils_utils.php';
 
 class UtilsError {
 
@@ -61,7 +61,7 @@ class UtilsError {
 			throw new Exception("parameter must be array");
 		}
 		elseif (strpos($errstr,'must be an instance of SimpleXMLElement') == true) {
-			throw new Exception("parameter must be as instance of SimpleXMLElement");
+			throw new Exception("parameter must be an instance of SimpleXMLElement");
 		}
 		else {
 			//echo $errstr.PHP_EOL.PHP_EOL;
