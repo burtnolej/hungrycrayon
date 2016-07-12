@@ -7,9 +7,12 @@ BASENAME=`basename "$0"`
 LOCKFILE="."$BASENAME".lock"
 RUNDATE=`date +"%m%d%y-%H%M%S"`
 LOGFILE=$BASENAME.$RUNDATE
-TESTBASE=/home/burtnolej/Development/pythonapps3/scripts/backup/backup-test-dir
+ROOTDIR=/home/burtnolej/Development/pythonapps3/scripts/backup
+TESTBASE=$ROOTDIR/backup-test-dir
 TESTRESULT=/tmp/$BASENAME.testresult
+BACKUP=delta
 MODE=$1
+LOGDIR=$ROOTDIR/logs
 
 # remove lock
 if [ "$1" = "removelock" ]; then
@@ -30,11 +33,18 @@ fi
 if [ "$MODE" = "test" ]; then
 	SOURCE=$TESTBASE/source/
 	TARGET=$TESTBASE/backup
-	BACKUP=./delta
-	echo $RUNDATE > $SOURCE/foobar1 # change a file so delta exists to backup
-	touch $SOURCE/foobar2 # touch a file so delta exists
+
+	# make changes to source to test rsync picks up everything 
+	touch $SOURCE/$RUNDATE # add a new file
+	echo $RUNDATE >> $SOURCE/foobar1 # change existing file
+	touch $SOURCE/foobar2 # change timestamp only
+        # setfattr 
 
 	EXPTESTRESULT=$TESTBASE/filelist
+	echo $RUNDATE >> $EXPTESTRESULT
+	sort $EXPTESTRESULT > /tmp/tmp
+	mv /tmp/tmp $EXPTESTRESULT
+
 	SUCCESSTEST="Files "$EXPTESTRESULT" and "$TESTRESULT" are identical"
 
 	EXCLUDE=( "foobar4" "foobar5" )
@@ -45,14 +55,30 @@ if [ "$MODE" = "test" ]; then
 
 fi
 
-EXEC="rsync -r -backup --backup-dir="$BACKUP/$RUNDATE" "$SOURCE" "$TARGET" --links --times -xattr --log-file="$LOGFILE
+EXEC="rsync -rv -backup --backup-dir=./"$BACKUP/$RUNDATE" "$SOURCE" "$TARGET" --links --times -xattr --log-file="$LOGDIR/$LOGFILE" "$EXCLUDEFLAG
 `$EXEC`
 
-echo $EXEC >> $LOGFILE # log the command that was run
+echo $EXEC >> $LOGDIR/$LOGFILE # log the command that was run
+
+# if no changes to existing files are present; delete the dir created in delta
+
+#awk '{split($0,a," "); print a[1]}'`
+
+#need a test if dir gets deleted - if delta file has 1 more line than orig file and if updated timestamp is done
+
+
+# check if any updated files (stored in delta dir)
+NUMDELTA=`ls $TARGET/$BACKUP/$RUNDATE | wc -l` 
+
+# if delta empty then delete
+if [ "$NUMDELTA" -eq 0 ];  then
+	echo $BACKUP/$RUNDATE" is empty so removing"
+	rmdir $TARGET/$BACKUP/$RUNDATE
+fi
 
 # check results
-if [ "$2" = "checktest" ]; then
-	`ls $TARGET > $TESTRESULT`
+if [ "$1" = "test" ]; then
+	`ls $TARGET | sort  > $TESTRESULT`
 
 	DIFFRESULT=`diff -s $EXPTESTRESULT $TESTRESULT`
 	
@@ -65,4 +91,4 @@ fi
 
 rm $LOCKFILE
 
-tail -n 3 $LOGFILE
+tail -n 3 $LOGDIR/$LOGFILE
