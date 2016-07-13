@@ -58,6 +58,10 @@ fi
 EXEC="rsync -rv -backup --backup-dir=./"$BACKUP/$RUNDATE" "$SOURCE" "$TARGET" --links --times -xattr --log-file="$LOGDIR/$LOGFILE" "$EXCLUDEFLAG
 `$EXEC`
 
+rm $LOGDIR/CURRENT
+
+ln -s $LOGFILE $LOGDIR/CURRENT
+ 
 echo $EXEC >> $LOGDIR/$LOGFILE # log the command that was run
 
 # if no changes to existing files are present; delete the dir created in delta
