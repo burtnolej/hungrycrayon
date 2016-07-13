@@ -28,6 +28,27 @@ else
 	touch $LOCKFILE
 fi
 
+# reset test directories
+
+if [ "$1" = "reset" ]; then
+
+	rm -rf $TESTBASE/backup
+	cp $TESTBASE/filelist.orig $TESTBASE/filelist
+	rm -rf $TESTBASE/source
+	cp -r $TESTBASE/source.orig $TESTBASE/source
+
+	# archive logs
+	if [ ! -f $LOGIDIR/RUNDATE ]; then
+		mkdir $LOGDIR/$RUNDATE
+	fi
+
+	mv $LOGDIR/backup.sh.* $LOGDIR/$RUNDATE
+	
+	# remove lock
+	rm $LOCKFILE
+	exit
+fi
+
 # if test passed then update SOURCE and TARGET
 
 if [ "$MODE" = "test" ]; then
