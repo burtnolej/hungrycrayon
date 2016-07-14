@@ -1,27 +1,70 @@
 #!/bin/bash
 
 function spacepad {
-        fullpad=$(printf '%0.1s' "-"{1..60})
-        strlen=${#1}
-        padlen=${#fullpad}-$2+$strlen
+
+	# passed args
+	element=$1
+	length=$2
+	padchar=$4
+	just=$3
+
+while [ $i -lt "$lenpad" ]
+do
+        i=$[$i+1]
+        padstr=$padchar$padstr
+done
+
+	fullpad=$(printf '%0.1s' "$padchar"{1..60})
+
+	if [ $padchar = 'x' ]; then
+		echo 
+
+	# create a log string of pad elements
+        padlen=${#fullpad}-$length+${#element}
         pad=${fullpad:$padlen}
-        padresult=$padresult$pad$1
+
+	# return padded string back to caller
+        if [ $just = "left" ]; then
+		echo $pad$1
+	else
+		echo $1$pad
+	fi
 }
 
 function writelog {
 
-	base=`basename "$0"`
-	spacepad $base $2
-	
-	rundate=`date +"%m-%d-%y"`
-	spacepad $rundate $2
+	# passed args
+	content=$1
+	length=$2
+	padchar=$3
+	just=$4
+	metalength=11
 
-	runtime=`date +"%H:%M:%S"`
-	spacepad $runtime $2
+	# init
+	padresult=""
 
-	spacepad $1 $2
+	# get meta data for log
+	base=`basename "$0"` # caller script name
+	rundate=`date +"%m-%d-%y"` #date
+	runtime=`date +"%H:%M:%S"` #time
 
+	# create list of all metadataitems to output
+	metalist=( $base $rundate $runtime )
+
+	# iterate and pad each element with default padlen
+	for meta in "${metalist[@]}"
+	do
+		padresult=$padresult$(spacepad $meta $metalength $just $padchar)
+        	
+	done
+
+	# pad content with user def len
+	padresult=$padresult$(spacepad $content $length $just $padchar)
+
+	# put on stdout
 	echo $padresult
 }
 
-writelog "foobar" 11
+writelog "foobar" 20 "_" "left"
+writelog "foobar" 40 "-" "right"
+writelog "foobar" 40 " " "right"
