@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 SOURCE=/usr
 TARGET=/media/backup/test
 PATH=$PATH:/bin:/usr/bin
@@ -55,11 +56,22 @@ if [ "$MODE" = "test" ]; then
 	SOURCE=$TESTBASE/source/
 	TARGET=$TESTBASE/backup
 
+	# --------------------------------------------------------
 	# make changes to source to test rsync picks up everything 
-	touch $SOURCE/$RUNDATE # add a new file
-	echo $RUNDATE >> $SOURCE/foobar1 # change existing file
+	# --------------------------------------------------------
+
+	# add a new file
+	touch $SOURCE/$RUNDATE
+
+	# change existing file
+	cp $SOURCE/foobar1 /tmp/foobar1 # make a copy of orig for comparing purposes
+	echo $RUNDATE >> $SOURCE/foobar1 # make a change
+
+	# timestamp only
 	touch $SOURCE/foobar2 # change timestamp only
-        # setfattr 
+
+	# change an attribute
+	setfattr -n user.foobar -v $RUNDATE $SOURCE/foobar3
 
 	EXPTESTRESULT=$TESTBASE/filelist
 	echo $RUNDATE >> $EXPTESTRESULT
@@ -68,6 +80,9 @@ if [ "$MODE" = "test" ]; then
 
 	SUCCESSTEST="Files "$EXPTESTRESULT" and "$TESTRESULT" are identical"
 
+	# --------------------------------------------------------
+	# create a list of files to exclude
+	# --------------------------------------------------------
 	EXCLUDE=( "foobar4" "foobar5" )
 	for i in "${EXCLUDE[@]}"
 	do	
@@ -76,7 +91,7 @@ if [ "$MODE" = "test" ]; then
 
 fi
 
-EXEC="rsync -rv -backup --backup-dir=./"$BACKUP/$RUNDATE" "$SOURCE" "$TARGET" --links --times -xattr --log-file="$LOGDIR/$LOGFILE" "$EXCLUDEFLAG
+EXEC="rsync -rv -backup --backup-dir=./"$BACKUP/$RUNDATE" "$SOURCE" "$TARGET" --links --times --xattrs --log-file="$LOGDIR/$LOGFILE" "$EXCLUDEFLAG
 `$EXEC`
 
 rm $LOGDIR/CURRENT
@@ -103,15 +118,35 @@ fi
 
 # check results
 if [ "$1" = "test" ]; then
+
+	# --------------------------------------------------------
+	# assert results are correct
+	# --------------------------------------------------------
+
+	# check that the new files have been rsynced
 	`ls $TARGET | sort  > $TESTRESULT`
 
 	DIFFRESULT=`diff -s $EXPTESTRESULT $TESTRESULT`
 	
 	if [ "$DIFFRESULT" = "$SUCCESSTEST" ]; then
-		echo "SUCCESS"
+		echo "SUCCESS:NEW"
 	else
-		echo "FAILURE - checkout "$TESTRESULT
+		echo "FAILURE:NEW - checkout "$TESTRESULT
 	fi
+
+	# check that the attribute update has been preserved
+	ATTRVAL=`getfattr --name=user.foobar --only-values "$TARGET"/foobar3`
+
+	if [ $ATTRVAL = $RUNDATE ]; then
+		echo "SUCCESS:ATTR"
+	else
+		echo "FAILURE:ATTR - checkout "$TESTRESULT
+	fi
+
+	# check that the updated file has been synced
+
+
+	# check that the prev version is in the delta directory
 fi
 
 rm $LOCKFILE
