@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 SOURCE=/usr
 TARGET=/media/backup/test
 PATH=$PATH:/bin:/usr/bin
@@ -14,6 +13,82 @@ TESTRESULT=/tmp/$BASENAME.testresult
 BACKUP=delta
 MODE=$1
 LOGDIR=$ROOTDIR/logs
+PID=$BASHPID
+
+function spacepad {
+
+        # passed args
+        content=$1  # the string to pad
+        strlen=$2 # the length of the result str (len(pad)+len(content))
+        padchar=$4 # the char to pad with
+        just=$3 # left / right
+
+        # init working variables
+        padstr=""
+        i=0
+
+        # work out the size of pad needed
+        contentlen=${#content}
+        lenpad=$[$strlen-$contentlen]
+
+        # create a str of char=padchar x lenpad
+        while [ $i -lt "$lenpad" ]
+        do
+                i=$[$i+1]
+                padstr=$padstr$padchar
+        done
+
+        # apply justify instructions
+        if [ $just = "left" ]; then
+                echo $padstr$content
+        else
+                echo $content$padstr
+        fi
+}
+
+function writelog {
+
+        # passed args
+        content=$1 # the string to pad
+        strlen=$2 # the length of the result content str
+        padchar=$3 # the char to pad with
+        just=$4 # left/right
+	logfile=$5
+        metalength=8 # the target len of non content fields (like date)
+
+        # init
+        padresult=""
+
+        # get meta data for log
+        base=`basename "$0"` # caller script name
+        rundate=`date +"%Y/%m/%d"` #date
+        runtime=`date +"%H:%M:%S"` #time
+
+        # create list of all metadataitems to output
+        metalist=( "$rundate " "$runtime " "[$PID]" "($base)" )
+
+	IFS='%' # allows strings to be made of consecutive spaces
+        # iterate and pad each element with default padlen
+        for meta in "${metalist[@]}"
+        do
+                padresult=$padresult$(spacepad $meta $metalength $just $padchar)
+
+        done
+
+        # pad content with user def len
+        padresult=$padresult$(spacepad $content $strlen $just $padchar)
+
+	echo $logfile
+
+        # put on stdout
+        if [ -f $logfile ]; then
+		echo $padresult >> $logfile
+	else
+		echo $padresult
+	fi
+	
+	unset IFS
+}
 
 # remove lock
 if [ "$1" = "removelock" ]; then
@@ -91,14 +166,13 @@ if [ "$MODE" = "test" ]; then
 
 fi
 
-EXEC="rsync -rv -backup --backup-dir=./"$BACKUP/$RUNDATE" "$SOURCE" "$TARGET" --links --times --xattrs --log-file="$LOGDIR/$LOGFILE" "$EXCLUDEFLAG
+EXEC="rsync -rvv -backup --backup-dir=./"$BACKUP/$RUNDATE" "$SOURCE" "$TARGET" --links --times --xattrs --log-file="$LOGDIR/$LOGFILE" "$EXCLUDEFLAG
 `$EXEC`
 
 rm $LOGDIR/CURRENT
 
 ln -s $LOGFILE $LOGDIR/CURRENT
  
-echo $EXEC >> $LOGDIR/$LOGFILE # log the command that was run
 
 # if no changes to existing files are present; delete the dir created in delta
 
@@ -106,13 +180,12 @@ echo $EXEC >> $LOGDIR/$LOGFILE # log the command that was run
 
 #need a test if dir gets deleted - if delta file has 1 more line than orig file and if updated timestamp is done
 
-
 # check if any updated files (stored in delta dir)
 NUMDELTA=`ls $TARGET/$BACKUP/$RUNDATE | wc -l` 
 
 # if delta empty then delete
 if [ "$NUMDELTA" -eq 0 ];  then
-	echo $BACKUP/$RUNDATE" is empty so removing"
+	writelog $BACKUP/$RUNDATE" is empty so removing" 20 " " "right" $LOGDIR/$LOGFILE
 	rmdir $TARGET/$BACKUP/$RUNDATE
 fi
 
@@ -129,18 +202,18 @@ if [ "$1" = "test" ]; then
 	DIFFRESULT=`diff -s $EXPTESTRESULT $TESTRESULT`
 	
 	if [ "$DIFFRESULT" = "$SUCCESSTEST" ]; then
-		echo "SUCCESS:NEW"
+		writelog "SUCCESS:NEW" 20 " " "right" $LOGDIR/$LOGFILE
 	else
-		echo "FAILURE:NEW - checkout "$TESTRESULT
+		writelog "FAILURE:NEW - checkout "$TESTRESULT 20 " " "right" $LOGDIR/$LOGFILE
 	fi
 
 	# check that the attribute update has been preserved
 	ATTRVAL=`getfattr --name=user.foobar --only-values "$TARGET"/foobar3`
 
 	if [ $ATTRVAL = $RUNDATE ]; then
-		echo "SUCCESS:ATTR"
+		writelog "SUCCESS:ATTR" 20 " " "right" $LOGDIR/$LOGFILE
 	else
-		echo "FAILURE:ATTR - checkout "$TESTRESULT
+		writelog "FAILURE:ATTR - checkout "$TESTRESULT 20 " " "right" $LOGDIR/$LOGFILE
 	fi
 
 	# check that the updated file has been synced
@@ -149,6 +222,5 @@ if [ "$1" = "test" ]; then
 	# check that the prev version is in the delta directory
 fi
 
+echo -e "\n\n"$EXEC >> $LOGDIR/$LOGFILE # log the command that was run
 rm $LOCKFILE
-
-tail -n 3 $LOGDIR/$LOGFILE
