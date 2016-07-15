@@ -3,42 +3,42 @@
 function spacepad {
 
 	# passed args
-	element=$1
-	length=$2
-	padchar=$4
-	just=$3
+	content=$1  # the string to pad
+	strlen=$2 # the length of the result str (len(pad)+len(content))
+	padchar=$4 # the char to pad with
+	just=$3 # left / right
 
-while [ $i -lt "$lenpad" ]
-do
-        i=$[$i+1]
-        padstr=$padchar$padstr
-done
+	# init working variables
+	padstr=""
+	i=0
 
-	fullpad=$(printf '%0.1s' "$padchar"{1..60})
+	# work out the size of pad needed
+	contentlen=${#content}
+	lenpad=$[$strlen-$contentlen]
 
-	if [ $padchar = 'x' ]; then
-		echo 
-
-	# create a log string of pad elements
-        padlen=${#fullpad}-$length+${#element}
-        pad=${fullpad:$padlen}
-
-	# return padded string back to caller
+	# create a str of char=padchar x lenpad
+	while [ $i -lt "$lenpad" ]
+	do
+        	i=$[$i+1]
+        	padstr=$padstr$padchar
+	done
+	
+	# apply justify instructions
         if [ $just = "left" ]; then
-		echo $pad$1
+		echo $padstr$content
 	else
-		echo $1$pad
+		echo $content$padstr
 	fi
 }
 
 function writelog {
 
 	# passed args
-	content=$1
-	length=$2
-	padchar=$3
-	just=$4
-	metalength=11
+	content=$1 # the string to pad
+	strlen=$2 # the length of the result content str 
+	padchar=$3 # the char to pad with
+	just=$4 # left/right
+	metalength=11 # the target len of non content fields (like date)
 
 	# init
 	padresult=""
@@ -51,6 +51,7 @@ function writelog {
 	# create list of all metadataitems to output
 	metalist=( $base $rundate $runtime )
 
+	IFS='%'
 	# iterate and pad each element with default padlen
 	for meta in "${metalist[@]}"
 	do
@@ -59,12 +60,14 @@ function writelog {
 	done
 
 	# pad content with user def len
-	padresult=$padresult$(spacepad $content $length $just $padchar)
+	padresult=$padresult$(spacepad $content $strlen $just $padchar)
 
 	# put on stdout
 	echo $padresult
+	unset IFS
 }
 
 writelog "foobar" 20 "_" "left"
 writelog "foobar" 40 "-" "right"
 writelog "foobar" 40 " " "right"
+unset IFS

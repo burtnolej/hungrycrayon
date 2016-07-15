@@ -16,5 +16,7 @@ for l in "$list"
 do
 	echo "$l"
 done
-exit
 
+echo ${#list[@]}
+
+exit

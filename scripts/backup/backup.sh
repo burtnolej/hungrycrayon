@@ -1,19 +1,46 @@
 #!/bin/bash
 
-SOURCE=/usr
-TARGET=/media/backup/test
 PATH=$PATH:/bin:/usr/bin
-BASENAME=`basename "$0"`
-LOCKFILE="."$BASENAME".lock"
-RUNDATE=`date +"%m%d%y-%H%M%S"`
-LOGFILE=$BASENAME.$RUNDATE
-ROOTDIR=/home/burtnolej/Development/pythonapps3/scripts/backup
-TESTBASE=$ROOTDIR/backup-test-dir
-TESTRESULT=/tmp/$BASENAME.testresult
-BACKUP=delta
-MODE=$1
-LOGDIR=$ROOTDIR/logs
-PID=$BASHPID
+rootdir=/home/burtnolej/Development/pythonapps3/scripts/backup
+logdir=$rootdir/logs
+backup=delta
+
+target=/media/backup/test
+source=/usr
+exclude=( "/dev" "/proc" "/sys" ) # files to exclude
+
+basename=`basename "$0"`
+rundate=`date +"%m%d%y-%H%M%S"`
+
+logfile=$logdir/$basename.$rundate
+lockfile="."$basename".lock"
+
+pid=$BASHPID
+argarray=( "$@" )
+touch $logfile
+
+function argset {
+        arg=$1
+
+        numargs=${#argarray[@]}
+
+	writelog "[Args] numargs=$numargs detected" 20 " " "right" $logfile
+
+        i=0
+        while [ $i -lt "$numargs" ]
+        do
+
+                if [ ${argarray[$i]} = "$arg" ]; then
+                        i=$[$i+1]
+                        echo ${argarray[$i]}
+                        exit
+                fi
+                i=$[$i+2]
+
+        done
+
+        echo "notfound"
+}
 
 function spacepad {
 
@@ -61,11 +88,11 @@ function writelog {
 
         # get meta data for log
         base=`basename "$0"` # caller script name
-        rundate=`date +"%Y/%m/%d"` #date
-        runtime=`date +"%H:%M:%S"` #time
+        local rundate=`date +"%Y/%m/%d"` #date
+        local runtime=`date +"%H:%M:%S"` #time
 
         # create list of all metadataitems to output
-        metalist=( "$rundate " "$runtime " "[$PID]" "($base)" )
+        metalist=( "$rundate " "$runtime " "[$pid]" "[$base]" )
 
 	IFS='%' # allows strings to be made of consecutive spaces
         # iterate and pad each element with default padlen
@@ -78,10 +105,9 @@ function writelog {
         # pad content with user def len
         padresult=$padresult$(spacepad $content $strlen $just $padchar)
 
-	echo $logfile
-
         # put on stdout
         if [ -f $logfile ]; then
+		touch $logfile
 		echo $padresult >> $logfile
 	else
 		echo $padresult
@@ -90,130 +116,167 @@ function writelog {
 	unset IFS
 }
 
+function finishup {
+	rm $logdir/CURRENT
+
+	ln -s $logfile $logdir/CURRENT
+
+	# mail results
+	grep -v 'uptodate' $logdir/CURRENT | mail -s "log for backup:"$source burtnolejusa2@gmail.com
+
+	rm $lockfile
+
+	exit
+}
+
+mode=$(argset "--mode")
+reset=$(argset "--reset")
+
+if [ "$mode" = "notfound" ]; then
+	writelog "[Args] defaulting to mode=test" 20 " " "right" $logfile
+	mode="test"
+else
+	writelog "[Args] running with mode=$mode" 20 " " "right" $logfile
+fi
+
+if [ "$reset" = "notfound" ]; then
+	writelog "[Args] defaulting to reset=false" 20 " " "right" $logfile
+	reset="false"
+else
+	writelog "[Args] reset=$reset" 20 " " "right" $logfile
+fi
+
+if [ "$mode" = "test" ]; then
+	target=$rootdir/backup
+	source=$rootdir/source/
+	exclude=( "foobar4" "foobar5" ) # files to exclude
+fi
+
 # remove lock
 if [ "$1" = "removelock" ]; then
-	rm $LOCKFILE
-	MODE=$2
+	rm $lockfile
+	mode=$2
 fi
 
 # check if lock exists and create if doesnt
-if [ -f $LOCKFILE ]; then
-	echo $LOCKFILE" exists - check process is not already running"
+if [ -f $lockfile ]; then
+	echo $lockfile" exists - check process is not already running"
 	exit
 else
-	touch $LOCKFILE
+	touch $lockfile
 fi
 
 # reset test directories
 
-if [ "$1" = "reset" ]; then
+if [ "$reset" = "true" ]; then
 
-	rm -rf $TESTBASE/backup
-	cp $TESTBASE/filelist.orig $TESTBASE/filelist
-	rm -rf $TESTBASE/source
-	cp -r $TESTBASE/source.orig $TESTBASE/source
-
-	# archive logs
-	if [ ! -f $LOGIDIR/RUNDATE ]; then
-		mkdir $LOGDIR/$RUNDATE
+	if [ "$mode" = "test" ]; then
+		writelog "[reset] resetting $source & $target" 20 " " "right" $logfile
+		cp $rootdir/filelist.orig $rootdir/filelist
+		rm -rf $source
+		cp -r $rootdir/source.orig $source
+		rm -rf $target
+	else
+		writelog "[reset] resetting $target" 20 " " "right" $logfile
+		rm -rf $target
 	fi
 
-	mv $LOGDIR/backup.sh.* $LOGDIR/$RUNDATE
+	# archive logs
+	if [ ! -f $logdir/rundate ]; then
+		mkdir $logdir/$rundate
+	fi
+
+	mv $logdir/backup.sh.* $logdir/$rundate
 	
 	# remove lock
-	rm $LOCKFILE
-	exit
+	rm $lockfile
+	finishup	
 fi
 
-# if test passed then update SOURCE and TARGET
+# if test passed then update source and target
 
-if [ "$MODE" = "test" ]; then
-	SOURCE=$TESTBASE/source/
-	TARGET=$TESTBASE/backup
+if [ "$mode" = "test" ]; then
 
 	# --------------------------------------------------------
 	# make changes to source to test rsync picks up everything 
 	# --------------------------------------------------------
 
 	# add a new file
-	touch $SOURCE/$RUNDATE
+	touch $source/$rundate
 
 	# change existing file
-	cp $SOURCE/foobar1 /tmp/foobar1 # make a copy of orig for comparing purposes
-	echo $RUNDATE >> $SOURCE/foobar1 # make a change
+	cp $source/foobar1 /tmp/foobar1 # make a copy of orig for comparing purposes
+	echo $rundate >> $source/foobar1 # make a change
 
 	# timestamp only
-	touch $SOURCE/foobar2 # change timestamp only
+	touch $source/foobar2 # change timestamp only
 
 	# change an attribute
-	setfattr -n user.foobar -v $RUNDATE $SOURCE/foobar3
+	setfattr -n user.foobar -v $rundate $source/foobar3
 
-	EXPTESTRESULT=$TESTBASE/filelist
-	echo $RUNDATE >> $EXPTESTRESULT
-	sort $EXPTESTRESULT > /tmp/tmp
-	mv /tmp/tmp $EXPTESTRESULT
-
-	SUCCESSTEST="Files "$EXPTESTRESULT" and "$TESTRESULT" are identical"
-
-	# --------------------------------------------------------
-	# create a list of files to exclude
-	# --------------------------------------------------------
-	EXCLUDE=( "foobar4" "foobar5" )
-	for i in "${EXCLUDE[@]}"
-	do	
-        	EXCLUDEFLAG=$EXCLUDEFLAG" --exclude="$i
-	done
+	exptestresult=$rootdir/filelist
+	echo $rundate >> $exptestresult
+	sort $exptestresult > /tmp/tmp
+	mv /tmp/tmp $exptestresult
 
 fi
 
-EXEC="rsync -rvv -backup --backup-dir=./"$BACKUP/$RUNDATE" "$SOURCE" "$TARGET" --links --times --xattrs --log-file="$LOGDIR/$LOGFILE" "$EXCLUDEFLAG
-`$EXEC`
+# --------------------------------------------------------
+# create exclusion list
+# --------------------------------------------------------
+for i in "${exclude[@]}"
+do
+	excludeFLAG=$excludeFLAG" --exclude="$i
+done
+	
+writelog "Target="$target 20 " " "right" $logfile
+writelog "Source=$source" 20 " " "right" $logfile
+writelog "Exclude=$exclude" 20 " " "right" $logfile
 
-rm $LOGDIR/CURRENT
+exec="rsync -rvv -backup --backup-dir=./"$backup/$rundate" "$source" "$target" --links --times --xattrs --log-file="$logfile" "$excludeFLAG
+`$exec`
 
-ln -s $LOGFILE $LOGDIR/CURRENT
- 
-
-# if no changes to existing files are present; delete the dir created in delta
-
-#awk '{split($0,a," "); print a[1]}'`
-
-#need a test if dir gets deleted - if delta file has 1 more line than orig file and if updated timestamp is done
+writelog "Command=$exec" 20 " " "right" $logfile
 
 # check if any updated files (stored in delta dir)
-NUMDELTA=`ls $TARGET/$BACKUP/$RUNDATE | wc -l` 
+numdelta=`ls $target/$backup/$rundate | wc -l` 
 
 # if delta empty then delete
-if [ "$NUMDELTA" -eq 0 ];  then
-	writelog $BACKUP/$RUNDATE" is empty so removing" 20 " " "right" $LOGDIR/$LOGFILE
-	rmdir $TARGET/$BACKUP/$RUNDATE
+if [ "$numdelta" -eq 0 ];  then
+	writelog $backup/$rundate" is empty so removing" 20 " " "right" $logfile
+	rmdir $target/$backup/$rundate
 fi
 
 # check results
-if [ "$1" = "test" ]; then
+if [ "$mode" = "test" ]; then
 
 	# --------------------------------------------------------
 	# assert results are correct
 	# --------------------------------------------------------
 
-	# check that the new files have been rsynced
-	`ls $TARGET | sort  > $TESTRESULT`
+	testresult=/tmp/$basename.testresult
+	exptestresult=$rootdir/filelist
+	successtest="Files "$exptestresult" and "$testresult" are identical"
 
-	DIFFRESULT=`diff -s $EXPTESTRESULT $TESTRESULT`
+	# check that the new files have been rsynced
+	`ls $target | sort  > $testresult`
+
+	diffresult=`diff -s $exptestresult $testresult`
 	
-	if [ "$DIFFRESULT" = "$SUCCESSTEST" ]; then
-		writelog "SUCCESS:NEW" 20 " " "right" $LOGDIR/$LOGFILE
+	if [ "$diffresult" = "$successtest" ]; then
+		writelog "SUCCESS:NEW" 20 " " "right" $logfile
 	else
-		writelog "FAILURE:NEW - checkout "$TESTRESULT 20 " " "right" $LOGDIR/$LOGFILE
+		writelog "FAILURE:NEW - checkout "$testresult 20 " " "right" $logfile
+		echo "$successtest != $diffresult" >> $logfile
 	fi
 
 	# check that the attribute update has been preserved
-	ATTRVAL=`getfattr --name=user.foobar --only-values "$TARGET"/foobar3`
+	attrval=`getfattr --name=user.foobar --only-values "$target"/foobar3`
 
-	if [ $ATTRVAL = $RUNDATE ]; then
-		writelog "SUCCESS:ATTR" 20 " " "right" $LOGDIR/$LOGFILE
+	if [ $attrval = $rundate ]; then
+		writelog "SUCCESS:ATTR" 20 " " "right" $logfile
 	else
-		writelog "FAILURE:ATTR - checkout "$TESTRESULT 20 " " "right" $LOGDIR/$LOGFILE
+		writelog "FAILURE:ATTR - checkout "$testresult 20 " " "right" $logfile
 	fi
 
 	# check that the updated file has been synced
@@ -222,5 +285,7 @@ if [ "$1" = "test" ]; then
 	# check that the prev version is in the delta directory
 fi
 
-echo -e "\n\n"$EXEC >> $LOGDIR/$LOGFILE # log the command that was run
-rm $LOCKFILE
+# add backup dir sizes to logfile
+`cd $target;du -bm -all --max-depth=2 --human-readable .  >> $logfile`
+
+finishup
