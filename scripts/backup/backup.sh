@@ -8,9 +8,10 @@ backup=delta
 target=/media/backup/test
 source=/usr
 exclude=( "/dev" "/proc" "/sys" ) # files to exclude
-
+utils=/home/burtnolej/Development/pythonapps3/scripts/utils
 basename=`basename "$0"`
 rundate=`date +"%m%d%y-%H%M%S"`
+mailto=burtnolejusa2@gmail.com
 
 logfile=$logdir/$basename.$rundate
 lockfile="."$basename".lock"
@@ -19,132 +20,23 @@ pid=$BASHPID
 argarray=( "$@" )
 touch $logfile
 
-function argset {
-        arg=$1
-
-        numargs=${#argarray[@]}
-
-	writelog "[Args] numargs=$numargs detected" 20 " " "right" $logfile
-
-        i=0
-        while [ $i -lt "$numargs" ]
-        do
-
-                if [ ${argarray[$i]} = "$arg" ]; then
-                        i=$[$i+1]
-                        echo ${argarray[$i]}
-                        exit
-                fi
-                i=$[$i+2]
-
-        done
-
-        echo "notfound"
-}
-
-function spacepad {
-
-        # passed args
-        content=$1  # the string to pad
-        strlen=$2 # the length of the result str (len(pad)+len(content))
-        padchar=$4 # the char to pad with
-        just=$3 # left / right
-
-        # init working variables
-        padstr=""
-        i=0
-
-        # work out the size of pad needed
-        contentlen=${#content}
-        lenpad=$[$strlen-$contentlen]
-
-        # create a str of char=padchar x lenpad
-        while [ $i -lt "$lenpad" ]
-        do
-                i=$[$i+1]
-                padstr=$padstr$padchar
-        done
-
-        # apply justify instructions
-        if [ $just = "left" ]; then
-                echo $padstr$content
-        else
-                echo $content$padstr
-        fi
-}
-
-function writelog {
-
-        # passed args
-        content=$1 # the string to pad
-        strlen=$2 # the length of the result content str
-        padchar=$3 # the char to pad with
-        just=$4 # left/right
-	logfile=$5
-        metalength=8 # the target len of non content fields (like date)
-
-        # init
-        padresult=""
-
-        # get meta data for log
-        base=`basename "$0"` # caller script name
-        local rundate=`date +"%Y/%m/%d"` #date
-        local runtime=`date +"%H:%M:%S"` #time
-
-        # create list of all metadataitems to output
-        metalist=( "$rundate " "$runtime " "[$pid]" "[$base]" )
-
-	IFS='%' # allows strings to be made of consecutive spaces
-        # iterate and pad each element with default padlen
-        for meta in "${metalist[@]}"
-        do
-                padresult=$padresult$(spacepad $meta $metalength $just $padchar)
-
-        done
-
-        # pad content with user def len
-        padresult=$padresult$(spacepad $content $strlen $just $padchar)
-
-        # put on stdout
-        if [ -f $logfile ]; then
-		touch $logfile
-		echo $padresult >> $logfile
-	else
-		echo $padresult
-	fi
-	
-	unset IFS
-}
-
-function finishup {
-	rm $logdir/CURRENT
-
-	ln -s $logfile $logdir/CURRENT
-
-	# mail results
-	grep -v 'uptodate' $logdir/CURRENT | mail -s "log for backup:"$source burtnolejusa2@gmail.com
-
-	rm $lockfile
-
-	exit
-}
+. $utils/utils.sh
 
 mode=$(argset "--mode")
 reset=$(argset "--reset")
+source=$(argset "--source")
 
-if [ "$mode" = "notfound" ]; then
-	writelog "[Args] defaulting to mode=test" 20 " " "right" $logfile
-	mode="test"
-else
-	writelog "[Args] running with mode=$mode" 20 " " "right" $logfile
+if [ "$mode" = "notfound" ]; then mode="test"; fi
+
+if [ "$reset" = "notfound" ]; then reset="false"; fi
+
+if [ "$source" = "notfound" ]; then 
+	if [ ! "$mode" = "test" ]; then 
+		exit 
+	fi
 fi
 
-if [ "$reset" = "notfound" ]; then
-	writelog "[Args] defaulting to reset=false" 20 " " "right" $logfile
-	reset="false"
-else
-	writelog "[Args] reset=$reset" 20 " " "right" $logfile
-fi
+writelog "[args] mode=$mode reset=$reset" 20 " " "right" $logfile
 
 if [ "$mode" = "test" ]; then
 	target=$rootdir/backup
@@ -197,9 +89,7 @@ fi
 
 if [ "$mode" = "test" ]; then
 
-	# --------------------------------------------------------
 	# make changes to source to test rsync picks up everything 
-	# --------------------------------------------------------
 
 	# add a new file
 	touch $source/$rundate
@@ -221,22 +111,20 @@ if [ "$mode" = "test" ]; then
 
 fi
 
-# --------------------------------------------------------
 # create exclusion list
-# --------------------------------------------------------
 for i in "${exclude[@]}"
 do
 	excludeFLAG=$excludeFLAG" --exclude="$i
 done
 	
-writelog "Target="$target 20 " " "right" $logfile
-writelog "Source=$source" 20 " " "right" $logfile
-writelog "Exclude=$exclude" 20 " " "right" $logfile
+writelog "target="$target 20 " " "right" $logfile
+writelog "source=$source" 20 " " "right" $logfile
+writelog "exclude=$exclude" 20 " " "right" $logfile
 
 exec="rsync -rvv -backup --backup-dir=./"$backup/$rundate" "$source" "$target" --links --times --xattrs --log-file="$logfile" "$excludeFLAG
 `$exec`
 
-writelog "Command=$exec" 20 " " "right" $logfile
+writelog "command=$exec" 20 " " "right" $logfile
 
 # check if any updated files (stored in delta dir)
 numdelta=`ls $target/$backup/$rundate | wc -l` 
@@ -250,10 +138,6 @@ fi
 # check results
 if [ "$mode" = "test" ]; then
 
-	# --------------------------------------------------------
-	# assert results are correct
-	# --------------------------------------------------------
-
 	testresult=/tmp/$basename.testresult
 	exptestresult=$rootdir/filelist
 	successtest="Files "$exptestresult" and "$testresult" are identical"
@@ -264,9 +148,9 @@ if [ "$mode" = "test" ]; then
 	diffresult=`diff -s $exptestresult $testresult`
 	
 	if [ "$diffresult" = "$successtest" ]; then
-		writelog "SUCCESS:NEW" 20 " " "right" $logfile
+		writelog "test success:new" 20 " " "right" $logfile
 	else
-		writelog "FAILURE:NEW - checkout "$testresult 20 " " "right" $logfile
+		writelog "test failure:new - checkout "$testresult 20 " " "right" $logfile
 		echo "$successtest != $diffresult" >> $logfile
 	fi
 
@@ -274,9 +158,9 @@ if [ "$mode" = "test" ]; then
 	attrval=`getfattr --name=user.foobar --only-values "$target"/foobar3`
 
 	if [ $attrval = $rundate ]; then
-		writelog "SUCCESS:ATTR" 20 " " "right" $logfile
+		writelog "test success:attr" 20 " " "right" $logfile
 	else
-		writelog "FAILURE:ATTR - checkout "$testresult 20 " " "right" $logfile
+		writelog "test failure:attr - checkout "$testresult 20 " " "right" $logfile
 	fi
 
 	# check that the updated file has been synced
@@ -286,6 +170,6 @@ if [ "$mode" = "test" ]; then
 fi
 
 # add backup dir sizes to logfile
-`cd $target;du -bm -all --max-depth=2 --human-readable .  >> $logfile`
+`cd $target$source;du -bm -all --max-depth=2 --human-readable .  >> $logfile`
 
 finishup
