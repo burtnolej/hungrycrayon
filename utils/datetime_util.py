@@ -58,7 +58,18 @@ class MyDT(object):
         dt = datetime.now().replace(hour=0, minute=0, second=0,microsecond=0)
         return(cls(dt,tz_str,**kw))
 
+    def replace_time(self,hour,min,sec=0):
+        
+        '''mydt = MyDT.now('US/Eastern
+        mydt.replace_time(0,0,0)'''      
 
+        self.dt = self.dt.replace(hour=hour,minute=min,second=sec)
+        
+    def adddelta(self,days):
+        import datetime
+        delta = datetime.timedelta(days)
+        self.dt = self.dt + delta
+        
     def __init__(self,dt,tz_str='US/Eastern',**kw):
         [setattr(self,k,v) for k,v in kw.iteritems()]
 

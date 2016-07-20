@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+    <Database Name="schedulerdb">
+        <Table Name="calendar">
+           <Column Name="day">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
+           <Column Name="month">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+            </Column> 
+           <Column Name="year">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+            </Column> 
+             <Column Name="start_hour">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
+            <Column Name="start_minute">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
+            <Column Name="end_hour">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
+            <Column Name="end_minute">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
+            <Row Table="calendar">
+                <Field>
+                    <Key>start_hour</Key>
+                    <Value>9</Value>
+                </Field>
+               <Field>
+                    <Key>start_minute</Key>
+                    <Value>1</Value>
+                </Field>
+                <Field>
+                    <Key>end_hour</Key>
+                    <Value>10</Value>
+                </Field>
+                <Field>
+                    <Key>end_minute</Key>
+                    <Value>0</Value>
+                </Field>
+            </Row>
+            <Row Table="calendar">
+                <Field>
+                    <Key>start_hour</Key>
+                    <Value>10</Value>
+                </Field>
+               <Field>
+                    <Key>start_minute</Key>
+                    <Value>1</Value>
+                </Field>
+                <Field>
+                    <Key>end_hour</Key>
+                    <Value>11</Value>
+                </Field>
+                <Field>
+                    <Key>end_minute</Key>
+                    <Value>0</Value>
+                </Field>
+            </Row>
+        </Table>
+    </Database>
+</Root>

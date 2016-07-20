@@ -121,6 +121,11 @@ def db_add_table_simple_column(db_cursor,table,column_name,column_type):
 
 def db_insert_table_rows(db_cursor,table,keys,values):
     
+    ''' where values is of the format [[9, 1, 10, 0], [10, 1, 11, 0]]
+    and keys are of the format ['start_hour', 'start_minute', 'end_hour', 'end_minute']
+    '''
+    
+    
     key_str = ",".join(keys)
     if len(values)>1:
         _l=[]
@@ -246,6 +251,8 @@ def insert_rows_from_file(data_file,db_file):
         table_name = table.attrib[NAME_ATTRIB]  
         rows = get_xml_elements(data_file,".//Row",table)
         
+        row_list = []
+        
         for row in rows:
             
             key_list = []
@@ -269,9 +276,12 @@ def insert_rows_from_file(data_file,db_file):
                     field_val = field_attrs["Value"]
                     
                 value_list.append(field_val)
-                
-        
-            db_insert_table_rows(c, table_name,key_list,value_list)
+            
+            row_list.append(value_list)
+            
+        print row_list
+	print key_list
+	db_insert_table_rows(c, table_name,key_list,row_list)
 
 
     conn.commit()
