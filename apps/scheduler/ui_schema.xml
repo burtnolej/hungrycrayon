@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <panel id="panel1">
+        <label>scheduler</label>
+        <stack>vertical</stack>
+        <db></db>
+        <table></table>
+        <element id="input1">
+            <dbcolumnn>num_instances</dbcolumn>
+            <label># of instances</label>
+             <uitype>input</uitype>
+             <width>50</width>
+             <validation>
+                <min>1</min>
+                <max>100</max>
+                <type>int</type>
+            </validation>
+            <hint>number of times the event will occur</hint>
+         </element>
+        <element id="input2">
+            <label>frequency</label>
+             <uitype>input</uitype>
+             <width>50</width>
+             <validation>
+                <min>1</min>
+                <max>28</max>
+                <type>int</type>
+            </validation>
+             <hint>number of days between events</hint>
+         </element>
+       <element id="input3">
+            <label>duration</label>
+             <datatype>integer</datatype>
+             <uitype>input</uitype>
+             <width>50</width>
+         </element>
+       <element id="input4">
+            <label>hr_of_day</label>
+             <datatype>integer</datatype>
+             <uitype>input</uitype>
+             <width>50</width>
+         </element>
+       <element id="input5">
+            <label>min_of_hour</label>
+             <datatype>integer</datatype>
+             <uitype>input</uitype>
+             <width>50</width>
+         </element>
+       <element id="input6">
+            <label>day_of_month</label>
+             <datatype>integer</datatype>
+             <uitype>input</uitype>
+             <width>50</width>
+         </element>
+       <element id="input7">
+            <label>month_of_year</label>
+             <datatype>integer</datatype>
+             <uitype>input</uitype>
+             <width>50</width>
+         </element>
+        <element id="button1">
+             <label>insert</label>
+             <uitype>button</uitype>
+             <width>50</width>
+         </element>
+    </panel>
+</root>
