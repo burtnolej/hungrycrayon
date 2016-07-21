@@ -144,7 +144,6 @@ for rowid in range(0,column_header_cfg.rows*2,2):
 
 init_cells(grid_frame)
 
-info = colwid[0].grid_info()
 merge_cells(2,3,1)
 
 master.mainloop()
