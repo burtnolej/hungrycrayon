@@ -1,7 +1,4 @@
-import Tkinter as tk
-import tkFont
-
-master = tk.Tk()
+master,
 
 class generic:
     def __init__(self,**args):
@@ -32,15 +29,23 @@ origincfg=generic(bg=color.grey,
                num=1,
                font=font.ubuntumono14b,
                pic=label4,
+               side="top",
+               frameside="bottom",
+               framefill="y",
+               frameexpand=False,
                bd=0)
 
 xlabelcfg=generic(bg=color.black,
                fg=color.grey,
                width=6,
                height=3,
-               num=5,
+               num=20,
                font=font.ubuntumono14b,
                pic=label4,
+               side="left",
+               frameside="top",
+               framefill="x",
+               frameexpand=False,
                bd=0)
 
 ylabelcfg=generic(bg=color.black,
@@ -50,6 +55,10 @@ ylabelcfg=generic(bg=color.black,
                num=8,
                font=font.ubuntumono14b,
                pic=label4,
+               side="top",
+               frameside="left",
+               framefill="y",
+               frameexpand=False,
                bd=0)
 
 cellcfg=generic(bg=color.grey,
@@ -59,10 +68,14 @@ cellcfg=generic(bg=color.grey,
                num=16,
                font=font.ubuntumono14b,
                pic=label12,
+               side="bottom",
+               frameside="right",
+               framefill="both",
+               frameexpand=True,
                bd=0.5)
 
 
-def button(parent,config,scale,width=0,height=0):
+def cell(parent,config,scale,width=0,height=0):
     
     if width==0: width=config.width*scale
     if height==0: height=config.height*scale
@@ -76,8 +89,7 @@ def button(parent,config,scale,width=0,height=0):
                      font=config.font,
                      bd=config.bd))
    
-def button_factory(parent,
-                   packside, 
+def cell_factory(parent, 
                    config, 
                    sizes,
                    scale=1):
@@ -86,24 +98,24 @@ def button_factory(parent,
 	cellwid = []
 	if len(sizes)==0:
 	    for i in range(config.num):
-		_button = button(parent,
+		_cell = cell(parent,
 		       config,
 		       scale)
-		_button.pack(fill="both",
+		_cell.pack(fill="both",
 		                   expand=True,
-		                   side=packside)
-		cellwid.append(_button)
+		                   side=config.side)
+		cellwid.append(_cell)
 	else:
 	    for size in sizes:
-		_button = button(parent,
+		_cell = cell(parent,
 		       config,
 		       scale,
 		       size*scale,
 		       size*scale)
-		_button.pack(fill="both",
+		_cell.pack(fill="both",
 		                        expand=True,
-		                        side=packside)
-		cellwid.append(_button)
+		                        side=config.side)
+		cellwid.append(_cell)
 		
 	return cellwid
 
@@ -119,41 +131,32 @@ def merge_cells(cellwid, config, scale, column,cell,last_cell):
                                     background=color.pink)
 	
     
+def init_range(parent,config,scale,**args):
+    _frame = tk.Frame(parent)
+    
+    for key,value in args.iteritems():
+	setattr(config,key,value)
+	
+    cellwid = cell_factory(_frame,
+                           config,
+                           [],
+                           scale)
+    _frame.pack(side=config.frameside,
+                fill=config.framefill,
+                expand=config.frameexpand)
+    
+    return(cellwid)
+    
 def init_grid():
 
-    ylabel = tk.Frame(master)
-    ylabelwid=button_factory(ylabel,
-                             "bottom",
-                             ylabelcfg,
-                             [],
-                             10)
-    ylabelwid.append(button_factory(ylabel,
-                                    "bottom",
-                                    origincfg,
-                                    [],
-                                    10))
-    ylabel.pack(side="left",
-                fill="y",
-                expand=False)
-		    
-    
-    
-    xlabel = tk.Frame(master)
-    xlabelwid = button_factory(xlabel,
-                               "right",
-                               xlabelcfg,
-                               [],
-                               10)
-    xlabel.pack(side="top",fill="x",expand=False)
+    init_range(master,ylabelcfg,10)
+    #init_range(ylabel,origincfg,10)    
+    init_range(master,xlabelcfg,10)
+    init_range(master,xlabelcfg,10,num=4)
     
     cellwid=[]
     for i in range(20):
-	gridcolumn = tk.Frame(master)
-	cellwid.append(button_factory(gridcolumn,
-	                              "bottom",
-	                              cellcfg,[],
-	                              10))
-	gridcolumn.pack(side="right",fill="both",expand=True)
+	cellwid.append(init_range(master,cellcfg,10))
 
     return cellwid
 
