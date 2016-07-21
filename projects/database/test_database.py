@@ -243,9 +243,9 @@ class TestTablePrimaryKey(unittest.TestCase):
     '''
 if __name__ == "__main__":
 
-    #unittest.main()
+    unittest.main()
     
-    #suite = unittest.TestLoader().loadTestsFromTestCase(TestDatabase)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestDatabase)
     suite = unittest.TestLoader().loadTestsFromTestCase(TestTablePrimaryKey)
     unittest.TextTestRunner(verbosity=2).run(suite)
     
