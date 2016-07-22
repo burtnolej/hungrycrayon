@@ -123,9 +123,7 @@ def db_insert_table_rows(db_cursor,table,keys,values):
     
     ''' where values is of the format [[9, 1, 10, 0], [10, 1, 11, 0]]
     and keys are of the format ['start_hour', 'start_minute', 'end_hour', 'end_minute']
-    '''
-    
-    
+    '''    
     key_str = ",".join(keys)
     if len(values)>1:
         _l=[]
@@ -135,7 +133,7 @@ def db_insert_table_rows(db_cursor,table,keys,values):
             
         value_str = ",".join(_l)
     else:
-        value_str = "(" + ",".join(map(str,values)) + ")"
+        value_str = "(" + ",".join(values) + ")"
     
     exec_str = "INSERT INTO {table} ({keys}) VALUES {values}".format(table=table, \
                                                                        keys=key_str,\
@@ -159,6 +157,8 @@ def create_db(database_name, table_name,pk_column_name,columns):
 
 def create_db_from_schema(schema):
     
+    config = {}
+    
     # for each database in the schema file
     databases = get_xml_elements(schema,".//Database")
     for database in databases:
@@ -176,6 +176,8 @@ def create_db_from_schema(schema):
             
             table_name = xml_table.attrib[NAME_ATTRIB]
             
+            config[table_name] = {}
+	    
             # if there is an index; create a list of the column names
             try:
                 xml_index = get_xml_element(schema,".//Index",xml_table)
@@ -198,11 +200,14 @@ def create_db_from_schema(schema):
                 
             # create the table
             db_add_table_complex(c,table_name,col_defn,pk_defn)
+	    
+	    config[table_name]['col_defn'] = col_defn
+	    config[table_name]['pk'] = pk_defn
     
     conn.commit()
     conn.close()
     
-    return(db_file)
+    return(db_file,config)
 
 
 def _get_values_from_file(data_file,table_name):
