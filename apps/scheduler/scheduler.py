@@ -2,20 +2,20 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
 
-from database_util import get_db_tables, create_db_from_schema, sqlite3, NAME_ATTRIB, get_db_table_columns, insert_rows_from_file, \
-     get_db_table_rows, db_add_table_complex, db_insert_table_rows, get_db_cursor
+from database_util import create_db_from_schema, insert_rows_from_file, get_db_table_rows, \
+     db_insert_table_rows, db_insert_table_rows_by_config
 
 from datetime_util import MyDT
+from scheduler_dates import get_days_of_year, day_enum, calendar_enum
+from scheduler_util import enum
 
 schema = "test_schema.xml"
 
 # this will create and close the db_file
-db_file = create_db_from_schema(schema)
+db_file,db_config = create_db_from_schema(schema)
 
 # insert rows from file
 insert_rows_from_file(schema,db_file)
-
-table_calendar_fields = ['day','month','start_hour', 'start_minute', 'end_hour', 'end_minute']
 
 def schedule_class_series(num_instances, frequency, duration, hr_of_day, 
                           min_of_hr, day_of_month, month_of_year):
@@ -59,9 +59,26 @@ def schedule_class_series(num_instances, frequency, duration, hr_of_day,
 def enroll_student_in_class_series():
     pass
 
-schedule_class_series(20,7,30,9,0,5,21)
+def init_calendar():
+       
+    days_of_year = get_days_of_year()
 
-# uniqueids
+    class_instances = []
+    for day_of_year in days_of_year:
+        
+        class_instances.append([day_of_year[day_enum.day_day],
+                                day_of_year[day_enum.day_month],
+                                day_of_year[day_enum.day_year],
+                                calendar_enum.start_hour,
+                                calendar_enum.start_min,
+                                calendar_enum.end_hour,
+                                calendar_enum.end_min])
+
+    db_insert_table_rows_by_config(db_file,db_config['calendar'],class_instances)
+
+init_calendar()
+
+#schedule_class_series(20,7,30,9,0,5,21)
 
 
 exit()

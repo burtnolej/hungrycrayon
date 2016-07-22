@@ -119,6 +119,16 @@ def db_add_table_simple_column(db_cursor,table,column_name,column_type):
     result = db_cursor.execute(exec_str).fetchall()
     return(exec_str,result) 
 
+def db_insert_table_rows_by_config(db_file,db_config,values):
+    
+    fields = [field for field,_ in db_config['col_defn']]
+    name = db_config['tablename']
+    
+    conn,c = get_db_cursor(db_file)    
+    db_insert_table_rows(c,name,fields,values)
+    conn.commit()
+    conn.close()
+
 def db_insert_table_rows(db_cursor,table,keys,values):
     
     ''' where values is of the format [[9, 1, 10, 0], [10, 1, 11, 0]]
@@ -138,7 +148,6 @@ def db_insert_table_rows(db_cursor,table,keys,values):
     exec_str = "INSERT INTO {table} ({keys}) VALUES {values}".format(table=table, \
                                                                        keys=key_str,\
                                                                        values=value_str)
-    print(exec_str)
     result = db_cursor.execute(exec_str).fetchall()
     return(exec_str,result) 
 
@@ -157,7 +166,7 @@ def create_db(database_name, table_name,pk_column_name,columns):
 
 def create_db_from_schema(schema):
     
-    config = {}
+    db_config = {}
     
     # for each database in the schema file
     databases = get_xml_elements(schema,".//Database")
@@ -176,7 +185,7 @@ def create_db_from_schema(schema):
             
             table_name = xml_table.attrib[NAME_ATTRIB]
             
-            config[table_name] = {}
+            db_config[table_name] = {}
 	    
             # if there is an index; create a list of the column names
             try:
@@ -201,13 +210,14 @@ def create_db_from_schema(schema):
             # create the table
             db_add_table_complex(c,table_name,col_defn,pk_defn)
 	    
-	    config[table_name]['col_defn'] = col_defn
-	    config[table_name]['pk'] = pk_defn
+	    db_config[table_name]['col_defn'] = col_defn
+	    db_config[table_name]['pk'] = pk_defn
+	    db_config[table_name]['tablename'] = table_name
     
     conn.commit()
     conn.close()
     
-    return(db_file,config)
+    return(db_file,db_config)
 
 
 def _get_values_from_file(data_file,table_name):
@@ -284,10 +294,7 @@ def insert_rows_from_file(data_file,db_file):
             
             row_list.append(value_list)
             
-        print row_list
-	print key_list
 	db_insert_table_rows(c, table_name,key_list,row_list)
-
 
     conn.commit()
     conn.close()
