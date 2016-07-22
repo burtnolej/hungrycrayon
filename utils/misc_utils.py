@@ -1,4 +1,4 @@
-
+from random import randint
 
 def gettype(string):
     try:
@@ -123,3 +123,78 @@ class Singleton(type):
             cls._instances[cls] = super(Singleton, cls).__call__(*args,**kwargs)
 
         return cls._instances[cls]
+    
+    
+    
+    #path.append("/Users/burtnolej/Dev/pythonapps/util")
+    #from misc_util import write_object_to_disk,read_object_from_disk,Singleton
+    #from os import path as ospath
+
+def write_pickle(object,filename=None):
+    import pickle
+    with open(filename, 'w') as f:
+        pickle.dump(object, f)
+
+    return(filename)
+
+def read_pickle(filename):
+    import pickle
+    with open(filename, 'r') as f:
+        object = pickle.load(f)
+
+    return(object)
+
+class UniqueIDGenerator(object):
+    #__metaclass__ = Singleton
+    
+    def __init__(self,filename,size):
+        self.fn = filename
+        self.usedids = []
+        self.size=size
+        
+        from os import path as ospath
+        
+        if ospath.exists(self.fn) == True:
+            #print "recovered file",self.fn
+            self.usedids = read_pickle(self.fn)
+            self.old_num_ids = len(self.usedids)
+        else:
+            self.old_num_ids = 0
+            #print "initializing new",self.fn
+
+    def num_ids(self):
+        return(len(self.usedids))
+        
+    def next(self):
+        count = 1
+        
+        maxid = pow(10,self.size)
+        unique=False
+        retry=0
+        
+        while unique==False:
+            uniqueid = randint(1,maxid)
+            uniqueid = hex(uniqueid).upper()[2:].rjust(self.size,"0")
+            
+            if not uniqueid in self.usedids: 
+                unique=True
+            else:
+                #print "conflict",uniqueid
+                retry+=1
+                
+            if retry>10: 
+                self.write()
+                raise Exception("max retry")
+            count += 1
+        self.usedids.append(uniqueid)
+        
+        return(uniqueid)
+
+    def reset(self):
+        self.usedids = []
+        
+    def write(self):
+        #print "writing to",self.fn,"[",self.old_num_ids,"/",self.num_ids(),"]"
+        write_pickle(self.usedids,self.fn)
+        return(self.old_num_ids,self.num_ids())
+        
