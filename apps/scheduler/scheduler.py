@@ -6,9 +6,9 @@ from database_util import create_db_from_schema, insert_rows_from_file, get_db_t
      db_insert_table_rows, db_insert_table_rows_by_config
 
 from datetime_util import MyDT
-from scheduler_dates import get_days_of_year, day_enum, calendar_enum
+from scheduler_dates import get_days_of_year, day_enum, calendar_enum, event_type_enum
 from scheduler_util import enum
-
+from misc_utils import UniqueIDGenerator
 schema = "test_schema.xml"
 
 # this will create and close the db_file
@@ -61,18 +61,25 @@ def enroll_student_in_class_series():
 
 def init_calendar():
        
+    uniqueid = UniqueIDGenerator("uniqueid.dat",10)
     days_of_year = get_days_of_year()
 
     class_instances = []
     for day_of_year in days_of_year:
         
-        class_instances.append([day_of_year[day_enum.day_day],
+        id = uniqueid.next()
+        str_id = "\"{0}\"".format(str(id))
+        class_instances.append([str_id,
+                                day_of_year[day_enum.day_day],
                                 day_of_year[day_enum.day_month],
                                 day_of_year[day_enum.day_year],
                                 calendar_enum.start_hour,
                                 calendar_enum.start_min,
                                 calendar_enum.end_hour,
-                                calendar_enum.end_min])
+                                calendar_enum.end_min,
+                                event_type_enum.freetime])
+        
+    del uniqueid
 
     db_insert_table_rows_by_config(db_file,db_config['calendar'],class_instances)
 
