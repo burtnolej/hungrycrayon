@@ -1,0 +1,123 @@
+<module name=db_util>
+    <purpose>creating/opening databases;creating tables (database cannot be created without a table)</purpose>
+</module>
+<module name=misc_utils>
+    <purpose></purpose>
+</module>
+
+<entity name=os_utils>
+    <shortname>mu</shortname>
+    <methods>
+        <m>os_file_exists</m>
+    </methods>
+    <variables>
+        <v></v>
+    </variables>
+</entity>
+
+<entity name=Database>   
+    <longname>Database</longname>
+    <shortname>db</shortname>
+    <type>class</type>
+    <enum>
+        <e name=col_name_attrib>name</e>
+        <e name=db_type>db_type</e>
+        <e name=s3_tbl_attrib>"type","name", "tbl_name","rootpage","sql"</e>
+        <e name=s3_col_attrib>'cid', 'column_name', 'data_type', 'nullable', 'default_value', 'pk_index'</e>
+    </enum> 
+    <methods>
+        <m>execute</m>
+        <m>remove</m>
+        <m>tbl_get</m>
+        <m>tbl_exists</m>
+        <m>open</m>
+        <m>close</m>
+    </methods>
+    <variables>
+        <v>cursor</v>
+        <v>connection</v>
+        <v>name</v>
+        <v>config</v>
+    </variables>
+    <tests>
+        <t>test_db_create</t>
+        <t>test_tbl_create_pk</t>
+    </tests>
+    <entity name=schema>
+        <methods>
+            <m>schema_read</m>
+            <m>schema_get</m>
+            <m>schema_tbl_get</m>
+            <m>schema_col_get</m>
+            <m>schema_tbl_pk_get</m>
+            <m>schema_print</m>
+            <m>schema_execute</m>
+            <m>schema_read_data</m>
+        </methods>
+        <variables>
+            <v>schema_file</v>
+            <v>schema</v>
+            <v>db_xml</v>
+            <v>col_xml</v>
+            <v>tbl_xml</v>
+        </variables>
+        <tests>
+            <t>test_schema_read</t>
+            <t>test_db_create_from_schema</t>
+            <t>test_schema_read_rows</t>
+        </tests>
+    </entity>
+</entity>
+<entity name=table>
+    <longname>database_table</longname>
+    <shortname>tbl</shortname>
+    <methods>
+        <m>tbl_create</m>
+        <m>tbl_create_pk</m>
+        <m>tbl_exists</m>
+        <m>tbl_index_exists</m>
+        <m>tbl_index_defn_get</m>
+        <m>tbl_get</m>
+    </variable>
+        <v>tbl_name</v>
+        <v>tbl_config</v>
+        <v>tbl_col_defn</v>
+        <v>tbl_col_name</v>
+        <v>tbl_pk_defn</v>
+        <v>tbl_rows_get</v>
+        <v>tbl_rows</v>
+        <v>tbl_rows_insert_from_schema</v>
+        <v>tbl_rows_insert</v>        
+    </variables>
+    <tests>
+        <t>test_tbl_rows_insert</t>
+        <t>test_tbl_rows_insert_str</t>
+        <t>test_tbl_rows_insert_dupe_key</t>
+        <t>test_tbl_rows_insert_from_schema</t>
+        <t>test_tbl_cols_get</t>
+        <t>test_tbl_col_add</t>
+    </tests>
+    <entity name=column>
+        <logname>database_table_column</longname>
+        <shortname>col</shortname>
+        <methods>
+            <m>col_get</m>
+            <m>col_add</m>
+            <m>col_exists</m>
+            <m>col_get</m>
+        </methods>
+        <variables>
+            <v>col_defn
+                <descr>col names and types</descr>
+                <type>list of tuples</type>
+            </v>
+            <v>col_name</v>
+            <v>col_type
+                <enum>
+                    <value>"text",1</value>
+                    <value>"integer",2</value>
+                <enum>
+            </v>
+        </variables> 
+    </entity>
+</entity>

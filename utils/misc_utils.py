@@ -1,5 +1,52 @@
 from random import randint
 
+def os_file_exists(os_file_name):
+    from os.path import exists
+    
+    if exists(os_file_name):
+        return(True)
+    else:
+        return(False)
+
+def os_file_get_wildcard(dir,pattern):
+    import os, re
+    return([f for f in os.listdir(dir) if re.search(pattern, f)])
+       
+    #os.remove(os.path.join(dir, f))
+
+           
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+#-------------------------------------------------------------
+
+def get_obj_members(obj):
+    from inspect import getmembers
+    return([(_attr,_val,callable(getattr(obj,_attr))) for _attr,_val in getmembers(obj) if not _attr.startswith("__")])
+
+def get_obj_attr_names(obj):
+    return [_name for _name,_,_ in get_obj_members(obj)]
+
+def get_obj_attr_vals(obj,notcallable=True):
+    return [val for _,val,callable in get_obj_members(obj) if callable == False]
+        
+def get_obj_attr(obj,notcallable=True):
+    return [(_name,_val) for _name,_val,callable in get_obj_members(obj) if callable == False]
+                
+class generic:
+    def __init__(self,**args):
+        for key,value in args.iteritems():
+            setattr(self,key,value)
+            
+        self.__get_attr__ = get_obj_attr
+        self.__get_attr_names__ = get_obj_attr_names
+
+    def __print_attr__(self):
+        for attrname,attrval in self.get_attr():
+            print attrname,attrval
+
+class enum(generic):
+    pass
+
 def gettype(string):
     try:
         return(int(string))
@@ -14,13 +61,7 @@ def write_text_to_file(filename,text):
     fh.write(text)
     fh.close
     
-def file_exists(filename):
-    from os.path import exists
-    
-    if exists(filename):
-        return(True)
-    else:
-        return(False)
+
 
 def read_text_from_file(filename,delim=","):
     '''returns a list of elements; converts to int if it can'''
@@ -111,7 +152,7 @@ def print_dict_of_dict(d):
     # ensure blanl line between table and any additional output
     print
     
-    
+
 class Singleton(type):
     '''
     this is to be used as a __metaclass__
@@ -197,4 +238,8 @@ class UniqueIDGenerator(object):
         #print "writing to",self.fn,"[",self.old_num_ids,"/",self.num_ids(),"]"
         write_pickle(self.usedids,self.fn)
         return(self.old_num_ids,self.num_ids())
+    
+    
+    def __del__(self):
+        self.write()
         

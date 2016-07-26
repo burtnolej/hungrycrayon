@@ -68,8 +68,14 @@ def init_calendar():
     for day_of_year in days_of_year:
         
         id = uniqueid.next()
+
+        now = MyDT.now('US/Eastern').msecs
+    
         str_id = "\"{0}\"".format(str(id))
+        str_user = "\"{0}\"".format("burtnolej")
         class_instances.append([str_id,
+                                now,
+                                str_user,
                                 day_of_year[day_enum.day_day],
                                 day_of_year[day_enum.day_month],
                                 day_of_year[day_enum.day_year],
@@ -78,6 +84,18 @@ def init_calendar():
                                 calendar_enum.end_hour,
                                 calendar_enum.end_min,
                                 event_type_enum.freetime])
+        
+        EventLinkedList(db_config['calendar'],[str_id,
+                                               now,
+                                               str_user,
+                                               day_of_year[day_enum.day_day],
+                                               day_of_year[day_enum.day_month],
+                                               day_of_year[day_enum.day_year],
+                                               calendar_enum.start_hour,
+                                               calendar_enum.start_min,
+                                               calendar_enum.end_hour,
+                                               calendar_enum.end_min,
+                                               event_type_enum.freetime])
         
     del uniqueid
 

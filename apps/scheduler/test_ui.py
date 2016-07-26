@@ -1,9 +1,9 @@
 master,
 
-class generic:
-    def __init__(self,**args):
-	for key,value in args.iteritems():
-	    setattr(self,key,value)
+from scheduler_util import generic
+
+class config(generic):
+    pass
 
 class color_enum:    
     black='#000000'
@@ -22,7 +22,7 @@ class font_enum:
     
 font = font_enum()
 
-origincfg=generic(bg=color.grey,
+origincfg=config(bg=color.grey,
                fg=color.black,
                width=3,
                height=2,
@@ -35,7 +35,7 @@ origincfg=generic(bg=color.grey,
                frameexpand=False,
                bd=0)
 
-xlabelcfg=generic(bg=color.black,
+xlabelcfg=config(bg=color.black,
                fg=color.grey,
                width=6,
                height=3,
@@ -48,7 +48,7 @@ xlabelcfg=generic(bg=color.black,
                frameexpand=False,
                bd=0)
 
-ylabelcfg=generic(bg=color.black,
+ylabelcfg=config(bg=color.black,
                fg=color.grey,
                width=3,
                height=6,
@@ -61,7 +61,7 @@ ylabelcfg=generic(bg=color.black,
                frameexpand=False,
                bd=0)
 
-cellcfg=generic(bg=color.grey,
+cellcfg=config(bg=color.grey,
                fg=color.black,
                width=6,
                height=3,

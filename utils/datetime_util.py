@@ -87,7 +87,7 @@ class MyDT(object):
         if kw.has_key('day_offset'):
             self.dt = self.dt + timedelta(days=1)
 
-        self.value = self.dt_to_str_fmt(self.dt,self.display_fmt,self.display_tz)
+        self.value = self.dt_to_str_fmt(self.display_fmt,self.display_tz)
 
 
     def __call__(self):
@@ -118,12 +118,12 @@ class MyDT(object):
         '''
         self.dt = datetime.strptime(dt_str, dt_str_fmt)
         self.dt = self.add_tz(self.dt,tz)
-
-    def dt_to_str_fmt(self,dt,display_fmt,display_tz):
+    
+    def dt_to_str_fmt(self,display_fmt,tz):
         '''
         take a datetime object and return a str of format fmt
         '''
-        dt_adj = self.display_astimezone(dt,display_tz)
+        dt_adj = self.display_astimezone(self.dt,tz)
         dt_display_str = dt_adj.strftime(display_fmt)
         return(dt_display_str)
 

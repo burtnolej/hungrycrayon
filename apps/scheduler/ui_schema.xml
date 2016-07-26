@@ -3,13 +3,15 @@
     <panel id="panel1">
         <label>scheduler</label>
         <stack>vertical</stack>
-        <db></db>
-        <table></table>
+        <db>scheduledb</db>
+        <table>calendar</table>
+        <execfunc>schedule_class_series</execfunc>
         <element id="input1">
-            <dbcolumnn>num_instances</dbcolumn>
+            <dbcolumn>num_instances</dbcolumn>
             <label># of instances</label>
              <uitype>input</uitype>
-             <width>50</width>
+             <width>20</width>
+             <default>30</default>
              <validation>
                 <min>1</min>
                 <max>100</max>
@@ -18,9 +20,11 @@
             <hint>number of times the event will occur</hint>
          </element>
         <element id="input2">
+            <dbcolumn>frequency</dbcolumn>
             <label>frequency</label>
              <uitype>input</uitype>
-             <width>50</width>
+             <width>20</width>
+             <default>7</default>
              <validation>
                 <min>1</min>
                 <max>28</max>
@@ -29,39 +33,50 @@
              <hint>number of days between events</hint>
          </element>
        <element id="input3">
-            <label>duration</label>
+             <dbcolumn>duration</dbcolumn>
+             <label>duration</label>
+             <default>30</default>
              <datatype>integer</datatype>
              <uitype>input</uitype>
-             <width>50</width>
+             <width>20</width>
          </element>
        <element id="input4">
-            <label>hr_of_day</label>
+             <dbcolumn>hr_of_day</dbcolumn>
+             <label>hr_of_day</label>
+             <default>10</default>
              <datatype>integer</datatype>
              <uitype>input</uitype>
-             <width>50</width>
+             <width>20</width>
          </element>
        <element id="input5">
+             <dbcolumn>min_of_hour</dbcolumn>
             <label>min_of_hour</label>
+            <default>30</default>
              <datatype>integer</datatype>
              <uitype>input</uitype>
-             <width>50</width>
+             <width>20</width>
          </element>
        <element id="input6">
+             <dbcolumn>day_of_month</dbcolumn>
+             <default>25</default>
             <label>day_of_month</label>
              <datatype>integer</datatype>
              <uitype>input</uitype>
-             <width>50</width>
+             <width>20</width>
          </element>
        <element id="input7">
+            <dbcolumn>month_of_year</dbcolumn>
+            <default>7</default>
             <label>month_of_year</label>
-             <datatype>integer</datatype>
+            <datatype>integer</datatype>
              <uitype>input</uitype>
-             <width>50</width>
+             <width>20</width>
          </element>
         <element id="button1">
              <label>insert</label>
              <uitype>button</uitype>
-             <width>50</width>
+             <width>20</width>
+             <callback>invoke</callback>
          </element>
     </panel>
 </root>

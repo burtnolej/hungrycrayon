@@ -1,305 +1,229 @@
+
 import sqlite3
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
 from xml_utils import get_xml_elements,get_xml_element,get_xml_child_elements, get_xml_root
-from misc_utils import file_exists, print_dict_of_dict
+from misc_utils import os_file_exists, print_dict_of_dict, enum, get_obj_attr_names
 
-DB_SCHEMA="./schema.xml"
-TEST_DB_SCHEMA="./test_schema.xml"
-NAME_ATTRIB='Name'
-DB_TYPE="DBType"
-DB_TABLE_ATTR=["type","name", "tbl_name","rootpage","sql"]
-DB_COLUMN_ATTR=['cid', 'column_name', 'data_type', 'nullable', 'default_value', 'pk_index']
+db_enum = enum(name_attrib="Name", # keywords used in the schema xml file
+               db_type="DBType", # keywords used in the schema xml file
+               s3_tbl_attrib=["type","name", "tbl_name","rootpage","sql"], # internal db table columns
+               s3_col_attrib=enum(cid=0,column_name=1,data_type=2,\
+                                  nullable=3,default_value=4,pk_index=5)) # internal db table columns & index
 
-def get_db_cursor(db_file):
+# keywords used in the schema xml file
+col_type_enum = enum(integer="integer",
+                     varchar="text")
+
+class Database():
     
-    if file_exists(db_file):
-        conn = sqlite3.connect(db_file)
-        return(conn,conn.cursor())
-    else:
-        raise Exception("file:",db_file," does not exist")
-            
-def get_db_table_columns(db_cursor,table_name,printout=False):
-    columns = db_cursor.execute("PRAGMA table_info("+table_name+")").fetchall()
+    def __init__(self,db_name,remove_flag=False):
+        self.name = db_name
+        self.remove_flag = remove_flag # remove database on exit (for testing)
+   
+    def __enter__(self):
+        self.open()
         
-    d = {}
-    for column in columns: 
-        _d = {}
-        for i in range(len(DB_COLUMN_ATTR)):
-            _d[DB_COLUMN_ATTR[i]]=column[i]
-        d[_d["column_name"]] = _d
-    
-    if printout: 
-        print_dict_of_dict(d)
-    
-    return(d)
-
-def get_db_tables(db_cursor):
-    tables = db_cursor.execute("select * from sqlite_master").fetchall()
-    
-    d = {}
-    for table in tables: 
-        _d = {}
-        for i in range(len(DB_TABLE_ATTR)):
-            _d[DB_TABLE_ATTR[i]]=table[i]
-        d[_d["name"]] = _d
-    
-    return(d)
-
-
-def get_db_table_rows(db_cursor,table_name):
-    values = db_cursor.execute("select * from " + table_name).fetchall()
-    
-    keys = [description[0] for description in db_cursor.description]
-    l=[]
-    d={}
-    #for i in range(len(values)):
-    #    d[keys[i]
-    return(keys,values)
-    
-def db_table_exists(db_cursor,table_name):
-    if get_db_tables(db_cursor).has_key(table_name):
-        return True
-    return False
-
-    
-def db_table_column_exists(db_cursor, table_name,column_name):
-    if get_db_table_columns(db_cursor,table_name).has_key(column_name):
-        return True
-    return False
-    
-
-def db_table_column_attr(db_cursor, table_name,column_name, column_attr):
-    
-    return(get_db_table_columns(db_cursor,table_name)[column_name][column_attr])
-    
-def db_add_table_simple(db_cursor,table,column,column_type):
-            
-    exec_str = "CREATE TABLE {table} ({column} {column_type})".format(table=table,\
-                                                                      column=column,\
-                                                                      column_type=column_type)  
-
-    result = db_cursor.execute(exec_str).fetchall()
-    return(exec_str,result) 
-
-
-def db_add_table_complex(db_cursor,table,columns,pk_column_name):
-    
-    ''' creates a table with multiple columns; provided in arg:columns in a 2d array where column1 is name and 2 type
-    column_name is a list containing the names that make up the key. The list will be of length 1 if the pk is not 
-    clustered and it will be 0 if there is no pk 
-    CREATE TABLE mytable (field1 TEXT,field2 INTEGER,field3 BLOB,PRIMARY KEY (field2, field1)) '''
-    
-    assert isinstance(columns,list)
-    
-    column_str = ",".join([str(column_name) + " " + str(column_key) for column_name,column_key in columns])
-    if isinstance(pk_column_name,list):
-        pk_str  = ",".join(pk_column_name)
-    else:
-        pk_str = pk_column_name[0]
-    
-    if len(pk_column_name) != 0:
-        exec_str = "CREATE TABLE {table} ({column},PRIMARY KEY ({pk}))".format(table=table,\
-                                                                              column=column_str,\
-                                                                              pk=pk_str)
-    else:
-        exec_str = "CREATE TABLE {table} ({column})".format(table=table,\
-                                                            column=column_str)        
-
-    result = db_cursor.execute(exec_str).fetchall()
-    return(exec_str,result) 
-
+    def __exit__(self,type,value,traceback):
+        self.connection.commit()
+        self.connection.close()
         
-
-def db_add_table_simple_column(db_cursor,table,column_name,column_type):
-    
-    exec_str = "ALTER TABLE {table} ADD COLUMN '{column}' {column_type}".format(table=table,\
-                                                                                column=column_name,\
-                                                                                column_type=column_type)
-    result = db_cursor.execute(exec_str).fetchall()
-    return(exec_str,result) 
-
-def db_insert_table_rows_by_config(db_file,db_config,values):
-    
-    fields = [field for field,_ in db_config['col_defn']]
-    name = db_config['tablename']
-    
-    conn,c = get_db_cursor(db_file)    
-    db_insert_table_rows(c,name,fields,values)
-    conn.commit()
-    conn.close()
-
-def db_insert_table_rows(db_cursor,table,keys,values):
-    
-    ''' where values is of the format [[9, 1, 10, 0], [10, 1, 11, 0]]
-    and keys are of the format ['start_hour', 'start_minute', 'end_hour', 'end_minute']
-    '''    
-    key_str = ",".join(keys)
-    if len(values)>1:
-        _l=[]
-        
-        for row in values:
-            _l.append("(" + ",".join(map(str,row)) + ")")
+        if self.remove_flag == True:
+            self.remove()
             
-        value_str = ",".join(_l)
-    else:
-        value_str = "(" + ",".join(values) + ")"
+    def description(self):
+        return(self.cursor.description)
     
-    exec_str = "INSERT INTO {table} ({keys}) VALUES {values}".format(table=table, \
-                                                                       keys=key_str,\
-                                                                       values=value_str)
-    result = db_cursor.execute(exec_str).fetchall()
-    return(exec_str,result) 
+    def execute(self,sql_str,singleval=False):
+        '''purpose: run a query on the db
+              args: sql_str     : sql test to send to sqlite engine
+                  : singleval   : true if expecting one field on one row (like a count)
+           returns: sql_result  : whatever sqlite returns - usually nested lists'''
+        
+        if singleval==False:
+            sql_result = self.cursor.execute(sql_str).fetchall()
+        else:
+            sql_result = self.cursor.execute(sql_str).fetchone()[0]
+        return(sql_result)
+            
+    def open(self):
+        '''purpose: if filename does not exist it creates it; but at least one table needs to be 
+            added for the db to persist'''
+        self.connection = sqlite3.connect(self.name+".sqlite")
+        self.cursor = self.connection.cursor()
 
+    def remove(self):
+        '''purpose: deletes the file on the filesystem containing the sqlite db'''
+        from os import remove as osremove
+        osremove(self.name+".sqlite")
+        
+    def tbl_get(self):
+        '''purpose: queries db internal table to retreive list of created tables
+           returns              : creates member attribute of type dict'''
+        sql_result = self.execute("select * from sqlite_master where type='table'")
+        
+        self.tbl = {}
+        for tbl_name in sql_result: 
+            _d = {}
+            for i in range(len(db_enum.s3_tbl_attrib)):
+                _d[db_enum.s3_tbl_attrib[i]]=tbl_name[i]
+            self.tbl[_d["name"]] = _d
+        
+        
+    def tbl_exists(self,tbl_name):
+        '''purpose: determines if a table exists
+              args: tbl_name     : table to detect
+           returns:              : true/false '''
 
-def create_db(database_name, table_name,pk_column_name,columns):
-    
-    db_file = database_name + ".sqlite"
+        self.tbl_get()
+        return(self.tbl.has_key(tbl_name))
 
-    # open a connection to the database
-    conn = sqlite3.connect(db_file)
-    db_cursor = conn.cursor()
+def tbl_index_count(database,tbl_name):
+    '''purpose: get the number of indexes on a particular table
+       returns: creates member attribute of type dict'''
+    sql_str = "select count(*) from sqlite_master "
+    sql_str += "where type='index'and tbl_name=\"{tbl_name}\"".format(tbl_name=tbl_name)
     
-    db_add_table_complex(db_cursor,table_name,columns,pk_column_name)
-    
-    return(db_file)
+    sql_result = database.execute(sql_str)
+    return(sql_result[0][0])
 
-def create_db_from_schema(schema):
+def tbl_index_defn_get(database,tbl_name):
+    '''purpose: get the defn of the index on a particular table
+       returns: a list containing the column names that make up the key'''
+    sql_str = "PRAGMA table_info({tbl_name})".format(tbl_name=tbl_name)
     
-    db_config = {}
+    sql_result = database.execute(sql_str)
+    
+    return([row[db_enum.s3_col_attrib.column_name] for row in sql_result \
+           if row[db_enum.s3_col_attrib.pk_index]<>0])
+            
+def tbl_create(database,tbl_name,col_defn,tbl_pk_defn=[]):
+    
+    '''purpose: create a table in the database; create index if specificied
+          args: database    : object containing db handle
+                tbl_name    : name of initial table to create db with; database cannot
+                            : be created without a table
+                col_defn    : list of tuples of the form (<col_name>,<col_type>) where col_type is
+                            : in col_type_enum
+                tbl_pk_name : name of the column that contains the primary key if the table
+                              has one.
+       returns: sql_result  : whatever sqlite returns - usually nested lists'''
+    sql_col_str = ",".join([str(col_name) + " " + str(col_type) for col_name,col_type in col_defn])
+
+    sql_str = "CREATE TABLE {tbl_name} ({sql_col_str})".format(tbl_name=tbl_name,\
+                                                               sql_col_str=sql_col_str)
+    
+    # check if a primary key had been specified.
+    if len(tbl_pk_defn)<>0:
+        sql_pk_str  = ",".join(tbl_pk_defn)
+        
+        # take off the last ')' and add primary key defn
+        sql_str = sql_str[:-1] + ",PRIMARY KEY (" + sql_pk_str + "))"
+        
+    sql_result = database.execute(sql_str)
+    return(sql_result) 
+
+def schema_read(schema_file):
+    '''purpose: read in database, table definition from an xml file
+          args: xml file
+       returns: a dict of the form <name<tbl_name><col_defn,pk_defn,tbl_name>'''
+    
+    # name shortening ...
+    name_enum = db_enum.name_attrib
+    type_enum = db_enum.db_type
+    
+    xml = get_xml_elements
+    child_xml = get_xml_child_elements
+    
+    config = {}
     
     # for each database in the schema file
-    databases = get_xml_elements(schema,".//Database")
-    for database in databases:
+    _names = [(db_xml.attrib[name_enum],db_xml) for db_xml in xml(schema_file,".//Database")]
+
+    for name,db_xml in _names:
+        tbl_config = config[name] = {}
+
+        _tbl_names = [(tbl_xml.attrib[name_enum],tbl_xml) for tbl_xml in xml(schema_file,".//Table",db_xml)]
         
-        # get the database name from the schema and construct the dbfile name
-        db_file = database.attrib[NAME_ATTRIB] + ".sqlite"
-        
-        # open a connection to the database
-        conn = sqlite3.connect(db_file)
-        c = conn.cursor()    
-    
-        # get the tables from the schema
-        xml_tables = get_xml_elements(schema,".//Table")
-        for xml_table in xml_tables:
-            
-            table_name = xml_table.attrib[NAME_ATTRIB]
-            
-            db_config[table_name] = {}
-	    
+        for tbl_name,tbl_xml in _tbl_names:
+
             # if there is an index; create a list of the column names
             try:
-                xml_index = get_xml_element(schema,".//Index",xml_table)
-                xml_keys = get_xml_elements(schema,".//Key",xml_index)
-                pk_defn = [xml_key.text for xml_key in xml_keys]
+                tbl_pk_defn = [_key.text for _key in xml(schema_file,".//Key",tbl_xml)]
             except:
-                pk_defn = []
+                tbl_pk_defn = []
+
+            tbl_col_defn = [(col_xml.attrib[name_enum], child_xml(col_xml)[type_enum]) for col_xml in xml(schema_file,".//Column",tbl_xml)]
+
+            tbl_config[tbl_name] = [tbl_col_defn,tbl_pk_defn,tbl_name]
             
-            col_defn=[]
-            
-            # from the schema get the name and type of each of the tables columns
-            xml_columns = get_xml_elements(schema,".//Column",xml_table)
-            for xml_column in xml_columns:
-                
-                column_name=xml_column.attrib[NAME_ATTRIB]            
-                column_type = get_xml_child_elements(xml_column)[DB_TYPE]
-                
-                # create a list of tuples
-                col_defn.append((column_name,column_type))
-                
-            # create the table
-            db_add_table_complex(c,table_name,col_defn,pk_defn)
-	    
-	    db_config[table_name]['col_defn'] = col_defn
-	    db_config[table_name]['pk'] = pk_defn
-	    db_config[table_name]['tablename'] = table_name
-    
-    conn.commit()
-    conn.close()
-    
-    return(db_file,db_config)
+    return(config)
 
+def schema_get(schema):
+    '''purpose: get the databases defined by the schema
+          args: schema   : in memory representation / dict
+       returns: a list'''
+    return(schema.keys())
 
-def _get_values_from_file(data_file,table_name):
-    ''' Extracts from a schema file the row value information required to insert into a table
-    returns those values in 2 lists, 1 for column names and 1 for values. This allows us to separate
-    the data extraction from xml from the data insertion into the DB. Which is useful at least
-    for testing where we want to extract the values and assert their existence in a db without inserting'''
-    
+def schema_tbl_get(schema,name):
+    '''purpose: get the tables defined by the schema for a particular database
+          args: schema   : in memory representation / dict
+              : name     : database name
+       returns: a list'''
+    return([_tbl_name for _tbl_name in schema[name].keys()])
 
-    rows = get_xml_elements(data_file,".//Row",table)
-         
-    for row in rows:
+def schema_col_get(schema,name, tbl_name):
+    '''purpose: get the columns defined by the schema for a particular database and table
+          args: schema   : in memory representation / dict
+              : name     : database name
+              : tbl_name : table name
+       returns: a list'''
+    return(schema[name][tbl_name][0])
+
+def schema_tbl_pk_get(schema,name, tbl_name):
+    '''purpose: get the index/pk defined by the schema for a particular database and table
+          args: schema   : in memory representation / dict
+              : name     : database name
+              : tbl_name : table name
+       returns: a list'''
+    return(schema[name][tbl_name][1])
+
+def schema_data_get(schema_file,tbl_name):
+    '''purpose: get the data rows defined by the schema for a particular database and table
+          args: schema   : xml file
+              : name     : database name
+              : tbl_name : table name
+       returns: tbl_col_name : a list of column names
+              : tbl_rows : a list of tuples containing data rows [('250772', 'cycling'), ('260772', 'rowing')]'''
+    # name shortening ...    
+    xml = get_xml_elements
+    child_xml = get_xml_child_elements
         
-        key_list = []
-        value_list = []
-        
-        fields = get_xml_elements(data_file,".//Field",row)
-
-        for field in fields:
-            field_attrs = get_xml_child_elements(field)    
-        
-            column_type = db_table_column_attr(c, table_name,str(field_attrs["Key"]), "data_type")
-                
-            key_list.append(field_attrs["Key"])
-            
-            if column_type == "INTEGER":
-                try:
-                    field_val = int(field_attrs["Value"])
-                except:
-                    raise Exception
-            else:
-                field_val = field_attrs["Value"]
-                
-            value_list.append(field_val)    
-
-
-        return(key_list,value_list)
-         
-def insert_rows_from_file(data_file,db_file):
+    rows = [xml(schema_file,".//Field",row_xml) for row_xml in xml(schema_file,".//Row") 
+            if row_xml.attrib['Table'] == tbl_name]
     
-    conn,c = get_db_cursor(db_file)
+    tbl_col_name = [child_xml(_row)['Key'] for _row in rows[0]]
+    tbl_rows = [tuple(child_xml(_row)['Value'] for _row in row) for row in rows]
     
-    tables = get_xml_elements(data_file,".//Table")
-    for table in tables:
+    return tbl_col_name, tbl_rows
+           
+def schema_print(schema):
+    '''purpose: print out the schema
+          args: schema   : in memory representation / dict'''
+    print "\n"
+    for name,_db in schema.iteritems():
+        for tbl_name,_tbl in _db.iteritems():
+            for col_name in _tbl[0]:
+                print name.ljust(10),tbl_name.ljust(10),col_name
 
-        table_name = table.attrib[NAME_ATTRIB]  
-        rows = get_xml_elements(data_file,".//Row",table)
-        
-        row_list = []
-        
-        for row in rows:
-            
-            key_list = []
-            value_list = []
-            
-            fields = get_xml_elements(data_file,".//Field",row)
-    
-            for field in fields:
-                field_attrs = get_xml_child_elements(field)    
-            
-                column_type = db_table_column_attr(c, table_name,str(field_attrs["Key"]), "data_type")
-                    
-                key_list.append(field_attrs["Key"])
-                
-                if column_type == "INTEGER":
-                    try:
-                        field_val = int(field_attrs["Value"])
-                    except:
-                        raise Exception
-                else:
-                    field_val = field_attrs["Value"]
-                    
-                value_list.append(field_val)
-            
-            row_list.append(value_list)
-            
-	db_insert_table_rows(c, table_name,key_list,row_list)
+def schema_execute(schema_file):
+    '''purpose: create databases and tables as defined in the schema
+          args: schema   : xml file'''
+    config = schema_read(schema_file)
+    for name in config.keys():
+        database = Database(name)
+        with database:
+            for tbl_name in config[name]:
+                tbl_col_defn,tbl_pk_defn,_ = config[name][tbl_name]
+                tbl_create(database,tbl_name,tbl_col_defn,tbl_pk_defn)
 
-    conn.commit()
-    conn.close()
-
-
-if __name__ == "__main__":
-    #create_db_from_schema(TEST_DB_SCHEMA)
-    insert_rows_from_file(TEST_DB_SCHEMA,"test_db.sqlite")

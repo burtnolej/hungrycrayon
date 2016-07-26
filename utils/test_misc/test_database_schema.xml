@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<!--Tags:            Parent: Tag=Tag1, Tag2; Child:  Tag=Tag1.1, Tag2.2; GChild: Tag=Tag1.2.1, Tag2.3.1
+    Attributes:      Parent Tag: Attr1; Child Tag:  Attr1.1
+    Attribute Value: Parent Tag: attr1_value
+    Content: Parent: tag1_content
+    Element: Parent: <Tag1>tag1_content</Tag1> -->
+
+<Root>
+    <Tag1 Attr1=attr1_value>
+        <Tag1.1 Attr1.1=attr1.1_value>
+            <Tag1.1.1>tag1.1.1_content</Tag1.1.1>
+        </Tag1.1>
+        <Tag1.2 Attr1.2=attr1.2_value>
+            <Tag1.2.1>tag1.2.1_content</Tag1.2.1>
+            <Tag1.2.2>tag1.2.2_content</Tag1.2.2>
+        </Tag1.2>
+    </Tag1>
+    <Tag2 Attr2=attr2_value>
+        <Tag2.1 Attr2.1=attr2.1_value>
+            <Tag2.1.1>tag2.1.1_content</Tag2.1.1>
+        </Tag2.1>
+    </Tag2>
+    <Tag3 Attr3=attr3_value>
+    </Tag3>
+    <Tag4 Attr4=attr4_value>
+        <Tag4.1 Attr4.1=attr4.1_value>
+        </Tag4.1>
+    </Tag4>
+</Root>

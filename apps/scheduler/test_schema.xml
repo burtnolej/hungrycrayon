@@ -2,6 +2,18 @@
 <Root>
     <Database Name="schedulerdb">
         <Table Name="calendar">
+           <Column Name="ID">
+                <DBType>"TEXT"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
+           <Column Name="last_update_time">
+                <DBType>"TEXT"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
+           <Column Name="last_update_user">
+                <DBType>"TEXT"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
            <Column Name="day">
                 <DBType>"INTEGER"</DBType>
                 <Nullable>0</Nullable>
@@ -30,7 +42,35 @@
                 <DBType>"INTEGER"</DBType>
                 <Nullable>0</Nullable>
             </Column>
+            <Column Name="event_type">
+                <DBType>"TEXT"</DBType>
+                <Nullable>0</Nullable>
+            </Column>
             <Row Table="calendar">
+                <Field>
+                    <Key>ID</Key>
+                    <Value>"0250A38201"</Value>
+                </Field>
+                <Field>
+                    <Key>last_update_time</Key>
+                    <Value>"Fri Jul 22 15:35:58 EDT 2016"</Value>
+                </Field>
+                <Field>
+                    <Key>last_update_user</Key>
+                    <Value>"burtnolej"</Value>
+                </Field>
+                <Field>
+                    <Key>day</Key>
+                    <Value>25</Value>
+                </Field>
+                <Field>
+                    <Key>month</Key>
+                    <Value>7</Value>
+                </Field>
+                <Field>
+                    <Key>year</Key>
+                    <Value>2016</Value>
+                </Field>
                 <Field>
                     <Key>start_hour</Key>
                     <Value>9</Value>
@@ -47,8 +87,36 @@
                     <Key>end_minute</Key>
                     <Value>0</Value>
                 </Field>
+                <Field>
+                    <Key>event_type</Key>
+                    <Value>0</Value>
+                </Field>
             </Row>
             <Row Table="calendar">
+                <Field>
+                    <Key>ID</Key>
+                    <Value>"00601FC793"</Value>
+                </Field>
+                <Field>
+                    <Key>last_update_time</Key>
+                    <Value>"Fri Jul 22 15:35:58 EDT 2016"</Value>
+                </Field>
+                <Field>
+                    <Key>last_update_user</Key>
+                    <Value>"burtnolej"</Value>
+                </Field>
+               <Field>
+                    <Key>day</Key>
+                    <Value>25</Value>
+                </Field>
+                <Field>
+                    <Key>month</Key>
+                    <Value>7</Value>
+                </Field>
+                <Field>
+                    <Key>year</Key>
+                    <Value>2016</Value>
+                </Field>
                 <Field>
                     <Key>start_hour</Key>
                     <Value>10</Value>
@@ -63,6 +131,10 @@
                 </Field>
                 <Field>
                     <Key>end_minute</Key>
+                    <Value>0</Value>
+                </Field>
+                <Field>
+                    <Key>event_type</Key>
                     <Value>0</Value>
                 </Field>
             </Row>
