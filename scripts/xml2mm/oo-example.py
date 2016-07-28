@@ -59,4 +59,9 @@ def build():
 '''
 
 if __name__ == '__main__':
-    code_utils.code2xml(sys.modules[__name__],globals()['__file__'])
+    
+    #code2xml(sys.argv[1])
+    
+    #code_utils.code2xml(sys.modules[__name__],globals()['__file__'])
+    
+    code_utils.code2xml(globals()['__file__'])    

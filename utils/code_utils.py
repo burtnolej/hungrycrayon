@@ -80,21 +80,34 @@ def __get_members__(obj,element,tokens):
                 for arg in __get_args__(_obj,tokens):
                     __add_element__(subelement,arg,'var')
 
-def code2xml(sysmodule, file):
+def code2xml(module_pathname):
     
-    _file = basename(file)
+    import importlib
+    
+    module_filename = basename(module_pathname)
+    
+    sysmodule, ext = splitext(module_filename)
+    
+    importlib.import_module(sysmodule)
+    
+    print "info: imported module",sysmodule
+    
+    
         
-    root, ext = splitext(_file)
     
-    output_file = root + ".xml"
     
-    root = xmltree.Element(_file)
-    tokens = __tokenize__(file)
+    output_file = sysmodule + ".xml"
+    print "info: writing output to",output_file
+    
+    print "info: converting module",sysmodule,"to xml"
+    root = xmltree.Element(module_filename)
+    tokens = __tokenize__(module_pathname)
     __get_members__(sysmodule,root,tokens)
     
     f = open(output_file,"w+")
     f.write(__xmltostring__(root))
     f.close()
+
     
 if __name__ == "__main__":
     code2xml(sys.argv[1])
