@@ -165,6 +165,8 @@ class XMLCreator():
     
                     tag_value,attrs = self._getattr2(value)
     
+    
+    
                     index = values.index(value)
                     tag = self._gettagname(self.data_table_headers[index])
                     element = self.add_child_tag(parent,tag)

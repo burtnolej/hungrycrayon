@@ -4,7 +4,7 @@ import os
 from os import path as ospath
 sys.path.append("/home/burtnolej/Development/pythonapps/utils")
 from misc_utils import UniqueIDGenerator, get_obj_attr_vals, get_obj_attr_names, \
-     get_obj_attr, generic, os_file_get_wildcard
+     get_obj_attr, generic, os_file_get_wildcard, os_file_to_string
 
 import unittest
 import time
@@ -105,6 +105,7 @@ class TestOSFiles(unittest.TestCase):
     def setUp(self):
         
         self.dir = "/tmp"
+        self.test_file = ospath.join(self.dir,"tmp.txt")
         self.match = ".txt"
         import os
         open(os.path.join(self.dir, 'foobar' + self.match),"w").close()
@@ -113,6 +114,44 @@ class TestOSFiles(unittest.TestCase):
     def test_os_file_get_wildcard(self):
         print os_file_get_wildcard(self.dir,self.match)
         
+    def test_os_file_to_string_remove_tab(self):
+        
+        s = "foobar\tfoobar"
+        
+        fh = open(self.test_file,'w+')
+        with (fh):
+            fh.write(s)
+            
+        expected_s = "foobarfoobar"
+        new_s = os_file_to_string(self.test_file,["\t"])
+        
+        self.assertEquals(new_s,expected_s)
+        
+    def test_os_file_to_string_remove_tab_and_string(self):
+        
+        s = "fo o b ar\tfo o b ar"
+        
+        fh = open(self.test_file,'w+')
+        with (fh):
+            fh.write(s)
+            
+        expected_s = "foobarfoobar"
+        new_s = os_file_to_string(self.test_file,["\t"," "])
+        
+        self.assertEquals(new_s,expected_s)
+
+    def test_os_file_to_string(self):
+        
+        s = "foobarfoobar"
+        
+        fh = open(self.test_file,'w+')
+        with (fh):
+            fh.write(s)
+            
+        expected_s = "foobarfoobar"
+        new_s = os_file_to_string(self.test_file)
+        
+        self.assertEquals(new_s,expected_s)
     
 if __name__ == "__main__":
 

@@ -19,30 +19,30 @@
     <longname>Database</longname>
     <shortname>db</shortname>
     <type>class</type>
-    <enum>
-        <e name=col_name_attrib>name</e>
-        <e name=db_type>db_type</e>
-        <e name=s3_tbl_attrib>"type","name", "tbl_name","rootpage","sql"</e>
-        <e name=s3_col_attrib>'cid', 'column_name', 'data_type', 'nullable', 'default_value', 'pk_index'</e>
-    </enum> 
-    <methods>
-        <m>execute</m>
-        <m>remove</m>
-        <m>tbl_get</m>
-        <m>tbl_exists</m>
-        <m>open</m>
-        <m>close</m>
-    </methods>
-    <variables>
-        <v>cursor</v>
-        <v>connection</v>
-        <v>name</v>
-        <v>config</v>
-    </variables>
-    <tests>
-        <t>test_db_create</t>
-        <t>test_tbl_create_pk</t>
-    </tests>
+    
+    <enum name=col_name_attrib>name</enum>
+    <enum name=db_type>db_type</enum>
+    <enum name=s3_tbl_attrib>"type","name", "tbl_name","rootpage","sql"</enum>
+    <enum name=s3_col_attrib>'cid', 'column_name', 'data_type', 'nullable', 'default_value', 'pk_index'</enum>
+    
+    <method name=execute></method>
+    <method name=remove></method>
+    <method name=tbl_get></method>
+    <method name=tbl_exists></method>
+    <method name=open>
+        <test>test_tbl_create_pk</test>
+        <test>test_tbl_create</test>
+    </method>
+    <method name=close></method>
+
+    <variable>cursor</variable>
+    <variable>connection</variable>
+    <variable>name</variable>
+    <variable>config</variable>
+    
+    
+    
+    
     <entity name=schema>
         <methods>
             <m>schema_read</m>

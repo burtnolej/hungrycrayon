@@ -1,0 +1,39 @@
+
+
+<class name='convert_xml_to_freemind'>
+
+    <method name=__init__>
+        <arg>input_filename</arg>
+        <type>string</type>
+        <description>name of xml input file</description>
+    </method>
+
+    <method name=convert />
+
+
+    <method name=parse />
+    <method name=parse_format />
+
+    <method name=element_add_attrib_format />
+    <method name=element_add_subelement_font />
+    <method name=element_add_subelement />
+    <method name=dump />
+    
+    <variable>root</variable>
+    <variable>output_format</variable>
+    <variable>output_format_type</variable>
+    <variable>element_format</variable>
+    <variable>new_element</variable>
+    <variable>element</variable>
+    <variable>attr_text</variable>
+    <variable name=input_filename />
+
+</class>
+    
+    
+        
+    
+    
+
+    
+    

@@ -1,39 +1,10 @@
 <map version="0.9.0">
-    <node TEXT="Database:diet"><node TEXT="Table:food"><node TEXT="Column:name"><node TEXT="DBType:text" />
-                <node TEXT="nullable:true" />
-            </node>
-            <node TEXT="Column:calories"><node TEXT="DBType:integer" />
-		<node TEXT="nullable:true" />
-            </node>
-	</node>
-	<node TEXT="Table:meals"><node TEXT="Column:type"><node TEXT="DBType:text" />
-		<node TEXT="nullable:true" />
-	    </node>
-	    <node TEXT="Column:time"><node TEXT="DBType:datetime" />
-		<node TEXT="nullable:true" />
-	    </node>
-        </node>
-    </node>
-    <node TEXT="Database:fitness"><node TEXT="Table:workout"><node TEXT="Key:date" />
-            <node TEXT="Column:date"><node TEXT="DBType:datetime" />
-                <node TEXT="nullable:true" />
-            </node>
-            <node TEXT="Column:type"><node TEXT="DBType:text" />
-		<node TEXT="nullable:true" />
-            </node>
-	</node>
-	<node TEXT="Row:"><node TEXT="Table:workout" />
-	    <node TEXT="Column:date"><node TEXT="Key:date" />
-	        <node TEXT="Value:250772" />
-	    </node>
-	    <node TEXT="Column:type"><node TEXT="Value:&quot;cycling&quot;" />
-	    </node>
-	</node>
-	<node TEXT="Row:"><node TEXT="Table:workout" />
-	    <node TEXT="Column:date"><node TEXT="Value:260772" />
-	    </node>
-	    <node TEXT="Column:type"><node TEXT="Value:&quot;rowing&quot;" />
-	    </node>
-	</node>
-    </node>
+	<node TEXT="class:Engine"><node TEXT="def:horsepower_set"><node TEXT="var:self"><node TEXT="Name:self" /></node>
+			<node TEXT="var:horsepower"><node TEXT="Name:horsepower" /></node>
+		<node TEXT="Name:horsepower_set" /></node>
+	<node TEXT="Name:Engine" /></node>
+	<node TEXT="module:code_utils"><node TEXT="Name:code_utils" /></node>
+	<node TEXT="module:os"><node TEXT="Name:os" /></node>
+	<node TEXT="module:sys"><node TEXT="Name:sys" /></node>
+	<node TEXT="module:xmltree"><node TEXT="Name:xmltree" /></node>
 </map>

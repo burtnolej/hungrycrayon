@@ -1,0 +1,10 @@
+<root>
+	<Database Name="foobar"/>
+	<Format Name=Database>burgundywhite18</Format>                    
+	<Format Name=Table>greyblack18</Format>
+	<Format Name=Column>darkbluelightblue16</Format>   
+	<Format Name=Key>yellowburgundy14</Format>   
+	<Format Name=Row>lightblueburgundy16</Format>   
+	<Format Name=Value>blackgreen14</Format>   
+	<Format Name=Attrib>whiteblack14i</Format>
+</root>

@@ -14,7 +14,20 @@ def os_file_get_wildcard(dir,pattern):
        
     #os.remove(os.path.join(dir, f))
 
-           
+def os_file_to_string(filename,remove=None):
+    
+    s=""
+    fh = open(filename, 'r+')
+
+    for line in fh:
+        if remove <> None:
+            for _str in remove:
+                line = line.replace(_str,"")
+        s+=line
+       
+    fh.close()
+    return s
+
 #-------------------------------------------------------------
 #-------------------------------------------------------------
 #-------------------------------------------------------------
@@ -37,12 +50,18 @@ class generic:
         for key,value in args.iteritems():
             setattr(self,key,value)
             
-        self.__get_attr__ = get_obj_attr
-        self.__get_attr_names__ = get_obj_attr_names
-
     def __print_attr__(self):
         for attrname,attrval in self.get_attr():
             print attrname,attrval
+        
+    def __get_attr__(self,obj=None):
+        if obj==None:
+            return get_obj_attr(self)
+    
+    def __get_attr_names__(self,obj=None):
+        if obj==None:
+            return get_obj_attr_names(self)
+
 
 class enum(generic):
     pass
@@ -61,8 +80,6 @@ def write_text_to_file(filename,text):
     fh.write(text)
     fh.close
     
-
-
 def read_text_from_file(filename,delim=","):
     '''returns a list of elements; converts to int if it can'''
     filel=[]
