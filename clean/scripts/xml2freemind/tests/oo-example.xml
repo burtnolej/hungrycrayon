@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<root>
+	<oo-example.py>
+		<class Name="Engine">
+			<def Name="horsepower_set">
+				<var Name="self"/>
+				<var Name="horsepower"/>
+			</def>
+		</class>
+		<module Name="code_utils"/>
+		<module Name="os"/>
+		<module Name="sys"/>
+		<module Name="xmltree"/>
+	</oo-example.py>
+</root>

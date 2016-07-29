@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<root>
+	<module Name="toottoot">
+	<class Name="foobar">
+		<method Name="boo">
+			<arg Name="self"/>
+		</method>
+		<var Name="boo"/>
+	</class>
+	<class Name="foobar2">
+		<method Name="boohoo">
+			<arg Name="self"/>
+			<arg Name="banana"/>
+		</method>
+		<method Name="boo2">
+			<arg Name="self"/>
+			<var Name="a"/>
+			<var Name="b"/>
+		</method>
+	</class>
+	<class Name="foobar3">
+		<method Name="boo3">
+			<arg Name="self"/>
+			<var Name="self.foobar"/>
+		</method>
+	</class>
+	<class Name="mybase"/>
+	<def Name="myfunc">
+		<arg Name="fe"/>
+		<arg Name="fi"/>
+		<arg Name="fo"/>
+		<arg Name="fum"/>
+		<var Name="foo"/>
+	</def>
+	<var Name="mylocal"/>
+	</module>
+</root>
+
