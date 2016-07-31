@@ -1,7 +1,7 @@
 
 import unittest
 
-from getopt import getopt, GetoptError
+from getopt import getopt, GetoptError, gnu_getopt
 
 class TestGetopt(unittest.TestCase):
     
@@ -59,13 +59,57 @@ class TestGetopt(unittest.TestCase):
     def test_long_multiargs_withvalue(self):
         
         rules = ['noarg','noarg2','witharg=']
-        validargs = ['--noarg','--noarg2','--witharg']
         options,remainder = getopt(['--witharg=foobar'],'',rules)
 
         self.assertEquals(options[0][0],'--witharg')
         self.assertEquals(options[0][1],'foobar')
-
         
+        # combining novalue and value
+        options,remainder = getopt(['--noarg','--witharg=foobar'],'',rules)
+        for option, value in options:
+            if option == '--witharg':
+                self.assertNotEqual(value,"")  
+            else:
+                self.assertEqual(value,"")  
+                
+    def test_long_outoforder(self):
+        
+        # mixing value and no value args
+        rules = ['noarg','witharg=']
+        expected_result = [('--witharg','foobar'),('--noarg','')]
+        options,remainder = getopt(['--witharg=foobar','--noarg'],'',rules)
+        self.assertListEqual(options, expected_result)
+
+        expected_result = [('--noarg',''),('--witharg','foobar')]
+        options,remainder = getopt(['--noarg','--witharg=foobar'],'',rules)
+        self.assertListEqual(options, expected_result)
+        
+    def test_catch_error_print_usage(self):
+        # mixing value and no value args
+        rules = ['noarg','witharg=']
+   
+        with self.assertRaises(GetoptError) as context:
+            options,remainder = getopt(['--noarg=asdfsdf'],'',rules)
+        
+        if (str(context.exception) == 'option --noarg must not have an argument'):
+
+            #print "\n\nusage: --witharg [valid arg] | --noarg"
+            #print "error:",context.exception
+            #print "\n"
+            pass
+    
+    def test_from_cmdline(self):
+        import sys
+        rules = ['noarg','witharg=']
+   
+        # if you pass in a garbage option at cmdline getopt will ignore and keep
+        # processing
+        options,remainder = getopt(sys.argv,'',rules)
+        
+        # need to start from sys.argv[1:]
+        with self.assertRaises(GetoptError) as context:
+            options,remainder = getopt(sys.argv[1:],'',rules)
+            
 if __name__ == "__main__":
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestGetopt)

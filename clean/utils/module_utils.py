@@ -113,9 +113,12 @@ def __add_element__(root,name,objtype):
     subelement.set('Name',name) 
     return(subelement)
 
-def code2xml(module, module_filename):
+def py2xml(module_filename,module=None):
     from inspect import getmembers, isclass, isroutine
      
+    if module==None:
+        module = __load_module__(module_filename)
+            
     tokens = __tokenize__(module_filename)
     root = xmltree.Element('root')
     
@@ -152,17 +155,22 @@ def code2xml(module, module_filename):
     
     return(output_filename)
 
-def __load_module__(module_filename):
+def __load_module__(module_abspathname):
     
     from importlib import import_module    
     from sys import modules
-    from os.path import basename, splitext
+    from os.path import basename, splitext, join, realpath
+    import os
+    import sys
     
-    module, ext = splitext(basename(module_filename))
-    import_module(module)
-    globals()['tmp_module2'] = modules[module] 
+    reldir = realpath(join(module_abspathname,".."))
+    module_name, ext = splitext(basename(module_abspathname))
+    sys.path.append(reldir)
+    import_module(module_name)
     
-    return(modules[module])
+    globals()[module_name] = modules[module_name] 
+    
+    return(modules[module_name])
 
 def __convert_filename__(module_filename,new_ext):
     from os.path import basename, splitext
@@ -174,5 +182,4 @@ if __name__ == "__main__":
     import sys
     
     module_filename = sys.argv[1]
-    module = __load_module__(module_filename)
-    code2xml(module, module_filename)    
+    py2xml(module_filename)    

@@ -1,0 +1,14 @@
+<root>
+	<Database Name="foobar">
+		<Table Name="barfoo">
+			<Column Name="dohdoh" />
+		</Table>
+		<Test Name="ooh"/>
+		<Test Name="ahh"/>
+	</Database>
+	<Database Name="foobarsaunders">
+		<Table Name="yippee">
+			<Column Name="blah" />
+		</Table>
+	</Database>
+</root>

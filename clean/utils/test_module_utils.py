@@ -3,7 +3,7 @@
 import unittest
 from random import randint
 import pickle
-from module_utils import __load_module__, _getmembers, code2xml,\
+from module_utils import __load_module__, _getmembers, py2xml,\
      _getvarfromsource, __tokenize__, _getargsfromsource, __getsourceaslist__, \
      _dir, _getclassmethods
 
@@ -11,9 +11,9 @@ class Test_ModuleUtils(unittest.TestCase):
     
     def test_get_loaded_modules(self):
         
-        ''' these can start to fail if other tests get ran before
-        and have imported modules that have not been previously been
-        deleted'''
+        #these can start to fail if other tests get ran before
+        #and have imported modules that have not been previously been
+        #deleted
         
         # detecting local modules
         from sys import modules
@@ -187,10 +187,58 @@ class Test_ModuleUtils(unittest.TestCase):
                               'mylocal', 'mylocal'],tokens)
         
     def test_xml_generator(self):
-
+        import os
+        print os.getcwd()
         module_filename = "./tmp_module2.py"
+        py2xml(module_filename)      
+
+    def test_load_module_not_in_cwd_abspath(self):
+        # if module.py in /home/burtnolej; move cwd to /tmp and load
+        # /home/burtnolej/module.py
+        import os
+        from inspect import isclass
+        _cwd = os.getcwd()
+        os.chdir("/tmp")
+        module_filename = "./tmp_module3.py"
+        module_path = os.path.join(_cwd,"./tmp_module3.py")
+        module = __load_module__(module_path)
+        os.chdir(_cwd)
+        
+        classes = [name for name in _dir(module) if isclass(getattr(module,name))]
+        
+        self.assertEquals(classes,['foobar','foobar2','foobar3','mybase'])
+        
+    def test_load_module_not_in_cwd_relpath(self):
+        # if module.py in /home/burtnolej; move cwd to /home and load
+        # ./burtnolej/module.py
+        import os
+        from inspect import isclass
+        _cwd = os.getcwd()
+        _basecwd = os.path.basename(_cwd)
+        os.chdir("..")
+        module_filename = "./tmp_module3.py"
+        module_path = os.path.join(_basecwd,"./tmp_module3.py")
+        
+        module = __load_module__(module_path)
+        
+        os.chdir(_cwd)
+        
+        classes = [name for name in _dir(module) if isclass(getattr(module,name))]
+        
+        self.assertEquals(classes,['foobar','foobar2','foobar3','mybase'])
+           
+    def test_load_module_not_in_cwd_relpath_forced(self):
+        # force the module to not be in the current path
+        import os
+        from inspect import isclass
+
+        module_filename = "./tmp/tmp_module4.py"
+        
         module = __load_module__(module_filename)
-        code2xml(module, module_filename)      
+
+        classes = [name for name in _dir(module) if isclass(getattr(module,name))]
+        
+        self.assertEquals(classes,['foobar','foobar2','foobar3','mybase'])
 
         
 if __name__ == "__main__":

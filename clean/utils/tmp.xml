@@ -1,0 +1,6 @@
+<node>
+	<childA>
+		<gchildA name='brian'/>
+		<gchildB>blahblah</gchildB>
+	</childA>
+</node>
