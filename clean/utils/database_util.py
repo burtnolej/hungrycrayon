@@ -1,9 +1,10 @@
 
 import sqlite3
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
-from xml_utils import get_xml_elements,get_xml_element,get_xml_child_elements, get_xml_root
-from misc_utils import os_file_exists, print_dict_of_dict, enum, get_obj_attr_names
+sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
+from xml_utils import element_find_tags,element_find_children
+
+from misc_utils import os_file_exists, enum, get_obj_attr_names
 
 db_enum = enum(name_attrib="Name", # keywords used in the schema xml file
                db_type="DBType", # keywords used in the schema xml file
@@ -132,8 +133,8 @@ def schema_read(schema_file):
     name_enum = db_enum.name_attrib
     type_enum = db_enum.db_type
     
-    xml = get_xml_elements
-    child_xml = get_xml_child_elements
+    xml = element_find_tags
+    child_xml = element_find_children
     
     config = {}
     
@@ -196,8 +197,9 @@ def schema_data_get(schema_file,tbl_name):
        returns: tbl_col_name : a list of column names
               : tbl_rows : a list of tuples containing data rows [('250772', 'cycling'), ('260772', 'rowing')]'''
     # name shortening ...    
-    xml = get_xml_elements
-    child_xml = get_xml_child_elements
+    xml = element_find_tags
+    child_xml = element_find_children
+    
         
     rows = [xml(schema_file,".//Field",row_xml) for row_xml in xml(schema_file,".//Row") 
             if row_xml.attrib['Table'] == tbl_name]

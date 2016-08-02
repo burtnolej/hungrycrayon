@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as xmltree
 import unittest
 from xml_utils import element_find_by_attrib_value, element_move, element_fuse, \
-     element_parent_get
+     element_parent_get, element_find_tags,element_find_children
     
 class Test_XML(unittest.TestCase):
 
@@ -9,6 +9,18 @@ class Test_XML(unittest.TestCase):
         
         self.xml = "<node><childA><gchildA name='brian'/><gchildB /></childA></node>"
         self.root = xmltree.fromstring(self.xml)
+        
+    def test_element_find_tags(self):
+        xml = "<node><child><gchildA name='brian'/><gchildB /></child><child><gchildB name='david'/><gchildB /></child></node>"
+        self.root = xmltree.fromstring(xml)
+        results = element_find_tags('','child',self.root)
+        self.assertEqual(len(results),2)
+        
+    def test_element_find_children(self):
+        xml = "<node><childA>blahblah<gchildA name='brian'/><gchildB /></childA><childB>foobar<gchildB name='david'/><gchildB /></childB></node>"
+        self.root = xmltree.fromstring(xml)
+        results = element_find_children(self.root)
+        self.assertEqual(results,{'childA':'blahblah','childB':'foobar'})
         
     def test_tree_find_unique_tag(self):
         # note that find(<tag>) will only search direct descendents

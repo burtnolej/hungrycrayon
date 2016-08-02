@@ -3,12 +3,17 @@
 import unittest
 from random import randint
 import pickle
-from module_utils import __load_module__, _getmembers, py2xml,\
+from module_utils import __load_module__, _getmembers, \
      _getvarfromsource, __tokenize__, _getargsfromsource, __getsourceaslist__, \
-     _dir, _getclassmethods
+     _dir, _getclassmethods, __getuserloadedmodules__, imported_sysclasses_remove, \
+     _getclasses, isuserclass, isuserfunc
+from os.path import join
 
 class Test_ModuleUtils(unittest.TestCase):
     
+    def setUp(self):
+        self.test_dir = "/home/burtnolej/Development/pythonapps3/clean/utils"
+        
     def test_get_loaded_modules(self):
         
         #these can start to fail if other tests get ran before
@@ -17,11 +22,11 @@ class Test_ModuleUtils(unittest.TestCase):
         
         # detecting local modules
         from sys import modules
-        self.assertFalse(modules.has_key('inspect'))
-        self.assertFalse(modules.has_key('sqlite3'))
+        self.assertFalse(modules.has_key('email'))
+        self.assertFalse(modules.has_key('json'))
         
-        import sqlite3        
-        self.assertTrue(modules.has_key('sqlite3'))
+        import json        
+        self.assertTrue(modules.has_key('json'))
         
         # when you select a component does the module get loaded too
         from threading import current_thread
@@ -57,7 +62,7 @@ class Test_ModuleUtils(unittest.TestCase):
         from sys import modules
         from os.path import basename, splitext
         
-        module_filename = "./tmp_module.py"
+        module_filename = "tmp_module.py"
         module, ext = splitext(basename(module_filename))
         
         # load module dynamically
@@ -73,8 +78,8 @@ class Test_ModuleUtils(unittest.TestCase):
         
         from inspect import getmembers
         
-        module_filename = "./tmp_module.py"
-        module = __load_module__(module_filename)
+        module_filename = "tmp_module.py"
+        module = __load_module__(module_filename,allowdupe=True)
         
         self.assertEquals(['foobar'],[member for member in dir(module) if not member.startswith('__')])
     
@@ -88,18 +93,19 @@ class Test_ModuleUtils(unittest.TestCase):
 
         from inspect import isclass
         
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
+        module_filename = "tmp_module2.py"
+        module = __load_module__(module_filename,allowdupe=True)
         
         classes = [name for name in _dir(module) if isclass(getattr(module,name))]
         
         self.assertEquals(classes,['foobar','foobar2','foobar3','mybase'])
+
         
     def test_get_module_class_methods(self):
         from inspect import isclass
         
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
+        module_filename = "tmp_module2.py"
+        module = __load_module__(module_filename,allowdupe=True)
         
         classes = [name for name in _dir(module) if isclass(getattr(module,name))]
         
@@ -111,18 +117,19 @@ class Test_ModuleUtils(unittest.TestCase):
           
     def test_get_module_class_method_args(self):
         
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
+        module_filename = "tmp_module2.py"
+        module = __load_module__(module_filename,allowdupe=True)
         
-        tokens = __tokenize__("./tmp_module2.py")
+        tokens = __tokenize__(join(self.test_dir,"tmp_module2.py"))
         
         args = _getargsfromsource(module.foobar2.boohoo,tokens)
         self.assertListEqual(['self','banana'],args)
         
+        
     def test_get_module_class_method_vars(self):
         
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
+        module_filename = "tmp_module2.py"
+        module = __load_module__(module_filename,allowdupe=True)
         
         vars = _getvarfromsource(module.foobar2.boo2)
         self.assertListEqual(['a','b'],vars)
@@ -131,8 +138,8 @@ class Test_ModuleUtils(unittest.TestCase):
         
         from inspect import isclass, ismethod
         
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
+        module_filename = "tmp_module2.py"
+        module = __load_module__(module_filename,allowdupe=True)
         
         classes = [name for name in _dir(module) if isclass(getattr(module,name))]
         
@@ -149,8 +156,8 @@ class Test_ModuleUtils(unittest.TestCase):
 
         from inspect import isroutine
         
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
+        module_filename = "tmp_module2.py"
+        module = __load_module__(module_filename,allowdupe=True)
         
         routines = [name for name in _dir(module) if isroutine(getattr(module,name))]
         
@@ -158,39 +165,36 @@ class Test_ModuleUtils(unittest.TestCase):
         
     def test_get_variables_in_function(self):
 
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
+        module_filename = "tmp_module2.py"
+        module = __load_module__(module_filename,allowdupe=True)
         
         self.assertListEqual(['foo'],_getvarfromsource(module.myfunc))
         
     def test_get_proc_signature(self):
         
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
-        tokens = __tokenize__("./tmp_module2.py")
+        module_filename = "tmp_module2.py"
+        module = __load_module__(module_filename,allowdupe=True)
+        tokens = __tokenize__(join(self.test_dir,"tmp_module2.py"))
         
         self.assertListEqual(['fe','fi','fo','fum'],_getargsfromsource(module.myfunc,tokens))
-    
+
     def test_get_module_info_all(self):
 
+        #need to put tmp_module to test_get_module_info_all.py
+        #as we are picking up tmp_module from a previous load
         
-        module_filename = "./tmp_module2.py"
-        module = __load_module__(module_filename)
+        module_filename = join(self.test_dir,"./test_misc/test_get_module_info_all.py")
         
-        tokens = __getsourceaslist__(module_filename, module)
+        module = __load_module__(module_filename,allowdupe=True)
         
-        self.assertListEqual(['foobar', 'boo', ['self'], [], ['blahblah'], 
-                              'foobar2', 'boohoo', ['self', 'banana'], [], 'boo2', ['self'], ['a', 'b'], [], 
-                              'foobar3', 'boo3', ['self'], ['self.foobar'], [], 
-                              'mybase', [], 
-                              'myfunc', 'myfunc', ['fe', 'fi', 'fo', 'fum'], ['foo'], 
-                              'mylocal', 'mylocal'],tokens)
-        
-    def test_xml_generator(self):
-        import os
-        print os.getcwd()
-        module_filename = "./tmp_module2.py"
-        py2xml(module_filename)      
+        tokens = __getsourceaslist__(join(self.test_dir,module_filename), module)
+                
+        self.assertListEqual(['foobart', 'boo', ['self'], [], ['blahblah'], 
+                              'foobart2', 'boohoo', ['self', 'banana'], [], 'boo2', ['self'], ['a', 'b'], [], 
+                              'foobart3', 'boo3', ['self'], ['self.foobar'], [], 
+                              'mybaser', [], 
+                              'myfunc',  ['fe', 'fi', 'fo', 'fum'], ['foo'], 
+                              'mylocal'],tokens)   
 
     def test_load_module_not_in_cwd_abspath(self):
         # if module.py in /home/burtnolej; move cwd to /tmp and load
@@ -199,9 +203,9 @@ class Test_ModuleUtils(unittest.TestCase):
         from inspect import isclass
         _cwd = os.getcwd()
         os.chdir("/tmp")
-        module_filename = "./tmp_module3.py"
-        module_path = os.path.join(_cwd,"./tmp_module3.py")
-        module = __load_module__(module_path)
+        module_filename = "tmp_module3.py"
+        module_path = os.path.join(_cwd,"tmp_module3.py")
+        module = __load_module__(module_path,allowdupe=True)
         os.chdir(_cwd)
         
         classes = [name for name in _dir(module) if isclass(getattr(module,name))]
@@ -216,10 +220,10 @@ class Test_ModuleUtils(unittest.TestCase):
         _cwd = os.getcwd()
         _basecwd = os.path.basename(_cwd)
         os.chdir("..")
-        module_filename = "./tmp_module3.py"
-        module_path = os.path.join(_basecwd,"./tmp_module3.py")
+        module_filename = "tmp_module3.py"
+        module_path = os.path.join(_basecwd,"tmp_module3.py")
         
-        module = __load_module__(module_path)
+        module = __load_module__(module_path,allowdupe=True)
         
         os.chdir(_cwd)
         
@@ -232,15 +236,75 @@ class Test_ModuleUtils(unittest.TestCase):
         import os
         from inspect import isclass
 
-        module_filename = "./tmp/tmp_module4.py"
+        module_filename = join(self.test_dir,"./.tmp/tmp_module4.py")
         
-        module = __load_module__(module_filename)
+        module = __load_module__(module_filename,allowdupe=True)
 
         classes = [name for name in _dir(module) if isclass(getattr(module,name))]
         
         self.assertEquals(classes,['foobar','foobar2','foobar3','mybase'])
+        
+    def test_load_module_same_module_twice(self):
+        # force the module to not be in the current path
+        import os
+        from inspect import isclass
 
+        module_filename = join(self.test_dir,"./.tmp/tmp_module5.py")
+        module = __load_module__(module_filename)
+
+        classes = [name for name in _dir(module) if isclass(getattr(module,name))]
+    
+        self.assertEquals(classes,['foobar','foobar2','foobar3','mybase'])
+
+        module_filename = "./.tmp_dupe/tmp_module5.py"
+        with self.assertRaises(Exception):
+            module = __load_module__(module_filename)
+            
+            
+class Test_ModuleUtilsImports(unittest.TestCase):
+    
+    def setUp(self):
+        self.test_dir = "/home/burtnolej/Development/pythonapps3/clean/utils"
+        
+    def test_getusermodules(self):
+        
+        print __getuserloadedmodules__()
+        
+    def test_get_module_classes_with_imports(self):
+
+        from inspect import isclass
+        test_module = "test_get_module_classes_with_imports.py"
+        
+        module_filename = join(self.test_dir+"/test_misc",test_module)
+        module = __load_module__(module_filename,allowdupe=True)        
+        classes = _getclasses(module,test_module)
+                    
+        self.assertEquals(classes,['foobar10'])
+    
+    def test_isuserdefnclass(self):
+
+        from inspect import isclass
+        test_module = "test_get_module_classes_with_imports.py"
+        
+        module_filename = join(self.test_dir+"/test_misc",test_module)
+        module = __load_module__(module_filename,allowdupe=True)        
+                    
+        self.assertTrue(isuserclass('foobar10',test_module))
+        self.assertFalse(isuserclass('GetoptError',test_module))
+        
+    def test_isuserfunc(self):
+
+        from inspect import isclass
+        test_module = "test_get_module_classes_with_imports.py"
+        
+        module_filename = join(self.test_dir+"/test_misc",test_module)
+        module = __load_module__(module_filename,allowdupe=True)        
+                    
+        self.assertTrue(isuserfunc('myfunk',test_module))
+        self.assertFalse(isuserfunc('gnu_getopt',test_module))
         
 if __name__ == "__main__":
+    suite = unittest.TestSuite()
     suite = unittest.TestLoader().loadTestsFromTestCase(Test_ModuleUtils)
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ModuleUtilsImports))
     unittest.TextTestRunner(verbosity=2).run(suite) 

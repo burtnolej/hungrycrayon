@@ -4,6 +4,7 @@ import sys
 
 from xml2freemind import xml2freemind
 import xml.etree.ElementTree as xmltree
+from os.path import join
 import filecmp
 
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
@@ -12,14 +13,15 @@ from misc_utils import os_file_to_string
 class Test_xml2mm(unittest.TestCase):
     
     def setUp(self):
-        self.output_xml="./tests/tmp.mm"
+        self.test_dir = "/home/burtnolej/Development/pythonapps3/clean/scripts/xml2freemind/tests"
+        self.output_xml=join(self.test_dir,"tmp.mm")
         self.verbosity=1
       
     def test_xml2mm_missing_key(self):
         #Format nodes must have SubElement with tag=Key
-        self.input_xml="./tests/test1_input_missing_key.xml"
-        self.output_xml="./tests/tmp.mm"
-        self.expected_output_xml = "./tests/test1_output.mm"
+        self.input_xml=join(self.test_dir,"test1_input_missing_key.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"test1_output.mm")
 
         with self.assertRaises(Exception):
             
@@ -29,9 +31,9 @@ class Test_xml2mm(unittest.TestCase):
 
     def test_xml2mm_missing_value(self):
         #Format nodes must have SubElement with tag=Value
-        self.input_xml="./tests/test1_input_missing_value.xml"
-        self.output_xml="./tests/tmp.mm"
-        self.expected_output_xml = "./tests/test1_output.mm"
+        self.input_xml=join(self.test_dir,"test1_input_missing_value.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"test1_output.mm")
 
         with self.assertRaises(Exception):
             
@@ -51,9 +53,9 @@ class Test_xml2mm(unittest.TestCase):
         #     </node>
         #</map>
 
-        self.input_xml="./tests/1node_short_format.xml"
-        self.output_xml="./tests/tmp.mm"
-        self.expected_output_xml = "./tests/1node_short_format.mm"
+        self.input_xml=join(self.test_dir,"1node_short_format.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"1node_short_format.mm")
 
         xml2freemind.convert(self.input_xml,
                              verbosity = self.verbosity,
@@ -76,8 +78,8 @@ class Test_xml2mm(unittest.TestCase):
         #      </node> 
         #</map>
         
-        self.input_xml="./tests/1node_long_format.xml"
-        self.expected_output_xml = "./tests/1node_long_format.mm"
+        self.input_xml=join(self.test_dir,"1node_long_format.xml")
+        self.expected_output_xml = join(self.test_dir,"1node_long_format.mm")
         
         xml2freemind.convert(self.input_xml,
                              verbosity = self.verbosity,
@@ -91,8 +93,8 @@ class Test_xml2mm(unittest.TestCase):
         
     def test_xml2mm_3levels_no_text(self):
         
-        self.input_xml="./tests/test4_input.xml"
-        self.expected_output_xml = "./tests/test4_output.mm"
+        self.input_xml=join(self.test_dir,"test4_input.xml")
+        self.expected_output_xml = join(self.test_dir,"test4_output.mm")
         
         xml2freemind.convert(self.input_xml,
                              verbosity = self.verbosity,
@@ -105,8 +107,8 @@ class Test_xml2mm(unittest.TestCase):
         
     def test_xml2mm_3levels_no_text_siblings(self):
         
-        self.input_xml="./tests/test5_input.xml"
-        self.expected_output_xml = "./tests/test5_output.mm"
+        self.input_xml=join(self.test_dir,"test5_input.xml")
+        self.expected_output_xml = join(self.test_dir,"test5_output.mm")
         
         xml2freemind.convert(self.input_xml,
                              verbosity = self.verbosity,
@@ -119,8 +121,8 @@ class Test_xml2mm(unittest.TestCase):
         
     def test_xml2mm_verbose(self):
         
-        self.input_xml="./tests/test5_input.xml"
-        self.expected_output_xml = "./tests/test5_output.mm"
+        self.input_xml=join(self.test_dir,"test5_input.xml")
+        self.expected_output_xml = join(self.test_dir,"test5_output.mm")
         
         xml2freemind.convert(self.input_xml,
                              verbosity = 5,
@@ -172,8 +174,8 @@ class Test_xml2mm(unittest.TestCase):
         #    </multiple_roots>
         #</map>
 
-        self.input_xml="./tests/multiple_roots.xml"
-        self.expected_output_xml = "./multiple_roots.mm"
+        self.input_xml=join(self.test_dir,"multiple_roots.xml")
+        self.expected_output_xml = join(self.test_dir,"./multiple_roots.mm")
         
         xml2freemind.convert(self.input_xml,
                              verbosity = 5,
@@ -189,9 +191,9 @@ class Test_xml2mm(unittest.TestCase):
         #    <node TEXT="foobar" />
         #</map>
 
-        self.input_xml="./tests/supress_name_attrib.xml"
-        self.output_xml="./tests/tmp.mm"
-        self.expected_output_xml = "./tests/supress_name_attrib.mm"
+        self.input_xml=join(self.test_dir,"supress_name_attrib.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"supress_name_attrib.mm")
 
         xml2freemind.convert(self.input_xml,
                              verbosity = self.verbosity,
@@ -222,9 +224,9 @@ class Test_xml2mm(unittest.TestCase):
         #      </node>
         #</map>
 
-        self.input_xml="./tests/formats.xml"
-        self.output_xml="./tests/tmp.mm"
-        self.expected_output_xml = "./tests/formats.mm"
+        self.input_xml=join(self.test_dir,"formats.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"formats.mm")
 
         xml2freemind.convert(self.input_xml,
                              verbosity = 5,
@@ -269,9 +271,9 @@ class Test_xml2mm(unittest.TestCase):
         
         xml = "<root><Database Name=\"foobar\"><Table Name=\"barfoo\"><Column Name=\"boohoo\" /></Table></Database><Database Name=\"foobar2\"><Table Name=\"barfoo2\"><Column Name=\"boohoo2\" /></Table></Database><gbyDatabase><foobar /><foobar2 /></gbyDatabase></root>"
 
-        self.input_xml="./tests/groupby.xml"
-        self.output_xml="./tests/tmp.mm"
-        self.expected_output_xml = "./tests/groupby.mm"
+        self.input_xml=join(self.test_dir,"groupby.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"groupby.mm")
          
         x2fm = xml2freemind.groupby(self.input_xml,
                                     verbosity = 5,
@@ -324,9 +326,9 @@ class Test_xml2mm(unittest.TestCase):
         #</map>
         
 
-        self.input_xml="./tests/groupby.xml"
-        self.output_xml="./tests/tmp.mm"
-        self.expected_output_xml = "./tests/groupby.mm"
+        self.input_xml=join(self.test_dir,"groupby.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"groupby.mm")
          
         x2fm = xml2freemind.convert(self.input_xml,
                                     verbosity = 5,
@@ -381,9 +383,9 @@ class Test_xml2mm(unittest.TestCase):
         #      </node>
         #</map>
         
-        self.input_xml="./tests/groupby.xml"
-        self.output_xml="./tests/tmp.mm"
-        self.expected_output_xml = "./tests/groupby_multi.mm"
+        self.input_xml=join(self.test_dir,"groupby.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"groupby_multi.mm")
          
         x2fm = xml2freemind.convert(self.input_xml,
                                     verbosity = 5,

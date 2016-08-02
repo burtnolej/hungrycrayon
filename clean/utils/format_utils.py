@@ -69,7 +69,3 @@ blackgreen14 = enum(STYLE="bubble",
                     COLOR=color.green,
                     BACKGROUND_COLOR=color.black,
                     FONT=ss14)
-
-
-<root> <Database Name="foobar"> <Table Name="barfoo"> <Column Name="boohoo" /> </Table> </Database> <Database Name="foobar2"> <Table Name="barfoo2"> <Column Name="boohoo2" /> </Table> </Database> <gbyDatabase><foobar /><foobar2 /></gbyDatabase></root>
-<root><DatabaseName="foobar"><TableName="barfoo"><ColumnName="boohoo"/></Table></Database><DatabaseName="foobar2"><TableName="barfoo2"><ColumnName="boohoo2"/></Table></Database><gbyDatabase><foobar/><foobar2/></gbyDatabase></root>'

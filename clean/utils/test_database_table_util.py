@@ -12,7 +12,6 @@ from database_table_util import tbl_rows_get, tbl_rows_insert, \
      tbl_rows_insert_from_schema, tbl_cols_get, tbl_col_add
 
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
-from xml_utils import get_xml_elements, get_xml_element
 from misc_utils import enum
 from os import remove
 

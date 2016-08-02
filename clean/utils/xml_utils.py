@@ -1,4 +1,26 @@
+
 import xml.etree.ElementTree as xmltree
+
+def element_find_tags(filen, tag, root=None,ns=None):
+    ''' starting at the root, search for any elements where tag=tag
+    and return a list of those xmlelement objects. root will default
+    to the top of the tree unless a lower level node is provided '''
+    
+    if root==None: #assume we search from actual tree root
+        search_root = xmltree.parse(filen)
+    else:
+        search_root = root
+        
+    return(search_root.findall(tag,ns))
+           
+def element_find_children(parent):
+    ''' for a given xml element, return all children as a list of tuples of the form
+    (name,value)'''
+    
+    d={}
+    for child in parent._children:
+        d[child.tag]=child.text
+    return(d)
 
 def element_attrib_as_string(element):
     s=""

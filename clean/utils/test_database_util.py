@@ -7,8 +7,7 @@ from database_util import Database, tbl_create, tbl_index_count, \
      schema_col_get, schema_tbl_pk_get, schema_print, schema_execute, \
      schema_data_get
 
-sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
-from xml_utils import get_xml_elements, get_xml_element
+sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import enum
 from os import remove
 

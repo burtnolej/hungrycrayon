@@ -1,7 +1,6 @@
 import sqlite3
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
-from xml_utils import get_xml_elements,get_xml_element,get_xml_child_elements, get_xml_root
+sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import enum
 from database_util import schema_data_get, db_enum
 
