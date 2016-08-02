@@ -16,12 +16,12 @@ from types import InstanceType
 
 class xml2freemind(generic):
 
-    def __init__(self,*arg,**kwargs):
+    def __init__(self,**kwargs):
         
         for k,v in kwargs.iteritems():
             setattr(self,k,v)
 
-        self.input_filename =arg[0]
+        #self.input_filename =arg[0]
         
         self.fmformat=enum()
         self.root = xmltree.parse(self.input_filename).getroot()
@@ -30,7 +30,10 @@ class xml2freemind(generic):
         date = datetime.now().strftime("%H%M%S")
                    
         if not hasattr(self,'output_filename') or self.output_filename == None:
-            self.output_filename = splitext(input_filename)[0]+".mm"
+            self.output_filename = splitext(self.input_filename)[0]+".mm"
+            
+        if not hasattr(self,'verbosity'):
+            self.verbosity = 1
 
         self.log_filename = splitext(self.output_filename)[0]+".log." + date
         self.log = open(self.log_filename,"w+")
@@ -240,9 +243,34 @@ class xml2freemind(generic):
 
 
 if __name__ == "__main__":
-    
-    if not isfile(sys.argv[1]):
-        print "usage: xml2mm.py <input xml file> <output xml file> [-full]"
-        exit()
 
-    xml2freemind(sys.argv[1])
+    def printusage(msg):
+        print "\nusage: --input=<python file> --output=<python file>"
+        print msg
+        exit()
+            
+    rules = ['input=']
+    input_file = None
+    
+    try:
+        options,remainder = getopt(sys.argv[1:],'',rules)
+    except GetoptError, e:
+        printusage("error:",e.msg)
+    
+    args={}
+    for option, value in options:
+        if option == '--input':
+            args['input_filename'] = value
+        if option == '-output':
+            args['output_filename'] = value
+    
+    if not args.has_key('input_filename') or not isfile(args['input_filename']):
+        printusage("error: --input arg must be set to a real file")
+        
+    if args.has_key('output_filename') and not isfile(args['output_filename']):
+        printusage("error: --output arg must be set to a real file")
+
+    xmlfile = xml2freemind.convert(**args)
+
+    #fmfile = xml2freemind(xmlfile,1).output_filename
+    #print "info: result written to",fmfile
