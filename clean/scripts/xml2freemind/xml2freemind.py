@@ -13,6 +13,7 @@ from datetime import datetime
 from copy import deepcopy
 from inspect import getmembers, isclass
 from types import InstanceType
+from pprint import pprint
 
 class xml2freemind(generic):
 
@@ -38,7 +39,7 @@ class xml2freemind(generic):
         self.log_filename = splitext(self.output_filename)[0]+".log." + date
         self.log = open(self.log_filename,"w+")
         
-        self._log(3,"args set:",*self.__dump__())
+        #self._log(3,"args set:",kwargs)
         
     @classmethod
     def convert(cls,*arg,**kwarg):
