@@ -13,7 +13,7 @@ class Test_testrunner(unittest.TestCase):
         suite, testsummary = testsuite_get('./dir',allowdupe=True)
         testsuite_run(suite)
         
-        #self.assertEqual(testsummary,expected_results)
+        self.assertEqual(testsummary,expected_results)
         
     def test_testsuite_results(self):
         # allow dupe has to be set as the prev test may not have released the module
@@ -24,7 +24,7 @@ class Test_testrunner(unittest.TestCase):
         
         testsuite_results(testresult)
         
-        #self.assertEqual(testsummary,expected_results)
+        self.assertEqual(testsummary,expected_results)
         
     def test_testsuite_results_failures(self):
         

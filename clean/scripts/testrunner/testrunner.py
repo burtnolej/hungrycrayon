@@ -120,10 +120,11 @@ if __name__ == "__main__":
         if option == '--ignoredir':
             args[option[2:]] = value
     
-    print args['ignoredir'],abspath(args['ignoredir']),abspath(args['ignoredir'])
-                                      
+                                          
     if not args.has_key('rootdir'):
         printusage("error: --rootdir arg must be set to a real directory")
+        
+    print args['ignoredir'],abspath(args['ignoredir']),abspath(args['ignoredir'])
         
     cwd = getcwd()
     if not isdir(args['rootdir']) or not isabs(args['rootdir']):

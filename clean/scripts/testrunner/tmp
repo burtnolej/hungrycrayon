@@ -1,0 +1,88 @@
+info:rootdir=./dir,allowdupe=False,ignoredir=[]
+
+
+== ./dir =================================================
+info:searching ./dir
+info:loaded test= Test_Test            from dir/test_test1.py
+info:loaded test= Test_Test2           from dir/test_test1.py
+info:searching ./dir/subdir
+info:loaded test= Test_Test21          from subdir/test_test2.py
+info:loaded test= Test_Test22          from subdir/test_test2.py
+info:rootdir=./dir,allowdupe=True,ignoredir=[]
+
+
+== ./dir =================================================
+info:searching ./dir
+info:loaded test= Test_Test            from dir/test_test1.py
+info:loaded test= Test_Test2           from dir/test_test1.py
+info:searching ./dir/subdir
+info:loaded test= Test_Test21          from subdir/test_test2.py
+info:loaded test= Test_Test22          from subdir/test_test2.py
+info:executing, results
+{'#errors': 0, '#failures': 0, '#tests': 8, 'errors': [], 'failures': []}
+info:rootdir=./dir_error,allowdupe=True,ignoredir=[]
+
+
+== ./dir_error =================================================
+info:searching ./dir_error
+info:loaded test= Test_Test2E          from dir_error/test_testerror1.py
+info:loaded test= Test_TestE           from dir_error/test_testerror1.py
+info:searching ./dir_error/subdir
+info:loaded test= Test_Test21E         from subdir/test_testerror2.py
+info:loaded test= Test_Test22E         from subdir/test_testerror2.py
+info:executing, results
+{'#errors': 2,
+ '#failures': 0,
+ '#tests': 8,
+ 'errors': [{'name': 'Test_TestE',
+             'trace': ('ZeroDivisionError: integer division or modulo by zero',
+                       ' line 11')},
+            {'name': 'Test_Test21E',
+             'trace': ('ZeroDivisionError: integer division or modulo by zero',
+                       ' line 13')}],
+ 'failures': []}
+info:rootdir=./dir_fail,allowdupe=False,ignoredir=[]
+
+
+== ./dir_fail =================================================
+info:searching ./dir_fail
+info:loaded test= Test_Test            from dir_fail/test_testfail1.py
+info:loaded test= Test_Test2           from dir_fail/test_testfail1.py
+info:searching ./dir_fail/subdir
+info:loaded test= Test_Test21          from subdir/test_testfail2.py
+info:loaded test= Test_Test22          from subdir/test_testfail2.py
+info:executing, results
+{'#errors': 0,
+ '#failures': 2,
+ '#tests': 8,
+ 'errors': [],
+ 'failures': [{'name': 'Test_Test',
+               'trace': ('AssertionError: 1 != 11', ' line 11')},
+              {'name': 'Test_Test',
+               'trace': ('AssertionError: 2 != 22', ' line 14')}]}
+info:rootdir=./dir,allowdupe=True,ignoredir=[]
+
+
+== ./dir =================================================
+info:searching ./dir
+info:loaded test= Test_Test            from dir/test_test1.py
+info:loaded test= Test_Test2           from dir/test_test1.py
+info:searching ./dir/subdir
+info:loaded test= Test_Test21          from subdir/test_test2.py
+info:loaded test= Test_Test22          from subdir/test_test2.py
+info:rootdir=./dir_error,allowdupe=True,ignoredir=['./dir_error/subdir']
+
+
+== ./dir_error =================================================
+info:searching ./dir_error
+info:loaded test= Test_Test2E          from dir_error/test_testerror1.py
+info:loaded test= Test_TestE           from dir_error/test_testerror1.py
+info: ignoring ./dir_error/subdir
+info:executing, results
+{'#errors': 1,
+ '#failures': 0,
+ '#tests': 4,
+ 'errors': [{'name': 'Test_TestE',
+             'trace': ('ZeroDivisionError: integer division or modulo by zero',
+                       ' line 11')}],
+ 'failures': []}
