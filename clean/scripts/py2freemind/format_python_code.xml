@@ -1,0 +1,7 @@
+<root>
+	<Format Name="class">burgundywhite18</Format>
+        <Format Name="def">greyblack18</Format>
+        <Format Name="var">darkbluelightblue16</Format>
+        <Format Name="arg">yellowburgundy14</Format>
+	<Format Name="groupby">blackgreen14</Format>
+</root>
