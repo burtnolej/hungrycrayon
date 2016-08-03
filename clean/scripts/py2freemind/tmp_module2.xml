@@ -4,7 +4,7 @@
 		<method Name="boo">
 			<arg Name="self"/>
 		</method>
-		<var Name="boo"/>
+		<var Name="blahblah"/>
 	</class>
 	<class Name="foobar2">
 		<method Name="boohoo">

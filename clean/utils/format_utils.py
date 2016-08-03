@@ -68,4 +68,5 @@ lightblueburgundy16 = enum(STYLE="bubble",
 blackgreen14 = enum(STYLE="bubble",
                     COLOR=color.green,
                     BACKGROUND_COLOR=color.black,
-                    FONT=ss14)
+                    FONT=ss14,
+                    POSITION="left")

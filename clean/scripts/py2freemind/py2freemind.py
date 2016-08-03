@@ -62,11 +62,20 @@ class py2xml():
 
 
 def printusage(msg):
-    print "\nusage: --input=<python file>"
-    print msg
+    print "\n" + msg
+    print
+    print "usage:" 
+    print "     --input-filename        = <python file>"
+    print "     --verbosity             = 1-5"
+    print "     --full-label            = True/False"
+    print "     --suppress-attrib       = foo,bar"
+    print "     --input-format-filename = <xml file>"
+    print "     --groupby-tag           = foo,bar"
     exit()
         
-rules = ['input=','verbosity=']
+rules = ['input-filename=','verbosity=','full-label', \
+         'suppress-attrib=','input-format-filename=', \
+         'groupby-tag=']
 input_file = None
 
 try:
@@ -76,13 +85,21 @@ except GetoptError, e:
 
 args={}
 for option, value in options:
-    if option == '--input':
+    if option == '--input-filename':
         args['input_filename'] = abspath(value)
     if option == '--verbosity':
         args['verbosity'] = value
+    if option == '--full-label':
+        args['full_label'] = True
+    if option == '--suppress-attrib':
+        args['suppress_attrib'] = value.split(",")
+    if option == '--input-format-filename':
+        args['input_format_filename'] = abspath(value)
+    if option == '--groupby-tag':
+        args['groupby_tag'] = value.split(",")
 
 if not args.has_key('input_filename') or not isfile(args['input_filename']):
-    printusage("error: --input arg must be set to a real file")
+    printusage("error: --input-filename must be set to a real file")
     
 xmlfile = py2xml().py2xml(**args)
 print "info: passing",xmlfile,"to xml2freemind"

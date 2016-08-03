@@ -52,6 +52,13 @@ class xml2freemind(generic):
         cls1 = cls(*arg,**kwarg)
         cls1.parse_add_groupby()
         return(cls1)
+    
+    @classmethod
+    def inputformat(cls,*arg,**kwarg):
+        cls1 = cls(*arg,**kwarg)
+        cls1.parse_format_file()
+        return(cls1)
+
         
     def __del__(self):
         self.log.close()
@@ -86,6 +93,7 @@ class xml2freemind(generic):
         if len(self.root.getchildren()) > 1:
             self.root = element_fuse(self.root,self.input_base,self.root)
 
+        self.parse_format_file()
         self.parse_format()        
         self.parse()
         
@@ -94,6 +102,12 @@ class xml2freemind(generic):
         
         self.dump_tofile(self.root)
         
+    def parse_format_file(self):
+        if hasattr(self,'input_format_filename'):
+            formatxmltree = xmltree.parse(self.input_format_filename).getroot()
+            for format in formatxmltree.getchildren():
+                self.root.append(format)
+            
     def parse_format(self,root=None):
         
         if root==None:
@@ -124,6 +138,10 @@ class xml2freemind(generic):
                 
     def parse_add_groupby(self,root=None):
         
+        # shorten
+        
+        el_add_sub = self.element_add_subelement
+        
         if root==None:
             root=self.root
             
@@ -136,14 +154,23 @@ class xml2freemind(generic):
 
             if element.tag in self.groupby_tag:
                 self._log(3,element.tag,"is a groupby tag")
-                element_groupby = root_copy.find('.//gby'+element.tag)
-                if element_groupby == None:
+                element_groupbys = root_copy.findall('.//groupby')
+                element_groupby=None
+                
+                if len(element_groupbys) == 0:
                     self._log(3,"no groupby parent detected for",element.tag)
-                    element_groupby = self.element_add_subelement(root_copy,"gby"+element.tag)
-        
-                _str = element_attrib_as_string(element)              
-                self.element_add_subelement(element_groupby,_str)
-            
+                    element_groupby = el_add_sub(root_copy,"groupby",('Name',element.tag))
+
+                _str = element_attrib_as_string(element) 
+                
+                for _element_groupby in element_groupbys:
+                    if _element_groupby.attrib['Name'] == element.tag:            
+                        element_groupby = el_add_sub(_element_groupby,element.tag,('Name',_str))
+                        
+                if element_groupby == None:
+                    _element_groupby = el_add_sub(root_copy,"groupby",('Name',element.tag))            
+                    element_groupby = el_add_sub(_element_groupby,element.tag,('Name',_str))
+                    
         self.root = root_copy
 
     def parse(self,parent=None):
@@ -225,12 +252,17 @@ class xml2freemind(generic):
             self._log(3,"adding font subelement for:",
                       output_format_type)
               
-    def element_add_subelement(self,element,tag):
+    def element_add_subelement(self,element,tag,attrib=None):
+        ''' attrib is a tuple of namevalue '''
         self._log(3,"adding sub element",
                   tag,
                   "as node for element",
                   element.tag)
-        return(xmltree.SubElement(element,tag))
+        element = xmltree.SubElement(element,tag)
+        if attrib <> None:
+            element.set(attrib[0],attrib[1])
+        
+        return(element)
     
     def dump_tofile(self,tree=None):
         
@@ -275,3 +307,4 @@ if __name__ == "__main__":
 
     #fmfile = xml2freemind(xmlfile,1).output_filename
     #print "info: result written to",fmfile
+

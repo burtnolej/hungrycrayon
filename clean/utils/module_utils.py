@@ -131,13 +131,16 @@ def __getuserloadedmodules__():
     mods = modules.keys()
     
     for builtinmod in python27builtin:
-        mods.remove(builtinmod)
+        try:
+            mods.remove(builtinmod)
+        except:
+            print "info: could not pop builtin mod",builtinmod
         
     for alwaysloaded in python27alwaysloaded:
         try:
             mods.remove(alwaysloaded)
         except:
-            print "info: could no pop",alwaysloaded
+            print "info: could not pop alwaysloaded mod",alwaysloaded
             
     return(mods)
     

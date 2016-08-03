@@ -25,7 +25,7 @@ class Test_xml2mm(unittest.TestCase):
 
         with self.assertRaises(Exception):
             
-            xml2freemind.convert(self.input_xml,
+            xml2freemind.convert(input_filename=self.input_xml,
                                  verbosity = self.verbosity,
                                  output_filename =self.output_xml)
 
@@ -37,7 +37,7 @@ class Test_xml2mm(unittest.TestCase):
 
         with self.assertRaises(Exception):
             
-            xml2freemind.convert(self.input_xml,
+            xml2freemind.convert(input_filename=self.input_xml,
                                  verbosity = self.verbosity,
                                  output_filename = self.output_xml)
           
@@ -57,7 +57,7 @@ class Test_xml2mm(unittest.TestCase):
         self.output_xml=join(self.test_dir,"tmp.mm")
         self.expected_output_xml = join(self.test_dir,"1node_short_format.mm")
 
-        xml2freemind.convert(self.input_xml,
+        xml2freemind.convert(input_filename=self.input_xml,
                              verbosity = self.verbosity,
                              output_filename = self.output_xml)
             
@@ -81,7 +81,7 @@ class Test_xml2mm(unittest.TestCase):
         self.input_xml=join(self.test_dir,"1node_long_format.xml")
         self.expected_output_xml = join(self.test_dir,"1node_long_format.mm")
         
-        xml2freemind.convert(self.input_xml,
+        xml2freemind.convert(input_filename=self.input_xml,
                              verbosity = self.verbosity,
                              output_filename = self.output_xml,
                              full_label =True)
@@ -96,7 +96,7 @@ class Test_xml2mm(unittest.TestCase):
         self.input_xml=join(self.test_dir,"test4_input.xml")
         self.expected_output_xml = join(self.test_dir,"test4_output.mm")
         
-        xml2freemind.convert(self.input_xml,
+        xml2freemind.convert(input_filename=self.input_xml,
                              verbosity = self.verbosity,
                              output_filename = self.output_xml)
             
@@ -110,7 +110,7 @@ class Test_xml2mm(unittest.TestCase):
         self.input_xml=join(self.test_dir,"test5_input.xml")
         self.expected_output_xml = join(self.test_dir,"test5_output.mm")
         
-        xml2freemind.convert(self.input_xml,
+        xml2freemind.convert(input_filename=self.input_xml,
                              verbosity = self.verbosity,
                              output_filename = self.output_xml)
             
@@ -124,10 +124,99 @@ class Test_xml2mm(unittest.TestCase):
         self.input_xml=join(self.test_dir,"test5_input.xml")
         self.expected_output_xml = join(self.test_dir,"test5_output.mm")
         
-        xml2freemind.convert(self.input_xml,
+        xml2freemind.convert(input_filename=self.input_xml,
                              verbosity = 5,
                              output_filename = self.output_xml)
         
+    def test_unit_input_format(self):
+         
+        # input_file
+        #<root>
+        #    <Database Name="foobar"/>
+        #</root>
+ 
+        # format input file
+        #<root> 
+        #    <Format Name="Database"burgundywhite18</Format>
+        #    <Format Name="Table">greyblack18</Value>
+        #    <Format Name="Column">darkbluelightblue16</Value>
+        #    <Format Name="Row">yellowburgundy14</Value>
+        #</root>
+            
+        # output
+        #<root>
+        #    <Database Name="foobar"/>
+        #    <Format Name="Database"burgundywhite18</Format>
+        #    <Format Name="Table">greyblack18</Value>
+        #    <Format Name="Column">darkbluelightblue16</Value>
+        #    <Format Name="Row">yellowburgundy14</Value>
+        #</root>
+
+        self.input_xml=join(self.test_dir,"test_unit_input_format.xml")
+        self.input_format_xml=join(self.test_dir,"format_input.xml")
+
+        self.output_xml=join(self.test_dir,"test_unit_input_format")
+        self.expected_output_xml = join(self.test_dir,"test_unit_input_format.mm")
+        
+        x2f = xml2freemind.inputformat(input_filename=self.input_xml,
+                                       verbosity = 5,
+                                       output_filename = self.output_xml,
+                                       suppress_attrib=['Name'],
+                                       input_format_filename=self.input_format_xml)
+            
+        x2f.dump_tofile()
+        
+        self.output_as_str = os_file_to_string(self.output_xml,["\n","\t"," "])
+        self.expected_as_str = os_file_to_string(self.expected_output_xml,["\n","\t"," "])
+        
+        self.assertEquals(self.output_as_str,self.expected_as_str )
+
+    def test_input_format(self):
+             
+            # input_file
+            #<root>
+            #    <Database Name="foobar"/>
+            #</root>
+     
+            # format input file
+            #<root> 
+            #    <Format Name="Database"burgundywhite18</Format>
+            #    <Format Name="Table">greyblack18</Value>
+            #    <Format Name="Column">darkbluelightblue16</Value>
+            #    <Format Name="Row">yellowburgundy14</Value>
+            #</root>
+                
+            #<map version="0.9.0">
+            #      <node BACKGROUND_COLOR="#85144B" \
+            #            COLOR="#FFFFFF" \
+            #            STYLE="bubble" \
+            #            TEXT="foobar">
+            #            <font BOLD="false" 
+            #                  ITALIC="False" 
+            #                  NAME="SansSerif"
+            #                  SIZE="18" />
+            #      </node>
+            #</map>
+    
+            self.input_xml=join(self.test_dir,"test_input_format_input.xml")
+            self.input_format_xml=join(self.test_dir,"format_input.xml")
+    
+            self.output_xml=join(self.test_dir,"tmp.mm")
+            self.expected_output_xml = join(self.test_dir,"test_input_format_output.mm")
+            
+            x2f = xml2freemind.convert(input_filename=self.input_xml,
+                                           verbosity = 5,
+                                           output_filename = self.output_xml,
+                                           suppress_attrib=['Name'],
+                                           input_format_filename=self.input_format_xml)
+                
+            #x2f.dump_tofile()
+            
+            self.output_as_str = os_file_to_string(self.output_xml,["\n","\t"," "])
+            self.expected_as_str = os_file_to_string(self.expected_output_xml,["\n","\t"," "])
+            
+            self.assertEquals(self.output_as_str,self.expected_as_str )
+
     def test_xml2mm_multiple_roots(self):
         
         #<root>
@@ -177,7 +266,7 @@ class Test_xml2mm(unittest.TestCase):
         self.input_xml=join(self.test_dir,"multiple_roots.xml")
         self.expected_output_xml = join(self.test_dir,"./multiple_roots.mm")
         
-        xml2freemind.convert(self.input_xml,
+        xml2freemind.convert(input_filename=self.input_xml,
                              verbosity = 5,
                              output_filename = self.output_xml)
         
@@ -195,7 +284,7 @@ class Test_xml2mm(unittest.TestCase):
         self.output_xml=join(self.test_dir,"tmp.mm")
         self.expected_output_xml = join(self.test_dir,"supress_name_attrib.mm")
 
-        xml2freemind.convert(self.input_xml,
+        xml2freemind.convert(input_filename=self.input_xml,
                              verbosity = self.verbosity,
                              output_filename = self.output_xml,
                              suppress_attrib=['Name'])
@@ -228,7 +317,7 @@ class Test_xml2mm(unittest.TestCase):
         self.output_xml=join(self.test_dir,"tmp.mm")
         self.expected_output_xml = join(self.test_dir,"formats.mm")
 
-        xml2freemind.convert(self.input_xml,
+        xml2freemind.convert(input_filename=self.input_xml,
                              verbosity = 5,
                              output_filename = self.output_xml,
                              suppress_attrib=['Name'])
@@ -275,7 +364,7 @@ class Test_xml2mm(unittest.TestCase):
         self.output_xml=join(self.test_dir,"tmp.mm")
         self.expected_output_xml = join(self.test_dir,"groupby.mm")
          
-        x2fm = xml2freemind.groupby(self.input_xml,
+        x2fm = xml2freemind.groupby(input_filename=self.input_xml,
                                     verbosity = 5,
                                     output_filename = self.output_xml,
                                     suppress_attrib=['Name'],
@@ -330,7 +419,7 @@ class Test_xml2mm(unittest.TestCase):
         self.output_xml=join(self.test_dir,"tmp.mm")
         self.expected_output_xml = join(self.test_dir,"groupby.mm")
          
-        x2fm = xml2freemind.convert(self.input_xml,
+        x2fm = xml2freemind.convert(input_filename=self.input_xml,
                                     verbosity = 5,
                                     output_filename = self.output_xml,
                                     suppress_attrib=['Name'],
@@ -387,7 +476,7 @@ class Test_xml2mm(unittest.TestCase):
         self.output_xml=join(self.test_dir,"tmp.mm")
         self.expected_output_xml = join(self.test_dir,"groupby_multi.mm")
          
-        x2fm = xml2freemind.convert(self.input_xml,
+        x2fm = xml2freemind.convert(input_filename=self.input_xml,
                                     verbosity = 5,
                                     output_filename = self.output_xml,
                                     suppress_attrib=['Name'],

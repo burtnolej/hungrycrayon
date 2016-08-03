@@ -1,7 +1,7 @@
 <map version="0.9.0">
-	<node TEXT="foobar"><node TEXT="boo"><node TEXT="self"><node TEXT="Name:self" /></node>
+	<node TEXT="tmp_module2.xml"><node TEXT="foobar"><node TEXT="boo"><node TEXT="self"><node TEXT="Name:self" /></node>
 		<node TEXT="Name:boo" /></node>
-		<node TEXT="boo"><node TEXT="Name:boo" /></node>
+		<node TEXT="blahblah"><node TEXT="Name:blahblah" /></node>
 	<node TEXT="Name:foobar" /></node>
 	<node TEXT="foobar2"><node TEXT="boohoo"><node TEXT="self"><node TEXT="Name:self" /></node>
 			<node TEXT="banana"><node TEXT="Name:banana" /></node>
@@ -23,4 +23,4 @@
 		<node TEXT="foo"><node TEXT="Name:foo" /></node>
 	<node TEXT="Name:myfunc" /></node>
 	<node TEXT="mylocal"><node TEXT="Name:mylocal" /></node>
-</map>
+</node></map>
