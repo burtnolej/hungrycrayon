@@ -60,12 +60,16 @@ def testsuite_run(suite):
     
 def _parsetesttrace(trace):
     
+    ''' returns : the error message
+                : the line no that failed
+                : the test function that has failed '''
+                  
     # trace as string will have newlines embedded
     if len(trace.split("\n")) == 0:
         raise Exception("expecting a trace as a string got ",trace)
        
     _trace = trace.split("\n")
-    return(_trace[-2], _trace[1].split(",")[1])
+    return(_trace[-2], _trace[1].split(",")[1], _trace[1].split(",")[2][4:])
 
 def _parsetestcase(testcase):
     print type(testcase)
@@ -116,15 +120,13 @@ if __name__ == "__main__":
     args={}
     for option, value in options:
         if option == '--rootdir':
-            args[option[2:]] = value
+            args[option[2:]] = abspath(value)
         if option == '--ignoredir':
-            args[option[2:]] = value
+            args[option[2:]] = abspath(value)
     
                                           
     if not args.has_key('rootdir'):
         printusage("error: --rootdir arg must be set to a real directory")
-        
-    print args['ignoredir'],abspath(args['ignoredir']),abspath(args['ignoredir'])
         
     cwd = getcwd()
     if not isdir(args['rootdir']) or not isabs(args['rootdir']):
@@ -133,7 +135,9 @@ if __name__ == "__main__":
     if args.has_key('ignoredir') and isdir(args['ignoredir']):
         if not isabs(args['ignoredir']):
             printusage("error: --ignoredir must be an abspath of a real directory")
-    
+   
+    print args['ignoredir'],abspath(args['ignoredir']),abspath(args['ignoredir'])
+     
     suite, testsummary = testsuite_get(rootdir=args['rootdir'],
                                        ignoredir=[args['ignoredir']])
     

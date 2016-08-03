@@ -160,16 +160,21 @@ class xml2freemind(generic):
                 if len(element_groupbys) == 0:
                     self._log(3,"no groupby parent detected for",element.tag)
                     element_groupby = el_add_sub(root_copy,"groupby",('Name',element.tag))
-
+                    element_groupbys.append(element_groupby)
+                    
                 _str = element_attrib_as_string(element) 
                 
                 for _element_groupby in element_groupbys:
                     if _element_groupby.attrib['Name'] == element.tag:            
                         element_groupby = el_add_sub(_element_groupby,element.tag,('Name',_str))
+                    else:
+                        self._log(3,"cannot identify node as no tag=Name",element.tag)
                         
                 if element_groupby == None:
+                    self._log(3,"groupby nodes exist but not for tag=",element.tag)
                     _element_groupby = el_add_sub(root_copy,"groupby",('Name',element.tag))            
                     element_groupby = el_add_sub(_element_groupby,element.tag,('Name',_str))
+
                     
         self.root = root_copy
 
@@ -254,10 +259,12 @@ class xml2freemind(generic):
               
     def element_add_subelement(self,element,tag,attrib=None):
         ''' attrib is a tuple of namevalue '''
-        self._log(3,"adding sub element",
+        self._log(3,"adding sub element=",
                   tag,
-                  "as node for element",
-                  element.tag)
+                  "as node for element=",
+                  element.tag,
+                  "with attribs=",
+                  str(attrib))
         element = xmltree.SubElement(element,tag)
         if attrib <> None:
             element.set(attrib[0],attrib[1])

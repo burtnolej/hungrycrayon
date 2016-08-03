@@ -327,51 +327,13 @@ class Test_xml2mm(unittest.TestCase):
         
         self.assertEquals(self.output_as_str,self.expected_as_str )
         
-    def test_unit_parse_add_groupby(self):
-        #<root>
-        #    <Database Name="foobar">
-        #           <Table Name="barfoo">
-        #                <Column Name="boohoo" />
-        #           </Table>
-        #    </Database>
-        #    <Database Name="foobar2">
-        #           <Table Name="barfoo2">
-        #                <Column Name="boohoo2" />
-        #           </Table>
-        #    </Database>
-        #</root>
-        
-        #<root>
-        #    <Database Name="foobar">
-        #           <Table Name="barfoo">
-        #                <Column Name="boohoo" />
-        #           </Table>
-        #    </Database>
-        #    <Database Name="foobar2">
-        #           <Table Name="barfoo2">
-        #                <Column Name="boohoo2" />
-        #           </Table>
-        #    </Database>
-        #    <gbyDatabase>
-        #          <foobar />
-        #          <foobar2 />
-        #    </gbyDatabase>
-        #</root>
-        
-        xml = "<root><Database Name=\"foobar\"><Table Name=\"barfoo\"><Column Name=\"boohoo\" /></Table></Database><Database Name=\"foobar2\"><Table Name=\"barfoo2\"><Column Name=\"boohoo2\" /></Table></Database><gbyDatabase><foobar /><foobar2 /></gbyDatabase></root>"
 
-        self.input_xml=join(self.test_dir,"groupby.xml")
+class Test_groupby(unittest.TestCase):
+    
+    def setUp(self):
+        self.test_dir = "/home/burtnolej/Development/pythonapps3/clean/scripts/xml2freemind/tests"
         self.output_xml=join(self.test_dir,"tmp.mm")
-        self.expected_output_xml = join(self.test_dir,"groupby.mm")
-         
-        x2fm = xml2freemind.groupby(input_filename=self.input_xml,
-                                    verbosity = 5,
-                                    output_filename = self.output_xml,
-                                    suppress_attrib=['Name'],
-                                    groupby_tag = ['Database'])
-        
-        self.assertEqual(xmltree.tostring(x2fm.root).replace(" ",""),xml.replace(" ",""))
-
+        self.verbosity=1
         
     def test_groupby(self):
         #<root>
@@ -487,9 +449,57 @@ class Test_xml2mm(unittest.TestCase):
         
         self.assertEquals(self.output_as_str,self.expected_as_str )
 
+    def test_unit_parse_add_groupby(self):
+        #<root>
+        #    <Database Name="foobar">
+        #           <Table Name="barfoo">
+        #                <Column Name="boohoo" />
+        #           </Table>
+        #    </Database>
+        #    <Database Name="foobar2">
+        #           <Table Name="barfoo2">
+        #                <Column Name="boohoo2" />
+        #           </Table>
+        #    </Database>
+        #</root>
+        
+        #<root>
+        #    <Database Name="foobar">
+        #           <Table Name="barfoo">
+        #                <Column Name="boohoo" />
+        #           </Table>
+        #    </Database>
+        #    <Database Name="foobar2">
+        #           <Table Name="barfoo2">
+        #                <Column Name="boohoo2" />
+        #           </Table>
+        #    </Database>
+        #    <gbyDatabase>
+        #          <foobar />
+        #          <foobar2 />
+        #    </gbyDatabase>
+        #</root>
+        
+        xml = "<root><Database Name=\"foobar\"><Table Name=\"barfoo\"><Column Name=\"boohoo\" /></Table></Database><Database Name=\"foobar2\"><Table Name=\"barfoo2\"><Column Name=\"boohoo2\" /></Table></Database><groupby Name=\"Database\"><Database Name=\"foobar\" /><Database Name=\"foobar2\" /></groupby></root>"
+
+        self.input_xml=join(self.test_dir,"groupby.xml")
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"groupby.mm")
+         
+        x2fm = xml2freemind.groupby(input_filename=self.input_xml,
+                                    verbosity = 5,
+                                    output_filename = self.output_xml,
+                                    suppress_attrib=['Name'],
+                                    groupby_tag = ['Database'])
+        
+        self.assertEqual(xmltree.tostring(x2fm.root).replace(" ","").replace("\n",""),
+                         xml.replace(" ",""))
+
 
 if __name__ == "__main__":
 
-    suite = unittest.TestLoader().loadTestsFromTestCase(Test_xml2mm)
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_xml2mm))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_groupby))
     unittest.TextTestRunner(verbosity=2).run(suite)
     

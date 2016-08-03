@@ -10,7 +10,7 @@
 				<node TEXT="boohoo2" />
 			</node>
 		</node>
-		<node TEXT="gbyDatabase">
+		<node TEXT="Database">
 			<node TEXT="foobar"/>
 			<node TEXT="foobar2"/>
 		</node>
