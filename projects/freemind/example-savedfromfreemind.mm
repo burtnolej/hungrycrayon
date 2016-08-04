@@ -1,0 +1,9 @@
+<map version="0.9.0">
+<!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
+<node CREATED="1468936693261" ID="ID_1039341896" MODIFIED="1468936693261" TEXT="New Mindmap">
+<node CREATED="1468936697709" ID="ID_1505563841" MODIFIED="1468936699911" POSITION="right" TEXT="child1"/>
+<node CREATED="1468936700144" ID="ID_1378724911" MODIFIED="1468936701878" POSITION="right" TEXT="child2"/>
+<node CREATED="1468936702568" ID="ID_941191714" MODIFIED="1468936704305" POSITION="right" TEXT="child3"/>
+<node COLOR="#ff0000" CREATED="1468936704896" ID="ID_690365466" MODIFIED="1468936721192" POSITION="right" TEXT="child4"/>
+</node>
+</map>

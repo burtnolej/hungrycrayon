@@ -1,7 +1,4 @@
 <map version="0.9.0">
-	<node TEXT="foobar"><node TEXT="barfoo"><node TEXT="dohdoh"><node TEXT="Name:dohdoh" /></node>
-		<node TEXT="Name:barfoo" /></node>
-		<node TEXT="ooh"><node TEXT="Name:ooh" /></node>
-		<node TEXT="ahh"><node TEXT="Name:ahh" /></node>
-	<node TEXT="Name:foobar" /></node>
+	<node BACKGROUND_COLOR="#000000" COLOR="#2ECC40" POSITION="left" STYLE="bubble" TEXT="class"><node TEXT="foobar" />
+	<font BOLD="false" ITALIC="False" NAME="SansSerif" SIZE="14" /></node>
 </map>

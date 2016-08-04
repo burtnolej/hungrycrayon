@@ -233,9 +233,14 @@ class xml2freemind(generic):
         
         if hasattr(self.fmformat,output_format_type): # else no format specified so ignore
             element_format = getattr(self.fmformat,output_format_type)
-        
-            for _key in ['STYLE','COLOR','BACKGROUND_COLOR']:
-                element.set(_key,getattr(eval(element_format),_key))
+            
+            format_attribs = eval(element_format).__get_attr__()
+            
+            for _key,_value in format_attribs:
+                if _key <> "FONT":
+                    # ignore font as it is separataly added as its
+                    # own node
+                    element.set(_key,_value)
                 
                 self._log(3,"adding format attributes",
                           _key,

@@ -328,6 +328,33 @@ class Test_xml2mm(unittest.TestCase):
         self.assertEquals(self.output_as_str,self.expected_as_str )
         
 
+class Test_format(unittest.TestCase):
+    
+    def setUp(self):
+        self.test_dir = "/home/burtnolej/Development/pythonapps3/clean/scripts/xml2freemind/tests"
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.verbosity=1
+        
+        
+    def test_format_side(self):
+        self.input_xml=join(self.test_dir,"test_format_side_input.xml")
+        self.input_format_xml=join(self.test_dir,"format_python_code.xml")
+
+        self.output_xml=join(self.test_dir,"tmp.mm")
+        self.expected_output_xml = join(self.test_dir,"test_format_side_output.mm")
+        
+        x2f = xml2freemind.convert(input_filename=self.input_xml,
+                                       verbosity = 5,
+                                       output_filename = self.output_xml,
+                                       suppress_attrib=['Name'],
+                                       input_format_filename=self.input_format_xml)
+        
+
+        self.output_as_str = os_file_to_string(self.output_xml,["\n","\t"," "])
+        self.expected_as_str = os_file_to_string(self.expected_output_xml,["\n","\t"," "])
+        
+        self.assertEquals(self.output_as_str,self.expected_as_str )
+        
 class Test_groupby(unittest.TestCase):
     
     def setUp(self):
@@ -499,7 +526,9 @@ class Test_groupby(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_xml2mm))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_groupby))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_xml2mm))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_groupby))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_format))
+
     unittest.TextTestRunner(verbosity=2).run(suite)
     
