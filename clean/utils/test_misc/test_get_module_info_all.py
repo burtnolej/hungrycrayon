@@ -25,8 +25,8 @@ class foobart3(mybaser):
         self.foobar = foobar()
         return("boo")
 
-def myfunc(fe, fi, fo, fum):
+def myfuncy(fe, fi, fo, fum):
     foo = 'bar'
     pass
 
-mylocal='blahblah'
+mylocaly='blahblah'

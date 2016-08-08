@@ -4,7 +4,7 @@ import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from xml_utils import element_find_tags,element_find_children
 
-from misc_utils import os_file_exists, enum, get_obj_attr_names
+from misc_utils import os_file_exists, enum
 
 db_enum = enum(name_attrib="Name", # keywords used in the schema xml file
                db_type="DBType", # keywords used in the schema xml file

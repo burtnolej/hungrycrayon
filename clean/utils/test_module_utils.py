@@ -193,8 +193,8 @@ class Test_ModuleUtils(unittest.TestCase):
                               'foobart2', 'boohoo', ['self', 'banana'], [], 'boo2', ['self'], ['a', 'b'], [], 
                               'foobart3', 'boo3', ['self'], ['self.foobar'], [], 
                               'mybaser', [], 
-                              'myfunc',  ['fe', 'fi', 'fo', 'fum'], ['foo'], 
-                              'mylocal'],tokens)   
+                              'myfuncy',  ['fe', 'fi', 'fo', 'fum'], ['foo'], 
+                              'mylocaly'],tokens)   
 
     def test_load_module_not_in_cwd_abspath(self):
         # if module.py in /home/burtnolej; move cwd to /tmp and load

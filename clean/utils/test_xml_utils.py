@@ -27,6 +27,8 @@ class Test_XML(unittest.TestCase):
         # so use xpath
         element = self.root.find(".//gchildA")
         self.assertEquals(element.attrib['name'],'brian')
+
+        
         
     def test_element_create_new_child(self):
         parent = self.root.find(".//childA")
@@ -186,10 +188,37 @@ class Test_XML(unittest.TestCase):
         
         elements = [element.tag for element in self.root.iter()]
         
-        self.assertEqual(elements,['node','childA','gchildA','gchildB'])    
+        self.assertEqual(elements,['node','childA','gchildA','gchildB'])   
         
+        
+    def test_find_leaf(self):
+        
+        leaf = [element.tag for element in self.root.iter() if len(element) == 0]
+        
+        self.assertEqual(leaf,['gchildA','gchildB'])   
+        
+        
+        
+class Test_XML_xpath(unittest.TestCase):
+
+    def setUp(self):
+        self.test_xml = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_xpath.xml"        
+        self.root = xmltree.parse(self.test_xml)        
+        
+    def test_element_getall_children(self):
+        # from a non root tag get its children using xpath
+        parent = element_find_by_attrib_value(self.root,'table','name','a')
+        self.assertEqual(len(self.root.findall('.//table[@name=\"a\"]/*')),2)
+        self.assertEqual(len(parent.findall("*")),2)
+        
+    def test_element_getall_grandchildren(self):
+        # from a non root tag get its children using xpath
+        self.assertEqual(len(self.root.findall('.//table[@name=\"a\"]/tr/*')),6)
+
         
 if __name__ == "__main__":
 
-    suite = unittest.TestLoader().loadTestsFromTestCase(Test_XML)
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML_xpath))
     unittest.TextTestRunner(verbosity=2).run(suite)

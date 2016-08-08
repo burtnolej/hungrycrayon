@@ -234,7 +234,7 @@ class xml2freemind(generic):
         if hasattr(self.fmformat,output_format_type): # else no format specified so ignore
             element_format = getattr(self.fmformat,output_format_type)
             
-            format_attribs = eval(element_format).__get_attr__()
+            format_attribs = eval(element_format).get_attr(notinternal=False)
             
             for _key,_value in format_attribs:
                 if _key <> "FONT":

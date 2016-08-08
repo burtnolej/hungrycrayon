@@ -1,5 +1,97 @@
 from random import randint
+import sys
 
+import sys
+sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
+from misc_utils_generic import GenericBase
+
+class generic(GenericBase):
+    def __init__(self):
+        self.log = Log()
+        self.id =  IDGenerator().getid()
+        
+class Singleton(type):
+    _instances = {}
+    def __call__(cls,*args,**kwargs):
+        if cls not in cls._instances:
+            #print "info: singleton object being created"
+            cls._instances[cls] = super(Singleton, cls).__call__(*args,**kwargs)
+        else:
+            #print "info: singleton already instantiated",cls._instances[cls]
+            pass
+        return cls._instances[cls]
+    
+class Log():    
+    __metaclass__ = Singleton
+    
+    logfile = open('log.log',"w+")
+    verbosity = 5
+    
+    def __repr__(self):
+        return ('log')
+    
+    def log(self,obj,priority,*args):
+        from inspect import stack
+        from os.path import basename
+        from datetime import datetime
+        
+        if priority < self.verbosity:
+            logitem = []
+            
+            if priority == 3:
+                logitem.append("sev=info")
+            
+            now = datetime.now().strftime("%H:%M:%S")
+            msecs = str(int(datetime.now().microsecond/1000)).rjust(4,"0")
+            
+            callerframe = stack()[2]
+            logitem = logitem + ["clr="   + str(obj),
+                                 "t="     + now+"."+msecs,
+                                 "clrfn=" + callerframe[3],
+                                 "clrfnln=",str(callerframe[2]),   
+                                 "msg="   + " ".join(list(args)),
+                                 "clrf="  + "("+basename(callerframe[1]) + ")"]
+    
+            self.logfile.write(";".join(logitem)+"\n")
+            
+    def __del_(self):
+        self.logfile.close()
+
+
+    
+class ObjFactory(generic):
+    
+    store = {}
+    
+    def new(self,clsname,objid,**kwargs):
+        
+        for key,value in kwargs.iteritems():
+            setattr(self,key,value)
+            
+        # modname is set if the cls definitions are not in this module
+        if self.modname == None:
+            self.modname = __name__
+            
+        kwargs.pop('modname')
+            
+        # if this is the first request for this cls then create a new dict
+        if self.store.has_key(clsname) == False:
+            self.store[clsname] = {}
+        
+        # if this is the first instance of this obj then else return existing    
+        if  self.store[clsname].has_key(objid) == False:
+            newobj = getattr(sys.modules[self.modname],clsname)(objid,**kwargs)
+            self.store[clsname][objid] = newobj
+            self.log(3,"added obj="+newobj.__class__.__name__+" tag="+str(newobj)+" id="+newobj.id)
+
+        return(self.store[clsname][objid])
+        
+    def query(self,clsname):
+        return [obj for name, obj in self.store[clsname].iteritems()]
+        
+    def __repr__(self):
+        return('ObjFactory')
+    
 def os_file_exists(os_file_name):
     from os.path import exists
     
@@ -28,50 +120,6 @@ def os_file_to_string(filename,remove=None):
     fh.close()
     return s
 
-def get_obj_members(obj):
-    from inspect import getmembers
-    return([(_attr,_val,callable(getattr(obj,_attr))) for _attr,_val in getmembers(obj) if not _attr.startswith("__")])
-
-def get_obj_attr_names(obj):
-    return [_name for _name,_,_ in get_obj_members(obj)]
-
-def get_obj_attr_vals(obj,notcallable=True):
-    return [val for _,val,callable in get_obj_members(obj) if callable == False]
-        
-def get_obj_attr(obj,notcallable=True,notinternal=True):
-    return [(_name,_val) for _name,_val,callable in get_obj_members(obj) 
-            if callable <> notcallable and _name.startswith('__') <> notinternal]         
-
-class generic:
-    
-    def __init__(self,**args):
-        for key,value in args.iteritems():
-            setattr(self,key,value)
-            
-    def __print_attr__(self):
-        for attrname,attrval in self.get_attr():
-            print attrname,attrval
-        
-    def __get_attr__(self,obj=None):
-        if obj==None:
-            return get_obj_attr(self)
-        return(get_obj_attr(obj))
-    
-    def __get_attr_names__(self,obj=None):
-        if obj==None:
-            return get_obj_attr_names(self)
-        return(get_obj_attr_names(obj))
-    
-    def __dump__(self):
-        _setargs=[]
-        from types import InstanceType
-        for name,obj in self.__get_attr__(self):
-            if type(obj) == InstanceType:
-                _setargs.append(str(name)+"="+obj.__class__.__name__)
-            else:
-                _setargs.append(str(name)+"="+str(obj))
-        return(_setargs)
-
 class enum(generic):
     pass
 
@@ -89,28 +137,36 @@ def read_pickle(filename):
 
     return(object)
 
-class UniqueIDGenerator(object):
-    #__metaclass__ = Singleton
-    
-    def __init__(self,filename,size):
-        self.fn = filename
-        self.usedids = []
-        self.size=size
-        
-        from os import path as ospath
-        
-        if ospath.exists(self.fn) == True:
-            #print "recovered file",self.fn
-            self.usedids = read_pickle(self.fn)
-            self.old_num_ids = len(self.usedids)
-        else:
-            self.old_num_ids = 0
-            #print "initializing new",self.fn
+class IDGenerator(object):
+    __metaclass__ = Singleton
 
+    idfile = ".id.dat"
+    usedids = []
+    size = 8
+        
+    def __init__(self):
+        from os import path as ospath
+        if ospath.exists(self.idfile) == True:
+            self.usedids = read_pickle(self.idfile)
+        
+    def getid(self):        
+        from os import path as ospath
+
+        return(self._next())
+            
     def num_ids(self):
         return(len(self.usedids))
+
+    def reset(self):
+        import os
+        self.usedids = []
+
+        try:
+            os.remove(self.idfile)
+        except OSError:
+            pass
         
-    def next(self):
+    def _next(self):
         count = 1
         
         maxid = pow(10,self.size)
@@ -124,7 +180,6 @@ class UniqueIDGenerator(object):
             if not uniqueid in self.usedids: 
                 unique=True
             else:
-                #print "conflict",uniqueid
                 retry+=1
                 
             if retry>10: 
@@ -132,20 +187,12 @@ class UniqueIDGenerator(object):
                 raise Exception("max retry")
             count += 1
         self.usedids.append(uniqueid)
-        
+        #print "adding",uniqueid
+        #self.write()
         return(uniqueid)
-
-    def reset(self):
-        self.usedids = []
         
     def write(self):
-        #print "writing to",self.fn,"[",self.old_num_ids,"/",self.num_ids(),"]"
-        write_pickle(self.usedids,self.fn)
-        return(self.old_num_ids,self.num_ids())
-    
+        write_pickle(self.usedids,self.idfile)
     
     def __del__(self):
         self.write()
-
-'<mapversion="0.9.0"><nodeTEXT="groupby.xml"><nodeTEXT="foobar"><nodeTEXT="barfoo"><nodeTEXT="boohoo"/></node></node><nodeTEXT="foobar2"><nodeTEXT="barfoo2"><nodeTEXT="boohoo2"/></node></node></node><nodeTEXT="gbyDatabase"><nodeTEXT="foobar"/><nodeTEXT="foobar2"/></node></map>'
-'<mapversion="0.9.0"><nodeTEXT="groupby.xml"><nodeTEXT="foobar"><nodeTEXT="barfoo"><nodeTEXT="boohoo"/></node></node><nodeTEXT="foobar2"><nodeTEXT="barfoo2"><nodeTEXT="boohoo2"/></node></node><nodeTEXT="gbyDatabase"><nodeTEXT="foobar"/><nodeTEXT="foobar2"/></node></node></map>'

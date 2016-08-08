@@ -3,9 +3,8 @@ import sys
 import os
 from os import path as ospath
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
-from misc_utils import UniqueIDGenerator, get_obj_attr_vals, get_obj_attr_names, \
-     get_obj_attr, generic, os_file_get_wildcard, os_file_to_string, read_pickle, \
-     write_pickle
+from misc_utils import IDGenerator, generic, os_file_get_wildcard, os_file_to_string, read_pickle, \
+     write_pickle, Singleton, enum
 
 import unittest
 import time
@@ -36,98 +35,136 @@ class TestPickle(unittest.TestCase):
         self.newobj = read_pickle(self.filename)
         self.assertEquals(self.newobj.myfunc(),'boo')
         
-class TestUniqueIDGenerator(unittest.TestCase):
+class TestIDGenerator(unittest.TestCase):
 
     def setUp(self):
-        self.idfile = "uniqueid.dat"
+        IDGenerator().reset()
+        self.idfile = '.id.dat'
+        self.idgen = IDGenerator()
+        self.idgen.size = 10
 
     def tearDown(self):
-        os.remove(self.idfile)
+        IDGenerator().reset()
+        pass
 
-    def _increment_ids(self,uniqueid,num_ids):
+    def _create_ids(self,num_ids):
         for i in range(num_ids):
-            uniqueid.next()
-           
-    def _create_unique_ids(self,num_ids,size):
-        uniqueid = UniqueIDGenerator(self.idfile,size)
-        self._increment_ids(uniqueid,num_ids)
-        old_num_ids,num_ids = uniqueid.write()
-        del uniqueid
-        return(old_num_ids,num_ids)
+            self.idgen.getid()
    
     def test_create30_generatefile(self):
-        self._create_unique_ids(30,10)
+        
+        self._create_ids(30)
+        
+        self.idgen.__del__()
+        del self.idgen
+        
         self.assertTrue(ospath.isfile(self.idfile))
         
     def test_create10_recover_count10(self):
-        self._create_unique_ids(10,10)
         
-        uniqueid = UniqueIDGenerator(self.idfile,10)
-        self.assertEquals(uniqueid.num_ids(),10)
+        self._create_ids(10)
+        self.idgen.__del__()
+        del self.idgen
+        self.idgen = IDGenerator()
+
+        self.assertEquals(self.idgen.num_ids(),10)
+        self.idgen.__del__()
+        del self.idgen
         
-    def test_create10_recover_add22_count44(self):
-        self._create_unique_ids(22,10)
-        old_num_ids,num_ids = self._create_unique_ids(22,10)
-        self.assertEquals(old_num_ids,22)
-        self.assertEquals(num_ids,44)
+    def test_recover_add22_count44(self):
+
+        self._create_ids(22)
+        self.idgen.__del__()
+        del self.idgen
         
-        uniqueid = UniqueIDGenerator(self.idfile,10)
-        self.assertEquals(uniqueid.num_ids(),44)
-        del uniqueid
+        self.idgen = IDGenerator()
+        self._create_ids(22)
+
+        self.assertEquals(self.idgen.num_ids(),44)
+        
+        self.idgen.__del__()
+        del self.idgen
         
     def test_destructor(self):
-        uniqueid = UniqueIDGenerator(self.idfile,10)
-        self._increment_ids(uniqueid,10)
-        del uniqueid
+        self._create_ids(22)
+        self.idgen.__del__()
         self.assertTrue(ospath.isfile(self.idfile))
         
-        
     def test_max_retry(self):
-        
+        self.idgen.size = 1
         with self.assertRaises(Exception):
-            self._create_unique_ids(20,1)
+            self._create_ids(20)
+            
+    def test_create10_via_generic(self):
+        # this is also testing generic
+        class myclass(generic): pass
+        
+        for i in range(10):
+            mc = myclass(__idgen__=True)
 
-class Test_get_obj_attr(unittest.TestCase):
-    
+        self.assertEquals(self.idgen.num_ids(),10)
+        
+
+class TestSingleton(unittest.TestCase):
+
+    def test_basic(self):
+        
+        class myclass():
+            __metaclass__ = Singleton
+            
+        class myclass_normal():
+            pass
+        
+        address1 = myclass()
+        address2 = myclass()
+ 
+        self.assertEqual(address1,address2)
+        
+        address1 = myclass_normal()
+        address2 = myclass_normal()
+        
+        self.assertNotEqual(address1,address2)
+            
+class TestIDGeneratorScale(unittest.TestCase):
+
     def setUp(self):
-        self.testobj = test_class()
-    
+        IDGenerator().reset()
+        self.idfile = '.id.dat'
+        self.idgen = IDGenerator()
+        self.idgen.size = 10
+
     def tearDown(self):
-        pass
-    
-    def test_get_attr_names(self):
-        expected_results = ['attr1','attr2','myfunc']
-        
-        self.assertListEqual(expected_results,get_obj_attr_names(self.testobj))
-    
-    def test_get_notcallable_attr_vals(self):
-        expected_results = [123,456]
-        self.assertListEqual(expected_results,get_obj_attr_vals(self.testobj))
-        
-    def test_get_notcallable_attr(self):
-        expected_results = [('attr1',123),('attr2',456)]
-        self.assertListEqual(expected_results,get_obj_attr(self.testobj))
+        IDGenerator().reset()
 
-class Test_generic(unittest.TestCase):
-    
-    def setUp(self):
-        self.g = generic(attr1=123,attr2=456)
-    
-    def test_construct(self):
-        self.assertTrue(hasattr(self.g,'attr1'))
-        self.assertEquals(123,getattr(self.g,'attr1'))
-        self.assertTrue(hasattr(self.g,'attr2'))
-        self.assertEquals(456,getattr(self.g,'attr2'))        
-    
-    def test_get_attr_names(self):
-        attr_names = self.g.__get_attr_names__(self.g)
-        self.assertListEqual(['attr1','attr2'],attr_names)
+    def _create_ids(self,num_ids):
+        for i in range(num_ids):
+            self.idgen.getid()
+   
+    def test_create1000(self):
         
-    def test_get_attr(self):
-        attr_names = self.g.__get_attr__(self.g)
+        self._create_ids(1000)
+        del self.idgen
         
-        self.assertListEqual([('attr1',123),('attr2',456)],attr_names)
+    def test_create1000objects_with_ids(self):
+        # this is also testing generic
+        class myclass(generic): pass
         
+        for i in range(1000):
+            mc = myclass(__idgen__=True)
+            
+        self.assertEquals(self.idgen.num_ids(),1000)
+        
+
+class Test_enum(unittest.TestCase):
+    ''' enum is a sub class of generic. needs to use the basic
+    constructor as it does not need id's etc '''       
+    def test_enum(self):
+        self.e = enum.basic(blue=1,green=5,yellow=7)
+        results = self.e.get_attr(notcallable=True,
+                                  notinternal=False)
+        self.assertListEqual([('blue',1),('green',5),('yellow',7)],results)
+        
+
 class TestOSFiles(unittest.TestCase):
     def setUp(self):
         
@@ -154,7 +191,7 @@ class TestOSFiles(unittest.TestCase):
         
         self.assertEquals(new_s,expected_s)
         
-    def test_os_file_to_string_remove_tab_and_string(self):
+    def test_os_fileTestIDGeneratorScale_to_string_remove_tab_and_string(self):
         
         s = "fo o b ar\tfo o b ar"
         
@@ -184,11 +221,13 @@ if __name__ == "__main__":
 
     #unittest.main()
     
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestUniqueIDGenerator)
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_get_obj_attr))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_generic))
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestIDGenerator))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestOSFiles))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestPickle))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSingleton))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestIDGeneratorScale))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_enum))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite)
