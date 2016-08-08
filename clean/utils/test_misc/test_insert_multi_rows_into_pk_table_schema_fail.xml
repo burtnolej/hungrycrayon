@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root>
+    <Database Name="tmp_test_db">
+        <Table Name="test_table">
+            <Index Type="CLUSTER">
+                <Key>test_column1</Key>
+                <Key>test_column2</Key>
+            </Index>
+            <Column Name="test_column1">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>5</FileTypeLen>
+                <Description>"blah blah"</Description>
+            </Column>
+            <Column Name="test_column2">
+                <DBType>"INTEGER"</DBType>
+                <Nullable>0</Nullable>
+                <FileType>"A"</FileType>
+                <FileTypeLen>50</FileTypeLen>
+                <Description>"blah blah"</Description>
+            </Column>
+            <Row Table="test_table">
+                <Field>
+                    <Key>test_column1</Key>
+                    <Value>111</Value>
+                </Field>
+                <Field>
+                    <Key>test_column2</Key>
+                    <Value>222</Value>
+                </Field>
+            </Row>
+            <Row Table="test_table">
+                <Field>
+                    <Key>test_column1</Key>
+                    <Value>111</Value>
+                </Field>
+                <Field>
+                    <Key>test_column2</Key>
+                    <Value>222</Value>
+                </Field>
+            </Row>
+        </Table>
+    </Database>
+</Root>

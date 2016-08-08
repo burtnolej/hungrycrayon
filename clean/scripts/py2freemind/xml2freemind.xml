@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<root>
+	<class Name="InstanceType">
+		<var Name="next"/>
+	</class>
+	<var Name="blackgreen14"/>
+	<var Name="burgundywhite18"/>
+	<var Name="darkbluelightblue16"/>
+	<var Name="format_utils"/>
+	<var Name="greyblack18"/>
+	<var Name="lightblueburgundy16"/>
+	<var Name="sys"/>
+	<var Name="whiteblack14i"/>
+	<var Name="xmltree"/>
+	<var Name="yellowburgundy14"/>
+</root>

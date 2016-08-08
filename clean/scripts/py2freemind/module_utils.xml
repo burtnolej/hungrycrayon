@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<root>
+	<def Name="_dir">
+		<arg Name="module_obj"/>
+		<arg Name="None"/>
+		<var Name="def_dir(module_obj"/>
+		<var Name="l"/>
+		<var Name="ifmodule_obj"/>
+		<var Name="module_obj"/>
+	</def>
+	<def Name="_getargsfromsource">
+		<arg Name="obj"/>
+		<arg Name="tokens"/>
+		<var Name="line"/>
+	</def>
+	<def Name="_getclasses">
+		<arg Name="module"/>
+		<arg Name="filename"/>
+		<var Name="classes"/>
+	</def>
+	<def Name="_getclassmethods">
+		<arg Name="clsobj"/>
+		<arg Name="inverse"/>
+		<arg Name="False"/>
+		<var Name="def_getclassmethods(clsobj,inverse"/>
+	</def>
+	<def Name="_getmembers">
+		<arg Name="module_obj"/>
+		<arg Name="None"/>
+		<var Name="def_getmembers(module_obj"/>
+		<var Name="d"/>
+		<var Name="ifmodule_obj"/>
+		<var Name="module_obj"/>
+		<var Name="d[name]"/>
+	</def>
+	<def Name="_getvarfromsource">
+		<arg Name="obj"/>
+		<var Name="source"/>
+		<var Name="l"/>
+		<var Name="line"/>
+		<var Name="tokens"/>
+	</def>
+	<def Name="imported_sysclasses_remove">
+		<arg Name="classes"/>
+		<arg Name="thisfilename"/>
+		<var Name="usermodules"/>
+	</def>
+	<def Name="isuserclass">
+		<arg Name="clsname"/>
+		<arg Name="thisfilename"/>
+		<var Name="usermodules"/>
+	</def>
+	<def Name="isuserfunc">
+		<arg Name="funcname"/>
+		<arg Name="thisfilename"/>
+		<var Name="usermodules"/>
+	</def>
+	<var Name="module_utils"/>
+	<var Name="xmltree"/>
+</root>

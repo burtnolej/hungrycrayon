@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<root>
+	<class Name="Database">
+		<method Name="execute">
+			<arg Name="self"/>
+			<arg Name="sql_str"/>
+			<arg Name="singleval"/>
+			<arg Name="False"/>
+			<var Name="defexecute(self,sql_str,singleval"/>
+			<var Name="ifsingleval"/>
+			<var Name="sql_result"/>
+			<var Name="sql_result"/>
+		</method>
+		<method Name="description">
+			<arg Name="self"/>
+		</method>
+		<method Name="tbl_get">
+			<arg Name="self"/>
+			<var Name="sql_result"/>
+			<var Name="self.tbl"/>
+			<var Name="_d"/>
+			<var Name="_d[db_enum.s3_tbl_attrib[i]]"/>
+			<var Name="self.tbl[_d[&quot;name&quot;]]"/>
+		</method>
+		<method Name="remove">
+			<arg Name="self"/>
+		</method>
+		<method Name="tbl_exists">
+			<arg Name="self"/>
+			<arg Name="tbl_name"/>
+		</method>
+		<method Name="open">
+			<arg Name="self"/>
+			<var Name="self.connection"/>
+			<var Name="self.cursor"/>
+		</method>
+	</class>
+	<var Name="col_type_enum"/>
+	<var Name="db_enum"/>
+	<def Name="schema_col_get">
+		<arg Name="schema"/>
+		<arg Name="name"/>
+		<arg Name="tbl_name"/>
+	</def>
+	<def Name="schema_data_get">
+		<arg Name="schema_file"/>
+		<arg Name="tbl_name"/>
+		<var Name="xml"/>
+		<var Name="child_xml"/>
+		<var Name="rows"/>
+		<var Name="ifrow_xml.attrib['Table']"/>
+		<var Name="tbl_col_name"/>
+		<var Name="tbl_rows"/>
+	</def>
+	<def Name="schema_execute">
+		<arg Name="schema_file"/>
+		<var Name="config"/>
+		<var Name="database"/>
+		<var Name="tbl_col_defn,tbl_pk_defn,_"/>
+	</def>
+	<def Name="schema_get">
+		<arg Name="schema"/>
+	</def>
+	<def Name="schema_print">
+		<arg Name="schema"/>
+	</def>
+	<def Name="schema_read">
+		<arg Name="schema_file"/>
+		<var Name="name_enum"/>
+		<var Name="type_enum"/>
+		<var Name="xml"/>
+		<var Name="child_xml"/>
+		<var Name="config"/>
+		<var Name="_names"/>
+		<var Name="tbl_config"/>
+		<var Name="_tbl_names"/>
+		<var Name="tbl_pk_defn"/>
+		<var Name="tbl_pk_defn"/>
+		<var Name="tbl_col_defn"/>
+		<var Name="tbl_config[tbl_name]"/>
+	</def>
+	<def Name="schema_tbl_get">
+		<arg Name="schema"/>
+		<arg Name="name"/>
+	</def>
+	<def Name="schema_tbl_pk_get">
+		<arg Name="schema"/>
+		<arg Name="name"/>
+		<arg Name="tbl_name"/>
+	</def>
+	<var Name="sqlite3"/>
+	<var Name="sys"/>
+	<def Name="tbl_create">
+		<arg Name="database"/>
+		<arg Name="tbl_name"/>
+		<arg Name="col_defn"/>
+		<arg Name="tbl_pk_defn"/>
+		<var Name="deftbl_create(database,tbl_name,col_defn,tbl_pk_defn"/>
+		<var Name="sql_col_str"/>
+		<var Name="sql_str"/>
+		<var Name="sql_col_str"/>
+		<var Name="sql_pk_str"/>
+		<var Name="sql_str"/>
+		<var Name="sql_result"/>
+	</def>
+	<def Name="tbl_index_count">
+		<arg Name="database"/>
+		<arg Name="tbl_name"/>
+		<var Name="sql_str"/>
+		<var Name="sql_str+"/>
+		<var Name="sql_result"/>
+	</def>
+	<def Name="tbl_index_defn_get">
+		<arg Name="database"/>
+		<arg Name="tbl_name"/>
+		<var Name="sql_str"/>
+		<var Name="sql_result"/>
+	</def>
+</root>

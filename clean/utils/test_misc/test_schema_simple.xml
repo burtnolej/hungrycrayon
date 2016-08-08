@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <Database Name="diet">
+        <Table Name="food">
+            <Column Name="name">
+                <DBType>text</DBType>
+                <nullable>true</nullable>
+            </Column>
+            <Column Name="calories">
+		<DBType>integer</DBType>
+		<nullable>true</nullable>
+            </Column>
+	</Table>
+	<Table Name="meals">
+	    <Column Name="type">
+		<DBType>text</DBType>
+		<nullable>true</nullable>
+	    </Column>
+	    <Column Name="time">
+		<DBType>datetime</DBType>
+		<nullable>true</nullable>
+	    </Column>
+        </Table>
+    </Database>
+    <Database Name="fitness">
+        <Table Name="workout">
+	    <Key>date</Key>
+            <Column Name="date">
+                <DBType>datetime</DBType>
+                <nullable>true</nullable>
+            </Column>
+            <Column Name="type">
+		<DBType>text</DBType>
+		<nullable>true</nullable>
+            </Column>
+	</Table>
+	<Row Table="workout">
+	    <Field>
+	        <Key>date</Key>
+	        <Value>250772</Value>
+	    </Field>
+	    <Field>
+	        <Key>type</Key>
+	        <Value>"cycling"</Value>
+	    </Field>
+	</Row>
+	<Row Table="workout">
+	    <Field>
+	        <Key>date</Key>
+	        <Value>260772</Value>
+	    </Field>
+	    <Field>
+	        <Key>type</Key>
+	        <Value>"rowing"</Value>
+	    </Field>
+	</Row>
+    </Database>
+</root>

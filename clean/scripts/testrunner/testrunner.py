@@ -40,7 +40,7 @@ def testsuite_get(rootdir=None,allowdupe=False,ignoredir=[]):
                         module = load_module(join(root,file),allowdupe)
                         
                         for item in dir(module):
-                            if item.startswith('Test_'):
+                            if item.startswith('Test'):
                                 suite.addTest(unittest.TestLoader().loadTestsFromTestCase(getattr(module,item)))
                                 print "info:loaded test=",str(item).ljust(20),"from",join(basename(root),file)
                                 if not testsummary.has_key(file) == True:

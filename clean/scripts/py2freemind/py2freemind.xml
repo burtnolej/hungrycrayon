@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<root>
+	<var Name="args"/>
+	<var Name="input_file"/>
+	<var Name="option"/>
+	<var Name="options"/>
+	<def Name="printusage">
+		<arg Name="msg"/>
+		<var Name="print&quot;\nusage:--input"/>
+	</def>
+	<def Name="py2xml">
+		<arg Name="module_filename"/>
+		<arg Name="module"/>
+		<arg Name="None"/>
+		<var Name="defpy2xml(module_filename,module"/>
+		<var Name="ifmodule"/>
+		<var Name="module"/>
+		<var Name="tokens"/>
+		<var Name="root"/>
+		<var Name="obj"/>
+		<var Name="cls_element"/>
+		<var Name="clsmth_element"/>
+		<var Name="def_element"/>
+		<var Name="output_filename"/>
+	</def>
+	<var Name="remainder"/>
+	<var Name="rules"/>
+	<var Name="sys"/>
+	<var Name="value"/>
+	<var Name="xmlfile"/>
+	<var Name="xmltree"/>
+</root>

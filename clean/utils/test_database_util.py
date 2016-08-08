@@ -100,42 +100,42 @@ class TestDBObject(unittest.TestCase):
     '''DBObject is fixtures to allow a generic object to write itself into a sqlite3 db'''
 
     class dbgeneric(generic):
-        
+            
         def db_tbl_name_get(self):
-            self.__db_tbl_name = self.__class__.__name__
+            self.db_tbl_name = self.__class__.__name__
         
         def db_tbl_col_defn_get(self):
-            self.__blah = 31321
+            self.blah = 31321
             
-            self.__db_tbl_col_defn = []
-            __attr = self.get_attr(notcallable=True,notinternal=False)
+            self.db_tbl_col_defn = []
+            attr = self.attr_get_keyval(include_callable=False,
+                                        include_nondataattr=False)
 
-            print __attr
-            
-            for __name,__val in __attr:
-                __type = "text"
+            for _name,_val in attr:
+                _type = "text"
                 try:
-                    int(__val)
-                    __type = "integer"
-                except ValueError:
+                    int(_val)
+                    _type = "integer"
+                except ValueError, TypeError:
                     pass
-                self.__db_tbl_col_defn.append((__attr,__type))
+                self.db_tbl_col_defn.append((_name,_type))
 
     def setUp(self):
         class dbtest(self.dbgeneric):
             pass
-        
-        self.dbg = dbtest.basic(col1=123,col2=456,col3=789)
-        
-    def test_basic_table_create_from_obj_int_cols(self):
+
+        self.dbg = dbtest.datamembers(datamembers={'col1':123,'col2':456,'col3':789})
         self.dbg.db_tbl_name_get()
         self.dbg.db_tbl_col_defn_get()
         
+    def test_dbobject_get_tblname(self):
+        self.assertEquals(self.dbg.db_tbl_name,'dbtest')
         
+    def test_dbobject_get_coldefn(self):
+        self.assertEquals(self.dbg.db_tbl_col_defn,[('col1','integer'),
+                                                    ('col2','integer'),
+                                                    ('col3','integer')])
         
-        '''self.assertEqual(self.db_tbl_col_defn,[(col1,123),(col2,456),(col3,789)])
-
-        self.assertEqual(self.db_tbl_name,'dbtest')'''
                 
 if __name__ == "__main__":
 

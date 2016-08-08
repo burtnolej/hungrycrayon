@@ -159,8 +159,7 @@ class Lesson(generic):
         return(self.objid)
 
     def attr_set(self,name,clsname):
-        self.teacher = ObjFactory(__logger__=True).new(clsname,name,
-                                        modname=__name__)
+        self.teacher = ObjFactory().new(clsname,name,modname=__name__)
 
 for schedule_num in range(len(schedule)):
     for period_num in range(1,len(schedule[schedule_num])):
@@ -169,7 +168,7 @@ for schedule_num in range(len(schedule)):
             dow =day_enum[day_num-2]
             objid = str(schedule_num)+"."+str(day_num-2)+"."+str(period_num-1)
 
-            lesson= ObjFactory(__logger__=True).new('Lesson',objid,
+            lesson= ObjFactory().new('Lesson',objid,
                                      modname=__name__,
                                      student = students[schedule_num],
                                      period=period,

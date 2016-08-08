@@ -47,21 +47,28 @@ class GenericBase(object):
         return(new_attr) 
 
     @classmethod
-    def datamembers(cls,datamembers,**kwarg):
+    def datamembers(cls,**kwarg):
         ''' constructor is used when special attributes want to be added
         to the object for extraction later; their names are mangled with
         a suffix of _dm_ so they can be identified later. this is usually
         for writing objects to a datatbase etc'''
         
-        cls1 = cls(**kwarg)
-
-        if not isinstance(datamembers,dict):
-            raise Exception("arg datamember must be of type dict")
+        if not kwarg.has_key('datamembers'):
+            raise Exception('datamembers arg not set; are you using the correct constructor')
         
-        for dm in datamembers.keys():
+        _datamembers = kwarg['datamembers']
+        
+        kwarg.pop('datamembers')
+        
+        if not isinstance(_datamembers,dict):
+            raise Exception("arg datamember must be of type dict")
+
+        for dm in _datamembers.keys():
             if dm in kwarg.keys():
                 raise Exception("attr",dm,"cannot appear in both dm and regular attr") 
         
-        cls1._setattr(datamembers,'_dm_')
+        cls1 = cls(**kwarg)
+        
+        cls1._setattr(_datamembers,'_dm_')
         
         return(cls1)
