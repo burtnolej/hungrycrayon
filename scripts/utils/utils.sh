@@ -10,6 +10,9 @@ function argset {
         i=0
         while [ $i -lt "$numargs" ]
         do
+		#if [[ ${argarray[$i] =~ '='$ ]]; then 
+                #        echo "True"
+		#	exit
                 if [ ${argarray[$i]} = "$arg" ]; then
                         i=$[$i+1]
                         echo ${argarray[$i]}
@@ -97,12 +100,17 @@ function writelog {
 }
 
 function finishup {
+
+	logmsg=$1
+
         rm $logdir/CURRENT
 
         ln -s $logfile $logdir/CURRENT
 
         # mail results
-        grep -v 'uptodate' $logdir/CURRENT | mail -s "log for backup:"$source $mailto
+        #grep -v 'uptodate' $logdir/CURRENT | mail -s "log for backup:"$source $mailto
+        grep -v 'uptodate' $logdir/CURRENT | mail -s "$0:$logmsg" $mailto
+
 
         rm $lockfile
 

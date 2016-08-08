@@ -172,4 +172,4 @@ fi
 # add backup dir sizes to logfile
 `cd $target$source;du -bm -all --max-depth=2 --human-readable .  >> $logfile`
 
-finishup
+finishup $source

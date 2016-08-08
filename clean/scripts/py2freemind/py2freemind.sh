@@ -1,7 +1,7 @@
 #!/bin/bash
 
-source="$1"
-
-scripts_path="/home/burtnolej/pythonapps/clean/scripts"
-
-xml2freemind = "$scripts_path/xml2freemind"
+python ./py2freemind.py --input-filename=../../utils/module_utils.py \
+                        --full-label \
+                        --suppress-attrib=Name \
+                        --groupby-tag=var,arg \
+                        --input-format-filename=./format_python_code.xml
