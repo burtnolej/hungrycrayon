@@ -7,7 +7,7 @@ class GenericBase(object):
         for key,value in attr.iteritems():
             setattr(self,suffix+key,value)
             
-    def __init__(self,*arg,**kwarg):
+    def __init__(self,**kwarg):
         self._setattr(kwarg)
         
     def attr_get_keyval(self,include_callable=True, 
@@ -47,13 +47,13 @@ class GenericBase(object):
         return(new_attr) 
 
     @classmethod
-    def datamembers(cls,datamembers,*arg,**kwarg):
+    def datamembers(cls,datamembers,**kwarg):
         ''' constructor is used when special attributes want to be added
         to the object for extraction later; their names are mangled with
         a suffix of _dm_ so they can be identified later. this is usually
         for writing objects to a datatbase etc'''
         
-        cls1 = cls(*arg,**kwarg)
+        cls1 = cls(**kwarg)
 
         if not isinstance(datamembers,dict):
             raise Exception("arg datamember must be of type dict")

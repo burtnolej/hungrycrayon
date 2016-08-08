@@ -100,7 +100,7 @@ class TestIDGenerator(unittest.TestCase):
         class myclass(generic): pass
         
         for i in range(10):
-            mc = myclass(__idgen__=True)
+            mc = myclass()
 
         self.assertEquals(self.idgen.num_ids(),10)
         
@@ -124,7 +124,47 @@ class TestSingleton(unittest.TestCase):
         address2 = myclass_normal()
         
         self.assertNotEqual(address1,address2)
-            
+   
+class TestLogging(unittest.TestCase):
+    def setUp(self):
+        self.myclass = generic()
+        
+    def test_logfile_exists(self):
+        self.assertTrue(self.myclass.log.logexists())
+        
+    def test_write_to_log(self):
+        self.myclass.log.log(self,3,"test")
+        self.myclass.log.log(self,3,"test2")
+        self.assertEquals(2,self.myclass.log.log_get_session_num_entries())
+    
+class TestLoggingRecovery(unittest.TestCase):
+    def setUp(self):
+        self.myclass = generic()
+        self.myclass.log.log_cache_reset()
+        
+        self.myclass.log.log(self,3,"test")
+        self.myclass.log.log(self,3,"test2")
+        
+    def test_recover_then_write_to_log(self):
+        self.myclass = generic()
+        self.myclass.log.log(self,3,"test3")
+        self.myclass.log.log(self,3,"test4")        
+        self.assertEquals(4,self.myclass.log.log_get_session_num_entries())
+
+class TestLoggingContent(unittest.TestCase):
+    def setUp(self):
+        self.myclass = generic()
+        self.myclass.log.log_cache_reset()
+        
+        self.myclass.log.log(self,3,"test")
+        self.myclass.log.log(self,3,"test2")
+    
+    def test_get_session_content(self):
+        _log_content = self.myclass.log.log_get_session_content()
+        
+        self.assertEquals(_log_content[0].msg,"test")
+        self.assertEquals(_log_content[1].msg,"test2")
+        
 class TestIDGeneratorScale(unittest.TestCase):
 
     def setUp(self):
@@ -150,7 +190,7 @@ class TestIDGeneratorScale(unittest.TestCase):
         class myclass(generic): pass
         
         for i in range(1000):
-            mc = myclass(__idgen__=True)
+            mc = myclass()
             
         self.assertEquals(self.idgen.num_ids(),1000)
         
@@ -159,9 +199,10 @@ class Test_enum(unittest.TestCase):
     ''' enum is a sub class of generic. needs to use the basic
     constructor as it does not need id's etc '''       
     def test_enum(self):
-        self.e = enum.basic(blue=1,green=5,yellow=7)
-        results = self.e.get_attr(notcallable=True,
-                                  notinternal=False)
+        self.e = enum(blue=1,green=5,yellow=7)
+        
+        results = self.e.attr_get_keyval(include_callable=False)
+
         self.assertListEqual([('blue',1),('green',5),('yellow',7)],results)
         
 
@@ -228,7 +269,10 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSingleton))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestIDGeneratorScale))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_enum))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestLogging))
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestLoggingContent))
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestLoggingRecovery))
     unittest.TextTestRunner(verbosity=2).run(suite)
     

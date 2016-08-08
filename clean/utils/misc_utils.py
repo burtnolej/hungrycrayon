@@ -6,7 +6,9 @@ sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from misc_utils_generic import GenericBase
 
 class generic(GenericBase):
-    def __init__(self):
+    def __init__(self,**kwargs):
+        super(generic,self).__init__(**kwargs)
+        
         self.log = Log()
         self.id =  IDGenerator().getid()
         
@@ -24,12 +26,17 @@ class Singleton(type):
 class Log():    
     __metaclass__ = Singleton
     
-    logfile = open('log.log',"w+")
+    logpath = '/home/burtnolej/log.log'
+    logfile = open(logpath,"a")
     verbosity = 5
-    
+    cache=[]
+        
     def __repr__(self):
         return ('log')
     
+    def log_cache_reset(self):
+        self.cache=[]
+        
     def log(self,obj,priority,*args):
         from inspect import stack
         from os.path import basename
@@ -45,6 +52,16 @@ class Log():
             msecs = str(int(datetime.now().microsecond/1000)).rjust(4,"0")
             
             callerframe = stack()[2]
+            
+            _logitem = generic(clr=str(obj),
+                               t=now+"."+msecs,
+                               clrf=callerframe[3],
+                               clrfnln=str(callerframe[2]),   
+                               msg=" ".join(list(args)),
+                               clrfr="("+basename(callerframe[1])+")")
+                               
+                                 
+            
             logitem = logitem + ["clr="   + str(obj),
                                  "t="     + now+"."+msecs,
                                  "clrfn=" + callerframe[3],
@@ -52,9 +69,26 @@ class Log():
                                  "msg="   + " ".join(list(args)),
                                  "clrf="  + "("+basename(callerframe[1]) + ")"]
     
-            self.logfile.write(";".join(logitem)+"\n")
+            _content = [(_key+"="+str(_val)) for _key,_val in _logitem.attr_get_keyval(include_callable=False)]
+            content = ";".join(_content)+"\n"
+            self.logfile.write(content)
+            self.cache.append(_logitem)
             
-    def __del_(self):
+    def log_get_session_content(self):
+        return(self.cache)
+    
+    def logexists(self):
+        return(os_file_exists(self.logpath))
+
+    def log_get_session_num_entries(self):
+        return(len(self.cache))
+    
+    def log_file_length(self):
+        for i,l in enumerate(self.logfile):
+            pass
+        return(i)
+    
+    def __del__(self):
         self.logfile.close()
 
 
@@ -120,7 +154,7 @@ def os_file_to_string(filename,remove=None):
     fh.close()
     return s
 
-class enum(generic):
+class enum(GenericBase):
     pass
 
 def write_pickle(object,filename=None):
