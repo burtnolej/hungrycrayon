@@ -8,7 +8,7 @@ from database_util import Database, tbl_create, tbl_index_count, \
      schema_data_get
 
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils import enum
+from misc_utils import enum, generic
 from os import remove
 
 PY2 = sys.version_info[0] == 2
@@ -39,7 +39,7 @@ class TestDatabase(unittest.TestCase):
 class TestTable(unittest.TestCase):
     
     def setUp(self):
-        self.schema_file = "./test_misc/test_schema_simple.xml"
+        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
             
     def test_tbl_create_pk(self):
         
@@ -58,7 +58,7 @@ class TestTable(unittest.TestCase):
 class TestSchema(unittest.TestCase):
     
     def setUp(self):
-        self.schema_file = "./test_misc/test_schema_simple.xml"
+        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
         
     def test_schema_read(self):
         
@@ -94,11 +94,56 @@ class TestSchema(unittest.TestCase):
         self.assertListEqual(tbl_col_name,['date', 'type'])
         self.assertListEqual(tbl_rows,[('250772', '"cycling"'), ('260772', '"rowing"')])
     
+
+class TestDBObject(unittest.TestCase):
+
+    '''DBObject is fixtures to allow a generic object to write itself into a sqlite3 db'''
+
+    class dbgeneric(generic):
+        
+        def db_tbl_name_get(self):
+            self.__db_tbl_name = self.__class__.__name__
+        
+        def db_tbl_col_defn_get(self):
+            self.__blah = 31321
+            
+            self.__db_tbl_col_defn = []
+            __attr = self.get_attr(notcallable=True,notinternal=False)
+
+            print __attr
+            
+            for __name,__val in __attr:
+                __type = "text"
+                try:
+                    int(__val)
+                    __type = "integer"
+                except ValueError:
+                    pass
+                self.__db_tbl_col_defn.append((__attr,__type))
+
+    def setUp(self):
+        class dbtest(self.dbgeneric):
+            pass
+        
+        self.dbg = dbtest.basic(col1=123,col2=456,col3=789)
+        
+    def test_basic_table_create_from_obj_int_cols(self):
+        self.dbg.db_tbl_name_get()
+        self.dbg.db_tbl_col_defn_get()
+        
+        
+        
+        '''self.assertEqual(self.db_tbl_col_defn,[(col1,123),(col2,456),(col3,789)])
+
+        self.assertEqual(self.db_tbl_name,'dbtest')'''
+                
 if __name__ == "__main__":
 
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestDatabase)
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTable))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSchema))
+    suite = unittest.TestSuite()
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDatabase))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTable))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSchema))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBObject))
 
     unittest.TextTestRunner(verbosity=2).run(suite)
     

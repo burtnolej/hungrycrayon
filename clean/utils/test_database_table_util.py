@@ -41,7 +41,7 @@ test_db_str = enum(name="db_name_test",
 class TestTableInsert(unittest.TestCase):
     
     def setUp(self):
-        self.schema_file = "./test_misc/test_schema_simple.xml"
+        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
     
     def test_tbl_rows_insert(self):
 
@@ -106,7 +106,7 @@ class TestTableInsert(unittest.TestCase):
 class TestTableColumnAdd(unittest.TestCase):
     
     def setUp(self):
-        self.schema_file = "./test_misc/test_schema_simple.xml"
+        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
         
     def test_tbl_cols_get(self):
         

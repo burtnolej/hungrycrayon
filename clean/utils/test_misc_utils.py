@@ -164,7 +164,7 @@ class TestLoggingContent(unittest.TestCase):
         
         self.assertEquals(_log_content[0].msg,"test")
         self.assertEquals(_log_content[1].msg,"test2")
-        
+    
 class TestIDGeneratorScale(unittest.TestCase):
 
     def setUp(self):
@@ -274,5 +274,6 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestLoggingContent))
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestLoggingRecovery))
+
     unittest.TextTestRunner(verbosity=2).run(suite)
     
