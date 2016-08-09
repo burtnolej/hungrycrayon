@@ -5,7 +5,7 @@ import sys
 from database_util import Database, tbl_create, tbl_index_count, \
      tbl_index_defn_get, schema_read, schema_get, schema_tbl_get, \
      schema_col_get, schema_tbl_pk_get, schema_print, schema_execute, \
-     schema_data_get, dbgeneric
+     schema_data_get
 
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import enum, generic
@@ -93,27 +93,7 @@ class TestSchema(unittest.TestCase):
         
         self.assertListEqual(tbl_col_name,['date', 'type'])
         self.assertListEqual(tbl_rows,[('250772', '"cycling"'), ('260772', '"rowing"')])
-    
 
-class TestDBObject(unittest.TestCase):
-
-          
-    def setUp(self):
-        class dbtest(dbgeneric):
-            pass
-
-        self.dbg = dbtest.datamembers(datamembers={'col1':123,'col2':456,'col3':789})
-        self.dbg.db_tbl_name_get()
-        self.dbg.db_tbl_col_defn_get()
-        
-    def test_dbobject_get_tblname(self):
-        self.assertEquals(self.dbg.db_tbl_name,'dbtest')
-        
-    def test_dbobject_get_coldefn(self):
-        self.assertEquals(self.dbg.db_tbl_col_defn,[('col1','integer'),('col2','integer'),('col3','integer')])
-        
-    def test_dbobject_get_row_value(self):
-        self.assertEquals(self.dbg.db_tbl_row_value_get(),[123,456,789])
         
                 
 if __name__ == "__main__":
@@ -122,7 +102,7 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDatabase))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTable))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSchema))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBObject))
+    
 
     unittest.TextTestRunner(verbosity=2).run(suite)
     

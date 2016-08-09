@@ -123,7 +123,7 @@ class Test_generic_attr_get(unittest.TestCase):
 
     def test_attr_get(self):
         exp_res = ['_setattr','attr_get_keyval','datamembers',
-                   'foo','boo','attr1','attr2']
+                   'foo','boo','attr1','attr2','log','id']
         
         exp_res.sort()
         
@@ -133,7 +133,7 @@ class Test_generic_attr_get(unittest.TestCase):
         self.assertListEqual(exp_res,_attr)
         
     def test_attr_exclude_callable(self):
-        exp_res = ['foo','boo','attr1','attr2']
+        exp_res = ['foo','boo','attr1','attr2','log','id']
         
         exp_res.sort()
         
@@ -169,7 +169,7 @@ class Test_generic_attr_get_from_derived(unittest.TestCase):
         _attr = [_key for _key,_val in self.dmg.attr_get_keyval(include_callable=False)]
         _attr.sort()
         
-        exp_res = ['foo','boo','attr1','attr2']
+        exp_res = ['foo','boo','attr1','attr2','log','id']
         
         exp_res.sort()
         

@@ -3,14 +3,18 @@ import sys
 
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
-from misc_utils_generic import GenericBase
+#from misc_utils_generic import GenericBase
 
-class generic(GenericBase):
-    def __init__(self,**kwargs):
-        super(generic,self).__init__(**kwargs)
+#class generic(GenericBase):
+#    def __init__(self,**kwargs):
+#        super(generic,self).__init__(**kwargs)
+#        
+#        self.log = Log()
+#        self.id =  IDGenerator().getid()
+#        
+#        
+#        print "generic","__init__"
         
-        self.log = Log()
-        self.id =  IDGenerator().getid()
         
 class Singleton(type):
     _instances = {}
@@ -53,12 +57,17 @@ class Log():
             
             callerframe = stack()[2]
             
-            _logitem = generic(clr=str(obj),
-                               t=now+"."+msecs,
-                               clrf=callerframe[3],
-                               clrfnln=str(callerframe[2]),   
-                               msg=" ".join(list(args)),
-                               clrfr="("+basename(callerframe[1])+")")
+            class myclass():
+                def __init__(self,**kwargs):
+                    for k,v in kwargs.iteritems():
+                        setattr(self,k,v)
+                        
+            _logitem = myclass()(clr=str(obj),
+                                 t=now+"."+msecs,
+                                 clrf=callerframe[3],
+                                 clrfnln=str(callerframe[2]),   
+                                 msg=" ".join(list(args)),
+                                 clrfr="("+basename(callerframe[1])+")")
                                
                                  
             
@@ -119,8 +128,8 @@ def os_file_to_string(filename,remove=None):
     fh.close()
     return s
 
-class enum(GenericBase):
-    pass
+#class enum(GenericBase):
+#    pass
 
 def write_pickle(object,filename=None):
     import pickle

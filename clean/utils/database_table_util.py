@@ -1,9 +1,10 @@
 import sqlite3
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils import enum
-from database_util import schema_data_get, db_enum, generic, Database, \
+from misc_utils_enum import enum
+from database_util import schema_data_get, db_enum, Database, \
      tbl_create
+from misc_utils_generic import GenericBase
 
 test_db = enum(name="db_name_test",
                tbl_name="tbl_name_test",
@@ -14,7 +15,7 @@ test_db = enum(name="db_name_test",
                tbl_pk_defn = ["col_name1","col_name2"])
 
 
-class dbtblgeneric(generic):
+class dbtblgeneric(GenericBase):
     '''DBGeneric is fixtures to allow a generic object to write itself into a sqlite3 db'''
 
     def __init__(self,**kwarg):
@@ -25,7 +26,9 @@ class dbtblgeneric(generic):
 	
 	kwarg.pop('database')
 	
-	#super(generic,self).datamembers(**kwarg)
+	print "dbtblgeneric","__init__"
+	
+	super(dbtblgeneric,self).__init__(**kwarg)
 
     def tbl_name_get(self):
 	self.tbl_name = self.__class__.__name__
