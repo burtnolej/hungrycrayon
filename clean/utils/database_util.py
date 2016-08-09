@@ -4,7 +4,7 @@ import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from xml_utils import element_find_tags,element_find_children
 
-from misc_utils import os_file_exists, enum
+from misc_utils import os_file_exists, enum, generic
 
 db_enum = enum(name_attrib="Name", # keywords used in the schema xml file
                db_type="DBType", # keywords used in the schema xml file
@@ -42,9 +42,15 @@ class Database():
            returns: sql_result  : whatever sqlite returns - usually nested lists'''
         
         if singleval==False:
-            sql_result = self.cursor.execute(sql_str).fetchall()
+            # orig return is a list of tuples; covert to list of list as 
+            # tuples can behave differently if we are only returning 1 column
+            _sql_result = self.cursor.execute(sql_str).fetchall()
+            sql_result = [list(s) for s in _sql_result]    
+            
         else:
             sql_result = self.cursor.execute(sql_str).fetchone()[0]
+            
+
         return(sql_result)
             
     def open(self):
@@ -78,6 +84,7 @@ class Database():
 
         self.tbl_get()
         return(self.tbl.has_key(tbl_name))
+
 
 def tbl_index_count(database,tbl_name):
     '''purpose: get the number of indexes on a particular table

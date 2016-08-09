@@ -2,7 +2,8 @@ import sqlite3
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import enum
-from database_util import schema_data_get, db_enum
+from database_util import schema_data_get, db_enum, generic, Database, \
+     tbl_create
 
 test_db = enum(name="db_name_test",
                tbl_name="tbl_name_test",
@@ -12,6 +13,60 @@ test_db = enum(name="db_name_test",
                          ("col_name4","integer")],
                tbl_pk_defn = ["col_name1","col_name2"])
 
+
+class dbtblgeneric(generic):
+    '''DBGeneric is fixtures to allow a generic object to write itself into a sqlite3 db'''
+
+    def __init__(self,**kwarg):
+	if not kwarg.has_key('database') or not isinstance(kwarg['database'],Database):
+	    raise Exception('Database onject must be passed as database=')
+	
+	self.database = kwarg['database']
+	
+	kwarg.pop('database')
+	
+	#super(generic,self).datamembers(**kwarg)
+
+    def tbl_name_get(self):
+	self.tbl_name = self.__class__.__name__
+
+    def tbl_col_defn_get(self):
+
+	self.tbl_col_defn = []
+	self.tbl_col_names = []
+	attr = self.attr_get_keyval(include_callable=False,
+	                            include_nondataattr=False)
+
+	for _name,_val in attr:
+	    _type = "text"
+	    try:
+		int(_val)
+		_type = "integer"
+	    except ValueError, TypeError:
+		pass
+	    self.tbl_col_defn.append((_name,_type))
+	    self.tbl_col_names.append(_name)
+	    
+
+    def tbl_row_value_get(self):
+	t = [_val for _key,_val in self.attr_get_keyval(include_callable=False,
+	                                                      include_nondataattr=False)]
+	
+	self.tbl_row_values = [t]
+ 
+    def persist(self):
+	
+	with self.database:
+	    tbl_create(self.database,
+	               self.tbl_name,
+	               self.tbl_col_defn)
+
+	    tbl_rows_insert(self.database,
+	                    self.tbl_name,
+	                    self.tbl_col_names,
+		            self.tbl_row_values)
+
+	
 def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
     '''purpose: insert 1 or more data rows into a table
 	  args: tbl_name    : table to insert into
@@ -22,7 +77,7 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
     if len(tbl_rows)>1:
 	tbl_rows_str=",".join(["(" + ",".join(map(str,row)) + ")" for row in tbl_rows])
     else:
-	tbl_rows_str = "(" + ",".join(tbl_rows) + ")"
+	tbl_rows_str = "(" + ",".join(map(str,tbl_rows[0])) + ")"
 
     exec_str = "INSERT INTO {table} ({keys}) VALUES {rows}".format(table=tbl_name, \
                                                                        keys=col_name_str,\

@@ -5,7 +5,7 @@ import sys
 from database_util import Database, tbl_create, tbl_index_count, \
      tbl_index_defn_get, schema_read, schema_get, schema_tbl_get, \
      schema_col_get, schema_tbl_pk_get, schema_print, schema_execute, \
-     schema_data_get
+     schema_data_get, dbgeneric
 
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import enum, generic
@@ -97,31 +97,9 @@ class TestSchema(unittest.TestCase):
 
 class TestDBObject(unittest.TestCase):
 
-    '''DBObject is fixtures to allow a generic object to write itself into a sqlite3 db'''
-
-    class dbgeneric(generic):
-            
-        def db_tbl_name_get(self):
-            self.db_tbl_name = self.__class__.__name__
-        
-        def db_tbl_col_defn_get(self):
-            self.blah = 31321
-            
-            self.db_tbl_col_defn = []
-            attr = self.attr_get_keyval(include_callable=False,
-                                        include_nondataattr=False)
-
-            for _name,_val in attr:
-                _type = "text"
-                try:
-                    int(_val)
-                    _type = "integer"
-                except ValueError, TypeError:
-                    pass
-                self.db_tbl_col_defn.append((_name,_type))
-
+          
     def setUp(self):
-        class dbtest(self.dbgeneric):
+        class dbtest(dbgeneric):
             pass
 
         self.dbg = dbtest.datamembers(datamembers={'col1':123,'col2':456,'col3':789})
@@ -132,9 +110,10 @@ class TestDBObject(unittest.TestCase):
         self.assertEquals(self.dbg.db_tbl_name,'dbtest')
         
     def test_dbobject_get_coldefn(self):
-        self.assertEquals(self.dbg.db_tbl_col_defn,[('col1','integer'),
-                                                    ('col2','integer'),
-                                                    ('col3','integer')])
+        self.assertEquals(self.dbg.db_tbl_col_defn,[('col1','integer'),('col2','integer'),('col3','integer')])
+        
+    def test_dbobject_get_row_value(self):
+        self.assertEquals(self.dbg.db_tbl_row_value_get(),[123,456,789])
         
                 
 if __name__ == "__main__":
