@@ -231,8 +231,8 @@ class TestDBTblGeneric3_cols_int(unittest.TestCase):
         self.dbg = dbtbltest.datamembers(database=self.database,
                                          dm={'col1':123,'col2':456,'col3':789})
         self.dbg.tbl_name_get()
-        self.dbg.tbl_col_defn_get()
-        self.dbg.tbl_row_value_get()
+        self.dbg.tbl_col_defn_get(False)
+        self.dbg.tbl_row_value_get(False)
         
     def test_dbobject_get_tblname(self):
         self.assertEquals(self.dbg.tbl_name,'dbtbltest')
@@ -252,8 +252,8 @@ class TestDBTblGeneric3_cols_int(unittest.TestCase):
         self.database = Database(test_db.name,True)
         
         with self.database:
-            self.assertEquals([[123,456,789]],self.database.execute("select * from dbtbltest"))
-               
+            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1','col2','col3']) 
+            self.assertEquals([[123,456,789]],tbl_rows)
                
 class TestDBTblGeneric3_cols_str(unittest.TestCase):
 
@@ -267,8 +267,8 @@ class TestDBTblGeneric3_cols_str(unittest.TestCase):
         self.dbg = dbtbltest.datamembers(database=self.database,
                                          dm={'col1':'\"abc\"','col2':'\"def\"','col3':'\"ghi\"'})
         self.dbg.tbl_name_get()
-        self.dbg.tbl_col_defn_get()
-        self.dbg.tbl_row_value_get()
+        self.dbg.tbl_col_defn_get(False)
+        self.dbg.tbl_row_value_get(False)
         
     def test_dbobject_get_tblname(self):
         self.assertEquals(self.dbg.tbl_name,'dbtbltest')
@@ -288,7 +288,8 @@ class TestDBTblGeneric3_cols_str(unittest.TestCase):
         self.database = Database(test_db.name,True)
 
         with self.database:
-            self.assertEquals([['abc','def','ghi']],self.database.execute("select * from dbtbltest"))
+            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1','col2','col3']) 
+            self.assertEquals([['abc','def','ghi']],tbl_rows)
 
 class TestDBTblGeneric1_col_str(unittest.TestCase):
 
@@ -302,8 +303,8 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
         self.dbg = dbtbltest.datamembers(database=self.database,
                                          dm={'col1':'\"abc\"'})
         self.dbg.tbl_name_get()
-        self.dbg.tbl_col_defn_get()
-        self.dbg.tbl_row_value_get()
+        self.dbg.tbl_col_defn_get(False)
+        self.dbg.tbl_row_value_get(False)
         
     def test_dbobject_get_tblname(self):
         self.assertEquals(self.dbg.tbl_name,'dbtbltest')
@@ -323,7 +324,45 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
         self.database = Database(test_db.name,True)
 
         with self.database:
-            self.assertEquals([['abc']],self.database.execute("select * from dbtbltest"))
+            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1']) 
+            self.assertEquals([['abc']],tbl_rows)
+            
+            
+class TestDBTblGeneric_sysinfo(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.database = Database(test_db.name)
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':'\"abc\"'})
+        self.dbg.tbl_name_get()
+        self.dbg.tbl_col_defn_get()
+        self.dbg.tbl_row_value_get()
+        
+        
+    def test_dbobject_get_sysinfo_cols(self):
+        self.assertEquals(self.dbg.tbl_col_defn,[('col1','text'),
+                                                 ('__timestamp','text'),
+                                                 ('__id','text')])
+        
+    def test_dbobject_assert_id(self):
+        from datetime import datetime
+        self.dbg.persist()
+        self.database = Database(test_db.name,True)
+        with self.database:
+            col_name,tbl_rows = tbl_rows_get(self.database,
+                                             'dbtbltest',
+                                             ['__timestamp','__id']) 
+            dt = datetime.strptime(tbl_rows[0][0],"%H:%M:%S")
+            
+            self.assertAlmostEqual(datetime.now().min,dt.min)
+            self.assertAlmostEqual(datetime.now().hour,dt.hour)
+            self.assertAlmostEqual(datetime.now().second,dt.second)
+                                
 
 
 if __name__ == "__main__":
@@ -334,9 +373,10 @@ if __name__ == "__main__":
     
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableColumnAdd))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_int))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_str))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric1_col_str))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_int))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_str))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric1_col_str))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric_sysinfo))
     
     unittest.TextTestRunner(verbosity=2).run(suite)
     

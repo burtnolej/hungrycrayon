@@ -38,7 +38,7 @@ class dbtblgeneric(GenericBase):
     def tbl_name_get(self):
 	self.tbl_name = self.__class__.__name__
 
-    def tbl_col_defn_get(self):
+    def tbl_col_defn_get(self,include_internal=True):
 
 	self.tbl_col_defn = []
 	self.tbl_col_names = []
@@ -56,18 +56,20 @@ class dbtblgeneric(GenericBase):
 	    self.tbl_col_names.append(_name)
 	    
 	# also include useful system info 
-	self.tbl_col_defn += [('__timestamp','text'),('__id','text')]
-	self.tbl_col_names += ['__timestamp','__id']
+	if include_internal == True:
+	    self.tbl_col_defn += [('__timestamp','text'),('__id','text')]
+	    self.tbl_col_names += ['__timestamp','__id']
 	
 	
-    def tbl_row_value_get(self):
+    def tbl_row_value_get(self,include_internal=True):
 	t = [_val for _key,_val in self.attr_get_keyval(include_callable=False,
 	                                                include_nondataattr=False)]
 	
 	# also include useful system info 
-	t.append(datetime.now().strftime("%H:%M:%S"))
-	t.append(self.id)
-	
+	if include_internal == True:
+	    t.append("\"" + datetime.now().strftime("%H:%M:%S") + "\"")
+	    t.append("\"" + self.id + "\"")
+	    
 	self.tbl_row_values = [t]
  
     def _metadata_set(self):
@@ -120,9 +122,11 @@ def tbl_rows_get(database,tbl_name,fields=None):
     fieldstr="*"
     if fields<>None:
 	fieldstr = ",".join(fields)
-	    
-    results = database.execute("select {fields} from {table}".format(fields=fieldstr,
-                                                                     table=tbl_name))
+
+    exec_str = "select {fields} from {table}".format(fields=fieldstr,
+                                                     table=tbl_name)
+    
+    results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]
     return(keys,results)
