@@ -134,6 +134,9 @@ edu_enum = ['SCIENCE','STEM','MATH','HUMANITIES','SS','PSYCHOLOGY',
             'SOCIAL S']
 break_enum = ['LUNCH','COMPUTER TIME','QUAD CAFE','QUADCAFE']
 
+
+of = ObjFactory(True)
+
 class Teacher(generic):
     def __init__(self,name):
         super(Teacher,self).__init__()
@@ -161,7 +164,7 @@ class Lesson(generic):
         return(self.objid)
 
     def attr_set(self,name,clsname):
-        self.teacher = ObjFactory().new(clsname,name,modname=__name__)
+        self.teacher = of.new(clsname,name,modname=__name__)
 
 for schedule_num in range(len(schedule)):
     for period_num in range(1,len(schedule[schedule_num])):
@@ -170,7 +173,7 @@ for schedule_num in range(len(schedule)):
             dow =day_enum[day_num-2]
             objid = str(schedule_num)+"."+str(day_num-2)+"."+str(period_num-1)
 
-            lesson= ObjFactory().new('Lesson',objid,
+            lesson= of.new('Lesson',objid,
                                      modname=__name__,
                                      student = students[schedule_num],
                                      period=period,
@@ -193,5 +196,5 @@ for schedule_num in range(len(schedule)):
                 else:
                     print _i
 
-for obj in ObjFactory().query('Lesson'):
+for obj in of.query('Lesson'):
     print obj.dump()
