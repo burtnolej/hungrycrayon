@@ -70,6 +70,11 @@ class ObjFactory(GenericBase):
     def object_get(self,clsname,objid):
         return(self.store[clsname][objid])
         
+    def object_iter(self):
+        for cls in self.store.values():
+            for obj in cls.values():
+                yield obj
+                
     def reset(self):
         self.store = {}
         

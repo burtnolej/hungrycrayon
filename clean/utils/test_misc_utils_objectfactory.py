@@ -11,13 +11,19 @@ import unittest
 
 class Student(GenericBase):
     def __init__(self,objid,**kwargs):
+        self.objid = objid
 
         super(Student,self).__init__(**kwargs)
         
 class Subject(GenericBase):
     def __init__(self,objid,**kwargs):
-
+        self.objid = objid
         super(Subject,self).__init__(**kwargs)
+        
+class Classroom(GenericBase):
+    def __init__(self,objid,**kwargs):
+        self.objid = objid
+        super(Classroom,self).__init__(**kwargs)
       
 class Test_ObjFrameworkBasic(unittest.TestCase):
 
@@ -114,6 +120,32 @@ class Test_ObjFrameworkDupeID(unittest.TestCase):
     def test_num_dupe_objid(self):
         self.assertEqual(self.obj1,self.obj2)
         
+class Test_ObjFrameworkIter(unittest.TestCase):
+
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.of.new('Student',
+                               objid='booker',
+                               modname=__name__)
+        
+        self.of.new('Student',
+                               objid='fred',
+                               modname=__name__)
+        
+        self.of.new('Classroom',
+                               objid='1a',
+                               modname=__name__)
+        
+
+    def tearDown(self):
+        self.of.reset()
+        
+    def test_iter(self):
+        result = [obj.objid for obj in self.of.object_iter()]
+        result.sort()
+        
+        self.assertListEqual(result,['1a','booker','fred'])
+        
 class DBLesson(dbtblgeneric):
     pass
       
@@ -160,6 +192,9 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDupeID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_records_same_cls))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_class))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkIter))
+    
+    
     
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

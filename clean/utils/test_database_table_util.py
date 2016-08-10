@@ -247,7 +247,8 @@ class TestDBTblGeneric3_cols_int(unittest.TestCase):
         self.assertEquals(self.dbg.tbl_row_values,[[123,456,789]])
         
     def test_persist(self):
-        self.dbg.persist()
+        with self.database:        
+            self.dbg.persist()
         
         self.database = Database(test_db.name,True)
         
@@ -283,7 +284,8 @@ class TestDBTblGeneric3_cols_str(unittest.TestCase):
         self.assertEquals(self.dbg.tbl_row_values,[['\"abc\"','\"def\"','\"ghi\"']])
         
     def test_persist(self):
-        self.dbg.persist()
+        with self.database:        
+            self.dbg.persist()
         
         self.database = Database(test_db.name,True)
 
@@ -319,7 +321,8 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
         self.assertEquals(self.dbg.tbl_row_values,[['\"abc\"']])
         
     def test_persist(self):
-        self.dbg.persist()
+        with self.database:        
+            self.dbg.persist()
         
         self.database = Database(test_db.name,True)
 
@@ -351,7 +354,8 @@ class TestDBTblGeneric_sysinfo(unittest.TestCase):
         
     def test_dbobject_assert_id(self):
         from datetime import datetime
-        self.dbg.persist()
+        with self.database:        
+            self.dbg.persist()
         self.database = Database(test_db.name,True)
         with self.database:
             col_name,tbl_rows = tbl_rows_get(self.database,
