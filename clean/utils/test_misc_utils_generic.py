@@ -26,45 +26,48 @@ class Test_generic_datamembers(unittest.TestCase):
     ''' using the datamembers constructor to set special attributes 
     ; using the attr_get_keyval method will strip of the _dm_ mangle that is applied to keep them separate '''
     def setUp(self):
-        dm = {'foo':'bar','boo':'hah'}
-        self.dmg = GenericBase.datamembers(datamembers=dm)
+        self.dm = {'foo':'bar','boo':'hah'}
+        self.dmg = GenericBase.datamembers(dm=self.dm)
     
     def tearDown(self):
         pass
     
     def test_hasattr_foo(self):
-        self.assertTrue(hasattr(self.dmg,'_dm_foo'))
+        self.assertTrue(hasattr(self.dmg,'foo'))
         
     def test_getattr_foo_bar(self):        
-        self.assertEquals('bar',getattr(self.dmg,'_dm_foo')) 
+        self.assertEquals('bar',getattr(self.dmg,'foo')) 
 
     def test_hasattr_boo(self):
-        self.assertTrue(hasattr(self.dmg,'_dm_boo'))
+        self.assertTrue(hasattr(self.dmg,'boo'))
         
     def test_getattr_fboo_hah(self):        
-        self.assertEquals('hah',getattr(self.dmg,'_dm_boo')) 
+        self.assertEquals('hah',getattr(self.dmg,'boo'))
+
+    def test_getattr_datamembers(self):        
+        self.assertEquals(self.dm,getattr(self.dmg,'dm'))
 
 class Test_generic_basic_and_datamembers(unittest.TestCase):
     ''' object with dm attrs and non-dm attrs; using the attr_get_keyval 
     method will strip of the _dm_ mangle that is applied to keep them separate '''
     def setUp(self):
-        dm = {'foo':'bar','boo':'hah'}
-        self.dmg = GenericBase.datamembers(datamembers=dm,attr1=123,attr2=456)
+        self.dm = {'foo':'bar','boo':'hah'}
+        self.dmg = GenericBase.datamembers(dm=self.dm,attr1=123,attr2=456)
     
     def tearDown(self):
         pass
     
     def test_hasattr_foo(self):
-        self.assertTrue(hasattr(self.dmg,'_dm_foo'))
+        self.assertTrue(hasattr(self.dmg,'foo'))
         
     def test_getattr_foo_bar(self):        
-        self.assertEquals('bar',getattr(self.dmg,'_dm_foo')) 
+        self.assertEquals('bar',getattr(self.dmg,'foo')) 
 
     def test_hasattr_boo(self):
-        self.assertTrue(hasattr(self.dmg,'_dm_boo'))
+        self.assertTrue(hasattr(self.dmg,'boo'))
         
     def test_getattr_fboo_hah(self):        
-        self.assertEquals('hah',getattr(self.dmg,'_dm_boo')) 
+        self.assertEquals('hah',getattr(self.dmg,'boo')) 
 
     def test_hasattr_attr1(self):
         self.assertTrue(hasattr(self.dmg,'attr1'))
@@ -82,23 +85,23 @@ class Test_generic_basic_and_datamembers(unittest.TestCase):
 class Test_generic_datamembers_no_other_args(unittest.TestCase):
     ''' test to see if kwargs can be passed as None'''
     def setUp(self):
-        dm = {'foo':'bar','boo':'hah'}
-        self.dmg = GenericBase.datamembers(datamembers=dm)
+        self.dm = {'foo':'bar','boo':'hah'}
+        self.dmg = GenericBase.datamembers(dm=self.dm)
     
     def tearDown(self):
         pass
     
     def test_hasattr_foo(self):
-        self.assertTrue(hasattr(self.dmg,'_dm_foo'))
+        self.assertTrue(hasattr(self.dmg,'foo'))
         
     def test_getattr_foo_bar(self):        
-        self.assertEquals('bar',getattr(self.dmg,'_dm_foo')) 
+        self.assertEquals('bar',getattr(self.dmg,'foo')) 
 
     def test_hasattr_boo(self):
-        self.assertTrue(hasattr(self.dmg,'_dm_boo'))
+        self.assertTrue(hasattr(self.dmg,'boo'))
         
     def test_getattr_fboo_hah(self):        
-        self.assertEquals('hah',getattr(self.dmg,'_dm_boo')) 
+        self.assertEquals('hah',getattr(self.dmg,'boo')) 
 
 class Test_generic_datamembers_errors(unittest.TestCase):
     ''' make sure usual errors are detected and caught'''
@@ -119,7 +122,7 @@ class Test_generic_attr_get(unittest.TestCase):
     that is applied to keep them separate '''
     def setUp(self):
         dm = {'foo':'bar','boo':'hah'}
-        self.dmg = GenericBase.datamembers(datamembers=dm,attr1=123,attr2=456)
+        self.dmg = GenericBase.datamembers(dm=dm,attr1=123,attr2=456)
 
     def test_attr_get(self):
         exp_res = ['_setattr','attr_get_keyval','datamembers',
@@ -162,7 +165,7 @@ class Test_generic_attr_get_from_derived(unittest.TestCase):
             staticattr = "imstatic"
             
         _datamembers = {'foo':'bar','boo':'hah'}
-        self.dmg = DerivedGenericBase.datamembers(datamembers=_datamembers,
+        self.dmg = DerivedGenericBase.datamembers(dm=_datamembers,
                                                   attr1=123,attr2=456) 
         
     def test_attr_get_from_derived_class_only(self):
@@ -179,8 +182,22 @@ class Test_generic_attr_get_from_derived(unittest.TestCase):
         
         self.assertListEqual(exp_res,_attr)
 
-        
     
+class Test_generic_attr_get_no_datamembers(unittest.TestCase):
+    '''no datamembers '''
+    def setUp(self):
+        self.dmg = GenericBase(attr1=123,attr2=456)
+
+    def test_attr_get(self):
+        exp_res = ['attr1','attr2','log','id']
+        
+        exp_res.sort()
+        
+        _attr = [_key for _key,_val in self.dmg.attr_get_keyval(include_callable=False)]
+        _attr.sort()
+        
+        self.assertListEqual(exp_res,_attr)
+                  
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
@@ -191,7 +208,7 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_generic_attr_get))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_generic_attr_get_from_derived))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_generic_datamembers_no_other_args))
-
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_generic_attr_get_no_datamembers))
 
 
     

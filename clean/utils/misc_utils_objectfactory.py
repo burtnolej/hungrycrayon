@@ -12,11 +12,20 @@ class ObjFactory(GenericBase):
     
     store = {}
     
+    def __init__(self,reset=False):
+        if reset==True:
+            self.reset()
+            
+        super(ObjFactory,self).__init__()
+    
     def new(self,clsname,**kwargs):
 
         for key,value in kwargs.iteritems():
             setattr(self,key,value)
-            
+        
+        if hasattr(self,'objid') == False:
+            raise Exception('arg objid must be set')
+        
         # modname is set if the cls definitions are not in this module
         if self.modname == None:
             self.modname = __name__
@@ -49,8 +58,20 @@ class ObjFactory(GenericBase):
 
         return(self.store[clsname][kwargs['objid']])
         
-    def query(self,clsname):
-        return [obj for name, obj in self.store[clsname].iteritems()]
+    def query(self,clsname=None):
+        if clsname == None:
+            return self.store.keys()
+        else:
+            return [obj for name, obj in self.store[clsname].iteritems()]
+    
+    def object_exists(self,clsname,objid):
+        return(self.store[clsname].has_key(objid))
+    
+    def object_get(self,clsname,objid):
+        return(self.store[clsname][objid])
+        
+    def reset(self):
+        self.store = {}
         
     def __repr__(self):
         return('ObjFactory')

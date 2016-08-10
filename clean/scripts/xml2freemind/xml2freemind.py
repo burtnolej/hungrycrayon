@@ -3,7 +3,9 @@ import sys
 from os.path import isfile, splitext, basename
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 import xml.etree.ElementTree as xmltree
-from misc_utils import enum, generic
+from misc_utils_enum import enum
+from misc_utils_generic import GenericBase
+
 from format_utils import burgundywhite18, darkbluelightblue16, greyblack18, \
      yellowburgundy14, lightblueburgundy16, blackgreen14, whiteblack14i
 import format_utils
@@ -15,7 +17,7 @@ from inspect import getmembers, isclass
 from types import InstanceType
 from pprint import pprint
 
-class xml2freemind(generic):
+class xml2freemind(GenericBase):
 
     def __init__(self,**kwargs):
         
@@ -234,7 +236,8 @@ class xml2freemind(generic):
         if hasattr(self.fmformat,output_format_type): # else no format specified so ignore
             element_format = getattr(self.fmformat,output_format_type)
             
-            format_attribs = eval(element_format).attr_get_keyval(include_callable=False)
+            format_attribs = eval(element_format).attr_get_keyval(include_callable=False,
+                                                                  include_nondataattr=False)
             
             for _key,_value in format_attribs:
                 if _key <> "FONT":

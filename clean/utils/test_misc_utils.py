@@ -3,8 +3,10 @@ import sys
 import os
 from os import path as ospath
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
-from misc_utils import IDGenerator, generic, os_file_get_wildcard, os_file_to_string, read_pickle, \
-     write_pickle, Singleton, enum
+from misc_utils import IDGenerator, os_file_get_wildcard, os_file_to_string, read_pickle, \
+     write_pickle, Singleton
+from misc_utils_enum import enum
+from misc_utils_generic import GenericBase
 
 import unittest
 import time
@@ -97,7 +99,7 @@ class TestIDGenerator(unittest.TestCase):
             
     def test_create10_via_generic(self):
         # this is also testing generic
-        class myclass(generic): pass
+        class myclass(GenericBase): pass
         
         for i in range(10):
             mc = myclass()
@@ -127,7 +129,7 @@ class TestSingleton(unittest.TestCase):
    
 class TestLogging(unittest.TestCase):
     def setUp(self):
-        self.myclass = generic()
+        self.myclass = GenericBase()
         
     def test_logfile_exists(self):
         self.assertTrue(self.myclass.log.logexists())
@@ -139,21 +141,21 @@ class TestLogging(unittest.TestCase):
     
 class TestLoggingRecovery(unittest.TestCase):
     def setUp(self):
-        self.myclass = generic()
+        self.myclass = GenericBase()
         self.myclass.log.log_cache_reset()
         
         self.myclass.log.log(self,3,"test")
         self.myclass.log.log(self,3,"test2")
         
     def test_recover_then_write_to_log(self):
-        self.myclass = generic()
+        self.myclass = GenericBase()
         self.myclass.log.log(self,3,"test3")
         self.myclass.log.log(self,3,"test4")        
         self.assertEquals(4,self.myclass.log.log_get_session_num_entries())
 
 class TestLoggingContent(unittest.TestCase):
     def setUp(self):
-        self.myclass = generic()
+        self.myclass = GenericBase()
         self.myclass.log.log_cache_reset()
         
         self.myclass.log.log(self,3,"test")
@@ -187,7 +189,7 @@ class TestIDGeneratorScale(unittest.TestCase):
         
     def test_create1000objects_with_ids(self):
         # this is also testing generic
-        class myclass(generic): pass
+        class myclass(GenericBase): pass
         
         for i in range(1000):
             mc = myclass()
@@ -199,9 +201,10 @@ class Test_enum(unittest.TestCase):
     ''' enum is a sub class of generic. needs to use the basic
     constructor as it does not need id's etc '''       
     def test_enum(self):
-        self.e = enum(blue=1,green=5,yellow=7)
+        self.e = enum.datamembers(dm={'blue':1,'green':5,'yellow':7})
         
-        results = self.e.attr_get_keyval(include_callable=False)
+        results = self.e.attr_get_keyval(include_callable=False,
+                                         include_nondataattr=False)
 
         self.assertListEqual([('blue',1),('green',5),('yellow',7)],results)
         

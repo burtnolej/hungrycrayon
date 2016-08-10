@@ -1,6 +1,8 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils import generic, enum, Log, ObjFactory
+from misc_utils import Log, ObjFactory
+from misc_utils_enum import enum
+
 from lxml import etree
 data = open('schedule.html','r').read()
 htmldoc = etree.HTML(data)

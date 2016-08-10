@@ -8,7 +8,8 @@ from database_util import Database, tbl_create, tbl_index_count, \
      schema_data_get
 
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils import enum, generic
+from misc_utils_enum import enum
+from misc_utils_generic import GenericBase
 from os import remove
 
 PY2 = sys.version_info[0] == 2

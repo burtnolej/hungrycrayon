@@ -27,9 +27,16 @@ class GenericBase(object):
             baseattr=False
             dataattr=False
             
-            if _name.startswith('_dm_') == True:
-                dataattr=True
-                _name = _name.replace('_dm_','')
+            # this is used internally and will never be returned
+            # use obj.name to access
+            if _name == 'dm':
+                continue
+            
+            if hasattr(self,'dm') == True:
+                if _name in getattr(self,'dm').keys():
+            #if _name.startswith('_dm_') == True:
+                    dataattr=True
+                #_name = _name.replace('_dm_','')
                 
             for cls in basecls:
                 if hasattr(cls,_name):
@@ -56,12 +63,12 @@ class GenericBase(object):
         a suffix of _dm_ so they can be identified later. this is usually
         for writing objects to a datatbase etc'''
         
-        if not kwarg.has_key('datamembers'):
-            raise Exception('datamembers arg not set; are you using the correct constructor')
+        if not kwarg.has_key('dm'):
+            raise Exception('dm arg not set; are you using the correct constructor')
         
-        _datamembers = kwarg['datamembers']
+        _datamembers = kwarg['dm']
         
-        kwarg.pop('datamembers')
+        #kwarg.pop('datamembers')
         
         if not isinstance(_datamembers,dict):
             raise Exception("arg datamember must be of type dict")
@@ -72,6 +79,7 @@ class GenericBase(object):
         
         cls1 = cls(**kwarg)
         
-        cls1._setattr(_datamembers,'_dm_')
+        #cls1._setattr(_datamembers,'_dm_')
+        cls1._setattr(_datamembers)
         
         return(cls1)

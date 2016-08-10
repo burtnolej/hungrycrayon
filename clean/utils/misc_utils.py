@@ -3,7 +3,6 @@ import sys
 
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
-#from misc_utils_generic import GenericBase
 
 #class generic(GenericBase):
 #    def __init__(self,**kwargs):
@@ -26,6 +25,10 @@ class Singleton(type):
             #print "info: singleton already instantiated",cls._instances[cls]
             pass
         return cls._instances[cls]
+    
+def attr_get_keyval(obj):
+    from inspect import getmembers
+    return[(k,v) for k,v in getmembers(obj) if not k.startswith('__')]
     
 class Log():    
     __metaclass__ = Singleton
@@ -62,12 +65,12 @@ class Log():
                     for k,v in kwargs.iteritems():
                         setattr(self,k,v)
                         
-            _logitem = myclass()(clr=str(obj),
-                                 t=now+"."+msecs,
-                                 clrf=callerframe[3],
-                                 clrfnln=str(callerframe[2]),   
-                                 msg=" ".join(list(args)),
-                                 clrfr="("+basename(callerframe[1])+")")
+            _logitem = myclass(clr=str(obj),
+                               t=now+"."+msecs,
+                               clrf=callerframe[3],
+                               clrfnln=str(callerframe[2]),   
+                               msg=" ".join(list(args)),
+                               clrfr="("+basename(callerframe[1])+")")
                                
                                  
             
@@ -78,11 +81,11 @@ class Log():
                                  "msg="   + " ".join(list(args)),
                                  "clrf="  + "("+basename(callerframe[1]) + ")"]
     
-            _content = [(_key+"="+str(_val)) for _key,_val in _logitem.attr_get_keyval(include_callable=False)]
+            _content = [(_key+"="+str(_val)) for _key,_val in attr_get_keyval(_logitem)]
             content = ";".join(_content)+"\n"
             self.logfile.write(content)
             self.cache.append(_logitem)
-            
+                
     def log_get_session_content(self):
         return(self.cache)
     
@@ -127,9 +130,6 @@ def os_file_to_string(filename,remove=None):
        
     fh.close()
     return s
-
-#class enum(GenericBase):
-#    pass
 
 def write_pickle(object,filename=None):
     import pickle

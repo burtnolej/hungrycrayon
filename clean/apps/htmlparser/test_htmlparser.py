@@ -1,7 +1,10 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils import generic, enum, Log
+from misc_utils_generic import GenericBase
+from misc_utils_enum import enum
 from misc_utils_objectfactory import ObjFactory
+from database_table_util import dbtblgeneric
+from database_util import Database
 import unittest
 
 period_enum = ['8:30-9:10','9:11-9:51','9:52-10:32','10:33-11:13',
@@ -11,7 +14,7 @@ period_enum = ['8:30-9:10','9:11-9:51','9:52-10:32','10:33-11:13',
 day_enum = ['Monday','Tuesday','Wednesday','Thursday','Friday']
 
 
-class Lesson(generic):
+'''class Lesson(dbtblgeneric):
     def __init__(self,objid,**kwargs):
 
         super(Lesson,self).__init__(**kwargs)
@@ -30,10 +33,10 @@ class Lesson(generic):
         return(self.objid)
 
     def attr_set(self,name,clsname):
-        self.teacher = ObjFactory(__logger__=True).new(clsname,name,
+        self.teacher = ObjFactory(__logger__=True).new(clsname,name=name,
                                         modname=__name__)    
         
-class Teacher(generic):
+class Teacher(dbtblgeneric):
     def __init__(self,name):
         super(Teacher,self).__init__()
         self.name = name
@@ -45,8 +48,11 @@ class Test_ObjFrameworkBasic(unittest.TestCase):
 
 
     def setUp(self):
+        
+        self.database = Database('foobar')
         lesson= ObjFactory(__logger__=True).new('Lesson',
-                                                '0.0.0',
+                                                objid='0.0.0',
+                                                database=self.database,
                                                 modname=__name__,
                                                 student = 'booker',
                                                 period=2,
@@ -79,10 +85,9 @@ class Test_ObjFrameworkBasic(unittest.TestCase):
         _lesson = ObjFactory().store['Lesson']['0.0.0']        
         self.assertEquals(_lesson.student,'booker')
         self.assertEquals(_lesson.period,2)
-        self.assertEquals(_lesson.dow,3)
+        self.assertEquals(_lesson.dow,3)'''
     
-        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     suite = unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic)
-    unittest.TextTestRunner(verbosity=2).run(suite) 
+    unittest.TextTestRunner(verbosity=2).run(suite)

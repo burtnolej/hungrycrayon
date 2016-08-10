@@ -9,75 +9,157 @@ from database_util import Database
 
 import unittest
 
-class Foobar(GenericBase):
+class Student(GenericBase):
     def __init__(self,objid,**kwargs):
 
-        super(Foobar,self).__init__(**kwargs)
+        super(Student,self).__init__(**kwargs)
+        
+class Subject(GenericBase):
+    def __init__(self,objid,**kwargs):
+
+        super(Subject,self).__init__(**kwargs)
       
 class Test_ObjFrameworkBasic(unittest.TestCase):
 
     def setUp(self):
-        foobar= ObjFactory(__logger__=True).new('Foobar',
-                                                objid='0.0.0',
-                                                modname=__name__,
-                                                student = 'booker',
-                                                period=2,
-                                                dow=3)
-        
+        self.of = ObjFactory()
+        foobar= self.of.new('Student',
+                              objid='booker',
+                              modname=__name__,
+                              name='booker',
+                              age=23)      
 
+    def tearDown(self):
+        self.of.reset()
         
     def test_num_obj_created(self):
-        self.assertEquals(len(ObjFactory().store['Foobar']),1)
+        self.assertEquals(len(ObjFactory().store['Student']),1)
         
     def test_correct_keys_created(self):
-        self.assertTrue(ObjFactory().store['Foobar'].has_key('0.0.0'))
+        self.assertTrue(ObjFactory().store['Student'].has_key('booker'))
     
     def test_objects_created_stored(self):
-        _lesson = ObjFactory().store['Foobar']['0.0.0']
-        self.assertTrue(isinstance(_lesson,Foobar))
+        _student = ObjFactory().store['Student']['booker']
+        self.assertTrue(isinstance(_student,Student))
 
     def test_objects_have_attributes(self):
-        _lesson = ObjFactory().store['Foobar']['0.0.0']        
-        self.assertEquals(_lesson.student,'booker')
-        self.assertEquals(_lesson.period,2)
-        self.assertEquals(_lesson.dow,3)
+        _student = ObjFactory().store['Student']['booker']        
+        self.assertEquals(_student.name,'booker')
+        self.assertEquals(_student.age,23)
+        
+class Test_ObjFramework_2_records_same_cls(unittest.TestCase):
 
-class DBFoobar(dbtblgeneric):
+    def setUp(self):
+        self.of = ObjFactory()
+        self.obj1= self.of.new('Student',
+                               objid='booker',
+                               modname=__name__,
+                               name='booker',
+                               age=23)
+        
+        self.obj2= self.of.new('Student',
+                               objid='frank',
+                               modname=__name__,
+                               name='frank',
+                               age=19)
+        
+
+    def tearDown(self):
+        self.of.reset()
+        
+    def test_2records_same_class(self):
+        names = [obj.name for obj in self.of.query('Student')]
+        names.sort()
+        self.assertEquals(names,['booker','frank'])
+        
+class Test_ObjFramework_2_class(unittest.TestCase):
+
+    def setUp(self):
+        self.of = ObjFactory()
+        self.obj1= self.of.new('Student',
+                               objid='booker',
+                               modname=__name__,
+                               name='booker',
+                               age=23)
+        
+        self.obj2= self.of.new('Subject',
+                               objid='science',
+                               modname=__name__,
+                               name='science',
+                               teacher_name='fran')
+        
+
+    def tearDown(self):
+        self.of.reset()
+        
+    def test_2_class(self):
+        self.assertListEqual(self.of.query(),['Student','Subject'])
+        
+class Test_ObjFrameworkDupeID(unittest.TestCase):
+
+    def setUp(self):
+        self.of = ObjFactory()
+        self.obj1= self.of.new('Student',
+                               objid='booker',
+                               modname=__name__)
+        
+        self.obj2= self.of.new('Student',
+                               objid='booker',
+                               modname=__name__)
+        
+
+    def tearDown(self):
+        self.of.reset()
+        
+    def test_num_dupe_objid(self):
+        self.assertEqual(self.obj1,self.obj2)
+        
+class DBLesson(dbtblgeneric):
     pass
       
 class Test_ObjFramework_Database(unittest.TestCase):
 
 
     def setUp(self):
+        self.of = ObjFactory(True)
         self.database = Database('foobar')
-        self.foobar= ObjFactory().new('DBFoobar',
-                                 objid='0.0.0',
+        self.foobar= self.of.new('DBLesson',
+                                 objid='dblesson0',
                                  constructor='datamembers',
                                  modname=__name__,
                                  database=self.database,
-                                 datamembers={'student':'booker',
-                                              'period':2,
-                                              'dow':3})
+                                 dm={'student':'booker',
+                                     'period':2,
+                                     'dow':3})
+        
+    def tearDown(self):
+        self.of.reset()
 
     def test_num_obj_created(self):
-        self.assertEquals(len(ObjFactory().store['DBFoobar']),1)
+        self.assertEquals(len(self.of.query('DBLesson')),1)
         
     def test_correct_keys_created(self):
-        self.assertTrue(ObjFactory().store['DBFoobar'].has_key('0.0.0'))
+        self.assertTrue(self.of.object_exists('DBLesson','dblesson0'))
+
     
     def test_objects_created_stored(self):
-        _lesson = ObjFactory().store['DBFoobar']['0.0.0']
-        self.assertTrue(isinstance(_lesson,DBFoobar))
+        _lesson = self.of.object_get('DBLesson','dblesson0')
+        self.assertTrue(isinstance(_lesson,DBLesson))
 
     def test_objects_have_attributes(self):
-        _lesson = ObjFactory().store['DBFoobar']['0.0.0']        
-        self.assertEquals(_lesson._dm_student,'booker')
-        self.assertEquals(_lesson._dm_period,2)
-        self.assertEquals(_lesson._dm_dow,3)
+        _lesson = self.of.object_get('DBLesson','dblesson0')  
+        self.assertEquals(_lesson.student,'booker')
+        self.assertEquals(_lesson.period,2)
+        self.assertEquals(_lesson.dow,3)
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDupeID))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_records_same_cls))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_class))
+    
+    
     unittest.TextTestRunner(verbosity=2).run(suite) 

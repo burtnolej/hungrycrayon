@@ -26,8 +26,6 @@ class dbtblgeneric(GenericBase):
 	
 	kwarg.pop('database')
 	
-	print "dbtblgeneric","__init__"
-	
 	super(dbtblgeneric,self).__init__(**kwarg)
 
     def tbl_name_get(self):

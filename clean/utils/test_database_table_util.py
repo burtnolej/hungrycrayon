@@ -13,7 +13,7 @@ from database_table_util import tbl_rows_get, tbl_rows_insert, \
      dbtblgeneric
 
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
-from misc_utils import enum
+from misc_utils_enum import enum
 from os import remove
 
 PY2 = sys.version_info[0] == 2
@@ -193,7 +193,7 @@ class TestDBTblGeneric3_cols_int(unittest.TestCase):
             pass
 
         self.dbg = dbtbltest.datamembers(database=self.database,
-                                         datamembers={'col1':123,'col2':456,'col3':789})
+                                         dm={'col1':123,'col2':456,'col3':789})
         self.dbg.tbl_name_get()
         self.dbg.tbl_col_defn_get()
         self.dbg.tbl_row_value_get()
@@ -229,7 +229,7 @@ class TestDBTblGeneric3_cols_str(unittest.TestCase):
             pass
 
         self.dbg = dbtbltest.datamembers(database=self.database,
-                                         datamembers={'col1':'\"abc\"','col2':'\"def\"','col3':'\"ghi\"'})
+                                         dm={'col1':'\"abc\"','col2':'\"def\"','col3':'\"ghi\"'})
         self.dbg.tbl_name_get()
         self.dbg.tbl_col_defn_get()
         self.dbg.tbl_row_value_get()
@@ -264,7 +264,7 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
             pass
 
         self.dbg = dbtbltest.datamembers(database=self.database,
-                                         datamembers={'col1':'\"abc\"'})
+                                         dm={'col1':'\"abc\"'})
         self.dbg.tbl_name_get()
         self.dbg.tbl_col_defn_get()
         self.dbg.tbl_row_value_get()
