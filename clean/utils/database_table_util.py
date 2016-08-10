@@ -5,6 +5,7 @@ from misc_utils_enum import enum
 from database_util import schema_data_get, db_enum, Database, \
      tbl_create
 from misc_utils_generic import GenericBase
+from datetime import datetime
 
 test_db = enum(name="db_name_test",
                tbl_name="tbl_name_test",
@@ -27,6 +28,12 @@ class dbtblgeneric(GenericBase):
 	kwarg.pop('database')
 	
 	super(dbtblgeneric,self).__init__(**kwarg)
+	
+	# these need to be set for persist to work
+	self.tbl_col_defn = None
+	self.tbl_col_names = None
+	self.tbl_row_values = None
+	self.tbl_name = None
 
     def tbl_name_get(self):
 	self.tbl_name = self.__class__.__name__
@@ -48,15 +55,35 @@ class dbtblgeneric(GenericBase):
 	    self.tbl_col_defn.append((_name,_type))
 	    self.tbl_col_names.append(_name)
 	    
-
+	# also include useful system info 
+	self.tbl_col_defn += [('__timestamp','text'),('__id','text')]
+	self.tbl_col_names += ['__timestamp','__id']
+	
+	
     def tbl_row_value_get(self):
 	t = [_val for _key,_val in self.attr_get_keyval(include_callable=False,
-	                                                      include_nondataattr=False)]
+	                                                include_nondataattr=False)]
+	
+	# also include useful system info 
+	t.append(datetime.now().strftime("%H:%M:%S"))
+	t.append(self.id)
 	
 	self.tbl_row_values = [t]
  
+    def _metadata_set(self):
+	''' if meta data required for db write is not set then set it'''
+	if self.tbl_col_defn == None or self.tbl_col_names == None:
+	    self.tbl_col_defn_get()
+
+	if self.tbl_row_values == None:
+	    self.tbl_row_value_get()
+	    
+	if self.tbl_name == None:
+	    self.tbl_name_get()
+	    
     def persist(self):
-	
+
+	self._metadata_set()
 	with self.database:
 	    tbl_create(self.database,
 	               self.tbl_name,
@@ -87,8 +114,16 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
 
     return(exec_str,result) 
 
-def tbl_rows_get(database,tbl_name):
-    results = database.execute("select * from " + tbl_name)    
+def tbl_rows_get(database,tbl_name,fields=None):
+    
+    
+    fieldstr="*"
+    if fields<>None:
+	fieldstr = ",".join(fields)
+	    
+    results = database.execute("select {fields} from {table}".format(fields=fieldstr,
+                                                                     table=tbl_name))
+    
     keys = [description[0] for description in database.description()]
     return(keys,results)
 

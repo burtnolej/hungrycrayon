@@ -46,6 +46,42 @@ test_db_str = enum(name="db_name_test",
                    col_name=["col_name1","col_name2"],
                    tbl_rows=[['\"foobar\"','\"barfoo\"']])
 
+class TestTableRowsGet(unittest.TestCase):
+    def setUp(self):
+        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
+    
+    def test_tbl_rows_get_spoecific_field(self):
+
+        database = Database(test_db.name)
+        
+        with database:
+            tbl_create(database,test_db.tbl_name,test_db.col_defn)
+            tbl_rows_insert(database,test_db.tbl_name,test_db.col_name,
+                            test_db.tbl_rows)
+
+        database = Database(test_db.name,True)
+        with database:
+            col_name,tbl_rows = tbl_rows_get(database,test_db.tbl_name,
+                                             ['col_name1','col_name2',
+                                              'col_name3','col_name4'])        
+            self.assertListEqual(col_name,test_db.col_name)
+            self.assertListEqual(tbl_rows,test_db.tbl_rows)
+            
+    def test_tbl_rows_get_all(self):
+
+        database = Database(test_db.name)
+        
+        with database:
+            tbl_create(database,test_db.tbl_name,test_db.col_defn)
+            tbl_rows_insert(database,test_db.tbl_name,test_db.col_name,
+                            test_db.tbl_rows)
+
+        database = Database(test_db.name,True)
+        with database:
+            col_name,tbl_rows = tbl_rows_get(database,test_db.tbl_name)        
+            self.assertListEqual(col_name,test_db.col_name)
+            self.assertListEqual(tbl_rows,test_db.tbl_rows)
+            
 class TestTableInsert(unittest.TestCase):
     
     def setUp(self):
@@ -293,11 +329,14 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestTableInsert)
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableRowsGet))
+    
+    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableColumnAdd))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_int))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_str))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric1_col_str))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_int))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_str))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric1_col_str))
     
     unittest.TextTestRunner(verbosity=2).run(suite)
     
