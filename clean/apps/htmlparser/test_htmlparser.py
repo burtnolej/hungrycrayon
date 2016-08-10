@@ -39,7 +39,8 @@ class Test_HTMLParserBasic(unittest.TestCase):
 
     def setUp(self):
         self.of = ObjFactory(True)
-        self.database = Database('foobar')
+        self.database = Database('foobar',True)
+
         lesson=self.of.new('Lesson',
                            objid='lesson0',
                            constructor='datamembers',
@@ -91,6 +92,7 @@ class Test_HTMLParserPersist(unittest.TestCase):
     def setUp(self):
         self.of = ObjFactory(True)
         self.database = Database('foobar')
+
         lesson=self.of.new('Lesson',
                            objid='lesson0',
                            constructor='datamembers',
@@ -105,27 +107,23 @@ class Test_HTMLParserPersist(unittest.TestCase):
         
     def test_persist(self):
         
-        for obj in self.of.object_iter():
-            obj.persist()
+        with self.database:
+            for obj in self.of.object_iter():
+                obj.persist()
             
         with self.database:
             self.assertEquals([['booker']],self.database.execute("select student from Lesson"))
             self.assertEquals([['fran']],self.database.execute("select name from Teacher"))
             
-    def test_persist(self):
-        
-        for obj in self.of.object_iter():
-            obj.persist()
-            
+        self.database = Database('foobar',True)
         with self.database:
-            self.assertEquals([['booker']],self.database.execute("select student from Lesson"))
-            self.assertEquals([['fran']],self.database.execute("select name from Teacher"))
+            pass
         
 class Test_HTMLParserPersistScale(unittest.TestCase):
 
     def setUp(self):
         self.of = ObjFactory(True)
-        self.database = Database('foobar',True)
+        self.database = Database('foobar')
         
         with self.database:
             tbl_create(self.database,'Lesson',[('student','text'),
@@ -157,13 +155,17 @@ class Test_HTMLParserPersistScale(unittest.TestCase):
                 
                 
     def test(self):
-        for obj in self.of.object_iter():
-            obj.persist(False)
+        with self.database:
+            for obj in self.of.object_iter():
+                obj.persist(False)
             
         with self.database:
             self.assertEquals(self.database.execute("select count(*) from Lesson",True),50)
             self.assertEquals(self.database.execute("select count(*) from Teacher",True),10)  
-        
+
+        self.database = Database('foobar',True)
+        with self.database:
+            pass
     
 if __name__ == "__main__":
     suite = unittest.TestSuite()

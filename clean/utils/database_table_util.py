@@ -83,18 +83,20 @@ class dbtblgeneric(GenericBase):
 	if self.tbl_name == None:
 	    self.tbl_name_get()
 	    
-    def persist(self):
+    def persist(self,createtable=True):
 
 	self._metadata_set()
-	with self.database:
+	#with self.database:
+	if createtable==True:
 	    tbl_create(self.database,
 	               self.tbl_name,
 	               self.tbl_col_defn)
 
-	    tbl_rows_insert(self.database,
-	                    self.tbl_name,
-	                    self.tbl_col_names,
-		            self.tbl_row_values)
+	
+	tbl_rows_insert(self.database,
+                        self.tbl_name,
+                        self.tbl_col_names,
+                        self.tbl_row_values)
 
 	
 def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
