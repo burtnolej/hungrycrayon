@@ -1,11 +1,15 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils import Log, ObjFactory
+from misc_utils import Log
+from misc_utils_objectfactory import ObjFactory
 from misc_utils_enum import enum
+from database_table_util import dbtblgeneric
+from database_util import Database, tbl_create
 
 from lxml import etree
 data = open('schedule.html','r').read()
 htmldoc = etree.HTML(data)
+database = Database('htmlparser')
 
 def students_get_from_html(htmldoc):
     students=[]
@@ -137,15 +141,11 @@ break_enum = ['LUNCH','COMPUTER TIME','QUAD CAFE','QUADCAFE']
 
 of = ObjFactory(True)
 
-class Teacher(generic):
-    def __init__(self,name):
-        super(Teacher,self).__init__()
-        self.name = name
-
+class Teacher(dbtblgeneric):
     def __repr__(self):
-        return(self.name)
+        return(self.objid)
 
-class Lesson(generic):
+class Lesson(dbtblgeneric):
     def __init__(self,objid,**kwargs):
 
         super(Lesson,self).__init__(**kwargs)
@@ -164,7 +164,12 @@ class Lesson(generic):
         return(self.objid)
 
     def attr_set(self,name,clsname):
-        self.teacher = of.new(clsname,name,modname=__name__)
+        self.teacher = of.new(clsname,
+                              objid=name,
+                              constructor='datamembers',
+                              database=database,
+                              modname=__name__,
+                              dm={'name':"\""+name+"\""})    
 
 for schedule_num in range(len(schedule)):
     for period_num in range(1,len(schedule[schedule_num])):
@@ -173,11 +178,16 @@ for schedule_num in range(len(schedule)):
             dow =day_enum[day_num-2]
             objid = str(schedule_num)+"."+str(day_num-2)+"."+str(period_num-1)
 
-            lesson= of.new('Lesson',objid,
-                                     modname=__name__,
-                                     student = students[schedule_num],
-                                     period=period,
-                                     dow=dow)
+            lesson=of.new('Lesson',
+                               objid="\""+objid+"\"",
+                               constructor='datamembers',
+                               database=database,
+                               modname=__name__,
+                               dm={'student':"\""+students[schedule_num]+"\"",
+                                   'period':"\""+period+"\"",
+                                   'dow':"\""+dow+"\"",
+                                   '_objid':"\""+objid+"\""})
+
             _i = schedule[schedule_num][period_num][day_num]
             
             if _i <> "":
@@ -196,5 +206,17 @@ for schedule_num in range(len(schedule)):
                 else:
                     print _i
 
-for obj in of.query('Lesson'):
-    print obj.dump()
+with database:
+    tbl_create(database,'Lesson',[('student','text'),
+                                       ('period','integer'),
+                                       ('dow','integer'),
+                                       ('_objid','text'),
+                                       ('__timestamp','text'),
+                                       ('__id','text')])
+    
+    tbl_create(database,'Teacher',[('name','text'),
+                                       ('__timestamp','text'),
+                                       ('__id','text')])
+
+    for obj in of.object_iter():
+        obj.persist(False)
