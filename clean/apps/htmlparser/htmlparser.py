@@ -53,12 +53,17 @@ for _table in table:
         rw.append(i)
     schedule.append(rw)
 
+
+
+
 def work_lesson_isa(lesson, item):
 
     if item.find('Work Period') <> -1 or item.find('WP') <> -1 or item.find('W lesson') <> -1:
         prefix = item.split(" ")[0]
         if  prefix not in ['Work']:
-            lesson.subject=prefix.replace(":","")
+            #lesson.subject=prefix.replace(":","")
+            lesson.attr_set(prefix.replace(":",""),'Subject')
+            
 
         suffix=item.split(" ")[-1]
         
@@ -76,8 +81,11 @@ def non_work_lesson_isa(lesson, item):
         try:
             if item.split(" ")[-2] in ['With:','with:']:
                 lesson.attr_set(suffix,'Teacher')
-                lesson.subject = item.split(" ")[0]
-                lesson.type = "nwp"
+                lesson.attr_set(subject,'Subject')
+                lesson.attr_set("nwp",'LessonType')
+                
+                #lesson.subject = item.split(" ")[0]
+                #lesson.type = "nwp"
                 return(True)            
         except:
             pass
@@ -95,30 +103,38 @@ def _find(item,tokens,inverse=False):
 
 def break_lesson_isa(lesson,item):
     
-    lesson.subject = _find(item,break_enum)
-    if lesson.subject == None: return(False)
-    lesson.type="break"
+    _subject = _find(item,break_enum)
+    
+    lesson.attr_set(_subject,'subject')
+    
+    #lesson.subject = _find(item,break_enum)
+    if _subject == None: return(False)
+    lesson.attr_set("break",'lessontype')
+    #lesson.type="break"
     return(True)
 
 def edu_lesson_isa(lesson, item):
-
-    lesson.subject = _find(item,edu_enum)
-    if lesson.subject == None: return(False)
-    lesson.type="edu"
+    _subject = _find(item,edu_enum)
+    #lesson.subject = _find(item,edu_enum)
+    if _subject == None: return(False)
+    lesson.attr_set("edu",'lessontype')
+    #lesson.type="edu"
     return(True)
 
 def other_lesson_isa(lesson, item):
-
-    lesson.subject = _find(item,other_enum)
-    if lesson.subject == None: return(False)
-    lesson.type="other"
+    _subject = _find(item,other_enum)
+    #lesson.subject = _find(item,other_enum)
+    if _subject == None: return(False)
+    lesson.attr_set("other",'lessontype')
+    #lesson.type="other"
     return(True)
 
 def psych_lesson_isa(lesson, item):
-
-    lesson.subject = _find(item,psych_enum)
-    if lesson.subject == None: return(False)
-    lesson.type="psych"
+    _subject = _find(item,psych_enum)
+    #lesson.subject = _find(item,psych_enum)
+    if _subject == None: return(False)
+    lesson.attr_set("psych",'lessontype')
+    #lesson.type="psych"
     return(True)
     
 students = students_get_from_html(htmldoc)
@@ -138,56 +154,92 @@ edu_enum = ['SCIENCE','STEM','MATH','HUMANITIES','SS','PSYCHOLOGY',
             'SOCIAL S']
 break_enum = ['LUNCH','COMPUTER TIME','QUAD CAFE','QUADCAFE']
 
-
+lesson_type = 'wp','nwp','break','edu','other','psych'
 of = ObjFactory(True)
 
-class Teacher(dbtblgeneric):
+class teacher(dbtblgeneric):
+    def __repr__(self):
+        return(self.objid)
+    
+class lessontype(dbtblgeneric):
+    def __repr__(self):
+        return(self.objid)
+    
+class subject(dbtblgeneric):
+    def __repr__(self):
+        return(self.objid)
+    
+class student(dbtblgeneric):
+    def __repr__(self):
+        return(self.objid)
+    
+class objid(dbtblgeneric):
+    def __repr__(self):
+        return(self.objid)
+    
+class dow(dbtblgeneric):
+    def __repr__(self):
+        return(self.objid)
+    
+class period(dbtblgeneric):
     def __repr__(self):
         return(self.objid)
 
-class Lesson(dbtblgeneric):
+class lesson(dbtblgeneric):
     def __init__(self,objid,**kwargs):
 
-        super(Lesson,self).__init__(**kwargs)
+        super(lesson,self).__init__(**kwargs)
         self.objid = objid
 
-        if not hasattr(self,'subject'):
-            setattr(self,'subject',None)
+        for k,v in kwargs['dm'].iteritems():
+            if not hasattr(self,k):
+                self.attr_set('none',k)
+            else:
+                self.attr_set(v,k)
+            
+        #if not hasattr(self,'subject'):
+        #    setattr(self,'subject',None)
 
-        if not hasattr(self,'teacher'):
-            setattr(self,'teacher',None)
+        #if not hasattr(self,'teacher'):
+        #    setattr(self,'teacher',None)
 
-        if not hasattr(self,'type'):
-            setattr(self,'type',None)
+        #if not hasattr(self,'type'):
+        #    setattr(self,'type',None)
 
     def __repr__(self):
         return(self.objid)
 
     def attr_set(self,name,clsname):
-        self.teacher = of.new(clsname,
+        setattr(self,clsname,of.new(clsname,
                               objid=name,
-                              constructor='datamembers',
+                              #constructor='datamembers',
                               database=database,
-                              modname=__name__,
-                              dm={'name':"\""+name+"\""})    
+                              modname=__name__))
+                              #dm={objid:"\""+name+"\""}))
+    
+        return(getattr(self,clsname))
+                   
 
 for schedule_num in range(len(schedule)):
     for period_num in range(1,len(schedule[schedule_num])):
         for day_num in range(2,len(schedule[schedule_num][period_num])):
-            period = period_enum[period_num-1]
-            dow =day_enum[day_num-2]
+            _period = period_enum[period_num-1]
+            _dow =day_enum[day_num-2]
             objid = str(schedule_num)+"."+str(day_num-2)+"."+str(period_num-1)
 
-            lesson=of.new('Lesson',
+            lesson=of.new('lesson',
                                objid="\""+objid+"\"",
                                constructor='datamembers',
                                database=database,
                                modname=__name__,
                                dm={'student':"\""+students[schedule_num]+"\"",
-                                   'period':"\""+period+"\"",
-                                   'dow':"\""+dow+"\"",
-                                   '_objid':"\""+objid+"\""})
+                                   'period':"\""+_period+"\"",
+                                   'dow':"\""+_dow+"\""})
+                                   #'objid':"\""+objid+"\""})
 
+
+            lesson.attr_set(students[schedule_num],'student')
+            
             _i = schedule[schedule_num][period_num][day_num]
             
             if _i <> "":
@@ -207,14 +259,14 @@ for schedule_num in range(len(schedule)):
                     print _i
 
 with database:
-    tbl_create(database,'Lesson',[('student','text'),
+    tbl_create(database,'lesson',[('student','text'),
                                        ('period','integer'),
                                        ('dow','integer'),
                                        ('_objid','text'),
                                        ('__timestamp','text'),
                                        ('__id','text')])
     
-    tbl_create(database,'Teacher',[('name','text'),
+    tbl_create(database,'leacher',[('name','text'),
                                        ('__timestamp','text'),
                                        ('__id','text')])
 
