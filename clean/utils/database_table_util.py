@@ -6,6 +6,7 @@ from database_util import schema_data_get, db_enum, Database, \
      tbl_create
 from misc_utils_generic import GenericBase
 from datetime import datetime
+from types import StringType,IntType
 
 test_db = enum(name="db_name_test",
                tbl_name="tbl_name_test",
@@ -50,7 +51,7 @@ class dbtblgeneric(GenericBase):
 	    try:
 		int(_val)
 		_type = "integer"
-	    except ValueError, TypeError:
+	    except Exception:
 		pass
 	    self.tbl_col_defn.append((_name,_type))
 	    self.tbl_col_names.append(_name)
@@ -62,9 +63,21 @@ class dbtblgeneric(GenericBase):
 	
 	
     def tbl_row_value_get(self,include_internal=True):
-	t = [_val for _key,_val in self.attr_get_keyval(include_callable=False,
-	                                                include_nondataattr=False)]
+	#t = [_val for _key,_val in self.attr_get_keyval(include_callable=False,
+	#                                                include_nondataattr=False)]
 	
+	t=[]
+	for _key,_val in self.attr_get_keyval(include_callable=False,
+	                                                include_nondataattr=False):
+	    if isinstance(_val,StringType):
+		t.append("\""+_val+"\"")
+	    elif not isinstance(_val,IntType):
+		if not hasattr(_val,"__repr__"):
+		    raise Exception("objects to be written to db need a __repr__ defined")
+		t.append("\""+str(_val)+"\"")
+	    else:
+		t.append(_val)
+		
 	# also include useful system info 
 	if include_internal == True:
 	    t.append("\"" + datetime.now().strftime("%H:%M:%S") + "\"")

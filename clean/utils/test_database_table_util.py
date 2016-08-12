@@ -1,6 +1,7 @@
 
 import unittest
-from sqlite3 import IntegrityError as S3IntegrityError
+from sqlite3 import IntegrityError as S3IntegrityError, \
+     OperationalError as S3OperationalError
 import sys
 
 from database_util import Database, tbl_create, tbl_index_count, \
@@ -266,7 +267,7 @@ class TestDBTblGeneric3_cols_str(unittest.TestCase):
             pass
 
         self.dbg = dbtbltest.datamembers(database=self.database,
-                                         dm={'col1':'\"abc\"','col2':'\"def\"','col3':'\"ghi\"'})
+                                         dm={'col1':"abc",'col2':"def",'col3':"ghi"})
         self.dbg.tbl_name_get()
         self.dbg.tbl_col_defn_get(False)
         self.dbg.tbl_row_value_get(False)
@@ -281,7 +282,7 @@ class TestDBTblGeneric3_cols_str(unittest.TestCase):
         self.assertEquals(self.dbg.tbl_col_names,['col1','col2','col3'])
     
     def test_dbobject_get_row_value(self):
-        self.assertEquals(self.dbg.tbl_row_values,[['\"abc\"','\"def\"','\"ghi\"']])
+        self.assertEquals(self.dbg.tbl_row_values,[['"abc"','"def"','"ghi"']])
         
     def test_persist(self):
         with self.database:        
@@ -303,7 +304,7 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
             pass
 
         self.dbg = dbtbltest.datamembers(database=self.database,
-                                         dm={'col1':'\"abc\"'})
+                                         dm={'col1':"abc"})
         self.dbg.tbl_name_get()
         self.dbg.tbl_col_defn_get(False)
         self.dbg.tbl_row_value_get(False)
@@ -318,7 +319,7 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
         self.assertEquals(self.dbg.tbl_col_names,['col1'])
     
     def test_dbobject_get_row_value(self):
-        self.assertEquals(self.dbg.tbl_row_values,[['\"abc\"']])
+        self.assertEquals(self.dbg.tbl_row_values,[['"abc"']])
         
     def test_persist(self):
         with self.database:        
@@ -328,7 +329,7 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
 
         with self.database:
             col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1']) 
-            self.assertEquals([['abc']],tbl_rows)
+            self.assertEquals([["abc"]],tbl_rows)
             
             
 class TestDBTblGeneric_sysinfo(unittest.TestCase):
@@ -341,7 +342,7 @@ class TestDBTblGeneric_sysinfo(unittest.TestCase):
             pass
 
         self.dbg = dbtbltest.datamembers(database=self.database,
-                                         dm={'col1':'\"abc\"'})
+                                         dm={'col1':"abc"})
         self.dbg.tbl_name_get()
         self.dbg.tbl_col_defn_get()
         self.dbg.tbl_row_value_get()
@@ -368,19 +369,147 @@ class TestDBTblGeneric_sysinfo(unittest.TestCase):
             self.assertAlmostEqual(datetime.now().second,dt.second)
                                 
 
+class TestDBTblGenericValidateInsertValuesStr(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.database = Database(test_db.name,True)
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+
+        str = 'foobar'
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':str})
+        self.dbg.tbl_name_get()
+        self.dbg.tbl_col_defn_get(False)
+        self.dbg.tbl_row_value_get(False)
+        
+    def test_dbobject_db_str_insert(self):
+        # tests that string values are wrapped in quotes
+        with self.database:        
+            #with self.assertRaises(S3OperationalError):
+            self.dbg.persist()
+        
+class TestDBTblGenericValidateInsertValuesSingleQuotedStr(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.database = Database(test_db.name)
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':'foobar'})
+        self.dbg.tbl_name_get()
+        self.dbg.tbl_col_defn_get(False)
+        self.dbg.tbl_row_value_get(False)
+        
+    def test_dbobject_db_str_insert(self):
+        # tests that string values are wrapped in quotes
+        with self.database:        
+            #with self.assertRaises(S3OperationalError):
+            self.dbg.persist()
+                
+        self.database = Database(test_db.name,True)
+
+        with self.database:
+            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1']) 
+            self.assertEquals([['foobar']],tbl_rows)
+
+class TestDBTblGenericValidateInsertValuesDblQuotedStr(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.database = Database(test_db.name)
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':"foobar"})
+        self.dbg.tbl_name_get()
+        self.dbg.tbl_col_defn_get(False)
+        self.dbg.tbl_row_value_get(False)
+        
+    def test_dbobject_db_str_insert(self):
+        # tests that string values are wrapped in quotes
+        with self.database:        
+            #with self.assertRaises(S3OperationalError):
+            self.dbg.persist()
+                
+        self.database = Database(test_db.name,True)
+
+        with self.database:
+            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1']) 
+            self.assertEquals([["foobar"]],tbl_rows)
+
+          
+class TestDBTblGenericValidateInsertValuesObject(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.database = Database(test_db.name,True)
+        
+        class dummy():
+            def __repr__(self):
+                return("foobar")
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+        
+        tmpobj = dummy()
+
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':tmpobj})
+        self.dbg.tbl_name_get()
+        self.dbg.tbl_col_defn_get(False)
+        self.dbg.tbl_row_value_get(False)
+        
+    def test_dbobject_db_obj_insert(self):
+        # tests that string values are wrapped in quotes
+        with self.database:        
+            #with self.assertRaises(Exception):
+            self.dbg.persist()
+        
+class TestDBTblGenericValidateInsertValuesInt(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.database = Database(test_db.name,True)
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+        
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':123})
+        self.dbg.tbl_name_get()
+        self.dbg.tbl_col_defn_get(False)
+        self.dbg.tbl_row_value_get(False)
+        
+    def test_dbobject_db_obj_insert(self):
+        # tests that string values are wrapped in quotes
+        with self.database:        
+            #with self.assertRaises(Exception):
+            self.dbg.persist()
 
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableRowsGet))
-    
-    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableColumnAdd))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_int))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_str))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric1_col_str))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric_sysinfo))
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesStr))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesObject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesInt))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesDblQuotedStr))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesSingleQuotedStr))
+
+
     unittest.TextTestRunner(verbosity=2).run(suite)
     
