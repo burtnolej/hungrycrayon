@@ -4,7 +4,7 @@ import os
 from os import path as ospath
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from misc_utils_generic import GenericBase
-
+from inspect import isclass
 import unittest
 import time
 
@@ -34,7 +34,8 @@ class ObjFactory(GenericBase):
         
         # has a dynamic constructor been specified
         constructor=None
-        if hasattr(self,'constructor'):
+        #if hasattr(self,'constructor'):
+        if kwargs.has_key('constructor'):
             constructor= kwargs.pop('constructor')
             
         # if this is the first request for this cls then create a new dict
@@ -46,11 +47,25 @@ class ObjFactory(GenericBase):
             # dynamically create the new object
             clsobj = getattr(sys.modules[self.modname],clsname)
             
+            if isinstance(clsobj,object) == False:
+                raise Exception('module',self.modname,'is returning',clsname,'as type',type(clsobj), \
+                                'must be object. member attr may have same name as class')
+
             if constructor <> None:
                 constobj = getattr(clsobj,constructor)
                 newobj =constobj(**kwargs)
             else:
                 newobj =clsobj(**kwargs)
+            
+            try:
+                print "clsname",clsname
+            except:
+                pass
+            
+            try:
+                print "newobj",newobj
+            except:
+                pass
             
             #newobj = getattr(sys.modules[self.modname],clsname)(objid,**kwargs)
             self.store[clsname][kwargs['objid']] = newobj
@@ -74,6 +89,16 @@ class ObjFactory(GenericBase):
         for cls in self.store.values():
             for obj in cls.values():
                 yield obj
+                
+    def object_serialize(self,obj):
+        items = []
+        for k,v in obj.attr_get_keyval(include_callable=False,
+                                       include_nondataattr=False):
+            try:
+                items.append("{k}={v}".format(k=k,v=v))
+            except:
+                items.append("{k}={v}".format(k=k,v='e'))
+        return(",".join(items))
                 
     def reset(self):
         self.store = {}
