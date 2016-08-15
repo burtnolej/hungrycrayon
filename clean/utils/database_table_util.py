@@ -3,7 +3,7 @@ import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_enum import enum
 from database_util import schema_data_get, db_enum, Database, \
-     tbl_create
+     tbl_create, tbl_exists
 from misc_utils_generic import GenericBase
 from datetime import datetime
 from types import StringType,IntType
@@ -85,13 +85,13 @@ class dbtblgeneric(GenericBase):
 	    
 	self.tbl_row_values = [t]
  
-    def _metadata_set(self):
+    def _metadata_set(self,include_internal=True):
 	''' if meta data required for db write is not set then set it'''
 	if self.tbl_col_defn == None or self.tbl_col_names == None:
-	    self.tbl_col_defn_get()
+	    self.tbl_col_defn_get(include_internal)
 
 	if self.tbl_row_values == None:
-	    self.tbl_row_value_get()
+	    self.tbl_row_value_get(include_internal)
 	    
 	if self.tbl_name == None:
 	    self.tbl_name_get()
@@ -99,8 +99,8 @@ class dbtblgeneric(GenericBase):
     def persist(self,createtable=True):
 
 	self._metadata_set()
-	#with self.database:
-	if createtable==True:
+
+	if not tbl_exists(self.database,self.tbl_name) ==True:
 	    tbl_create(self.database,
 	               self.tbl_name,
 	               self.tbl_col_defn)
@@ -147,8 +147,11 @@ def tbl_rows_get(database,tbl_name,fields=None):
     return(keys,results)
 
 def tbl_rows_insert_from_schema(database,schema_file,tbl_name):
-    tbl_col_name, tbl_rows = schema_data_get(schema_file,tbl_name)
-    tbl_rows_insert(database,tbl_name,tbl_col_name, tbl_rows)
+    
+    datarows = {'tbl_col_name':[],'tbl_rows':[]}
+    
+    schema_data_get(schema_file,tbl_name,datarows)
+    tbl_rows_insert(database,tbl_name,datarows['tbl_col_name'],datarows['tbl_rows'])
 
 def tbl_cols_get(database,tbl_name):
     '''purpose: get the column definition for a particular table

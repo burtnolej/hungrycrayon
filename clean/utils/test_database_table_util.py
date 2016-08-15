@@ -7,7 +7,7 @@ import sys
 from database_util import Database, tbl_create, tbl_index_count, \
      tbl_index_defn_get, schema_read, schema_get, schema_tbl_get, \
      schema_col_get, schema_tbl_pk_get, schema_print, schema_execute, \
-     schema_data_get
+     schema_data_get, tbl_count_get
 
 from database_table_util import tbl_rows_get, tbl_rows_insert, \
      tbl_rows_insert_from_schema, tbl_cols_get, tbl_col_add, \
@@ -493,7 +493,35 @@ class TestDBTblGenericValidateInsertValuesInt(unittest.TestCase):
         with self.database:        
             #with self.assertRaises(Exception):
             self.dbg.persist()
-
+            
+class TestDBTblGenericValidateInsert2RowsSameTable(unittest.TestCase):
+    
+    # check to see that the table is not created twice
+    # will throw up an exception if the test fails
+    def setUp(self):
+        
+        self.database = Database(test_db.name,True)
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+        
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':123})
+        self.dbg2 = dbtbltest.datamembers(database=self.database,
+                                          dm={'col1':456})
+        
+    def test_dbobject_no_exception(self):
+        with self.database:        
+            self.dbg.persist()
+            self.dbg2.persist()
+            
+    def test_dbobject_num_rows(self):
+        with self.database:        
+            self.dbg.persist()
+            self.dbg2.persist()
+            
+            self.assertEqual(tbl_count_get(self.database,'dbtbltest'),2)
+            
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
@@ -509,7 +537,9 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesInt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesDblQuotedStr))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesSingleQuotedStr))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsert2RowsSameTable))
 
+    
 
     unittest.TextTestRunner(verbosity=2).run(suite)
     

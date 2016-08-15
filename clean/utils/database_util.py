@@ -101,11 +101,30 @@ def tbl_index_defn_get(database,tbl_name):
     '''purpose: get the defn of the index on a particular table
        returns: a list containing the column names that make up the key'''
     sql_str = "PRAGMA table_info({tbl_name})".format(tbl_name=tbl_name)
+   
+    sql_result = database.execute(sql_str)
+   
+    return([row[db_enum.s3_col_attrib.column_name] for row in sql_result \
+           if row[db_enum.s3_col_attrib.pk_index]<>0])
+
+def tbl_exists(database,tbl_name):
+    '''purpose: check if a table already exists
+       returns: boolean'''
+    sql_str = "select count(*) from sqlite_master "
+    sql_str += "where type='table'and tbl_name=\"{tbl_name}\"".format(tbl_name=tbl_name)
     
     sql_result = database.execute(sql_str)
     
-    return([row[db_enum.s3_col_attrib.column_name] for row in sql_result \
-           if row[db_enum.s3_col_attrib.pk_index]<>0])
+    if sql_result[0][0]==1:
+        return True
+    return False
+
+def tbl_count_get(database,tbl_name):
+    '''purpose: get the number of rows in a table
+       returns: the number of rows'''
+    sql_str = "select count(*) from \"{tbl_name}\"".format(tbl_name=tbl_name)
+    
+    return(database.execute(sql_str,True))
             
 def tbl_create(database,tbl_name,col_defn,tbl_pk_defn=[]):
     
@@ -198,7 +217,7 @@ def schema_tbl_pk_get(schema,name, tbl_name):
        returns: a list'''
     return(schema[name][tbl_name][1])
 
-def schema_data_get(schema_file,tbl_name):
+def schema_data_get(schema_file,tbl_name,datarows):
     '''purpose: get the data rows defined by the schema for a particular database and table
           args: schema   : xml file
               : name     : database name
@@ -209,15 +228,13 @@ def schema_data_get(schema_file,tbl_name):
     xml = element_find_tags
     child_xml = element_find_children
     
-        
     rows = [xml(schema_file,".//Field",row_xml) for row_xml in xml(schema_file,".//Row") 
             if row_xml.attrib['Table'] == tbl_name]
     
-    tbl_col_name = [child_xml(_row)['Key'] for _row in rows[0]]
-    tbl_rows = [tuple(child_xml(_row)['Value'] for _row in row) for row in rows]
-    
-    return tbl_col_name, tbl_rows
-           
+    if len(rows) > 0: 
+        datarows['tbl_col_name'] = [child_xml(_row)['Key'] for _row in rows[0]]
+        datarows['tbl_rows'] = [tuple(child_xml(_row)['Value'] for _row in row) for row in rows]
+
 def schema_print(schema):
     '''purpose: print out the schema
           args: schema   : in memory representation / dict'''
@@ -227,14 +244,41 @@ def schema_print(schema):
             for col_name in _tbl[0]:
                 print name.ljust(10),tbl_name.ljust(10),col_name
 
-def schema_execute(schema_file):
+def schema_execute(schema_file,insert=False):
     '''purpose: create databases and tables as defined in the schema
           args: schema   : xml file'''
     config = schema_read(schema_file)
+    
     for name in config.keys():
         database = Database(name)
         with database:
             for tbl_name in config[name]:
                 tbl_col_defn,tbl_pk_defn,_ = config[name][tbl_name]
                 tbl_create(database,tbl_name,tbl_col_defn,tbl_pk_defn)
+            
+                if insert==True:
+                    datarows = {'tbl_col_name':[],'tbl_rows':[]}
+                    schema_data_get(schema_file,tbl_name,datarows)
+                    if len(datarows['tbl_rows']) > 0:
+                        _tbl_rows_insert(database,tbl_name,
+                                        datarows['tbl_col_name'],datarows['tbl_rows'])
+                
 
+def _tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
+    '''purpose: insert 1 or more data rows into a table
+    args: tbl_name    : table to insert into
+    : tbl_col_name: list of columns by name ['start_hour', 'start_minute', 'end_hour', 'end_minute']
+    : tbl_rows    : list of lists of col values [[9, 1, 10, 0], [10, 1, 11, 0]]
+       returns: sql_result  : whatever sqlite returns - usually nested lists'''
+    col_name_str = ",".join(tbl_col_name)
+    if len(tbl_rows)>1:
+        tbl_rows_str=",".join(["(" + ",".join(map(str,row)) + ")" for row in tbl_rows])
+    else:
+        tbl_rows_str = "(" + ",".join(map(str,tbl_rows[0])) + ")"
+
+    exec_str = "INSERT INTO {table} ({keys}) VALUES {rows}".format(table=tbl_name, \
+                                                                   keys=col_name_str,\
+                                                                   rows=tbl_rows_str)
+    result = database.execute(exec_str)
+
+    return(exec_str,result) 
