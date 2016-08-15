@@ -57,16 +57,6 @@ class ObjFactory(GenericBase):
             else:
                 newobj =clsobj(**kwargs)
             
-            try:
-                print "clsname",clsname
-            except:
-                pass
-            
-            try:
-                print "newobj",newobj
-            except:
-                pass
-            
             #newobj = getattr(sys.modules[self.modname],clsname)(objid,**kwargs)
             self.store[clsname][kwargs['objid']] = newobj
             self.log.log(3,"added obj="+newobj.__class__.__name__+" tag="+str(newobj)+" id="+newobj.id)

@@ -56,7 +56,7 @@ def testsuite_get(rootdir=None,allowdupe=False,ignoredir=[]):
     return(suite, testsummary)
 
 def testsuite_run(suite):
-    return(unittest.TextTestRunner(verbosity=0,buffer=True).run(suite))
+    return(unittest.TextTestRunner(verbosity=3,buffer=True).run(suite))
     
 def _parsetesttrace(trace):
     

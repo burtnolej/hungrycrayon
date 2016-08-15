@@ -196,16 +196,6 @@ class Test_SchoolSched_enrich(unittest.TestCase):
         
         with self.assertRaises(Exception):
             _enrich('Regions Prep',datamembers)
-        
-
-class Test_SchoolSched_completeness(unittest.TestCase):
-    
-    def test_completeness(self):
-        
-        schedule, students = htmlschedule_parse('schedule.html')
-        
-        schedule_load(schedule)
-       
        
 class Test_SchoolSched_lesson_create(unittest.TestCase):
     

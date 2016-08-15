@@ -1,7 +1,0 @@
-<root>
-	<Database Name="foobar">
-		<Table Name="barfoo">
-			<Column Name="dohdoh" />
-		</Table>
-	</Database>
-</root>

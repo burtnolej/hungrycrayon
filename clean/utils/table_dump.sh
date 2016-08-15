@@ -8,6 +8,4 @@ sqlite3 -batch $1 <<EOF
 
 select * from ${tbl_name};
 
-PRAGMA table_info(${tbl_name});
-
 EOF

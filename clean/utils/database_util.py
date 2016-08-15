@@ -264,6 +264,7 @@ def schema_execute(schema_file,insert=False):
                                         datarows['tbl_col_name'],datarows['tbl_rows'])
                 
 
+#need to figure this out
 def _tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
     '''purpose: insert 1 or more data rows into a table
     args: tbl_name    : table to insert into

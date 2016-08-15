@@ -90,6 +90,7 @@ class TestTableQueries(unittest.TestCase):
         
         database = Database('fitness',True)
         
+        
         with database:
             self.assertEquals(tbl_count_get(database,'workout'),2)     
             
