@@ -3,6 +3,17 @@ from ttk import *
 
 import tkFont
 import sys
+
+widget_config = {'cursor': 0, 
+                 'style':0,
+                 'height': 0,
+                 'padding':0,
+                 'width':0,
+                 'borderwidth':0,  
+                 'class': 0,
+                 'takefocus':0, 
+                 'relief':0}
+
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_enum import enum
 
