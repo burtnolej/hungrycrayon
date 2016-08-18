@@ -44,11 +44,6 @@ teacher_lesson_type = {'MELISSA':'psych','EMILY':'psych','ALEXA':'other','ASHLEY
 teacher_enum = teacher_lesson_type.keys()
 
 log = Log()
-#['ALEXA','ASHLEY','DYLAN','EMILY','FRAN','ISAAC','KAYLA','MOIRA',\
-#                'NATHANIEL','RACHEL','RAHUL','RICKY','TRISTAN','YOSEF', \
-#                'EMILY','MELISSA']
-
-
 
 class schoolschedgeneric(dbtblgeneric):
 
@@ -99,13 +94,6 @@ class userdefid(dbtblgeneric):
         
         super(userdefid,self).__init__(**kwargs)
         self.objid = objid
-    
-        '''self.of.new('userdefid',
-               objid=objid,
-               database=self.database,
-               of=self.of,
-               modname=__name__,
-               dm={})'''
         
     def __repr__(self):
         return(self.objid)
@@ -114,7 +102,10 @@ class objtype(dbtblgeneric):
     def __repr__(self):
         return(self.objid)
 
-class lesson(dbtblgeneric):
+class lesson(schoolschedgeneric):
+    pass
+    
+'''class lesson(dbtblgeneric):
     def __init__(self,objid,**kwargs):
 
         super(lesson,self).__init__(**kwargs)
@@ -135,7 +126,7 @@ class lesson(dbtblgeneric):
                                          self.of,
                                          clsname))
 
-        return(getattr(self,clsname))
+        return(getattr(self,clsname))'''
 
 def _initdatamembers(clsname,**kw):
     
@@ -144,10 +135,6 @@ def _initdatamembers(clsname,**kw):
             userdefid = str(kw['schedule_num'])+"."+ \
                 str(kw['day_num'])+"."+\
                 str(kw['period_num'])
-            
-            '''userdefid = str(kw['schedule_num'])+"."+ \
-                str(kw['day_num']-2)+"."+\
-                str(kw['period_num']-1)'''
             
             student = student_enum[kw['student_num']]
         except KeyError:

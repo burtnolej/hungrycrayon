@@ -966,10 +966,10 @@ class Test_SchoolSched_schdule_load_persist_1student_1period_all_fields(unittest
 
     def test_schdloadpsistobjtype(self):
         self.database = Database('htmlparser',True)
-        exp_results =  ['period','student','objtype','userdefid','dow','lessontype','subject','lesson']
+        exp_results =  ['period','student','teacher','dow','lessontype','subject','lesson']
 
         with self.database:
-            self.assertEquals(tbl_count_get(self.database,'objtype'),8)
+            self.assertEquals(tbl_count_get(self.database,'objtype'),7)
             _,rowvals = tbl_rows_get(self.database,'objtype',['userdefid'])
             
         self.assertListEqual(rowvals,exp_results)
