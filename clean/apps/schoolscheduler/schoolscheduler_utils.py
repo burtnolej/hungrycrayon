@@ -48,35 +48,69 @@ log = Log()
 #                'NATHANIEL','RACHEL','RAHUL','RICKY','TRISTAN','YOSEF', \
 #                'EMILY','MELISSA']
 
-class teacher(dbtblgeneric):
-    def __repr__(self):
-        return(self.objid)
 
-class lessontype(dbtblgeneric):
-    def __repr__(self):
-        return(self.objid)
 
-class subject(dbtblgeneric):
-    def __repr__(self):
-        return(self.objid)
+class schoolschedgeneric(dbtblgeneric):
 
-class student(dbtblgeneric):
+    def __init__(self,objid,**kwargs):
+
+        super(schoolschedgeneric,self).__init__(**kwargs)
+        self.objid = objid
+
+        for k,v in kwargs['dm'].iteritems():
+            if v <> 'None':
+                self.attr_set(v,k)
+                
+    def attr_set(self,name,clsname):
+        datamembers = _initdatamembers(clsname,name=name)
+        
+        setattr(self,clsname,_obj_create(datamembers,
+                                         self.database,
+                                         self.of,
+                                         clsname))
+
+        return(getattr(self,clsname))
+    
     def __repr__(self):
         return(self.objid)
+    
+
+class teacher(schoolschedgeneric):
+    pass
+
+class lessontype(schoolschedgeneric):
+    pass
+
+class subject(schoolschedgeneric):
+    pass
+
+class student(schoolschedgeneric):
+    pass
+
+class dow(schoolschedgeneric):
+    pass
+
+class period(schoolschedgeneric):
+    pass
 
 class userdefid(dbtblgeneric):
+    
+    def __init__(self,objid,**kwargs):
+        
+        super(userdefid,self).__init__(**kwargs)
+        self.objid = objid
+    
+        '''self.of.new('userdefid',
+               objid=objid,
+               database=self.database,
+               of=self.of,
+               modname=__name__,
+               dm={})'''
+        
     def __repr__(self):
         return(self.objid)
 
 class objtype(dbtblgeneric):
-    def __repr__(self):
-        return(self.objid)
-
-class dow(dbtblgeneric):
-    def __repr__(self):
-        return(self.objid)
-
-class period(dbtblgeneric):
     def __repr__(self):
         return(self.objid)
 

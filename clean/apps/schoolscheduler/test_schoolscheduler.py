@@ -585,16 +585,14 @@ class Test_SchoolSched_create_secondary_objects_no_teacher(unittest.TestCase):
         exp_res =  [('9:11-9:51','period'),
                    ('NATHANIEL','student'),
                    ('Monday','dow'),
-                   ('lesson','objtype'),
                    ('1.0.1','lesson'),
-                   ('1.0.1','userdefid'),
                    ('break','lessontype'),
                    ('QUAD CAFE','subject')]
 
 
         _lesson_create(datamembers,self.database,self.of)
 
-        attr_list = [(obj.userdefid, obj.objtype) for obj in self.of.object_iter()]
+        attr_list = [(obj.userdefid, obj.objtype) for obj in self.of.object_iter() if obj.objtype not in ['objtype','userdefid']]
 
         attr_list.sort()
         exp_res.sort()
@@ -626,16 +624,14 @@ class Test_SchoolSched_create_secondary_objects_with_teacher(unittest.TestCase):
                     ('9:11-9:51','period'),
                    ('NATHANIEL','student'),
                    ('Monday','dow'),
-                   ('lesson','objtype'),
                    ('1.0.1','lesson'),
-                   ('1.0.1','userdefid'),
                    ('wp','lessontype'),
                    ('SCIENCE','subject')]
 
 
         _lesson_create(datamembers,self.database,self.of)
 
-        attr_list = [(obj.userdefid, obj.objtype) for obj in self.of.object_iter()]
+        attr_list = [(obj.userdefid, obj.objtype) for obj in self.of.object_iter() if obj.objtype not in ['objtype','userdefid']]
 
         attr_list.sort()
         exp_res.sort()
@@ -651,7 +647,7 @@ class Test_SchoolSched_create_secondary_objects_type(unittest.TestCase):
     # the correct object type
 
     def setUp(self):
-        self.database = Database('htmlparser')
+        self.database = Database('htmlparser',True)
         self.of = ObjFactory(True)
     
     def test_(self):
@@ -668,6 +664,9 @@ class Test_SchoolSched_create_secondary_objects_type(unittest.TestCase):
 
         for obj in self.of.object_iter():
             self.assertTrue(isinstance(obj,eval(obj.objtype)))
+            
+        with self.database:
+            pass
 
 class Test_SchoolSched_persist(unittest.TestCase):
 
@@ -702,36 +701,6 @@ class Test_SchoolSched_persist(unittest.TestCase):
         exp_res.sort()
 
         self.assertListEqual(rowvals,exp_res)
-
-class Test_SchoolSched_persist_secondary(unittest.TestCase):
-
-    # test that a the secondary objects are persisted to the db correctly
-    # by asserting the fields written into the database table
-    def setUp(self):
-        self.database = Database('htmlparser')
-        self.of = ObjFactory(True)
-    
-    def test_persist_lesson(self):
-        
-        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,2,2,0])
-    
-        datamembers = _initdatamembers('lesson',**_dm)
-    
-        _enrich('Science WP With: Kayla',datamembers)
-
-        _lesson_create(datamembers,self.database,self.of)
-        with self.database:
-            for obj in self.of.object_iter():
-                obj.persist()
-            
-        self.database = Database('htmlparser',True)
-        res = {}
-        with self.database:
-            for tblname,userdefidval in datamembers.iteritems():
-                _,rowvals =  tbl_rows_get(self.database,tblname,['userdefid'])
-                res[tblname] = rowvals[0][0]
-        
-        self.assertEqual(res,datamembers)
         
 class Test_SchoolSched_persist_multi(unittest.TestCase):
 
@@ -807,7 +776,59 @@ class Test_SchoolSched_persist_multi(unittest.TestCase):
             _,rowvals = tbl_rows_get(self.database,'student',['userdefid'])
                  
         self.assertListEqual(rowvals,[['NATHANIEL']])
-            
+    
+    
+class Test_SchoolSched_schdule_load_1lesson(unittest.TestCase):
+
+    def setUp(self):
+        self.database = Database('htmlparser')
+        self.of = ObjFactory(True)
+        
+        f = "/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule.html" 
+        self.schedule = htmlschedule_slice(f,num_periods=1,num_students=1,num_days=1)
+
+        schedule_load(self.schedule, self.of, self.database)
+        
+    def test_schdload_lesson(self):
+        schedule_load(self.schedule, self.of, self.database)
+        
+        exp_res = ['0.0.0']
+        exp_res.sort()
+        
+        _res = self.of.query('lesson')
+        
+        
+        _resstr =  [str(_r) for _r in _res]
+        _resstr.sort()
+        
+        self.assertListEqual(exp_res, _resstr)
+
+        
+    def test_schdload_subject(self):
+        schedule_load(self.schedule, self.of, self.database)
+        
+        _res = self.of.query('subject')        
+        _resstr =  [str(_r) for _r in _res] 
+        
+        _resstr.sort()
+        
+        self.assertListEqual(['MOVEMENT'],
+                             _resstr)
+        
+    def test_schdload_objtype(self):
+        schedule_load(self.schedule, self.of, self.database)
+        
+        exp_res = ['period','student','dow','lessontype','subject','lesson']
+        exp_res.sort()
+        
+        _res = self.of.query('objtype')        
+        _resstr =  [str(_r) for _r in _res] 
+        
+        _resstr.sort()
+        
+        self.assertListEqual(exp_res,_resstr)
+        
+                
 class Test_SchoolSched_schdule_load(unittest.TestCase):
 
     def setUp(self):
@@ -866,6 +887,20 @@ class Test_SchoolSched_schdule_load(unittest.TestCase):
         
         self.assertListEqual(['Friday','Monday','Thursday','Tuesday','Wednesday'],
                              _resstr)
+        
+    def test_schdload_objtype(self):
+        schedule_load(self.schedule, self.of, self.database)
+        
+        exp_res = ['period','student','dow','lessontype','subject','lesson','teacher']
+        exp_res.sort()
+        
+        _res = self.of.query('objtype')        
+        _resstr =  [str(_r) for _r in _res] 
+        
+        _resstr.sort()
+        
+        self.assertListEqual(exp_res,_resstr)
+        
                 
 class Test_SchoolSched_schdule_load_persist(unittest.TestCase):
 
@@ -928,6 +963,26 @@ class Test_SchoolSched_schdule_load_persist_1student_1period_all_fields(unittest
             
 
         self.assertListEqual(rowvals,exp_results)
+
+    def test_schdloadpsistobjtype(self):
+        self.database = Database('htmlparser',True)
+        exp_results =  ['period','student','objtype','userdefid','dow','lessontype','subject','lesson']
+
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'objtype'),8)
+            _,rowvals = tbl_rows_get(self.database,'objtype',['userdefid'])
+            
+        self.assertListEqual(rowvals,exp_results)
+        
+    def test_schdloadpsiststudent(self):
+        self.database = Database('htmlparser',True)
+        exp_results =  [['NATHANIEL']]
+
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'student'),1)
+            _,rowvals = tbl_rows_get(self.database,'student',['userdefid'])
+            
+        self.assertListEqual(rowvals,exp_results)       
         
 class Test_SchoolSched_schdule_load_persist_1student(unittest.TestCase):
 
@@ -1145,9 +1200,9 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_create_secondary_objects_no_teacher))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_create_secondary_objects_type))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_persist))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_persist_secondary))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_persist_multi))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_1lesson))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist_1student))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist_1student_1period_all_fields))

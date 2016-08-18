@@ -150,10 +150,7 @@ def schedule_persist(of,database):
             obj.persist()
         
 def schedule_load(schedule,of=None,database=None):
-    #for schedule_num in range(len(schedule)):
-        #for period_num in range(1,len(schedule[schedule_num])):
-             #for day_num in range(2,len(schedule[schedule_num][period_num])):
-    
+
     for schedule_num in range(len(schedule)):
         for period_num in range(len(schedule[schedule_num])):
             for day_num in range(len(schedule[schedule_num][period_num])):
@@ -172,6 +169,9 @@ def schedule_load(schedule,of=None,database=None):
 if __name__ == '__main__':
     database = Database('htmlparser')
     of = ObjFactory(True)
-    schedule, students = htmlschedule_parse('schedule.html')
+    #schedule, students = htmlschedule_parse('schedule.html')
+    #schedule = htmlschedule_slice('schedule.html',num_students=1)
+    schedule = htmlschedule_slice('schedule.html')
+    
     schedule_load(schedule,of,database)
     schedule_persist(of,database)
