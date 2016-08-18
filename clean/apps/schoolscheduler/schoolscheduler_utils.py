@@ -2,6 +2,7 @@ import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from database_table_util import dbtblgeneric
 from schoolscheduler_utils import *
+from misc_utils import Log
 
 __all__ = ["period_enum","day_enum","other_enum","teacher","lesson","period","dow",
            "objtype","student","subject","lessontype","userdefid","edu_enum","psych_enum",
@@ -9,30 +10,40 @@ __all__ = ["period_enum","day_enum","other_enum","teacher","lesson","period","do
            "_obj_create","teacher_enum","types_enum","student_enum", \
            "teacher_lesson_type"]
 
-types_enum = ['period','day','other','psych','edu', \
+types_enum = ['period','day','other','psych','edu',
              'break','lesson','student','teacher']
 
 period_enum = ['8:30-9:10','9:11-9:51','9:52-10:32','10:33-11:13',
                '11:13-11:45','11:45-12:25','12:26-1:06','1:07-1:47',
                '1:48-2:28','2:30-3:00']
 day_enum = ['Monday','Tuesday','Wednesday','Thursday','Friday']
-other_enum = ['MOVEMENT','CORE','YOGA','MUSIC','CODING/TED TALKS', \
-              'REGENTS PREP','REGIONS PREP','READING PERIOD', \
-              'INDEPENDENT READING']
+other_enum = ['MOVEMENT','CORE','YOGA','MUSIC','CODING/TED TALKS',
+              'REGENTS PREP','REGIONS PREP','READING PERIOD',
+              'INDEPENDENT READING','MENTORING','READING','CAR BLOG',
+              'INDEPENDENT STUDY','SUBWAY BLOG','VIDEO GAME BLOG']
+
 psych_enum = ['COUNSELING','SPEECH']
 edu_enum = ['SCIENCE','STEM','MATH','HUMANITIES','PSYCHOLOGY',
             'ELA','ITALIAN','ART','SOCIAL STUDIES','LITERACY','OT',
-            'ANIMAL RESEARCH']
+            'ANIMAL RESEARCH','ESPANOL']
 break_enum = ['END COMPUTER TIME','LUNCH COMPUTER TIME','QUAD CAFE','QUADCAFE',
               'GAME STAR MECHANIC','BOARD GAMES','SEWING',
               'GS MECHANIC','STUDENT NEWS','CHESS']
 lesson_enum = 'wp','nwp','break','edu','other','psych'
 
-student_enum = ['BOOKER','BRIAN']
+student_enum = ['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY',
+                'BOOKER',
+                'ASHLEY','YOSEF','LUCY','JAKE','ASHER',
+                'DONOVAN','LIAM','SIMON B','NICK']
 
-teacher_lesson_type = {'MELISSA':'psych','EMILY':'psych','ALEXA':'other','ASHLEY':'other','DYLAN':'other','FRAN':'other','ISAAC':'other','KAYLA':'other','MOIRA':'other','NATHANIEL':'other','RACHEL':'other','RAHUL':'other','RICKY':'other','TRISTAN':'other','YOSEF':'other'}
+teacher_lesson_type = {'MELISSA':'psych','EMILY':'psych','ALEXA':'other','ASHLEY':'other',
+                       'DYLAN':'other','FRAN':'other','ISAAC':'other','KAYLA':'other',
+                       'MOIRA':'other','NATHANIEL':'other','RACHEL':'other','RAHUL':'other',
+                       'RICKY':'other','TRISTAN':'other','YOSEF':'other','CHRIS':'other'}
 
 teacher_enum = teacher_lesson_type.keys()
+
+log = Log()
 #['ALEXA','ASHLEY','DYLAN','EMILY','FRAN','ISAAC','KAYLA','MOIRA',\
 #                'NATHANIEL','RACHEL','RAHUL','RICKY','TRISTAN','YOSEF', \
 #                'EMILY','MELISSA']
@@ -97,8 +108,12 @@ def _initdatamembers(clsname,**kw):
     if clsname == 'lesson':       
         try:
             userdefid = str(kw['schedule_num'])+"."+ \
+                str(kw['day_num'])+"."+\
+                str(kw['period_num'])
+            
+            '''userdefid = str(kw['schedule_num'])+"."+ \
                 str(kw['day_num']-2)+"."+\
-                str(kw['period_num']-1)
+                str(kw['period_num']-1)'''
             
             student = student_enum[kw['student_num']]
         except KeyError:
@@ -107,8 +122,8 @@ def _initdatamembers(clsname,**kw):
         dm = {'teacher':'None',
               'subject':'None',
               'lessontype':'None',
-              'period':period_enum[kw['period_num']-1],
-              'dow':day_enum[kw['day_num']-2],
+              'period':period_enum[kw['period_num']],
+              'dow':day_enum[kw['day_num']],
               'student':student}
     else:
         try:
@@ -125,7 +140,6 @@ def _initdatamembers(clsname,**kw):
         
 def _lesson_create(datamembers,database,of):
     _lesson = _obj_create(datamembers,database,of,'lesson')
-    
     return(_lesson)
     
 def _obj_create(datamembers,database,of,clsname):

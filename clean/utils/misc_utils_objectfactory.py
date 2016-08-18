@@ -7,6 +7,7 @@ from misc_utils_generic import GenericBase
 from inspect import isclass
 import unittest
 import time
+from collections import OrderedDict
 
 class ObjFactory(GenericBase):
     
@@ -40,7 +41,8 @@ class ObjFactory(GenericBase):
             
         # if this is the first request for this cls then create a new dict
         if self.store.has_key(clsname) == False:
-            self.store[clsname] = {}
+            #self.store[clsname] = {}
+            self.store[clsname] = OrderedDict()
         
         # if this is the first instance of this obj then else return existing    
         if  self.store[clsname].has_key(kwargs['objid']) == False:
@@ -59,7 +61,7 @@ class ObjFactory(GenericBase):
             
             #newobj = getattr(sys.modules[self.modname],clsname)(objid,**kwargs)
             self.store[clsname][kwargs['objid']] = newobj
-            self.log.log(3,"added obj="+newobj.__class__.__name__+" tag="+str(newobj)+" id="+newobj.id)
+            self.log.log(newobj,3,"added obj="+newobj.__class__.__name__+" tag="+str(newobj)+" id="+newobj.id)
 
         return(self.store[clsname][kwargs['objid']])
         

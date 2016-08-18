@@ -49,6 +49,11 @@ class Log():
         from os.path import basename
         from datetime import datetime
         
+        try:
+            int(priority)
+        except:
+            raise Exception('priority arg needs to be an int, got',priority)
+        
         if priority < self.verbosity:
             logitem = []
             
@@ -65,7 +70,7 @@ class Log():
                     for k,v in kwargs.iteritems():
                         setattr(self,k,v)
                         
-            _logitem = myclass(clr=str(obj),
+            _logitem = myclass(clr=str(obj.__class__),
                                t=now+"."+msecs,
                                clrf=callerframe[3],
                                clrfnln=str(callerframe[2]),   

@@ -34,7 +34,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
         # dow starts from 2/Monday thru 7
         
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,2,2,0])
+                          [1,0,1,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -48,13 +48,13 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Monday',
                    'userdefid':'1.0.1',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
     def test_psychperiod(self):        
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,4,8,0])
+                          [1,2,7,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -68,14 +68,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Wednesday',
                    'userdefid':'1.2.7',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
 
     def test_eduperiod(self):
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,6,10,0])
+                          [1,4,9,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -89,14 +89,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Friday',
                    'userdefid':'1.4.9',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
     
 
         self.assertEquals(exp_res,datamembers)
         
     def test_otherperiod(self):
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,4,8,0])
+                          [1,2,7,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -110,14 +110,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Wednesday',
                    'userdefid':'1.2.7',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
     def test_edu_workperiod(self):
 
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,4,8,0])
+                          [1,2,7,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -131,14 +131,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Wednesday',
                    'userdefid':'1.2.7',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
     def test_edu_workperiod_wp(self):
         # 'wp' tag used not 'work period'
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,4,8,0])
+                          [1,2,7,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -152,7 +152,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Wednesday',
                    'userdefid':'1.2.7',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
@@ -160,7 +160,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
         # work period with no subject specified
         
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -174,7 +174,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         #_pprint(exp_res,datamembers)
         self.assertEquals(exp_res,datamembers)
@@ -183,7 +183,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
         # work period with no subject specified
         
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -197,7 +197,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         #_pprint(exp_res,datamembers)
         self.assertEquals(exp_res,datamembers)
@@ -208,7 +208,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
     def test_edu_nonworkperiod_2_teachers(self):
         # work period and 2 teachers
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -222,14 +222,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
     def test_edu_nonworkperiod_noteacher(self):
         # work period and nothing else
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -244,14 +244,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
     def test_edu_nonworkperiod_backslash(self):
         # work period and W/
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -265,14 +265,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
     def test_edu_nonworkperiod_nowith(self):
         # work period and just teacher name
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -286,14 +286,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
 
     def test_edu_nonworkperiod_noteacher2(self):
         # work period captial W small p nothing else
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -307,14 +307,14 @@ class Test_SchoolSched_enrich(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
     def test_no_match(self):
         # work period and just teacher name
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -326,7 +326,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
     def test_no_match_ex2(self):
         # work period and just teacher name
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -339,7 +339,7 @@ class Test_SchoolSched_enrich(unittest.TestCase):
     def test_no_match_ex3(self):
         # work period and just teacher name
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -352,7 +352,7 @@ class Test_SchoolSched_misc(unittest.TestCase):
     
     def test_misc_1(self):
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -366,13 +366,13 @@ class Test_SchoolSched_misc(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)
         
     def test_misc_2(self):
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -386,13 +386,13 @@ class Test_SchoolSched_misc(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers)        
  
     def test_misc_3(self):
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -406,13 +406,13 @@ class Test_SchoolSched_misc(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers) 
         
     def test_misc_4(self):
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -422,7 +422,7 @@ class Test_SchoolSched_misc(unittest.TestCase):
             
     def test_misc_single_token_teacher(self):
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -436,13 +436,13 @@ class Test_SchoolSched_misc(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers) 
         
     def test_misc_single_token_subject(self):
         _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
-                          [1,5,5,0])
+                          [1,3,4,0])
         
         datamembers = _initdatamembers('lesson',
                                        **_dm)
@@ -456,9 +456,73 @@ class Test_SchoolSched_misc(unittest.TestCase):
                    'dow':'Thursday',
                    'userdefid':'1.3.4',
                    'objtype':'lesson',
-                   'student':'BOOKER'}  
+                   'student':'NATHANIEL'}  
 
         self.assertEquals(exp_res,datamembers) 
+        
+    def test_misc5(self):
+        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
+                          [1,3,4,0])
+        
+        datamembers = _initdatamembers('lesson',
+                                       **_dm)
+        
+        _enrich('Reading Period With: Nathaniel',datamembers)
+        
+        exp_res = {'teacher':'NATHANIEL',
+                   'subject':'READING PERIOD',
+                   'lessontype':'other',
+                   'period':'11:13-11:45',
+                   'dow':'Thursday',
+                   'userdefid':'1.3.4',
+                   'objtype':'lesson',
+                   'student':'NATHANIEL'}  
+
+        self.assertEquals(exp_res,datamembers)
+        
+        
+    def test_misc6(self):
+        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
+                          [1,3,4,0])
+        
+        datamembers = _initdatamembers('lesson',
+                                       **_dm)
+        
+        _enrich('Lunch Computer Time',datamembers)
+        
+        exp_res = {'teacher':'None',
+                   'subject':'LUNCH COMPUTER TIME',
+                   'lessontype':'break',
+                   'period':'11:13-11:45',
+                   'dow':'Thursday',
+                   'userdefid':'1.3.4',
+                   'objtype':'lesson',
+                   'student':'NATHANIEL'}  
+
+        self.assertEquals(exp_res,datamembers)    
+        
+    def test_misc7(self):
+        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],
+                          [1,3,4,0])
+        
+        datamembers = _initdatamembers('lesson',
+                                       **_dm)
+        
+        _enrich('Social Studies Work Period',datamembers)
+        
+        exp_res = {'teacher':'None',
+                   'subject':'SOCIAL STUDIES',
+                   'lessontype':'wp',
+                   'period':'11:13-11:45',
+                   'dow':'Thursday',
+                   'userdefid':'1.3.4',
+                   'objtype':'lesson',
+                   'student':'NATHANIEL'}  
+
+        self.assertEquals(exp_res,datamembers)            
+        
+        
+        
         
        
 class Test_SchoolSched_lesson_create(unittest.TestCase):
@@ -472,7 +536,7 @@ class Test_SchoolSched_lesson_create(unittest.TestCase):
     
     def test_(self):
         
-        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,2,2,0])
+        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,0,1,0])
         
         datamembers = _initdatamembers('lesson',**_dm)
         
@@ -485,7 +549,7 @@ class Test_SchoolSched_lesson_create(unittest.TestCase):
                  ('lessontype','break'),
                  ('period','9:11-9:51'),
                  ('userdefid','1.0.1'),
-                 ('student','BOOKER')]
+                 ('student','NATHANIEL')]
         
         exp_res.sort()
         
@@ -510,7 +574,7 @@ class Test_SchoolSched_create_secondary_objects_no_teacher(unittest.TestCase):
     
     def test_(self):
         
-        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,2,2,0])
+        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,0,1,0])
     
         datamembers = _initdatamembers('lesson',**_dm)
     
@@ -519,7 +583,7 @@ class Test_SchoolSched_create_secondary_objects_no_teacher(unittest.TestCase):
         #exp_res = [('None','teacher'),
                    
         exp_res =  [('9:11-9:51','period'),
-                   ('BOOKER','student'),
+                   ('NATHANIEL','student'),
                    ('Monday','dow'),
                    ('lesson','objtype'),
                    ('1.0.1','lesson'),
@@ -550,7 +614,7 @@ class Test_SchoolSched_create_secondary_objects_with_teacher(unittest.TestCase):
     
     def test_(self):
         
-        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,2,2,0])
+        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,0,1,0])
     
         datamembers = _initdatamembers('lesson',**_dm)
     
@@ -560,7 +624,7 @@ class Test_SchoolSched_create_secondary_objects_with_teacher(unittest.TestCase):
                    
         exp_res =  [('KAYLA','teacher'),
                     ('9:11-9:51','period'),
-                   ('BOOKER','student'),
+                   ('NATHANIEL','student'),
                    ('Monday','dow'),
                    ('lesson','objtype'),
                    ('1.0.1','lesson'),
@@ -578,6 +642,7 @@ class Test_SchoolSched_create_secondary_objects_with_teacher(unittest.TestCase):
         
         #_pprint(exp_res,attr_list)
         self.assertListEqual(attr_list,exp_res)
+    
         
 class Test_SchoolSched_create_secondary_objects_type(unittest.TestCase):
     
@@ -591,7 +656,7 @@ class Test_SchoolSched_create_secondary_objects_type(unittest.TestCase):
     
     def test_(self):
         
-        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,2,2,0])
+        _dm = _cdict(['schedule_num','day_num','period_num','student_num'],[1,0,1,0])
     
         datamembers = _initdatamembers('lesson',**_dm)
     
@@ -676,9 +741,9 @@ class Test_SchoolSched_persist_multi(unittest.TestCase):
         self.database = Database('htmlparser')
         self.of = ObjFactory(True)
         
-        self._create('Math WP With: Moira', [1,4,8,0])
-        self._create('HUMANITIES',[1,6,10,0])
-        self._create('Math WP With: Moira',[1,4,4,0])
+        self._create('Math WP With: Moira', [1,2,7,0])
+        self._create('HUMANITIES',[1,4,9,0])
+        self._create('Math WP With: Moira',[1,2,3,0])
         self._persist()
 
     def _create(self,lessonname,params):
@@ -741,28 +806,33 @@ class Test_SchoolSched_persist_multi(unittest.TestCase):
             self.assertEquals(tbl_count_get(self.database,'student'),1)
             _,rowvals = tbl_rows_get(self.database,'student',['userdefid'])
                  
-        self.assertListEqual(rowvals,[['BOOKER']])
+        self.assertListEqual(rowvals,[['NATHANIEL']])
             
 class Test_SchoolSched_schdule_load(unittest.TestCase):
 
     def setUp(self):
         self.database = Database('htmlparser')
         self.of = ObjFactory(True)
-        self.schedule =  [[['Period', 'Time', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                           ['1', '8:30- 9:10', 'Movement', 'Movement', 'Chess With: Rahul', 'Core', 'Stem'], 
-                           ['2', '9:11- 9:51', 'YOGA', 'Art', 'Reading Period With: Nathaniel', 'Science', 'Movement']]]
+        
+        f = "/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule.html" 
+        self.schedule = htmlschedule_slice(f,num_periods=2,num_students=1)
 
+        schedule_load(self.schedule, self.of, self.database)
+        
     def test_schdload_lesson(self):
         schedule_load(self.schedule, self.of, self.database)
         
+        exp_res = ['0.0.0','0.1.0','0.2.0','0.3.0','0.4.0','0.0.1','0.1.1','0.2.1','0.3.1','0.4.1']
+        exp_res.sort()
+        
         _res = self.of.query('lesson')
-        _res.sort()
         
-        _resstr =  [str(_r) for _r in _res] 
-        self.assertListEqual(['0.0.0','0.1.0','0.2.0','0.3.0','0.4.0','0.0.1','0.1.1','0.2.1','0.3.1','0.4.1'],
-                             _resstr)
         
-        #print _resstr
+        _resstr =  [str(_r) for _r in _res]
+        _resstr.sort()
+        
+        self.assertListEqual(exp_res, _resstr)
+
         
     def test_schdload_subject(self):
         schedule_load(self.schedule, self.of, self.database)
@@ -802,10 +872,10 @@ class Test_SchoolSched_schdule_load_persist(unittest.TestCase):
     def setUp(self):
         self.database = Database('htmlparser')
         self.of = ObjFactory(True)
-        self.schedule =  [[['Period', 'Time', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                           ['1', '8:30- 9:10', 'Movement', 'Movement', 'Chess With: Rahul', 'Core', 'Stem'], 
-                           ['2', '9:11- 9:51', 'YOGA', 'Art', 'Reading Period With: Nathaniel', 'Science', 'Movement']]]
-                
+        
+        f = "/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule.html" 
+        self.schedule = htmlschedule_slice(f,num_periods=2,num_students=1)
+        
         schedule_load(self.schedule, self.of, self.database)
         schedule_persist(self.of,self.database)
 
@@ -827,15 +897,167 @@ class Test_SchoolSched_schdule_load_persist(unittest.TestCase):
             rowvals.sort()   
             self.assertListEqual(rowvals,[['ART'],['CHESS'],['CORE'],['MOVEMENT'],['READING PERIOD'],['SCIENCE'],['STEM'],['YOGA']])
 
-class Test_SchoolSched_schdule_load_persist_big(unittest.TestCase):
+    def test_schdloadpsist_lessons(self):
+        self.database = Database('htmlparser',True)
+        
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'lesson'),10)
+
+class Test_SchoolSched_schdule_load_persist_1student_1period_all_fields(unittest.TestCase):
 
     def setUp(self):
         self.database = Database('htmlparser')
         self.of = ObjFactory(True)
         
-        f = open("/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule_dump_2days.txt","r+")
-        self.schedule = eval(f.readline())
+        f = "/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule.html" 
+        self.schedule = htmlschedule_slice(f,num_students=1,num_periods=1)
         
+        schedule_load(self.schedule, self.of, self.database)
+        schedule_persist(self.of,self.database)
+                         
+    def test_schdloadpsist_lessons(self):
+        self.database = Database('htmlparser',True)
+        exp_results = [['8:30-9:10','Monday','MOVEMENT','None','other'], ['8:30-9:10','Tuesday','MOVEMENT','None','other'],
+                       ['8:30-9:10','Wednesday','CHESS','RAHUL','break'],['8:30-9:10','Thursday','CORE','None','other'],
+                       ['8:30-9:10','Friday','STEM','None','edu']]
+
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'lesson'),5)
+            _,rowvals = tbl_rows_get(self.database,'lesson',['period','dow','subject',
+                                                             'teacher','lessontype'])
+            
+
+        self.assertListEqual(rowvals,exp_results)
+        
+class Test_SchoolSched_schdule_load_persist_1student(unittest.TestCase):
+
+    def setUp(self):
+        self.database = Database('htmlparser')
+        self.of = ObjFactory(True)
+        
+        f = "/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule.html" 
+        self.schedule = htmlschedule_slice(f,num_students=1)
+        
+        schedule_load(self.schedule, self.of, self.database)
+        schedule_persist(self.of,self.database)
+                         
+    def test_schdloadpsist_lessons(self):
+        self.database = Database('htmlparser',True)
+        exp_results = [['8:30-9:10','Monday','MOVEMENT','None','other'], 
+                       ['8:30-9:10','Tuesday','MOVEMENT','None','other'], 
+                       ['8:30-9:10','Wednesday','CHESS','RAHUL','break'], 
+                       ['8:30-9:10','Thursday','CORE','None','other'], 
+                       ['8:30-9:10','Friday','STEM','None','edu'], 
+                       ['9:11-9:51','Monday','YOGA','None','other'], 
+                       ['9:11-9:51','Tuesday','ART','None','edu'], 
+                       ['9:11-9:51','Wednesday','READING PERIOD','NATHANIEL','other'], 
+                       ['9:11-9:51','Thursday','SCIENCE','None','edu'], 
+                       ['9:11-9:51','Friday','MOVEMENT','None','other'],
+                       ['9:52-10:32','Monday','ELA','None','edu'], 
+                       ['9:52-10:32','Tuesday','MATH','None','edu'], 
+                       ['9:52-10:32','Wednesday','MUSIC','None','other'], 
+                       ['9:52-10:32','Thursday','CHESS','RAHUL','break'], 
+                       ['9:52-10:32','Friday','HUMANITIES','None','edu'],
+                       ['10:33-11:13','Monday','None','DYLAN','nwp'], 
+                       ['10:33-11:13','Tuesday','MATH','MOIRA','wp'], 
+                       ['10:33-11:13','Wednesday','MATH','None','edu'],
+                       ['10:33-11:13','Thursday','None','DYLAN','nwp'],
+                       ['10:33-11:13','Friday','OT','None','edu'], 
+                       ['11:13-11:45','Monday','LUNCH COMPUTER TIME','None','break'],
+                       ['11:13-11:45','Tuesday','LUNCH COMPUTER TIME','None','break'], 
+                       ['11:13-11:45','Wednesday','LUNCH COMPUTER TIME','None','break'], 
+                       ['11:13-11:45','Thursday','LUNCH COMPUTER TIME','None','break'],
+                       ['11:13-11:45','Friday','LUNCH COMPUTER TIME','None','break'],
+                       ['11:45-12:25','Monday','ANIMAL RESEARCH','ISAAC','wp'], 
+                       ['11:45-12:25','Tuesday','SOCIAL STUDIES','None','edu'],
+                       ['11:45-12:25','Wednesday','MATH','DYLAN','wp'], 
+                       ['11:45-12:25','Thursday','None','EMILY','psych'], 
+                       ['11:45-12:25','Friday','None','None','None'], 
+                       ['12:26-1:06','Monday','YOGA','DYLAN','other'], 
+                       ['12:26-1:06','Tuesday','None','DYLAN','nwp'], 
+                       ['12:26-1:06','Wednesday','None','RACHEL','nwp'], 
+                       ['12:26-1:06','Thursday','SOCIAL STUDIES','None','edu'],
+                       ['12:26-1:06','Friday','None','None','None'], 
+                       ['1:07-1:47','Monday','SCIENCE','None','edu'], 
+                       ['1:07-1:47','Tuesday','SOCIAL STUDIES','DYLAN','wp'],
+                       ['1:07-1:47','Wednesday','MOVEMENT','None','other'], 
+                       ['1:07-1:47','Thursday','SOCIAL STUDIES','RICKY','wp'],
+                       ['1:07-1:47','Friday','None','None','None'],
+                       ['1:48-2:28','Monday','SCIENCE','KAYLA','wp'], 
+                       ['1:48-2:28','Tuesday','CORE','EMILY','other'], 
+                       ['1:48-2:28','Wednesday','ELA','None','edu'],
+                       ['1:48-2:28','Thursday','CHESS','RAHUL','break'], 
+                       ['1:48-2:28','Friday','None','None','None'], 
+                       ['2:30-3:00','Monday','END COMPUTER TIME','None','break'],
+                       ['2:30-3:00','Tuesday','END COMPUTER TIME','None','break'], 
+                       ['2:30-3:00','Wednesday','END COMPUTER TIME','None','break'],
+                       ['2:30-3:00','Thursday','END COMPUTER TIME','None','break'],
+                       ['2:30-3:00','Friday','None','None','None']]
+
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'lesson'),50)
+            _,rowvals = tbl_rows_get(self.database,'lesson',['period','dow','subject',
+                                                             'teacher','lessontype'])
+            
+        self.assertListEqual(rowvals,exp_results)
+
+ 
+                         
+class Test_SchoolSched_schdule_load_persist_big_multistudent(unittest.TestCase):
+
+    def setUp(self):
+        self.database = Database('htmlparser')
+        self.of = ObjFactory(True)
+
+        f = "/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule.html" 
+        self.schedule = htmlschedule_slice(f,num_periods=2)
+
+        schedule_load(self.schedule, self.of, self.database)
+        schedule_persist(self.of,self.database)
+
+    def test_schdloadpsist_lesson(self):
+        self.database = Database('htmlparser',True)
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'lesson'),15*2*5)
+
+    def test_schdloadpsist_student(self):
+        self.database = Database('htmlparser',True)
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'student'),15)
+            
+    def test_schdloadpsist_days(self):
+        self.database = Database('htmlparser',True)
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'dow'),5)
+            
+            
+class Test_SchoolSched_schdule_load_persist_all(unittest.TestCase):
+
+    def setUp(self):
+        self.database = Database('htmlparser')
+        self.of = ObjFactory(True)
+
+        f = "/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule.html" 
+        self.schedule = htmlschedule_slice(f)
+
+        schedule_load(self.schedule, self.of, self.database)
+        schedule_persist(self.of,self.database)
+        
+    def test_lessons(self):
+        self.database = Database('htmlparser')
+        with self.database:
+            self.assertEquals(tbl_count_get(self.database,'lesson'),15*10*5)
+
+            
+class Test_SchoolSched_schdule_load_persist_big(unittest.TestCase):
+
+    def setUp(self):
+        self.database = Database('htmlparser')
+        self.of = ObjFactory(True)
+
+        f = "/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler/schedule.html" 
+        self.schedule = htmlschedule_slice(f,num_students=2)
+
         schedule_load(self.schedule, self.of, self.database)
         schedule_persist(self.of,self.database)
 
@@ -848,6 +1070,7 @@ class Test_SchoolSched_schdule_load_persist_big(unittest.TestCase):
         
         exp_res = ['DYLAN','EMILY','ISAAC','KAYLA','MELISSA','MOIRA','NATHANIEL','RACHEL','RAHUL', \
                    'RICKY']
+        
         self.database = Database('htmlparser',True)
         with self.database:
             _,rowvals = tbl_rows_get(self.database,'teacher',['userdefid'])
@@ -877,7 +1100,7 @@ class Test_SchoolSched_schdule_load_persist_big(unittest.TestCase):
             _,rowvals = tbl_rows_get(self.database,'subject',['userdefid'])
             
             rowvals.sort()
-            
+
             self.assertListEqual(rowvals,exp_res)
 
 class Test_SchoolSched_token_type_get(unittest.TestCase):
@@ -926,8 +1149,14 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_persist_multi))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist_1student))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist_1student_1period_all_fields))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist_1student))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist_big))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_token_type_get))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_validate_token))
-  
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist_big_multistudent))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SchoolSched_schdule_load_persist_all))
+     
+    
     unittest.TextTestRunner(verbosity=2).run(suite)

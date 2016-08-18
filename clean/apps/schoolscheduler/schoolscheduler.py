@@ -94,6 +94,13 @@ def _find(item,tokens,inverse=False):
     if len(hits) == 1:
         return(hits[0])
     elif len(hits) > 1:
+        # this handles the case where 2 or more enums exists
+        # 1 is 2 words and 1 is 1 of the 2 words. ie. reading period
+        # and reading. in this case we can always assume that the longer
+        # is correct
+        for h in hits:
+            if len(h.split(" ")) == 2:
+                return(h)
         raise Exception('multiple hits for',item,'in',tokens)
     return(None)
 
@@ -143,9 +150,13 @@ def schedule_persist(of,database):
             obj.persist()
         
 def schedule_load(schedule,of=None,database=None):
+    #for schedule_num in range(len(schedule)):
+        #for period_num in range(1,len(schedule[schedule_num])):
+             #for day_num in range(2,len(schedule[schedule_num][period_num])):
+    
     for schedule_num in range(len(schedule)):
-        for period_num in range(1,len(schedule[schedule_num])):
-            for day_num in range(2,len(schedule[schedule_num][period_num])):
+        for period_num in range(len(schedule[schedule_num])):
+            for day_num in range(len(schedule[schedule_num][period_num])):
 
                 datamembers = _initdatamembers('lesson',
                                                schedule_num = schedule_num,
