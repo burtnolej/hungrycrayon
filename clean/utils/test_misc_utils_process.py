@@ -36,6 +36,15 @@ class TestSubProcess(unittest.TestCase):
         status = parse_convert_stdout(p,self.label)
         self.assertTrue(status[0],1)
         
+    def test_failure_grabstderr(self):
+        # known external command --verbose is a bad switch
+        cmd = ['convert','--verbose','label:'+self.label,'-pointsize','22','/tmp/foobar.gif']
+        
+        p = process_start(cmd)
+        
+        stderr =  parse_convert_stdout(p,self.label)[1]
+        self.assertTrue(stderr.startswith('convert.im6'))
+        
     def test_killprocess(self):
         
         import os
@@ -49,6 +58,22 @@ class TestSubProcess(unittest.TestCase):
         self.assertEquals(len(pids),1)
         
         process_kill(pids[0][0])
+        pids=process_instances_get('display')
+        self.assertEquals(len(pids),0)
+        
+    def test_killprocess_popen(self):
+        ''' passing in a Popen object not a pid '''
+        import os
+        import signal
+        
+        # some process that runs until killed
+        cmd = ['display','-geometry','750x750+7500+740','/tmp/foobar.gif']
+        
+        p = process_start(cmd)
+        pids=process_instances_get('display')
+        self.assertEquals(len(pids),1)
+        
+        process_kill(p)
         pids=process_instances_get('display')
         self.assertEquals(len(pids),0)
         

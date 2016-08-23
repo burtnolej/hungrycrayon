@@ -8,6 +8,9 @@ from os import remove, kill
 import signal
 import unittest
 
+
+__all__ = ['process_start','process_stdin','process_kill','process_instances_get']
+
 log = Log()
 
 def process_start(cmdlineargs,stdin=True):
@@ -27,15 +30,21 @@ def process_stdin(process,stdinstr):
     ''' pass stdin to a process waiting for stdin '''
     return(process.communicate(input=stdinstr))
 
-def process_kill(pid):
-    ''' accepts str or int'''
-    try:
-        _pid = int(pid)
-    except ValueError:
-        raise Exception('requires an int or int as string')
+def process_kill(p):
+    ''' accepts a Popen object and if not assumes its a PID str or int'''
+    
+    if isinstance(p,Popen) == True:
+        _pid = p.pid
+        p.kill()
+    else:
+        try:
+            _pid = int(p)
+            kill(_pid,signal.SIGTERM)
+        except ValueError:
+            raise Exception('requires an int or int as string')
 
     log.log(__name__,3,"killed process","pid=",str(_pid))
-    return(kill(_pid,signal.SIGTERM))
+    return()
     
 def process_instances_get(match):
 

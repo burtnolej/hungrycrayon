@@ -1,10 +1,18 @@
 from Tkinter import *
+from Tkinter import Button as Tkbutton
+from Tkinter import Label as Tklabel
 from ttk import *
+from PIL import Image, ImageTk
+from image_utils import ImageCreate, rgbstr_get
 
+import tkFont
 import unittest
 
+sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
+from format_utils import *
+
 from ui_utils import tk_create_config, tkfrm_cfg, \
-     tk_create_frame
+     tk_create_frame, GridTableWidget, tk_label_get_image
 
 def _dumpwgt2(wgt):
     
@@ -114,7 +122,7 @@ class TestUIPack(unittest.TestCase):
         button.pack(fill=BOTH, expand=1)
         
         #_dumpwgt2(self.frame)
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def test_pack_sidebyside(self):
         #self.frame.pack()
@@ -123,7 +131,7 @@ class TestUIPack(unittest.TestCase):
         button = Button(self.master,text="Button2")
         button.pack(side=LEFT, fill=BOTH,expand=1)        
         #_dumpwgt2(self.frame)
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def test_pack_ontop(self):
         #self.frame.pack()
@@ -132,7 +140,7 @@ class TestUIPack(unittest.TestCase):
         button = Button(self.master,text="Button2")
         button.pack(fill=BOTH,expand=1)        
         #_dumpwgt2(self.frame)
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def test_pack_2x2_in_frame(self):
         #self.frame.pack()
@@ -151,8 +159,6 @@ class TestUIPack(unittest.TestCase):
         #_dumpwgt2(self.frame)
         self.master.mainloop()
                 
-        
-        
     def test_pack_2x2(self):
         #self.frame.pack()
         leftframe = Frame(self.master)
@@ -168,7 +174,7 @@ class TestUIPack(unittest.TestCase):
         button = Button(rightframe,text="Button2.2")
         button.pack(fill=BOTH,expand=1) 
         #_dumpwgt2(self.frame)
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def test_pack_20x20(self):
         widgetgrid=[]
@@ -185,7 +191,7 @@ class TestUIPack(unittest.TestCase):
         self.assertEquals(widgetgrid[0][0].winfo_class(),'TButton')
         #_dumpwgt2(widgetgrid[19][19])
         #_dumpwgt2(widgetgrid[0][0])
-        self.master.mainloop()
+        #self.master.mainloop()
 
     def tearDown(self):
         try: # not every test is creating a frame
@@ -194,7 +200,94 @@ class TestUIPack(unittest.TestCase):
             pass
         
         self.master.destroy()
-    
+        
+class TestUIButton(unittest.TestCase):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry('300x200+100+100')
+        self.master.configure(background='red')
+        _style = Style()
+        _style.configure('mystyle.TFrame',background='blue')
+        self.frame = Frame(self.master,style='mystyle.TFrame')
+        self.frame.place(height=160,width=260,x=20,y=20)
+        self.frame.config()
+        
+    def test_setgettext(self):
+        
+        def callback(button):
+            ctext = button.cget("text")
+            
+            ntext = str(int(ctext) + 1)
+            button.config(text=ntext)
+            
+        button = Button(self.master,text="0",command=lambda:callback(button))
+        button.pack(fill=BOTH,expand=1)   
+        
+    def test_dimensions(self):
+        button = Tkbutton(self.frame,text="dsds")
+        button.config(height=5,width=5)
+        button.pack(side=LEFT)   
+        button = Tkbutton(self.frame,height = 1,width=4)
+        button.pack(side=LEFT)    
+        button = Tkbutton(self.frame,height = 3,width=10)
+        button.pack(side=LEFT)    
+        #self.master.mainloop()
+        
+    def test_colors(self):
+        
+        from random import randint
+
+        def callback(button):
+
+            r=randint(0,255)
+            g=randint(0,255)
+            b=randint(0,255)
+            mycolor = '#%02x%02x%02x' % (r, g, b)
+            button.config(bg=mycolor)
+            button.config(text=mycolor)
+        
+        button = Tkbutton(self.frame,command=lambda:callback(button))
+        button.pack(side=LEFT, fill=BOTH,expand=1)
+        #self.master.mainloop()
+        
+    def test_font(self):
+         
+        font = tkFont.Font(family="Monospace", size=20)   
+        # slant=tkFont.ITALIC
+        # weight=tkFont.BOLD
+
+        button = Tkbutton(self.frame,font=font,text='foobar')
+        button.pack(side=LEFT, fill=BOTH,expand=1)
+        #self.master.mainloop()
+        
+    def test_image(self):
+        
+        photo = PhotoImage(file="../scripts/buildgifs/8:30-9:10-270-68-68-rgb(97,91,92).gif")
+        font = tkFont.Font(family="Monospace", size=20)   
+        # slant=tkFont.ITALIC
+        # weight=tkFont.BOLD
+
+        mycolor = '#%02x%02x%02x' % (97, 91, 92) # #615b5c
+
+        
+        print mycolor
+        self.master.grid()
+        button = Tkbutton(self.master)
+        button = Tklabel(self.master)
+        button.config(image=photo,width="100",height="100",bg=mycolor)
+        button.grid()
+        #button.pack(side=LEFT, fill=BOTH,expand=1)
+        self.master.mainloop()
+        
+    def tearDown(self):
+        try: # not every test is creating a frame
+            self.frame.destroy()
+        except:
+            pass
+        
+        self.master.destroy()
+        
+        
 class TestUIEntry(unittest.TestCase):
     def setUp(self):
         self.master = Tk()
@@ -214,13 +307,13 @@ class TestUIEntry(unittest.TestCase):
         entry.pack(fill=X,expand=1)
         entry = Entry(self.frame)
         entry.pack(fill=X,expand=1)
-        self.master.mainloop()
+        #self.master.mainloop()
     
     def test_addentry_addtext(self):
         entry = Entry(self.frame)
         entry.pack(fill=X,expand=1)
         entry.insert(0,'default value')
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def test_addentry_add_delete_then_add(self):
         import time
@@ -231,7 +324,7 @@ class TestUIEntry(unittest.TestCase):
         entry.delete(0,END)
         entry.insert(0,'another default value')
         
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def test_addentry_stringvar(self):
         
@@ -250,9 +343,7 @@ class TestUIEntry(unittest.TestCase):
         
         button = Button(self.frame,command=lambda:callback(v,y))
         button.pack(fill=BOTH,expand=1)
-        self.master.mainloop()
-               
-        
+        #self.master.mainloop()
             
 class TestUIGrid(unittest.TestCase):
     def setUp(self):
@@ -277,7 +368,7 @@ class TestUIGrid(unittest.TestCase):
         button.grid(row=3,column=3,sticky=SW)
         
         _dumpwgt2(self.frame)
-        self.master.mainloop()
+        #self.master.mainloop()
 
     def tearDown(self):
         self.frame.destroy()
@@ -300,16 +391,490 @@ class TestUIWidgets(unittest.TestCase):
 
     def tearDown(self):
         self.master.destroy()
+        
+        
+class TestUIInheritance(unittest.TestCase):
     
+    class MyWgt(Frame):
+        
+        def __init__(self, master=None):
+            _style = Style()
+            _style.configure('mystyle.TFrame',background='blue')
+            Frame.__init__(self, master,style='mystyle.TFrame')
+
+            self.place(height=160,width=260,x=20,y=20)
+            self.config()
+            
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry('300x200+100+100')
+        self.master.configure(background='red')
+
+    def test_(self):
+        wgt = self.MyWgt(self.master)
+        
+        leftframe = Frame(wgt)
+        leftframe.pack(side=LEFT,fill=BOTH,expand=1)
+        button = Button(leftframe,text="butinframe1.1")
+        button.pack(fill=BOTH,expand=1)
+        button = Button(leftframe,text="butinframe1.1")
+        button.pack(fill=BOTH,expand=1)  
+
+        #self.master.mainloop()
+
+
+class TestUITable(unittest.TestCase):
+
+    class MyTblWgt(Frame):
+
+        def __init__(self,master=None,width=5,height=5):
+            _style = Style()
+            _style.configure('mystyle.TFrame',background='blue')
+
+            self.widgetgrid=[]
+            # add on 1 for title row/column
+            for column in range(width+1):
+                widgetcolumn=[]
+                frame = Frame(master)
+                frame.pack(side=LEFT,fill=Y,expand=1,anchor='n')                  
+                for row in range(height+1):
+                    if row==0 and column==0:                        
+                        button = Tkbutton(frame,text='',height=1,anchor='n')
+                        button.pack(side=TOP)
+                    elif row==0:
+                        button = Tkbutton(frame,text='')
+                        button.pack(fill=X)
+                    elif column==0:
+                        button = Tkbutton(frame,text='')
+                        button.pack(fill=Y,expand=1)
+                    else:
+                        cellouterframe = Frame(frame,style='mystyle.TFrame')
+                        cellouterframe.pack(fill=BOTH,expand=1,anchor='w')
+                        
+                        cellinnerframe = Frame(cellouterframe)
+                        cellinnerframe.pack(side=LEFT,fill=BOTH,expand=1)
+                        
+                        topbutton=Tkbutton(cellinnerframe,width=50,height=2,text='')
+                        topbutton.pack(fill=Y,expand=1,)
+                        midbutton=Tkbutton(cellinnerframe,width=50,height=2,text='')
+                        midbutton.pack(fill=Y,expand=1,)
+                        botbutton=Tkbutton(cellinnerframe,width=50,height=2,text='')
+                        botbutton.pack(fill=Y,expand=1,)
+                    widgetcolumn.append(button)
+                self.widgetgrid.append(widgetcolumn)
+                
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry('2200x1000+100+100')
+
+    def test_create(self):
+        wgt = self.MyTblWgt(self.master,5,5)
+        for row in wgt.widgetgrid:
+            for w in row:
+                self.assertTrue(isinstance(w,Tkbutton))
+        self.master.mainloop()
+        
+    '''def test_update(self):
+        wgt = self.MyTblWgt(self.master,5,5)
+        
+        for row in wgt.widgetgrid:
+            for w in row:
+                self.assertTrue(isinstance(w,Tkbutton))
+        self.master.mainloop()
+        
+    def test_controls(self):
+        controlframe = Frame(self.master)
+        controlframe.pack(side=RIGHT)          
+        gridframe = Frame(self.master)
+        gridframe.pack(side=LEFT,fill=BOTH,expand=1)        
+
+        wgt = self.MyTblWgt(gridframe,5,5)
+        
+        for row in wgt.widgetgrid:
+            for w in row:
+                self.assertTrue(isinstance(w,Tkbutton))
+                
+   
+        entry = Entry(controlframe)
+        entry.pack(side=TOP)
+        entry.insert(0,'default value')
+        entry = Entry(controlframe)
+        entry.pack(side=TOP)
+        entry.insert(0,'default value')
+        self.master.mainloop()       ''' 
+     
+class TestUIGridTableBasic(unittest.TestCase):
+    
+
+    def setUp(self):
+        self.master = Tk()
+        
+    def test_create_small_dump_details(self):
+        wgt = GridTableWidget(self.master,2,2)
+        wgt.table_update_all_text('foobar')
+        #font = tkFont.Font(family="Helvetica", size=16)
+        #wgt.table_update_all_fonts(font)
+        wgt.table_dump_info(wgt)
+        wgt.table_dump_header_info()
+        self.master.mainloop()
+        
+    
+class TestUIGridTable(unittest.TestCase):
+
+    def setUp(self):
+        self.master = Tk()
+        self.test_text = [[['david','',''],['brian','',''],['phil','',''],['bruce','',''],['peter','','']],
+                [['basil','',''],['tim','',''],['gary','',''],['steve','',''],['paul','','']],
+                [['val','',''],['nancy','',''],['grace','',''],['jane','',''],['jon','','']],
+                [['turnip','',''],['potato','',''],['radisch','',''],['lettuce','',''],['beetroot','','']],
+                [['bill','',''],['damian','',''],['barry','',''],['dave','',''],['luke','','']],
+                [['jamie','',''],['larry','',''],['harry','',''],['george','',''],['matilda','','']],
+                [['james','',''],['briece','',''],['bonny','',''],['sanjay','',''],['sachin','','']],
+                [['graham','',''],['banana','',''],['pony','',''],['wellies','',''],['beans','','']]]
+
+        
+        #self.master.geometry('2200x1000+100+100')
+
+    def test_create(self):
+        wgt = GridTableWidget(self.master,5,8)
+        
+        self.assertEquals(len(wgt.widget),8)
+        self.assertEquals(len(wgt.widget[0]),5)
+        self.assertEquals(len(wgt.widget[0][0]),3)
+        #self.master.mainloop()
+        
+        ''' 
+        def test_update_text(self):
+    
+        
+        wgt = GridTableWidget(self.master,5,8)   
+        wgt.table_update_content(self.test_text)
+
+        self.assertEquals(wgt.table_get_content(),text)'''
+
+        
+        ''' 
+        def test_update_text(self):
+    
+        
+        wgt = GridTableWidget(self.master,5,8)   
+        wgt.table_update_content(self.test_text)
+
+        self.assertEquals(wgt.table_get_content(),text)'''
+        
+    '''def test_init_datagrid(self):
+        wgt = GridTableWidget(self.master,5,8) 
+        exp_res = [[['','',''],['','',''],['','',''],['','',''],['','','']],
+                   [['','',''],['','',''],['','',''],['','',''],['','','']],
+                   [['','',''],['','',''],['','',''],['','',''],['','','']],
+                   [['','',''],['','',''],['','',''],['','',''],['','','']],
+                   [['','',''],['','',''],['','',''],['','',''],['','','']],
+                   [['','',''],['','',''],['','',''],['','',''],['','','']],
+                   [['','',''],['','',''],['','',''],['','',''],['','','']],
+                   [['','',''],['','',''],['','',''],['','',''],['','','']]]
+        
+        self.assertEquals(wgt._init_datagrid(),exp_res)'''
+        
+    '''def test_update_color(self):
+        wgt = GridTableWidget(self.master,5,8)
+        wgt.table_update_content(self.test_text)
+        colors = wgt._init_datagrid()
+        colors[0][0][0] = whiteblack14i
+        colors[1][0][0] = burgundywhite18
+        colors[7][3][0] = yellowburgundy14
+        wgt.table_update_colors(colors)
+
+    def test_update_text(self):
+        wgt = GridTableWidget(self.master,5,8)
+        wgt.table_update_content(self.test_text)
+
+        self.assertEquals(wgt.table_get_content(),self.test_text)
+        
+    def test_update_font(self):
+        wgt = GridTableWidget(self.master,5,8)
+        wgt.table_update_content(self.test_text)
+        
+        mono20 = tkFont.Font(family="Monospace", size=20)
+        mono10 = tkFont.Font(family="Monospace", size=8)
+        #mono15b = tkFont.Font(family="Monospace", size=8,weight=tkFont.BOLD)
+        #mono20i = tkFont.Font(family="Monospace", size=8,slant=tkFont.ITALIC)
+        
+        fonts = wgt._init_datagrid()
+        fonts[0][0][0] = mono20
+        #fonts[1][0][0] = mono10
+        #fonts[7][3][0] = mono15b
+        #fonts[7][4][0] = mono20i
+        wgt.table_update_font(fonts)
+        
+    def test_update_all_font(self):
+        helv36 = tkFont.Font(family="Helvetica", size=18)
+        wgt = GridTableWidget(self.master,5,8)
+        wgt.table_update_all_text('foobar')
+        wgt.table_update_all_fonts(helv36)
+        self.master.mainloop()
+        
+    def test_update_all_text(self):
+        wgt = GridTableWidget(self.master,5,8)
+        wgt.table_update_all_text('foobar')
+        self.master.mainloop()'''
+        
+    '''def test_update_top_label_text(self):
+        wgt = GridTableWidget(self.master,5,8)
+        
+        helv36 = tkFont.Font(family="Helvetica", size=18)
+        wgt.table_update_all_fonts(helv36)
+        labels = ['Monday','Tuesday','Wednesday','Thursday','Friday']
+        for i in range(len(labels)):
+            
+            wgt.columnheaderwidget[i].config(text=labels[i])
+            wgt.columnheaderwidget[i].config(font=helv36)     
+        self.master.mainloop()'''
+        
+    def test_update_top_label_image(self):
+        
+        fontfamily = "Helvetica"
+        fontsize=12
+        tkrgb = '#%02x%02x%02x' % (214, 210, 208)
+        
+        photo = PhotoImage(file="/tmp/foobar.gif")
+        wgt = GridTableWidget(self.master,5,8)
+        #font = tkFont.Font(family=fontfamily, size=fontsize)
+        #wgt.table_update_all_fonts(font)
+        wgt.table_update_all_text('foobar')
+
+        rowheaderimages=[]
+        labels = ['Monday','Tuesday','Wednesday','Thursday','Friday']
+        for i in range(len(labels)):
+            
+            rowheaderimages.append(tk_label_get_image(wgt.columnheaderwidget[i],
+                                       labels[i],
+                                       pointsize=fontsize,
+                                       font=fontfamily,
+                                       background=tkrgb,
+                                       gravity='center'))
+            
+        for i in range(len(rowheaderimages)):
+            
+            wgt.columnheaderwidget[i].config(image=rowheaderimages[i])
+            #wgt.columnheaderwidget[i].config(width=206,height=21)
+            #wgt.columnheaderwidget[i].update_idletasks()
+
+        
+        colheaderimages=[]
+        labels = ['0830-915','0915-1000','1000-1045','1045-1130',
+                  '1130-1215','1215-1300','1300-1345','1345-1430']
+        for i in range(len(labels)):
+            
+            colheaderimages.append(tk_label_get_image(wgt.rowheaderwidget[i],
+                                       labels[i],
+                                       pointsize=fontsize,
+                                       font=fontfamily,
+                                       background=tkrgb,
+                                       rotate=90,
+                                       gravity='center'))
+            
+        for i in range(len(colheaderimages)):
+            #wgt.rowheaderwidget[i].config(image=photo)
+            wgt.rowheaderwidget[i].config(image=colheaderimages[i])
+            
+            #wgt.rowheaderwidget[i].config(width=12,height=79)
+            #wgt.rowheaderwidget[i].update_idletasks()
+        self.master.mainloop()
+
+    def tearDown(self):
+        self.master.destroy()
+        
+        
+class TestUILabel(unittest.TestCase):
+    def setUp(self):
+        self.master = Tk()
+        #self.master.geometry('300x200+100+100')
+        #self.master.configure(background='red')
+        #_style = Style()
+        #_style.configure('mystyle.TFrame',background='blue')
+        #self.frame = Frame(self.master,style='mystyle.TFrame')
+        #self.frame.place(height=160,width=260,x=20,y=20)
+        #self.frame.config()
+        
+    def test_drawlabel(self):
+        
+        lbl = Tklabel(self.master,text='text')
+        lbl.pack(fill=BOTH,expand=1)
+        #self.master.mainloop()
+        self.master.update_idletasks()
+        
+        #self.assertEquals(lbl.winfo_width(),28)
+        #self.assertEquals(lbl.winfo_height(),28)
+        
+    def test_drawbiggerlabel(self):
+        
+        lbl = Tklabel(self.master,text='text',width=10,height=10)
+        lbl.pack(fill=BOTH,expand=1)
+
+        self.master.update_idletasks()
+        #self.master.mainloop()
+        
+        #self.assertEquals(lbl.winfo_width(),154)
+        #self.assertEquals(lbl.winfo_height(),154)
+    
+    def test_drawlabel_font(self):
+        
+        self.master.geometry('500x500+10+10')
+        font = tkFont.Font(family="Monospace", size=20)  
+        lbl = Tklabel(self.master,text='text', font=font)
+        lbl.pack(fill=BOTH,expand=1)
+
+        #self.master.mainloop()
+        
+        #self.master.update_idletasks()
+        #self.master.mainloop()
+        
+        #self.assertEquals(lbl.winfo_width(),154)
+        #self.assertEquals(lbl.winfo_height(),154)
+        
+        
+    def test_draw_expand(self):
+
+        _style = Style()
+        _style.configure('mystyle.TFrame',background='blue')
+        self.frame = Frame(self.master,style='mystyle.TFrame')
+        self.frame.place(height=500,width=500,x=20,y=20)
+        self.frame.config()
+        
+        self.master.update_idletasks()
+        lbl = Tklabel(self.frame,text='text')
+        lbl.pack(fill=BOTH,expand=1)  
+
+        self.frame.update_idletasks()
+        
+        self.assertEquals(lbl.winfo_width(),500)
+        self.assertEquals(lbl.winfo_height(),500)
+        
+    def test_draw_expand_image(self):
+        self.master.geometry('500x500+10+10')
+        
+        _style = Style()
+        _style.configure('mystyle.TFrame',background='blue')
+        self.frame = Frame(self.master,style='mystyle.TFrame')
+        self.frame.pack(fill=BOTH,expand=1)
+
+        lbl = Tklabel(self.frame,text='text')
+        lbl.pack(fill=BOTH,expand=1)  
+
+        self.frame.update_idletasks()
+        
+        w = lbl.winfo_width()
+        h = lbl.winfo_height()
+
+        geom = "{0}x{1}".format(w,h)
+        ic = ImageCreate()
+        outputfiles = ic.create_image_file('label image',
+                             pointsize=64,
+                             size=geom,
+                             gravity='center')
+        
+        
+        photo = PhotoImage(file=outputfiles[0])
+        lbl.config(image=photo)
+  
+    def test_draw_expand_image_rotate(self):
+        self.master.geometry('500x500+10+10')
+        
+        _style = Style()
+        _style.configure('mystyle.TFrame',background='blue')
+        self.frame = Frame(self.master,style='mystyle.TFrame')
+        self.frame.pack(fill=BOTH,expand=1)
+
+        lbl = Tklabel(self.frame,text='text')
+        lbl.pack(fill=BOTH,expand=1)  
+
+        photo = tk_label_get_image(lbl,'text',rotate=90)
+
+        lbl.config(image=photo)
+        
+    def test_draw_expand_image_2labels(self):
+        self.master.geometry('500x500+10+10')
+        
+        fontfamily = "Helvetica"
+        fontsize=48
+        tkrgb = '#%02x%02x%02x' % (214, 210, 208)
+
+        _style = Style()
+        _style.configure('mystyle.TFrame',background='blue')
+        self.frame = Frame(self.master,style='mystyle.TFrame')
+        self.frame.pack(fill=BOTH,expand=1)
+
+        lbl = Tklabel(self.frame)
+        lbl.place( width=500,height=250,x=0,y=0)
+
+        font = tkFont.Font(family=fontfamily, size=fontsize)  
+        lbl2 = Tklabel(self.frame,text='label text',font=font,background=tkrgb)
+        lbl2.place( width=500,height=250,x=0,y=250)
+
+        photo = tk_label_get_image(lbl,
+                                   'label image',
+                                   pointsize=fontsize,
+                                   font=fontfamily,
+                                   background=tkrgb,
+                                   gravity='center')
+        lbl.config(image=photo)
+        
+    def test_draw_expand_image_2labels_both_images(self):
+        self.master.geometry('500x500+10+10')
+        
+        fontfamily = "Helvetica"
+        fontsize=48
+        tkrgb = '#%02x%02x%02x' % (214, 210, 208)
+
+        _style = Style()
+        _style.configure('mystyle.TFrame',background='blue')
+        self.frame = Frame(self.master,style='mystyle.TFrame')
+        self.frame.pack(fill=BOTH,expand=1)
+
+        lbl = Tklabel(self.frame)
+        lbl.place( width=500,height=250,x=0,y=0)
+
+        lbl2 = Tklabel(self.frame)
+        lbl2.place( width=500,height=250,x=0,y=250)
+
+        photo = tk_label_get_image(lbl,
+                                   'label image',
+                                   pointsize=fontsize,
+                                   font=fontfamily,
+                                   background=tkrgb,
+                                   gravity='center')
+        lbl.config(image=photo)
+        
+        photo2 = tk_label_get_image(lbl2,
+                                   'label image2',
+                                   pointsize=fontsize,
+                                   font=fontfamily,
+                                   background=tkrgb,
+                                   gravity='center')
+        lbl2.config(image=photo2)
+        
+        self.master.mainloop()
+        
+    def tearDown(self):
+        self.master.destroy()
+        
+
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIRoot))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrame))
-
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIPack))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIEntry))
-  
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIEntry))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIWidgets))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIInheritance))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUITable))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIButton))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridTable))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridTableBasic))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabel))
+    
+    
+    
     unittest.TextTestRunner(verbosity=2).run(suite)

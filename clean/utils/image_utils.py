@@ -67,15 +67,20 @@ class ImageCreate(GenericBase):
         for lbl in self.labels:
             
             cmd = ['convert','-verbose']
-            for k,v in kw.iteritems():
-                cmd = cmd + ["-"+k,str(v)]
-                
+
             filename = lbl + "-" + "-".join(map(str,kw.values())) + ".gif"  
             outputfilename = ospathjoin(self.outputdirname,filename)
             
             if os_file_exists(outputfilename) == False:
                 
-                cmd = cmd + [labelstr_get(lbl),outputfilename]
+                cmd.append(labelstr_get(lbl))
+                
+                for k,v in kw.iteritems():
+                    cmd = cmd + ["-"+k,str(v)]
+        
+                cmd.append(outputfilename)
+                
+                print cmd
                 
                 p = process_start(cmd)
                 
