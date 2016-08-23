@@ -633,7 +633,7 @@ class TestUIGridTable(unittest.TestCase):
     def test_update_top_label_image(self):
         
         fontfamily = "Helvetica"
-        fontsize=12
+        fontsize=36
         tkrgb = '#%02x%02x%02x' % (214, 210, 208)
         
         photo = PhotoImage(file="/tmp/foobar.gif")
@@ -656,10 +656,7 @@ class TestUIGridTable(unittest.TestCase):
         for i in range(len(rowheaderimages)):
             
             wgt.columnheaderwidget[i].config(image=rowheaderimages[i])
-            #wgt.columnheaderwidget[i].config(width=206,height=21)
-            #wgt.columnheaderwidget[i].update_idletasks()
 
-        
         colheaderimages=[]
         labels = ['0830-915','0915-1000','1000-1045','1045-1130',
                   '1130-1215','1215-1300','1300-1345','1345-1430']
@@ -674,11 +671,9 @@ class TestUIGridTable(unittest.TestCase):
                                        gravity='center'))
             
         for i in range(len(colheaderimages)):
-            #wgt.rowheaderwidget[i].config(image=photo)
+
             wgt.rowheaderwidget[i].config(image=colheaderimages[i])
-            
-            #wgt.rowheaderwidget[i].config(width=12,height=79)
-            #wgt.rowheaderwidget[i].update_idletasks()
+
         self.master.mainloop()
 
     def tearDown(self):

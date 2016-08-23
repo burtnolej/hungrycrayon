@@ -112,7 +112,7 @@ class GridTableWidget(Frame):
                            column=column,
                            columnspan=cellcolumnspan-1)
             
-            photo = PhotoImage(file="ic_082316/Thursday-Helvetica-16-center-#d6d2d0-204x19.gif")
+            photo = PhotoImage(file="ic_082316/Thursday-Helvetica-48-center-#d6d2d0-204x19.gif")
             colhdrlbl.config(image=photo)
             colhdrlbl.config(width=204)
             colhdrlbl.config(height=19)
@@ -148,7 +148,7 @@ class GridTableWidget(Frame):
                            column=0,
                            rowspan=cellrowspan-1)
             
-            photo = PhotoImage(file="ic_082316/1215-1300-90-16-center-#d6d2d0-Helvetica-12x79.gif")
+            photo = PhotoImage(file="ic_082316/1215-1300-90-48-center-#d6d2d0-Helvetica-12x79.gif")
             rowhdrbut.config(image=photo)
             rowhdrbut.config(width=12)
             rowhdrbut.config(height=79)

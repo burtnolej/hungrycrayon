@@ -1,5 +1,5 @@
 import unittest
-from image_utils import ImageCreate, rgbstr_get
+from image_utils import ImageCreate, rgbstr_get, get_gif_filename
 import magic
 import Image
 from subprocess import call, check_output
@@ -8,214 +8,438 @@ sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_process import *
 from time import sleep
 from datetime import datetime
+from collections import OrderedDict
 
-class TestImageCreate(unittest.TestCase):
+settings = ['gravity','background','pointsize','font']
+image_operator = ['rotate','size']
+  
+class TestImageCreateBasic(unittest.TestCase):
     
     def setUp(self):
-        self.wait=0.25
-        pass
+        
+        self.ic = ImageCreate()
+        self.inputfiles = "foobar"
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
     
     def test_create_1image_basic(self):
-        
-        #tkgrey = rgbstr_get(240,240,237)
-        #white = rgbstr_get(255,255,255)
-        #black = rgbstr_get(0,0,0)
     
-        ic = ImageCreate()
-    
-        inputfiles = "basic"
-        outputfiles = ic.create_image_file(inputfiles)
-
-        im = Image.open(outputfiles[0])
+        args=OrderedDict()
+        inputfiles = "foobar"
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
         
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
         p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
         
-        self.assertEquals(im.format,'GIF')
+        result = p.stdout.read().find('differ')
+        self.assertEquals(result,-1)
+        
+    def test_create_1image_basic_fail(self):
+    
+        args=OrderedDict()
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.inputfiles = "foobdddar"
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+        
+        pstdout = p.stdout.read()
+
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
+        
+        result = pstdout.find('differ')
+        self.assertNotEquals(result,-1)
+
+    def tearDown(self):
+        import os
+        self.ic = ImageCreate()
+        os.remove(self.outputfiles[0])
+        
+class TestImageCreatePointsize(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.ic = ImageCreate()
+        self.inputfiles = "foobar"
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
+        
+    def test_create_1image_pointsize_64(self):
+
+        args = OrderedDict(pointsize=64)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+        
+        result = p.stdout.read().find('differ')
+        self.assertEquals(result,-1)
+        
+    def test_create_1image_pointsize_12(self):
+
+        args = OrderedDict(pointsize=12)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+        
+        result = p.stdout.read().find('differ')
+        self.assertEquals(result,-1)
+        
+    def test_create_1image_pointsize_24(self):
+
+        args = OrderedDict(pointsize=24)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+        
+        result = p.stdout.read().find('differ')
+        self.assertEquals(result,-1)
+        
+    def tearDown(self):
+        import os
+        self.ic = ImageCreate()
+        os.remove(self.outputfiles[0])
+        
+class TestImageCreateBackground(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.ic = ImageCreate()
+        self.inputfiles = "foobar"
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
+        
+    def test_create_1image_background_red(self):
+
+        red = '#%02x%02x%02x' % (255, 0, 0)
+
+        args = OrderedDict(background=red)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+        
+        result = p.stdout.read().find('differ')
+        self.assertEquals(result,-1)
+        
+    def test_create_1image_background_tkgrey(self):
+
+        args = OrderedDict(background='#d6d2d0')
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+        
+        result = p.stdout.read().find('differ')
+        self.assertEquals(result,-1)
+        
+    def test_create_1image_background_fail(self):
+
+        red = '#%02x%02x%02x' % (255, 0, 0)
+        blue = '#%02x%02x%02x' % (0, 0, 255)
+
+        args = OrderedDict(background=red)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        args = OrderedDict(background=blue)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+    
+        pstdout = p.stdout.read()
+
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
+        
+        self.assertNotEquals(pstdout.find('differ'),-1)
+    
+    def tearDown(self):
+        import os
+        self.ic = ImageCreate()
+        os.remove(self.outputfiles[0])
+        
+class TestImageCreateRotate(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.ic = ImageCreate()
+        self.inputfiles = "foobar"
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
+        
+    def test_create_1image_rotate90(self):
+
+        args = OrderedDict(rotate=90)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+    
+        pstdout = p.stdout.read()
+
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
+        
+        self.assertEquals(pstdout.find('differ'),-1)
+        
+    def test_create_1image_rotate270(self):
+
+        args = OrderedDict(rotate=270)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
+    
+        pstdout = p.stdout.read()
+
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
+        
+        self.assertEquals(pstdout.find('differ'),-1)
+        
+    def tearDown(self):
+        import os
+        os.remove(self.outputfiles[0])
       
-    def test_create_1image_largefont(self):
+class TestImageCreateSize(unittest.TestCase):
     
-        ic = ImageCreate()
+    def setUp(self):
+        
+        self.ic = ImageCreate()
+        self.inputfiles = "foobar"
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
+        
+    def test_create_1image_size200x200(self):
+
+        args = OrderedDict(size='200x200')
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
+        p = process_start(cmd)
     
-        inputfiles = "pointsize=64"
-        outputfiles = ic.create_image_file(inputfiles,pointsize=64)
+        pstdout = p.stdout.read()
 
-        im = Image.open(outputfiles[0])
-        self.assertEquals(im.format,'GIF')
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
         
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
+        self.assertEquals(pstdout.find('differ'),-1)
+        
+    def test_create_1image_size200x800(self):
+
+        args = OrderedDict(size='200x800')
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
         p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
-        
-    def test_create_1image_redbg(self):
+    
+        pstdout = p.stdout.read()
 
-        ic = ImageCreate()
-        ps = 64
-        red = rgbstr_get(255,0,0)
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
         
-        inputfiles = "bg=red"
-        outputfiles = ic.create_image_file(inputfiles,
-                                           pointsize=ps,
-                                           background=red)
+        self.assertEquals(pstdout.find('differ'),-1)
+        
+    def tearDown(self):
+        import os
+        os.remove(self.outputfiles[0])
+       
+class TestImageCreateGravity(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.ic = ImageCreate()
+        self.inputfiles = "foobar"
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
+        
+    def test_create_1image_gravitycenter(self):
 
-        im = Image.open(outputfiles[0])
-        self.assertEquals(im.format,'GIF')
-        
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
+        args = OrderedDict(gravity='center')
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
         p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
-        
-    def test_create_1image_bluefg(self):
+    
+        pstdout = p.stdout.read()
 
-        ic = ImageCreate()
-        ps = 64
-        blue = rgbstr_get(0,0,255)
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
         
-        inputfiles = "fill=blue"
-        outputfiles = ic.create_image_file(inputfiles,
-                                           pointsize=ps,
-                                           fill=blue)
+        self.assertEquals(pstdout.find('differ'),-1)
+        
+    def tearDown(self):
+        import os
+        os.remove(self.outputfiles[0])
+        
+class TestImageCreateFont(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.ic = ImageCreate()
+        self.inputfiles = "foobar"
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
+        
+    def test_create_1image_fonthelvetica(self):
 
-        im = Image.open(outputfiles[0])
-        self.assertEquals(im.format,'GIF')
-        
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
+        args = OrderedDict(font='Helvetica')
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
         p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
-        
-        
-    def test_create_1image_rotate90c(self):
+    
+        pstdout = p.stdout.read()
 
-        ic = ImageCreate()
-        ps = 64
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
         
-        inputfiles = "rotate=90"
-        outputfiles = ic.create_image_file(inputfiles,
-                                           pointsize=ps,
-                                           rotate=90)
+        self.assertEquals(pstdout.find('differ'),-1)
+        
+    def tearDown(self):
+        import os
+        os.remove(self.outputfiles[0])
 
-        im = Image.open(outputfiles[0])
-        self.assertEquals(im.format,'GIF')
+class TestImageCreateMultiSetting(unittest.TestCase):
+    
+
+    def setUp(self):
         
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
+        self.ic = ImageCreate()
+        self.inputfiles = "foobar"
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
+        
+    def test_create_1image_red800x200(self):
+        
+        ''' setting and image operator - so testing that args are going 
+        either side of label/file'''
+
+        red = '#%02x%02x%02x' % (255, 0, 0)
+        
+        args = OrderedDict(background=red,size='800x200')
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
         p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
-        
-    def test_create_1image_rotate90antic(self):
+    
+        pstdout = p.stdout.read()
 
-        ic = ImageCreate()
-        ps = 64
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
         
-        inputfiles = "rotate=-90"
-        outputfiles = ic.create_image_file(inputfiles,
-                                           pointsize=ps,
-                                           rotate=270)
+        self.assertEquals(pstdout.find('differ'),-1)
+        
+    def test_create_1image_red_48(self):
+        
+        ''' 2 settings '''
 
-        im = Image.open(outputfiles[0])
-        self.assertEquals(im.format,'GIF')
+        red = '#%02x%02x%02x' % (255, 0, 0)
         
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
+        args = OrderedDict(background=red,pointsize=48)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
         p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
-        
-    def test_create_1image_size(self):
+    
+        pstdout = p.stdout.read()
 
-        ic = ImageCreate()
-        ps = 64
-        extent = '400x400'
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
         
-        inputfiles = "size=400x400"
-        outputfiles = ic.create_image_file(inputfiles,
-                                           pointsize=ps,
-                                           extent=extent)
+        self.assertEquals(pstdout.find('differ'),-1)
+        
+    def test_create_1image_red_48_Helvetica_90_800x200(self):
+        
+        ''' all settings '''
 
-        im = Image.open(outputfiles[0])
-        self.assertEquals(im.format,'GIF')
+        red = '#%02x%02x%02x' % (255, 0, 0)
         
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
+        args = OrderedDict(background=red,
+                           pointsize=48,
+                           size='800x200',
+                           font='Helvetica',
+                           rotate=90)
+        exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
+        cmd = ['diff',self.outputfiles[0],exp_res]
+               
         p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
-        
-    def test_create_1image_aligncenter(self):
+    
+        pstdout = p.stdout.read()
 
-        ic = ImageCreate()
-        ps = 64
-        extent = '400x400'
-        gravity='center'
+        if pstdout.find('No such file or directory') <> -1:
+            
+            raise Exception('no reference gif for this test',exp_res)
         
-        inputfiles = "gravity=center"
-        outputfiles = ic.create_image_file(inputfiles,
-                                           pointsize=ps,
-                                           extent=extent,
-                                           gravity=gravity)
-
-        im = Image.open(outputfiles[0])
-        self.assertEquals(im.format,'GIF')
+        self.assertEquals(pstdout.find('differ'),-1)
         
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
-        p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
+    def tearDown(self):
+        import os
+        os.remove(self.outputfiles[0])
+             
+class TestImageCreateMultiFile(unittest.TestCase):
         
-    def test_create_1image_font(self):
+    def setUp(self):
         
-        '''convert -list font (to list fonts)'''
-
-        ic = ImageCreate()
-        ps = 64
-        font = 'Ubuntu-Mono-Regular'
-        
-        inputfiles = "font=Ubuntu-mono font"
-        outputfiles = ic.create_image_file(inputfiles,
-                                           pointsize=ps,
-                                           font=font)
-
-        im = Image.open(outputfiles[0])
-        self.assertEquals(im.format,'GIF')
-        
-        cmd = ['display','-geometry','750x750+7500+740',outputfiles[0]]
-        p = process_start(cmd)
-        sleep(self.wait)
-        process_kill(p)
-        
+        self.ic = ImageCreate()
+        self.inputfiles = ['foobar','barfoo']
+        self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
       
     def test_create_1image_largefont_multi(self):
         
-        labels = ['Monday','Tuesday','Wednesday']
-        ps = 64
-        now =str(datetime.now().strftime("%m%d%y"))
+        red = '#%02x%02x%02x' % (255, 0, 0)
         
-        exp_res = []
-        for lbl in labels:
-            exp_res.append("ic_{0}/{1}-{2}.gif".format(now,lbl,ps))
-    
-        ic = ImageCreate()
-    
-        outputfiles = ic.create_image_file(labels,pointsize=ps)
+        args = OrderedDict(background=red,
+                           pointsize=48,
+                           size='800x200',
+                           font='Helvetica',
+                           rotate=90)
         
-        self.assertEquals(outputfiles,exp_res)
+        exp_res = [get_gif_filename(self.testfiledir,lbl,args) for lbl in self.inputfiles]
         
-        self.assertEquals(len(outputfiles),3)
+        self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
         
-        for i in range(len(outputfiles)):
-            im = Image.open(outputfiles[i])
-            self.assertEquals(im.format,'GIF')
-            
-            cmd = ['display','-geometry','750x750+7500+740',outputfiles[i]]
+        for i in range(len(self.outputfiles)):
+            cmd = ['diff',self.outputfiles[i],exp_res[i]]
+                   
             p = process_start(cmd)
-            sleep(self.wait)
-            process_kill(p)
         
+            pstdout = p.stdout.read()
+    
+            if pstdout.find('No such file or directory') <> -1:
+                
+                raise Exception('no reference gif for this test',exp_res)
+            
+            self.assertEquals(pstdout.find('differ'),-1)
         
-        
+    def tearDown(self):
+        import os
+        for f in self.outputfiles:
+            os.remove(f)
+       
 class TestImageCreateFails(unittest.TestCase):
     def test_create_1image_badfontsize(self):
 
@@ -230,9 +454,16 @@ class TestImageCreateFails(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreate))
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateBasic))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreatePointsize))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateBackground))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateRotate))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateSize))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateGravity))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateFont))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateMultiSetting))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateMultiFile))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateFails))
-    
-    
     
     unittest.TextTestRunner(verbosity=2).run(suite)

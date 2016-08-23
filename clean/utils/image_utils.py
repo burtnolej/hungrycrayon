@@ -7,6 +7,9 @@ from os import mkdir, getcwd
 from os.path import join as ospathjoin
 from datetime import datetime
 
+settings = ['gravity','background','pointsize']
+image_operator = ['rotate','size']
+
 def parse_convert_stdout(p,label):
     
     ''' parse stdout and sterr messages created by imagemagick
@@ -45,6 +48,26 @@ def labelstr_get(label):
 def now():
     return(str(datetime.now().strftime("%m%d%y")))
 
+def get_gif_filename(dir,label,args):    
+    argcopy = args.copy()
+    filename =""
+    for s in settings:
+        if args.has_key(s) == True:
+            filename = filename + str(args[s])
+            
+    filename = filename + label
+        
+    for io in image_operator:
+        if args.has_key(io) == True:
+            filename = filename + str(args[io])
+
+    filename = filename+ ".gif"
+    filename = filename.replace("#","")
+    
+    filename = ospathjoin(dir,filename)
+    
+    return(filename)
+
 class ImageCreate(GenericBase):
     
     def create_image_file(self,labels, **kw):
@@ -68,20 +91,26 @@ class ImageCreate(GenericBase):
             
             cmd = ['convert','-verbose']
 
-            filename = lbl + "-" + "-".join(map(str,kw.values())) + ".gif"  
-            outputfilename = ospathjoin(self.outputdirname,filename)
+            outputfilename = get_gif_filename(self.outputdirname,lbl,kw)
+            #filename = lbl + "-" + "-".join(map(str,kw.values())) + ".gif"  
+            #outputfilename = ospathjoin(self.outputdirname,filename)
             
             if os_file_exists(outputfilename) == False:
                 
-                cmd.append(labelstr_get(lbl))
-                
-                for k,v in kw.iteritems():
-                    cmd = cmd + ["-"+k,str(v)]
+                # settings go before the input label/file
+                for s in settings:
+                    if kw.has_key(s):
+                        cmd = cmd + ["-"+s,str(kw[s])]
         
+                cmd.append(labelstr_get(lbl))  
+                
+                # image operators come afterwards
+                for im in image_operator:
+                    if kw.has_key(im):
+                        cmd = cmd + ["-"+im,str(kw[im])]
+                
                 cmd.append(outputfilename)
-                
-                print cmd
-                
+    
                 p = process_start(cmd)
                 
                 status = parse_convert_stdout(p,lbl)
