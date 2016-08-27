@@ -7,8 +7,8 @@ from os import mkdir, getcwd
 from os.path import join as ospathjoin
 from datetime import datetime
 
-settings = ['gravity','background','pointsize']
-image_operator = ['rotate','size']
+settings = ['gravity','background','pointsize','font']
+image_operator = ['rotate','size','extent']
 
 def parse_convert_stdout(p,label):
     
@@ -71,7 +71,10 @@ def get_gif_filename(dir,label,args):
 class ImageCreate(GenericBase):
     
     def create_image_file(self,labels, **kw):
-        
+
+        if not kw.has_key('overwrite'):
+            kw['overwrite'] = False
+            
         if not isinstance(labels,list):
             labels = [labels]
         
@@ -95,7 +98,7 @@ class ImageCreate(GenericBase):
             #filename = lbl + "-" + "-".join(map(str,kw.values())) + ".gif"  
             #outputfilename = ospathjoin(self.outputdirname,filename)
             
-            if os_file_exists(outputfilename) == False:
+            if os_file_exists(outputfilename) == False or kw['overwrite'] == True:
                 
                 # settings go before the input label/file
                 for s in settings:

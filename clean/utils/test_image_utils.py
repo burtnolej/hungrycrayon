@@ -11,7 +11,7 @@ from datetime import datetime
 from collections import OrderedDict
 
 settings = ['gravity','background','pointsize','font']
-image_operator = ['rotate','size']
+image_operator = ['rotate','extent']
   
 class TestImageCreateBasic(unittest.TestCase):
     
@@ -60,7 +60,7 @@ class TestImageCreateBasic(unittest.TestCase):
         self.ic = ImageCreate()
         os.remove(self.outputfiles[0])
         
-class TestImageCreatePointsize(unittest.TestCase):
+class TestImageCreatepointsize(unittest.TestCase):
     
     def setUp(self):
         
@@ -215,7 +215,7 @@ class TestImageCreateRotate(unittest.TestCase):
         import os
         os.remove(self.outputfiles[0])
       
-class TestImageCreateSize(unittest.TestCase):
+class TestImageCreateextent(unittest.TestCase):
     
     def setUp(self):
         
@@ -223,9 +223,9 @@ class TestImageCreateSize(unittest.TestCase):
         self.inputfiles = "foobar"
         self.testfiledir = "/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs"
         
-    def test_create_1image_size200x200(self):
+    def test_create_1image_extent200x200(self):
 
-        args = OrderedDict(size='200x200')
+        args = OrderedDict(extent='200x200')
         exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
         self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
         cmd = ['diff',self.outputfiles[0],exp_res]
@@ -240,9 +240,9 @@ class TestImageCreateSize(unittest.TestCase):
         
         self.assertEquals(pstdout.find('differ'),-1)
         
-    def test_create_1image_size200x800(self):
+    def test_create_1image_extent200x800(self):
 
-        args = OrderedDict(size='200x800')
+        args = OrderedDict(extent='200x800')
         exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
         self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
         cmd = ['diff',self.outputfiles[0],exp_res]
@@ -335,7 +335,7 @@ class TestImageCreateMultiSetting(unittest.TestCase):
 
         red = '#%02x%02x%02x' % (255, 0, 0)
         
-        args = OrderedDict(background=red,size='800x200')
+        args = OrderedDict(background=red,extent='800x200')
         exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
         self.outputfiles = self.ic.create_image_file(self.inputfiles,**args)
         cmd = ['diff',self.outputfiles[0],exp_res]
@@ -379,7 +379,7 @@ class TestImageCreateMultiSetting(unittest.TestCase):
         
         args = OrderedDict(background=red,
                            pointsize=48,
-                           size='800x200',
+                           extent='800x200',
                            font='Helvetica',
                            rotate=90)
         exp_res = get_gif_filename(self.testfiledir,self.inputfiles,args)
@@ -414,7 +414,7 @@ class TestImageCreateMultiFile(unittest.TestCase):
         
         args = OrderedDict(background=red,
                            pointsize=48,
-                           size='800x200',
+                           extent='800x200',
                            font='Helvetica',
                            rotate=90)
         
@@ -441,7 +441,7 @@ class TestImageCreateMultiFile(unittest.TestCase):
             os.remove(f)
        
 class TestImageCreateFails(unittest.TestCase):
-    def test_create_1image_badfontsize(self):
+    def test_create_1image_badfontextent(self):
 
         ic = ImageCreate()
     
@@ -456,10 +456,10 @@ if __name__ == "__main__":
     suite = unittest.TestSuite()
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateBasic))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreatePointsize))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreatepointsize))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateBackground))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateRotate))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateSize))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateextent))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateGravity))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateFont))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestImageCreateMultiSetting))

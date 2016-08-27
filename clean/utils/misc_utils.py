@@ -14,7 +14,18 @@ sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 #        
 #        print "generic","__init__"
         
-        
+
+def nxnarraycreate(maxrows,maxcols,args={}):
+    ''' creates a n x n array containing args; args can be none '''
+    grid=[]
+    for row in range(maxrows):
+        row=[]
+        for col in range(maxcols):
+            argcopy = args.copy()
+            row.append(argcopy)
+        grid.append(row)
+    return(grid)
+
 class Singleton(type):
     _instances = {}
     def __call__(cls,*args,**kwargs):

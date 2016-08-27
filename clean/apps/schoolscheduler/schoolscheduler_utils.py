@@ -58,18 +58,12 @@ class schoolschedgeneric(dbtblgeneric):
                 
     def attr_set(self,name,clsname):
         datamembers = _initdatamembers(clsname,name=name)
-        
-        setattr(self,clsname,_obj_create(datamembers,
-                                         self.database,
-                                         self.of,
-                                         clsname))
-
+        setattr(self,clsname,_obj_create(datamembers,self.database,self.of,clsname))
         return(getattr(self,clsname))
     
     def __repr__(self):
         return(self.objid)
     
-
 class teacher(schoolschedgeneric):
     pass
 
@@ -105,29 +99,6 @@ class objtype(dbtblgeneric):
 class lesson(schoolschedgeneric):
     pass
     
-'''class lesson(dbtblgeneric):
-    def __init__(self,objid,**kwargs):
-
-        super(lesson,self).__init__(**kwargs)
-        self.objid = objid
-
-        for k,v in kwargs['dm'].iteritems():
-            if v <> 'None':
-                self.attr_set(v,k)
-
-    def __repr__(self):
-        return(self.objid)
-
-    def attr_set(self,name,clsname):
-        datamembers = _initdatamembers(clsname,name=name)
-        
-        setattr(self,clsname,_obj_create(datamembers,
-                                         self.database,
-                                         self.of,
-                                         clsname))
-
-        return(getattr(self,clsname))'''
-
 def _initdatamembers(clsname,**kw):
     
     if clsname == 'lesson':       
