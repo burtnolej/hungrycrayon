@@ -101,7 +101,7 @@ def tkwidgetfactory(widgettype,master,**kwargs):
     
         def __init__(self,master,**kwargs):
             widgettype.__init__(self,master)
-            
+            self.widgettype = widgettype
             
             self.config(**kwargs)
 
