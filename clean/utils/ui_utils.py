@@ -545,7 +545,8 @@ class GridTableWidget(Frame):
                 columnwidget.append(cellrowwidget)
             grid.append(columnwidget)
         return grid  
-        
+    
+
 if __name__ == '__main__':
     master = Tk()
     wgt = GridTableWidget(master,5,8)

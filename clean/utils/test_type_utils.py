@@ -3,7 +3,7 @@ import unittest
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from type_utils import RealInt, BoundRealInt, SetMember, \
-     DBSetMember
+     DBSetMember, TextAlphaNum, SetMemberPartial
 
 class TestRealIntNoName(unittest.TestCase):
     def setUp(self):
@@ -98,6 +98,20 @@ class TestSetMember(unittest.TestCase):
 
     def test_plum_false(self):
         self.assertFalse(self.setmember('plum'))
+        
+class TestSetMemberPartial(unittest.TestCase):
+
+    def setUp(self):
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['cherry','banana','grape','apple'])
+        
+    def test_er_true(self):
+        self.assertTrue(self.setmemberp('er'))
+
+    def test_ap_false(self):
+        self.assertFalse(self.setmemberp('ap'))
+        
+    def test_ER_true(self):
+        self.assertTrue(self.setmemberp('ER'))
 
 class TestDBSetMember(unittest.TestCase):
 
@@ -115,6 +129,16 @@ class TestDBSetMember(unittest.TestCase):
     def test_Spinach_false(self):
         self.assertFalse(self.dbsetmember('Spinach'))
 
+class TestTextAlphaNum(unittest.TestCase):
+    def setUp(self):
+        self.mytextalphanum = TextAlphaNum(name='textalphanum')
+ 
+    def test_Peanut(self):
+        self.assertTrue(self.mytextalphanum('Peanut'))
+        
+    def test_Peanut_Butter(self):
+        self.assertFalse(self.mytextalphanum('Peanut_Butter'))
+        
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
@@ -127,4 +151,9 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGtltBadargs))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSetMember))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBSetMember))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTextAlphaNum))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSetMemberPartial))
+    
+    
+    
     unittest.TextTestRunner(verbosity=2).run(suite)

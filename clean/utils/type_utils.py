@@ -2,6 +2,7 @@ import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from database_table_util import tbl_rows_get
 from database_util import Database
+import re
 
 class Validator(object):
     def __init__(self,name,**kwargs):
@@ -43,16 +44,7 @@ class BoundRealIntVdt(Validator):
                 return False
         return True
 
-class SetMemberVdt(Validator):
-    def __init__(self,**kwargs):
-        if not kwargs.has_key('set'):
-            raise Exception('set must be passed')
-        super(SetMemberVdt,self).__init__(**kwargs)
-        
-    def validate(self,value):
-        if value in getattr(self,'set'):
-            return True
-        return False
+
     
 class BaseType(object):
     def __init__(self):
@@ -83,6 +75,42 @@ class BoundRealInt(RealInt):
         super(BoundRealInt,self).__init__(**kwargs)
         self.validations.append(BoundRealIntVdt(**kwargs))
         
+class SetMemberVdt(Validator):
+    def __init__(self,**kwargs):
+        if not kwargs.has_key('set'):
+            raise Exception('set must be passed')
+        super(SetMemberVdt,self).__init__(**kwargs)
+        
+    def validate(self,value):
+        if value in getattr(self,'set'):
+            return True
+        return False
+    
+class SetMemberPartialVdt(Validator):
+    ''' matches on unique partial strings 
+    i.e er in ,set=['cherry','banana','grape','apple'] but ap not as
+    appears twice. also ignores case '''
+    def __init__(self,**kwargs):
+        if not kwargs.has_key('set'):
+            raise Exception('set must be passed')
+        super(SetMemberPartialVdt,self).__init__(**kwargs)
+        
+    def validate(self,value):
+        r = re.compile(value.lower())
+        
+        hits=0
+        for item in getattr(self,'set'):
+            results = r.findall(item.lower())
+            if len(results)>0: hits+=1
+        if hits==1: return True
+        return False
+    
+class SetMemberPartial(BaseType):
+    def __init__(self,**kwargs):
+        
+        super(SetMemberPartial,self).__init__()
+        self.validations.append(SetMemberPartialVdt(**kwargs))
+        
 class SetMember(BaseType):
     def __init__(self,**kwargs):
         
@@ -103,9 +131,21 @@ class DBSetMember(BaseType):
         super(DBSetMember,self).__init__()
         self.validations.append(SetMemberVdt(**kwargs))
         
-class Basestr(BaseType):
+class TextAlphaNumVdt(Validator):
+    
+    def __init__(self,**kwargs):
+        super(TextAlphaNumVdt,self).__init__(**kwargs)
+        
     def validate(self,value):
+        r = re.compile("^[a-zA-Z0-9]*$")
+        
         try:
-            str(value)
-        except:
+            if r.match(value).group: return True
+        except AttributeError:
             return False
+        
+class TextAlphaNum(BaseType):
+    def __init__(self,**kwargs):
+        
+        super(TextAlphaNum,self).__init__()
+        self.validations.append(TextAlphaNumVdt(**kwargs))
