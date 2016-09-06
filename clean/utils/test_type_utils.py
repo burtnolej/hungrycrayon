@@ -2,7 +2,8 @@
 import unittest
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from type_utils import RealInt, BoundRealInt, SetMember
+from type_utils import RealInt, BoundRealInt, SetMember, \
+     DBSetMember
 
 class TestRealIntNoName(unittest.TestCase):
     def setUp(self):
@@ -98,6 +99,22 @@ class TestSetMember(unittest.TestCase):
     def test_plum_false(self):
         self.assertFalse(self.setmember('plum'))
 
+class TestDBSetMember(unittest.TestCase):
+
+    def setUp(self):
+        dbname = '/data/food'
+        tbl_name = 'food'
+        fldname = 'food_name'
+        self.dbsetmember = DBSetMember(dbname,tbl_name,
+                                     fldname,
+                                     name='x{dblist}')
+        
+    def test_spinach_true(self):
+        self.assertTrue(self.dbsetmember('spinach'))
+        
+    def test_Spinach_false(self):
+        self.assertFalse(self.dbsetmember('Spinach'))
+
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
@@ -109,5 +126,5 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGtltBadargs))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSetMember))
- 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBSetMember))
     unittest.TextTestRunner(verbosity=2).run(suite)

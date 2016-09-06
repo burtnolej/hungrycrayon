@@ -1,3 +1,8 @@
+import sys
+sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
+from database_table_util import tbl_rows_get
+from database_util import Database
+
 class Validator(object):
     def __init__(self,name,**kwargs):
         if name == None:
@@ -85,9 +90,17 @@ class SetMember(BaseType):
         self.validations.append(SetMemberVdt(**kwargs))
         
 class DBSetMember(BaseType):
-    def __init__(self,dbname,tablename,fieldname,**kwargs):
+    def __init__(self,dbname,tblname,fldname,**kwargs):
         
-        super(SetMember,self).__init__()
+        database = Database(dbname)
+        with database:
+            rows = tbl_rows_get(database,tblname,
+                                         [fldname])
+            
+            # rows is a tuple; list is element 2
+            kwargs['set'] = [row[0] for row in rows[1]]
+        
+        super(DBSetMember,self).__init__()
         self.validations.append(SetMemberVdt(**kwargs))
         
 class Basestr(BaseType):
