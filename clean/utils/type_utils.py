@@ -13,20 +13,20 @@ class Validator(object):
     def validate(self,value):
         True
 
-class IntVdt(Validator):
+class RealIntVdt(Validator):
     def validate(self,value):
         try:
             int(value)
         except:
             return False
         
-class BIntVdt(Validator):
+class BoundRealIntVdt(Validator):
     ''' Bounded int validator '''
     
     def __init__(self,**kwargs):
         if not kwargs.has_key('ubound') and not kwargs.has_key('lbound'):
             raise Exception('ubound or lbound argument must be passed')
-        super(BIntVdt,self).__init__(**kwargs)
+        super(BoundRealIntVdt,self).__init__(**kwargs)
         
     def validate(self,value):
         if hasattr(self,'lbound'):
@@ -38,7 +38,18 @@ class BIntVdt(Validator):
                 return False
         return True
 
-class BType(object):
+class SetMemberVdt(Validator):
+    def __init__(self,**kwargs):
+        if not kwargs.has_key('set'):
+            raise Exception('set must be passed')
+        super(SetMemberVdt,self).__init__(**kwargs)
+        
+    def validate(self,value):
+        if value in getattr(self,'set'):
+            return True
+        return False
+    
+class BaseType(object):
     def __init__(self):
         self.validations = []
     
@@ -53,21 +64,33 @@ class BType(object):
             
         return True
 
-class IntType(BType):
+class RealInt(BaseType):
     def __init__(self,**kwargs):
         
-        super(IntType,self).__init__()
-        self.validations.append(IntVdt(**kwargs))
+        super(RealInt,self).__init__()
+        self.validations.append(RealIntVdt(**kwargs))
         
-class BIntType(IntType):
+class BoundRealInt(RealInt):
     ''' bounded int type ; support upper and/or lower bound
     ubound,lbound need to be passed in as kw args'''
     def __init__(self,**kwargs):
         
-        super(BIntType,self).__init__(**kwargs)
-        self.validations.append(BIntVdt(**kwargs))
+        super(BoundRealInt,self).__init__(**kwargs)
+        self.validations.append(BoundRealIntVdt(**kwargs))
         
-class Basestr(BType):
+class SetMember(BaseType):
+    def __init__(self,**kwargs):
+        
+        super(SetMember,self).__init__()
+        self.validations.append(SetMemberVdt(**kwargs))
+        
+class DBSetMember(BaseType):
+    def __init__(self,dbname,tablename,fieldname,**kwargs):
+        
+        super(SetMember,self).__init__()
+        self.validations.append(SetMemberVdt(**kwargs))
+        
+class Basestr(BaseType):
     def validate(self,value):
         try:
             str(value)

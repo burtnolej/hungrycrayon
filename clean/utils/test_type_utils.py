@@ -2,20 +2,20 @@
 import unittest
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from type_utils import IntType, BIntType
+from type_utils import RealInt, BoundRealInt, SetMember
 
-class TestIntTypeNoName(unittest.TestCase):
+class TestRealIntNoName(unittest.TestCase):
     def setUp(self):
         pass
         
     def test_nonamekey_fail(self):
         
         with self.assertRaises(Exception):
-            self.mintype = IntType()
+            self.mintype = RealInt()
     
-class TestIntType(unittest.TestCase):
+class TestRealInt(unittest.TestCase):
     def setUp(self):
-        self.myintype = IntType(name='bint')
+        self.myintype = RealInt(name='bint')
  
     def test_bintname(self):
         self.assertEquals(self.myintype.validations[0].name,'bint')    
@@ -26,29 +26,29 @@ class TestIntType(unittest.TestCase):
     def test_AAAfalse(self):
         self.assertFalse(self.myintype('aaa'))
         
-class TestBIntType(unittest.TestCase):
+class TestBoundRealInt(unittest.TestCase):
     ''' if inheriting correctly should fail on 
     first test, not int'''
     def setUp(self):
-        self.mybintype = BIntType(name='40>=x<=60',
+        self.mybintype = BoundRealInt(name='40>=x<=60',
                                   ubound=60,lbound=40)
     
     def test_aaafalse(self):
         self.assertFalse(self.mybintype('aaa'))
 
-class TestBIntTypeGtltBadargs(unittest.TestCase):
+class TestBoundRealIntGtltBadargs(unittest.TestCase):
     ''' between an upper and lower bound '''
     def setUp(self):
         pass
     
     def test_(self):
         with self.assertRaises(Exception):
-            BIntType(name='40>=x<=60')
+            BoundRealInt(name='40>=x<=60')
         
-class TestBIntTypeGtlt(unittest.TestCase):
+class TestBoundRealIntGtlt(unittest.TestCase):
     ''' between an upper and lower bound '''
     def setUp(self):
-        self.mybintype = BIntType(name='40>=x<=60',
+        self.mybintype = BoundRealInt(name='40>=x<=60',
                                   ubound=60,lbound=40)
         
     
@@ -70,10 +70,10 @@ class TestBIntTypeGtlt(unittest.TestCase):
     def test_lbound39false(self):
         self.assertFalse(self.mybintype(39))
 
-class TestBIntTypeGt(unittest.TestCase):
+class TestBoundRealIntGt(unittest.TestCase):
 
     def setUp(self):
-        self.mybintype = BIntType(name='40>=x',lbound=40)
+        self.mybintype = BoundRealInt(name='40>=x',lbound=40)
         
     def test_lboundMassivetrue(self):
         self.assertTrue(self.mybintype(10000))
@@ -86,16 +86,28 @@ class TestBIntTypeGt(unittest.TestCase):
 
     def test_lbound39false(self):
         self.assertFalse(self.mybintype(39))
+        
+class TestSetMember(unittest.TestCase):
+
+    def setUp(self):
+        self.setmember = SetMember(name='x{mylist}',set=['cherry','banana','grape'])
+        
+    def test_cherry_true(self):
+        self.assertTrue(self.setmember('cherry'))
+
+    def test_plum_false(self):
+        self.assertFalse(self.setmember('plum'))
 
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestIntTypeNoName))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestIntType))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBIntType))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBIntTypeGtlt))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBIntTypeGt))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBIntTypeGtltBadargs))
-  
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestRealIntNoName))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestRealInt))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealInt))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGtlt))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGt))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGtltBadargs))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSetMember))
+ 
     unittest.TextTestRunner(verbosity=2).run(suite)
