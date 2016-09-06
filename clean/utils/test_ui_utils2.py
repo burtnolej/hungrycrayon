@@ -2,7 +2,7 @@ from Tkinter import *
 from Tkinter import Button as Tkbutton
 from Tkinter import Label as Tklabel
 from ttk import *
-from PIL import Image, ImageTk
+#from PIL import Image, ImageTk
 from image_utils import ImageCreate, rgbstr_get, get_gif_filename
 from collections import OrderedDict
 from misc_utils_process import *
