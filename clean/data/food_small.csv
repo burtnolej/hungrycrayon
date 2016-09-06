@@ -1,0 +1,6 @@
+food_name,food_type,meal_id
+food_name TEXT,food_type TEXT,meal_id INTEGER
+'spinach','leafy green',''
+'granny smiths','fruit',''
+'chicken breast','poultry',''
+'tomatoes','salad',''

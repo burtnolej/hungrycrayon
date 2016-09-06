@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+ <html lang="en" class="no-js"><!--<![endif]-->
+ 
+    <head>
+     
+        <title>Error</title>
+        <link rel="shortcut icon" href="/ndb/static/images/favicon.ico" type="image/x-icon" />
+    
+        
+<link rel="stylesheet" href="/ndb/static/css/main.css" />
+ 
+  <script language="javascript" id="_fed_an_ua_tag" src="https://data.nal.usda.gov/sites/all/themes/usda/usda_radix_theme/assets/javascripts/Universal-Federated-Analytics.1.0.js?agency=USDA&subagency=ARS-NAL"></script><script type="text/JavaScript"> 
+		 var _gaq = _gaq || [];
+		 // NAL 
+		  _gaq.push(['_setAccount', 'UA-28627214-1']);
+		  _gaq.push(['_setDomainName', 'nal.usda.gov']);
+		  _gaq.push(['_setAllowLinker', true]);
+		  _gaq.push(['_trackPageview']);
+		 //
+		// _gaq.push(['_setAccount', 'UA-3876418-1']);
+		//  _gaq.push(['_trackPageview']);
+		  // for NDB
+		  _gaq.push(['_setAccount', 'UA-36442725-1']);
+		  _gaq.push(['_trackPageview']);
+			// USDA servers
+		  _gaq.push(['_setAccount', 'UA-466807-3']);
+		  _gaq.push(['_setDomainName', 'usda.gov']);
+		  _gaq.push(['_setAllowLinker', true]);
+		  _gaq.push(['_trackPageview']);
+		  //
+		  _gaq.push(['a._setAccount', 'UA-27627304-18']);
+		  _gaq.push(['a._setDomainName', 'usda.gov']);
+		  _gaq.push(['a._setAllowLinker', true]);
+		  _gaq.push(['a._trackPageview']);
+			//
+		  _gaq.push(['b._setAccount', 'UA-27627304-1']);
+		  _gaq.push(['b._setDomainName', 'usda.gov']);
+		  _gaq.push(['b._setAllowLinker', true]);
+		  _gaq.push(['b._trackPageview']);
+		 
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 
+		'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 
+		'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; 
+		s.parentNode.insertBefore(ga, s);
+		  })();
+	</script> 
+      
+     
+          
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="layout" content="main"/>
+         
+        
+    
+          <script src="/ndb/static/plugins/jquery-1.11.1/js/jquery/jquery-1.11.1.min.js" type="text/javascript" ></script>
+<link href="/ndb/static/css/jquery-ui-1.10.4/smoothness/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" media="screen, projection" />
+<script src="/ndb/static/plugins/jquery-ui-1.10.4/jquery-ui/js/jquery-ui-1.10.4.custom.min.js" type="text/javascript" ></script>
+
+    </head>
+<body style="background:#f7f7f7;">  
+<br/>
+	<div class="section clearfix"> 
+			<div style="padding-left:15px;">
+                <a href="http://www.usda.gov" target="_blank">
+                <img style="float:left;padding:5px;" src="/ndb/static/images/USDA-Logo.jpg" style="border:none;" alt="United States Department of Agriculture" id="USDALOGO" title="United States Department of Agriculture" height="51" width="72">
+                </a>
+                <span style="font-size:1.2em;font-weight:bold;color:#005842;">United States Department of Agriculture
+                <br/>Agricultural Research Service</span>
+                <br/><span style="font-weight:bold;font-size:1.4em;color:#000">
+               
+                
+                 National Nutrient Database for Standard Reference
+                 Release 28
+                 
+                 </span>
+           
+			</div>
+           <div style="padding-left:105px;float:left">
+           </div>
+                
+	</div>
+	<br/>
+
+
+<div class="bodywrapper">
+<div class="nav">
+  
+   
+
+  
+    <ul id="jMenu" class="jMenu">
+  <li>
+    <a href="http://www.ars.usda.gov/main/site_main.htm?modecode=12-35-45-00" title="Go the NDL home page">NDL Home</a>
+  </li>
+  	<li >
+  		<a href="/ndb/foods" class="list" name="menu-advanced" title="Browse the foods list">Food Search</a>
+  		</li>
+  	<li>
+  		<a href="/ndb/nutrients/index" class="list" name="menu-advanced" title="Create a nutrients list report">Nutrients List</a>
+  	</li>
+  	<li>
+  		<a href="/ndb/beef/show" class="calc" title="Use the ground beef calculator">Ground Beef Calculator</a>
+  	</li>
+  	<li><a>Documentation and Help</a>
+  	<ul>
+  	 <li>
+    	<a href="/ndb/doc/index" class="help" title="How to use the NDB API">API</a>
+    </li>
+  
+    <li>
+    	<a href="http://www.ars.usda.gov/sp2UserFiles/Place/80400525/Data/SR/SR28/sr28_doc.pdf" class="docs" title="View and download release documentation" target="_help">SR28 Documentation</a>
+    </li>
+    <li>
+    	<a href="/ndb/docs/SR_BrandedFoods_May2016.pdf" class="docs" title="View and download branded food products documentation" target="_help">USDA Branded Food Products Documentation</a>
+    </li>
+  <li>
+    	<a href="/ndb/help/index" class="help" title="Read help on how to use the website">Help</a>
+    </li>
+    </ul>
+    </li>
+     	<li>
+  		<a href="http://www.ars.usda.gov/main/docs.htm?docid=4445" class="help" title="Click to contact us">Contact Us</a>
+  	</li>
+    
+</ul>
+    <script type="text/javascript">
+    
+  $(document).ready(function(){
+    // simple jMenu plugin called
+    $("#jMenu").jMenu();
+    // more complex jMenu plugin called
+    $("#jMenu").jMenu({
+      ulWidth : 130,
+      absoluteLeft:40,
+      paddingLeft:0,
+      effects : {
+        effectSpeedOpen : 100,
+        effectTypeClose : 'slide'
+      },
+      animatedText : false
+    });
+
+  });
+</script></div>
+ 
+      
+        <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="layout" content="main"/>
+         <title>Error</title>
+        
+    </head>
+        <div class="body">
+           <br/><br/>
+           <div class="errors"><ul><li>A technical error is preventing your request from completing.  If this condition continues, please contact the NAL Helpdesk at &lt;a href=&quot;mailto:userhelp@rt.nal.usda.gov&quot;&gt;userhelp@rt.nal.usda.gov&lt;/a&gt;</ul></div>
+        </div>
+</html>
+ </div>
+        <div class="footer" >
+        
+        
+        	<br/>National Nutrient Database for Standard Reference<br/>
+        	Release 28 slightly revised May, 2016
+        
+			&#160;&#160;Software v.2.6.1<br/>
+			 <a href="http://www.nal.usda.gov">The National Agricultural Library</a>
+			 
+		</div>
+		 <script src="/ndb/static/bundle-bundle_application_defer.js" type="text/javascript" ></script>
+
+
+    </body>
+   
+</html>
