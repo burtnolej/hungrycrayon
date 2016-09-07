@@ -22,48 +22,6 @@ defaultframe = dict(height=300,width=200,x=0,y=0)
 
 fullscreenmaster = dict(height=2500,width=3500,x=0,y=0)
         
-class TestTkcomboSetMember(unittest.TestCase):
-    def setUp(self):
-        self.master = Tk()
-        self.master.geometry(geometry_get_dict(defaultmaster))  
-        
-        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
-                                                                 'peach','pomegranate','passionfruit',
-                                                                 'pear','grape','strawberry','raspberry',
-                                                                 'rhubarb','mango','guava','apple',
-                                                                 'Orange'])
-        
-        self.combo = TkCombobox(self.master,self.setmemberp)
-        
-    def test_(self):
-        self.combo.sv.set('p')
-        self.assertEqual(self.combo.label.cget('text'),9)
-        
-    def tearDown(self):
-        self.master.destroy()
-        
-class TestTkcomboDBSetMember(unittest.TestCase):
-    def setUp(self):
-        dbname = '/data/food'
-        tbl_name = 'food'
-        fldname = 'food_name'
-        self.dbsetmember = DBSetMember(dbname,tbl_name,
-                                     fldname,
-                                     name='x{dblist}')
-        
-        self.master = Tk()
-        self.master.geometry(geometry_get_dict(defaultmaster))  
-        
-        self.combo = TkCombobox(self.master,self.dbsetmember)
-        
-    def test_(self):
-        #self.master.mainloop()
-        self.combo.sv.set('d')
-        self.assertEqual(self.combo.label.cget('text'),65)
-        
-    def tearDown(self):
-        self.master.destroy()
-        
 class TestTkValidEntryBInt(unittest.TestCase):
     def setUp(self):
         self.master = Tk()

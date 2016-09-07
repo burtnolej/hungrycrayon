@@ -1,6 +1,6 @@
 from Tkinter import *
-from Tkinter import Button as Tkbutton
-from Tkinter import Label as Tklabel
+#from Tkinter import Button as Tkbutton
+#from Tkinter import Label as Tklabel
 from ttk import *
 #from PIL import Image, ImageTk
 from image_utils import ImageCreate, rgbstr_get, get_gif_filename
@@ -10,15 +10,16 @@ from misc_utils_enum import enum
 from misc_utils import nxnarraycreate
 
 from ui_utils import TkImageWidget, TkImageLabelGrid, geometry_get, font_scale, \
-     tkwidgetfactory, geometry_get_dict, tkwidgetimage_set, fontscale
+     tkwidgetfactory, geometry_get_dict, tkwidgetimage_set, fontscale, \
+     TkCombobox, TkButton, TkEntry, TkLabel
 import tkFont
 import unittest
 
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from format_utils import *
-from type_utils import TextAlphaNum, TextAlphaNumRO
+from type_utils import TextAlphaNum, TextAlphaNumRO, SetMemberPartial
 from ui_utils import tk_create_config, tkfrm_cfg, \
-     tk_create_frame, GridTableWidget, tk_label_get_image
+     tk_create_frame, tk_label_get_image
 
 #fontscale = enum(sy = 2500,sx = 3500,
 #                 minfpt = 8,maxfpt = 64,
@@ -799,6 +800,11 @@ class TestUILabel(TestWidget):
     def tearDown(self):
         self.master.destroy()
         
+class TestUIComboImageGrid(TestWidget):
+    pass
+
+class TestUIVentryImageGrid(TestWidget):
+    pass
 
 class TestUILabelImageGrid(TestWidget):
                     
@@ -924,11 +930,53 @@ class TestUILabelImageGridCustom(TestWidget):
     def tearDown(self):
         self.master.destroy()
         
+class TestTkcomboSetMember(unittest.TestCase):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry(geometry_get_dict(defaultmaster))  
+        
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
+                                                                 'peach','pomegranate','passionfruit',
+                                                                 'pear','grape','strawberry','raspberry',
+                                                                 'rhubarb','mango','guava','apple',
+                                                                 'Orange'])
+        
+        self.combo = TkCombobox(self.master,self.setmemberp)
+        
+    def test_(self):
+        self.combo.sv.set('p')
+        self.assertEqual(self.combo.label.cget('text'),9)
+        
+    def tearDown(self):
+        self.master.destroy()
+        
+class TestTkcomboDBSetMember(unittest.TestCase):
+    def setUp(self):
+        dbname = '/data/food'
+        tbl_name = 'food'
+        fldname = 'food_name'
+        self.dbsetmember = DBSetMember(dbname,tbl_name,
+                                     fldname,
+                                     name='x{dblist}')
+        
+        self.master = Tk()
+        self.master.geometry(geometry_get_dict(defaultmaster))  
+        
+        self.combo = TkCombobox(self.master,self.dbsetmember)
+        
+    def test_(self):
+        #self.master.mainloop()
+        self.combo.sv.set('d')
+        self.assertEqual(self.combo.label.cget('text'),65)
+        
+    def tearDown(self):
+        self.master.destroy()
+        
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
 
-    
+    '''
     # Test helper
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTestWidget))
     
@@ -969,6 +1017,16 @@ if __name__ == "__main__":
     # LabelImageResizing    
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResize))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
+    '''
     
+    # Combo
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
+    
+
+    
+    # Entry
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIVentryImageGrid))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
     
     unittest.TextTestRunner(verbosity=2).run(suite)
