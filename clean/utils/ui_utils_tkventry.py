@@ -52,7 +52,7 @@ class TkValidEntry(object):
                  sv=self.sv: self.validate())
         
         self.statuslabel = Tklabel(self.frame,
-                                   text=self.var.name(),
+                                   text='',
                                    width=1,
                                    anchor=W,
                                    background='lightblue',
@@ -106,7 +106,7 @@ class TkCombobox(object):
             raise Exception('arg datatype must be a valid type')
         
         self.frame = Frame(master)
-        self.frame.pack()
+        self.frame.pack(side=LEFT)
         self.sv=StringVar()
         self.values = var.set
 
@@ -145,6 +145,7 @@ class TkCombobox(object):
             
                 
     def update(self,newvalues):
+        print "update",newvalues
         self.combo.config(values=newvalues)
         self.label.config(text=len(newvalues))
         

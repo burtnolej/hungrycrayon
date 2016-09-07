@@ -80,7 +80,7 @@ class TestTkValidEntryBInt(unittest.TestCase):
     def test_55_True(self):
         self.ventry.sv.set(55)
         self.assertEqual(self.ventry.statuslabel.cget('background'),'lime')
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def test_65_True(self):
         self.ventry.sv.set(65)
@@ -107,9 +107,10 @@ class TestTkValidEntrySetMember(unittest.TestCase):
         
         self.master.rowconfigure(0,uniform='foo2')
         
-    def test_55_True(self):
+    def test_Pomegranate_True(self):
+        self.ventry.sv.set('pomegranate')
+        self.assertEqual(self.ventry.statuslabel.cget('background'),'lime')
         self.master.mainloop()
-        pass
         
     def tearDown(self):
         self.master.destroy()
@@ -152,7 +153,7 @@ if __name__ == "__main__":
     suite = unittest.TestSuite()
     
 
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkValidEntryBInt))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkValidEntryBInt))
 
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkValidEntrySetMember))
 
