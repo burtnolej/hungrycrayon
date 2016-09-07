@@ -10,7 +10,7 @@ import unittest
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from ui_utils_tkventry import TkValidEntry, TkCombobox
 from ui_utils import geometry_get,  tkwidgetfactory, geometry_get_dict
-from type_utils import BoundRealInt, SetMember, SetMemberPartial
+from type_utils import BoundRealInt, SetMember, SetMemberPartial, DBSetMember
 
 #fontscale = enum(sy = 2500,sx = 3500,
 #                 minfpt = 8,maxfpt = 64,
@@ -21,21 +21,6 @@ defaultmaster = dict(height=300,width=200,x=400,y=100)
 defaultframe = dict(height=300,width=200,x=0,y=0)
 
 fullscreenmaster = dict(height=2500,width=3500,x=0,y=0)
-
-class TestTkcombo(unittest.TestCase):
-    def setUp(self):
-        self.master = Tk()
-        self.master.geometry(geometry_get_dict(defaultmaster))  
-        
-        self.mylist = ['pineapple','grapefruit','banana',
-            'peach','pomegranate','passionfruit',
-            'pear','grape','strawberry','raspberry',
-            'rhubarb','mango','guava','apple',
-            'Orange']
-        self.combo = TkCombobox(self.master,self.mylist)
-        
-    def test_(self):
-        self.master.mainloop()        
         
 class TestTkcomboSetMember(unittest.TestCase):
     def setUp(self):
@@ -51,7 +36,33 @@ class TestTkcomboSetMember(unittest.TestCase):
         self.combo = TkCombobox(self.master,self.setmemberp)
         
     def test_(self):
-        self.master.mainloop()
+        self.combo.sv.set('p')
+        self.assertEqual(self.combo.label.cget('text'),9)
+        
+    def tearDown(self):
+        self.master.destroy()
+        
+class TestTkcomboDBSetMember(unittest.TestCase):
+    def setUp(self):
+        dbname = '/data/food'
+        tbl_name = 'food'
+        fldname = 'food_name'
+        self.dbsetmember = DBSetMember(dbname,tbl_name,
+                                     fldname,
+                                     name='x{dblist}')
+        
+        self.master = Tk()
+        self.master.geometry(geometry_get_dict(defaultmaster))  
+        
+        self.combo = TkCombobox(self.master,self.dbsetmember)
+        
+    def test_(self):
+        #self.master.mainloop()
+        self.combo.sv.set('d')
+        self.assertEqual(self.combo.label.cget('text'),65)
+        
+    def tearDown(self):
+        self.master.destroy()
         
 class TestTkValidEntryBInt(unittest.TestCase):
     def setUp(self):
@@ -112,7 +123,10 @@ if __name__ == "__main__":
 
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkValidEntryBInt))
 
+
+
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite)

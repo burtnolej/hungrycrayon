@@ -138,7 +138,7 @@ class SetMember(BaseSetMember):
         
         #self.set = kwargs['set']
         
-class DBSetMember(BaseType):
+class DBSetMember(BaseSetMember):
     def __init__(self,dbname,tblname,fldname,**kwargs):
         
         database = Database(dbname)
@@ -149,7 +149,7 @@ class DBSetMember(BaseType):
             # rows is a tuple; list is element 2
             kwargs['set'] = [row[0] for row in rows[1]]
         
-        super(DBSetMember,self).__init__()
+        super(DBSetMember,self).__init__(**kwargs)
         self.validations.append(_SetMemberVdt(**kwargs))
         
 class _TextAlphaNumVdt(_Validator):
