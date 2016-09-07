@@ -1,7 +1,7 @@
 from Tkinter import *
 from Tkinter import Button as Tkbutton
 from Tkinter import Label as Tklabel
-from Tkinter import Entry as Tkentry
+#from Tkinter import Entry as Tkentry
 from ttk import *
 import tkFont
 import sys
@@ -28,11 +28,19 @@ class TkValidEntry(object):
         
         sv = StringVar()
         self.sv = sv
-        self.entry= tkwidgetfactory(self.var.widgettype,
+        '''self.entry= tkwidgetfactory(self.var.widgettype,
+                                    self.frame,
+                                    textvariable=self.sv,
+                                    width=15,
+                                    x=100)'''
+        
+        self.entry= tkwidgetfactory(self.var,
                                     self.frame,
                                     textvariable=self.sv,
                                     width=15,
                                     x=100)
+        
+        
         self.sv.set(default)
         self.entry.pack(side=LEFT,padx=5,pady=5,fill=BOTH,expand=1)
         
@@ -85,8 +93,11 @@ class TkValidEntry(object):
     def select_all(self,event):       
         event.widget.selection_range(0,END)
         return("break")
-    
-
+  
+class TkEntry(Entry):
+    def __init__(self,master,var,**kwargs):
+        Entry.__init__(self,master,**kwargs)
+        
 class TkCombobox(object):
     
     def __init__(self,master,var):
@@ -149,3 +160,16 @@ class TkCombobox(object):
                 
         match.sort()
         return(match)
+    
+    def config(self,**kwargs):
+        self.combo.config(**kwargs)
+        
+    def pack(self,**kwargs):
+        self.combo.pack(**kwargs)
+        
+    def bind(self,*args,**kwargs):
+        self.combo.bind(*args,**kwargs)
+        
+    def focus_set(self,*args,**kwargs):
+        self.combo.focus_set(*args,**kwargs)
+        

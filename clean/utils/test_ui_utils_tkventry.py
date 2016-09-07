@@ -1,14 +1,14 @@
 from Tkinter import *
 from Tkinter import Button as Tkbutton
 from Tkinter import Label as Tklabel
-from Tkinter import Entry as Tkentry
+#from Tkinter import Entry as Tkentry
 from ttk import *
 
 import tkFont
 import unittest
 
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
-from ui_utils_tkventry import TkValidEntry, TkCombobox
+from ui_utils_tkventry import TkValidEntry, TkCombobox, TkEntry
 from ui_utils import geometry_get,  tkwidgetfactory, geometry_get_dict
 from type_utils import BoundRealInt, SetMember, SetMemberPartial, DBSetMember
 
@@ -77,8 +77,39 @@ class TestTkValidEntryBInt(unittest.TestCase):
         
         self.master.rowconfigure(0,uniform='foo2')
         
-    def test_(self):
+    def test_55_True(self):
+        self.ventry.sv.set(55)
+        self.assertEqual(self.ventry.statuslabel.cget('background'),'lime')
         self.master.mainloop()
+        
+    def test_65_True(self):
+        self.ventry.sv.set(65)
+        self.assertEqual(self.ventry.statuslabel.cget('background'),'pink')
+        #self.master.mainloop()
+        
+    def tearDown(self):
+        self.master.destroy()
+        
+class TestTkValidEntrySetMember(unittest.TestCase):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry(geometry_get_dict(defaultmaster))  
+        
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
+                                                                 'peach','pomegranate','passionfruit',
+                                                                 'pear','grape','strawberry','raspberry',
+                                                                 'rhubarb','mango','guava','apple',
+                                                                 'Orange'])
+        
+        self.ventry = TkValidEntry(self.master,'foobar',8,0,self.setmemberp)
+        self.ventry.grid(row=0,sticky=NSEW)
+        self.ventry.entry.focus_set()
+        
+        self.master.rowconfigure(0,uniform='foo2')
+        
+    def test_55_True(self):
+        self.master.mainloop()
+        pass
         
     def tearDown(self):
         self.master.destroy()
@@ -123,10 +154,15 @@ if __name__ == "__main__":
 
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkValidEntryBInt))
 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkValidEntrySetMember))
 
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))
+    
+    
+
+
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite)

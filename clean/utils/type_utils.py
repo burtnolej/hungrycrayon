@@ -52,8 +52,9 @@ class BaseType(object):
         self.validations = []
         
         # default to using a Tkentry
-        from Tkinter import Entry as Tkentry
-        self.widgettype = Tkentry
+        #from Tkinter import Entry as Tkentry
+        from ui_utils_tkventry import TkEntry
+        self.widgettype = TkEntry
     
     def __call__(self,value):
         return(self.validate(value))
@@ -123,6 +124,10 @@ class BaseSetMember(BaseType):
 
         self.set = kwargs['set']
         super(BaseSetMember,self).__init__()
+        
+        from ui_utils_tkventry import TkCombobox
+        self.widgettype = TkCombobox
+
     
 class SetMemberPartial(BaseSetMember):
     def __init__(self,**kwargs):
@@ -134,8 +139,9 @@ class SetMember(BaseSetMember):
     def __init__(self,**kwargs):
         
         super(SetMember,self).__init__(**kwargs)
-        self.validations.append(_SetMemberVdt(**kwargs))
         
+        self.validations.append(_SetMemberVdt(**kwargs))
+                
         #self.set = kwargs['set']
         
 class DBSetMember(BaseSetMember):

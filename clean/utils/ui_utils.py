@@ -95,19 +95,37 @@ def tkwidgetimage_set(ic,widget,label,overwrite=False,**kwargs):
     widget.image_args['extent'] = widget.image_size
     
 
-def tkwidgetfactory(widgettype,master,**kwargs):
+'''def tkwidgetfactory(widgettype,master,*args,**kwargs):
     
     class tkwidget(widgettype):
     
-        def __init__(self,master,**kwargs):
-            widgettype.__init__(self,master)
+        def __init__(self,master,*args,**kwargs):
+            widgettype.__init__(self,master,*args,**kwargs)
             self.widgettype = widgettype
             
             self.config(**kwargs)
 
         #staticmethod(tkwidgetimage_set)
         
-    tkw = tkwidget(master)
+    tkw = tkwidget(master,*args,**kwargs)
+    tkw.config(**kwargs)
+    
+    return(tkw)'''
+
+
+def tkwidgetfactory(var,master,**kwargs):
+    
+    class tkwidget(var.widgettype):
+    
+        def __init__(self,master,widgettype):
+            widgettype.__init__(self,master,var)
+            self.widgettype = widgettype
+            
+            self.config(**kwargs)
+
+        #staticmethod(tkwidgetimage_set)
+        
+    tkw = tkwidget(master,var.widgettype)
     tkw.config(**kwargs)
     
     return(tkw)
