@@ -3,7 +3,7 @@ import unittest
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from type_utils import RealInt, BoundRealInt, SetMember, \
-     DBSetMember, TextAlphaNum, SetMemberPartial
+     DBSetMember, TextAlphaNum, SetMemberPartial, isadatatype
 
 class TestRealIntNoName(unittest.TestCase):
     def setUp(self):
@@ -88,6 +88,16 @@ class TestBoundRealIntGt(unittest.TestCase):
     def test_lbound39false(self):
         self.assertFalse(self.mybintype(39))
         
+class TestSetMemberNoList(unittest.TestCase):
+    ''' SetMember needs a set attribute to be provided '''
+    def setUp(self):
+        pass
+    
+    def test_nolist(self):
+        
+        with self.assertRaises(Exception):
+            self.setmember = SetMember(name='x{mylist}')
+        
 class TestSetMember(unittest.TestCase):
 
     def setUp(self):
@@ -139,21 +149,50 @@ class TestTextAlphaNum(unittest.TestCase):
     def test_Peanut_Butter(self):
         self.assertFalse(self.mytextalphanum('Peanut_Butter'))
         
+class TestIsDatatype(unittest.TestCase):
+    def setUp(self):
+        pass
+    
+    def test_TextAlphaNum_True(self):
+        self.assertTrue(isadatatype(TextAlphaNum))
+        
+    def test_Foobar_False(self):
+        class Foobar(object):
+            pass
+        
+        self.assertFalse(isadatatype(Foobar))
+        
+    def test_Myvar_instance_true(self):
+        
+        myvar = TextAlphaNum(name='textalphanum')
+        
+        self.assertTrue(isadatatype(myvar))
+
+        
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestRealIntNoName))
+    # RealInt & BoundRealInt
+
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestRealInt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealInt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGtlt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBoundRealIntGtltBadargs))
+    
+    # SetMember
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSetMember))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBSetMember))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTextAlphaNum))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSetMemberPartial))
+
+    # AlphaNum
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTextAlphaNum))
     
+    # Validations 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestIsDatatype))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSetMemberNoList))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestRealIntNoName))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite)

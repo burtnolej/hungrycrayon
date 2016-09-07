@@ -4,7 +4,10 @@ from database_table_util import tbl_rows_get
 from database_util import Database
 import re
 
-class Validator(object):
+__all__ = ['RealInt','BoundRealInt','SetMemberPartial','SetMember','DBSetMember', \
+           'DBSetMemberPartial']
+
+class _Validator(object):
     def __init__(self,name,**kwargs):
         if name == None:
             raise Exception('name argument must be passed')
@@ -19,20 +22,20 @@ class Validator(object):
     def validate(self,value):
         True
 
-class RealIntVdt(Validator):
+class _RealIntVdt(_Validator):
     def validate(self,value):
         try:
             int(value)
         except:
             return False
         
-class BoundRealIntVdt(Validator):
+class _BoundRealIntVdt(_Validator):
     ''' Bounded int validator '''
     
     def __init__(self,**kwargs):
         if not kwargs.has_key('ubound') and not kwargs.has_key('lbound'):
             raise Exception('ubound or lbound argument must be passed')
-        super(BoundRealIntVdt,self).__init__(**kwargs)
+        super(_BoundRealIntVdt,self).__init__(**kwargs)
         
     def validate(self,value):
         if hasattr(self,'lbound'):
@@ -43,12 +46,14 @@ class BoundRealIntVdt(Validator):
             if int(value) > self.ubound:
                 return False
         return True
-
-
     
 class BaseType(object):
     def __init__(self):
         self.validations = []
+        
+        # default to using a Tkentry
+        from Tkinter import Entry as Tkentry
+        self.widgettype = Tkentry
     
     def __call__(self,value):
         return(self.validate(value))
@@ -60,12 +65,17 @@ class BaseType(object):
                 return False
             
         return True
+    
+    def name(self):
+        namestr=""
+        names = [validator.name for validator in self.validations]
+        return(",".join(names))
 
 class RealInt(BaseType):
     def __init__(self,**kwargs):
         
         super(RealInt,self).__init__()
-        self.validations.append(RealIntVdt(**kwargs))
+        self.validations.append(_RealIntVdt(**kwargs))
         
 class BoundRealInt(RealInt):
     ''' bounded int type ; support upper and/or lower bound
@@ -73,27 +83,27 @@ class BoundRealInt(RealInt):
     def __init__(self,**kwargs):
         
         super(BoundRealInt,self).__init__(**kwargs)
-        self.validations.append(BoundRealIntVdt(**kwargs))
+        self.validations.append(_BoundRealIntVdt(**kwargs))
         
-class SetMemberVdt(Validator):
+class _SetMemberVdt(_Validator):
     def __init__(self,**kwargs):
         if not kwargs.has_key('set'):
             raise Exception('set must be passed')
-        super(SetMemberVdt,self).__init__(**kwargs)
+        super(_SetMemberVdt,self).__init__(**kwargs)
         
     def validate(self,value):
         if value in getattr(self,'set'):
             return True
         return False
     
-class SetMemberPartialVdt(Validator):
+class _SetMemberPartialVdt(_Validator):
     ''' matches on unique partial strings 
     i.e er in ,set=['cherry','banana','grape','apple'] but ap not as
     appears twice. also ignores case '''
     def __init__(self,**kwargs):
         if not kwargs.has_key('set'):
             raise Exception('set must be passed')
-        super(SetMemberPartialVdt,self).__init__(**kwargs)
+        super(_SetMemberPartialVdt,self).__init__(**kwargs)
         
     def validate(self,value):
         r = re.compile(value.lower())
@@ -105,17 +115,28 @@ class SetMemberPartialVdt(Validator):
         if hits==1: return True
         return False
     
-class SetMemberPartial(BaseType):
+    
+class BaseSetMember(BaseType):
+    def __init__(self,**kwargs):
+        # could be multiple validators but first one (and only one) will/must have the set assigned
+        # create a local instance variable so users dont need to go search for the set
+
+        self.set = kwargs['set']
+        super(BaseSetMember,self).__init__()
+    
+class SetMemberPartial(BaseSetMember):
     def __init__(self,**kwargs):
         
-        super(SetMemberPartial,self).__init__()
-        self.validations.append(SetMemberPartialVdt(**kwargs))
+        super(SetMemberPartial,self).__init__(**kwargs)
+        self.validations.append(_SetMemberPartialVdt(**kwargs))
         
-class SetMember(BaseType):
+class SetMember(BaseSetMember):
     def __init__(self,**kwargs):
         
-        super(SetMember,self).__init__()
-        self.validations.append(SetMemberVdt(**kwargs))
+        super(SetMember,self).__init__(**kwargs)
+        self.validations.append(_SetMemberVdt(**kwargs))
+        
+        #self.set = kwargs['set']
         
 class DBSetMember(BaseType):
     def __init__(self,dbname,tblname,fldname,**kwargs):
@@ -129,12 +150,12 @@ class DBSetMember(BaseType):
             kwargs['set'] = [row[0] for row in rows[1]]
         
         super(DBSetMember,self).__init__()
-        self.validations.append(SetMemberVdt(**kwargs))
+        self.validations.append(_SetMemberVdt(**kwargs))
         
-class TextAlphaNumVdt(Validator):
+class _TextAlphaNumVdt(_Validator):
     
     def __init__(self,**kwargs):
-        super(TextAlphaNumVdt,self).__init__(**kwargs)
+        super(_TextAlphaNumVdt,self).__init__(**kwargs)
         
     def validate(self,value):
         r = re.compile("^[a-zA-Z0-9]*$")
@@ -148,4 +169,17 @@ class TextAlphaNum(BaseType):
     def __init__(self,**kwargs):
         
         super(TextAlphaNum,self).__init__()
-        self.validations.append(TextAlphaNumVdt(**kwargs))
+        self.validations.append(_TextAlphaNumVdt(**kwargs))
+        
+def isadatatype(datatype):
+  
+    try:
+        if issubclass(datatype,BaseType): return True
+    except TypeError:
+    
+        if hasattr(datatype,'__class__'):
+            datatype = datatype.__class__
+            if issubclass(datatype,BaseType):
+                return True
+            
+    return False    
