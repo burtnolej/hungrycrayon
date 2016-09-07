@@ -125,7 +125,7 @@ class BaseSetMember(BaseType):
         self.set = kwargs['set']
         super(BaseSetMember,self).__init__()
         
-        from ui_utils_tkventry import TkCombobox
+        from ui_utils import TkCombobox
         self.widgettype = TkCombobox
 
     

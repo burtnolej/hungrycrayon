@@ -17,7 +17,7 @@ import unittest
 
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from format_utils import *
-from type_utils import TextAlphaNum, TextAlphaNumRO, SetMemberPartial
+from type_utils import TextAlphaNum, TextAlphaNumRO, SetMemberPartial, DBSetMember
 from ui_utils import tk_create_config, tkfrm_cfg, \
      tk_create_frame, tk_label_get_image
 
@@ -801,8 +801,44 @@ class TestUILabel(TestWidget):
         self.master.destroy()
         
 class TestUIComboImageGrid(TestWidget):
-    pass
+    
+    def setUp(self):
+        self.master = Tk()
+        
+        self.maxrows=2 # rows in the grid
+        self.maxcols=2 # cols in the grid
+        self.wmheight=400 # master height
+        self.wmwidth=400 # master width
+        
+        image_args = dict(pointsize=48,font='Helvetica',gravity='center',
+                          rotate=90,label='foobar')
+        gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
+        
+        widget_args={}
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
+                                                                 'peach','pomegranate','passionfruit',
+                                                                 'pear','grape','strawberry','raspberry',
+                                                                 'rhubarb','mango','guava','apple',
+                                                                 'Orange'])
+        
+        self.tkilg = TkImageLabelGrid(self.master,self.setmemberp,self.wmwidth,self.wmheight,
+                                      0,0,self.maxrows,self.maxcols,
+                                      gridcfg,widgetcfg)
 
+        #self.tkilg.image_set()
+        
+    def test_topleft(self):
+
+        self.tkilg.widgets[0][0].sv.set('passion')
+        self.assertEqual(self.tkilg.widgets[0][0].sv.get(),'passionfruit')
+        self.master.mainloop()
+        
+        
+    def tearDown(self):
+        self.master.destroy()
+        
 class TestUIVentryImageGrid(TestWidget):
     pass
 
@@ -965,9 +1001,10 @@ class TestTkcomboDBSetMember(unittest.TestCase):
         self.combo = TkCombobox(self.master,self.dbsetmember)
         
     def test_(self):
-        #self.master.mainloop()
+        
         self.combo.sv.set('d')
         self.assertEqual(self.combo.label.cget('text'),65)
+        
         
     def tearDown(self):
         self.master.destroy()
@@ -1021,12 +1058,12 @@ if __name__ == "__main__":
     
     # Combo
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))
     
 
     
     # Entry
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIVentryImageGrid))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
     
     unittest.TextTestRunner(verbosity=2).run(suite)

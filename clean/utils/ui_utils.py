@@ -322,21 +322,29 @@ class TkCombobox(Combobox):
         if not isadatatype(var):
             raise Exception('arg datatype must be a valid type')
         
-        self.frame = Frame(master)
-        self.frame.pack(side=LEFT)
+
+        #self.frame = Frame(master)
+        #self.frame.grid()
 
         self.values = var.set
         self.sv=StringVar()
         Combobox.__init__(self,master,values=self.values,
                            textvariable=self.sv,
                            **kwargs)
+
+        self.grid(row=0,column=0,sticky=NSEW)
+                
+        #self.frame.grid_columnconfigure(0, weight=1, uniform="foo")
+        #self.frame.grid_columnconfigure(1, weight=1, uniform="foo")
+        #self.frame.grid_rowconfigure(0, weight=1, uniform="foo")
         
-        self.textstr = TextAlphaNumRO(name='textalphanum')
-        self.textstr(str(len(self.values)))
+        #self.textstr = TextAlphaNumRO(name='textalphanum')
+        #self.textstr(str(len(self.values)))
         
-        self.label = TkLabel(self.frame,self.textstr,
-                             text=self.textstr)
-        self.label.pack(side=LEFT,expand=1,fill=Y)
+        #self.label = TkLabel(self.frame,self.textstr,
+        #                     text=self.textstr)
+        
+        #self.label.grid(row=0,column=1,sticky=NSEW)
 
         self.sv.trace("w",lambda name, index, mode, 
                   sv=self.sv: self.complete())
@@ -367,7 +375,6 @@ class TkCombobox(Combobox):
         print "update",newvalues
         #self.combo.config(values=newvalues)
         self.config(values=newvalues)
-        self.label.config(text=len(newvalues))
         
     def rematch(self,expr,list):
         
