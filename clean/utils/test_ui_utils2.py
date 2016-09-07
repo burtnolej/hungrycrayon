@@ -16,7 +16,7 @@ import unittest
 
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from format_utils import *
-
+from type_utils import TextAlphaNum, TextAlphaNumRO
 from ui_utils import tk_create_config, tkfrm_cfg, \
      tk_create_frame, GridTableWidget, tk_label_get_image
 
@@ -428,9 +428,12 @@ class TestUIGrid7x5odd(TestWidget):
         self.wheight=29 # default button height
         self.wmheight=self.wheight*self.maxrows # master height
         self.wmwidth=self.wwidth*self.maxcols # master width
-        
-        self.tkilg = TkImageLabelGrid(self.master,Tkbutton,self.wmwidth,self.wmheight,
+
+        self.mytextalphanum = TextAlphaNum(name='textalphanum')
+        self.tkilg = TkImageLabelGrid(self.master,self.mytextalphanum,self.wmwidth,self.wmheight,
                                       0,0,7,5)
+        
+        
 
     def test_master(self):
         #self.master.mainloop()
@@ -488,13 +491,15 @@ class TestUIGridCustom(TestWidget):
     
         gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
 
-        widget_args=dict(background='black',text='foo')
+        widget_args=dict(background='white',text='foo',borderwidth=2)
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
 
-        rowcfg = dict(width=2,fg='yellow',text="x",background='green')
-        colcfg = dict(height=2,fg='yellow',text="y")
+        rowcfg = dict(width=2,foreground='yellow',text="x",background='green')
+        colcfg = dict(height=2,foreground='yellow',text="y")
         
-        self.tkilg = TkImageLabelGrid(self.master,Tklabel,self.wmwidth,self.wmheight,
+        self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+        
+        self.tkilg = TkImageLabelGrid(self.master,self.mytextalphanumro,self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols,
                                       gridcfg,widgetcfg,1,1,rowcfg,colcfg)
         
@@ -502,20 +507,20 @@ class TestUIGridCustom(TestWidget):
         self.tkilg.cell_set(1,1,**dict(background='pink',width=2,height=2))
                             
     def test_origin(self):
-        
-        exp_results = dict(height=34,width=20,x=0,y=0)
+        exp_results = dict(height=36,width=22,x=0,y=0)
         self.assertWidgetDimensions(self.tkilg.widgets[0][0],0.01,**exp_results)
+        
         
     def test_topheader(self):
         
-        exp_results = dict(height=34,width=120,x=20,y=0)
+        exp_results = dict(height=36,width=120,x=22,y=0)
         self.assertWidgetDimensions(self.tkilg.widgets[0][1],0.01,**exp_results)
         
     def test_left_leftheader(self):
         
-        exp_results = dict(height=77,width=20,x=0,y=34)
+        exp_results = dict(height=77,width=22,x=0,y=36)
         self.assertWidgetDimensions(self.tkilg.widgets[1][0],0.01,**exp_results)
-
+    
     def tearDown(self):
         self.master.destroy()
         
@@ -594,7 +599,9 @@ class TestUILabelImage(TestWidget):
         
         label='foobar'
         
-        self.lbl = tkwidgetfactory(Tklabel,self.master)
+        self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+        
+        self.lbl = tkwidgetfactory(self.mytextalphanumro,self.master)
         self.lbl.pack(fill=BOTH,expand=1)
 
         tkwidgetimage_set(self.ic,self.lbl,label,True,**self.image_args)
@@ -609,7 +616,9 @@ class TestUILabelImage(TestWidget):
         
         label='foobar'
         
-        self.lbl = tkwidgetfactory(Tkbutton,self.master)
+        self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+        
+        self.lbl = tkwidgetfactory(self.mytextalphanumro,self.master)
         self.lbl.pack(fill=BOTH,expand=1)
 
         tkwidgetimage_set(self.ic,self.lbl,label,True,**self.image_args)
@@ -650,8 +659,9 @@ class TestUIFrameResizeFont(TestWidget):
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
 
         
-
-        self.tkilg = TkImageLabelGrid(self.master,Tkbutton,self.wmwidth,self.wmheight,
+        self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+        
+        self.tkilg = TkImageLabelGrid(self.master,self.mytextalphanumro,self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols,
                                       gridcfg,widgetcfg)
         #self.tkilg = False
@@ -736,7 +746,7 @@ class TestUIFrameResize(TestWidget):
     
         self.assertFilesEqual(exp_res,self.lbl.image)    
         
-        #self.master.mainloop()
+        self.master.mainloop()
 
     def tearDown(self):
         self.master.destroy()
@@ -810,7 +820,9 @@ class TestUILabelImageGrid(TestWidget):
         gridcfg[1][1]['rotate'] = 270
         
 
-        self.tkilg = TkImageLabelGrid(self.master,Tklabel,self.wmwidth,self.wmheight,
+        self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+                
+        self.tkilg = TkImageLabelGrid(self.master,self.mytextalphanumro,self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols,
                                       gridcfg,widgetcfg)
 
@@ -818,6 +830,7 @@ class TestUILabelImageGrid(TestWidget):
 
     def test_topleft(self):
 
+        self.master.mainloop()
         widget = self.tkilg.widgets[0][0]
         
         exp_res = get_gif_filename('/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs',
@@ -876,7 +889,9 @@ class TestUILabelImageGridCustom(TestWidget):
         rowcfg = dict(height=2,fg='yellow',text="x")
         colcfg = dict(width=2,fg='yellow',text="y")
         
-        self.tkilg = TkImageLabelGrid(self.master,Tklabel,self.wmwidth,self.wmheight,
+        self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+        
+        self.tkilg = TkImageLabelGrid(self.master,self.mytextalphanumro,self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols,
                                       gridcfg,widgetcfg,1,1,rowcfg,colcfg)
 
@@ -913,7 +928,7 @@ if __name__ == "__main__":
 
     suite = unittest.TestSuite()
 
-        
+    
     # Test helper
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTestWidget))
     
@@ -948,18 +963,12 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGrid))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGridCustom))
 
-    
-    
-    # LabelImageGridCustom
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGridCustom))
-
-
     # Button
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIButton))
     
     # LabelImageResizing    
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResize))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite)

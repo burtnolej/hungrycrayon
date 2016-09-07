@@ -1,6 +1,7 @@
 from Tkinter import *
-from Tkinter import Button as Tkbutton
-from Tkinter import Label as Tklabel
+from Tkinter import Button as _tkbutton
+from Tkinter import Label as _tklabel
+from Tkinter import Entry as _tkentry
 from ttk import *
 import tkFont
 from math import ceil,floor
@@ -155,9 +156,25 @@ class TkImageWidget(object):
         self.photo = PhotoImage(file=self.image)
         self.config(image=self.photo)
        
+class TkEntry(_tkentry):
+    def __init__(self,master,var,**kwargs):
+        _tkentry.__init__(self,master,**kwargs)
+
+class TkLabel(_tklabel):
+    def __init__(self,master,var,**kwargs):
+        _tklabel.__init__(self,master,**kwargs)
+        
+class TkButton(_tkbutton):
+    def __init__(self,master,var,**kwargs):
+        _tkbutton.__init__(self,master,**kwargs)
+        
 class TkImageLabelGrid():
     
-    def __init__(self,master,widgettype,width,height,x,y,maxrows,maxcols,
+    
+    ''' need to pass in a var here not a widget type
+        also need to create my own label and button class (like entry) '''
+    
+    def __init__(self,master,var,width,height,x,y,maxrows,maxcols,
                  gridcfg=None,widgetcfg=None,
                  gridcolstart=0,gridrowstart=0,
                  rowhdrcfg={},colhdrcfg={}):
@@ -194,7 +211,7 @@ class TkImageLabelGrid():
             ylbls=[]
             for y in range(self.maxcols):
                 
-                lbl = tkwidgetfactory(widgettype,self.master,**widgetcfg[x][y])
+                lbl = tkwidgetfactory(var,self.master,**widgetcfg[x][y])
                 lbl.grid(row=x,column=y,sticky=NSEW)
                                
                 ylbls.append(lbl)

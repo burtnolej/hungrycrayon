@@ -177,6 +177,14 @@ class TextAlphaNum(BaseType):
         super(TextAlphaNum,self).__init__()
         self.validations.append(_TextAlphaNumVdt(**kwargs))
         
+class TextAlphaNumRO(TextAlphaNum):
+    ''' readonly so has a Tklabel widget type '''
+    def __init__(self,**kwargs):
+        
+        super(TextAlphaNumRO,self).__init__(**kwargs)
+        from ui_utils import TkLabel
+        self.widgettype = TkLabel
+        
 def isadatatype(datatype):
   
     try:

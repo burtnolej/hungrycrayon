@@ -97,6 +97,14 @@ class TkValidEntry(object):
 class TkEntry(Entry):
     def __init__(self,master,var,**kwargs):
         Entry.__init__(self,master,**kwargs)
+
+class TkLabel(Label):
+    def __init__(self,master,var,**kwargs):
+        Label.__init__(self,master,**kwargs)
+        
+class TkButton(Button):
+    def __init__(self,master,var,**kwargs):
+        Button.__init__(self,master,**kwargs)
         
 class TkCombobox(object):
     
