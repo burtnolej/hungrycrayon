@@ -2,6 +2,7 @@ from Tkinter import *
 from Tkinter import Button as _tkbutton
 from Tkinter import Label as _tklabel
 from Tkinter import Entry as _tkentry
+
 from ttk import *
 import tkFont
 from math import ceil,floor
@@ -119,7 +120,14 @@ def tkwidgetfactory(var,master,**kwargs):
     class tkwidget(var.widgettype):
     
         def __init__(self,master,widgettype):
-            widgettype.__init__(self,master,var)
+            
+            d={}
+            if kwargs.has_key('name'):
+                d = dict(name=kwargs['name'])
+                kwargs.pop('name')
+
+            widgettype.__init__(self,master,var,**d)
+
             self.widgettype = widgettype
             
             self.config(**kwargs)
@@ -194,14 +202,25 @@ class TkImageLabelGrid():
         
         self.label='foobar'
 
+        self.master.bind("<Left>",self.refocus)
+        self.master.bind("<Right>",self.refocus)
+        self.master.bind("<Up>",self.refocus)
+        self.master.bind("<Next>",self.refocus)
+        
+        
+
         self.widgets=[]
         for x in range(self.maxrows):
             ylbls=[]
             for y in range(self.maxcols):
                 
-                lbl = tkwidgetfactory(var,self.master,**widgetcfg[x][y])
+                #lbl = tkwidgetfactory(var,self.master,'aaa',**widgetcfg[x][y])
+                lbl = tkwidgetfactory(var,self.master,
+                                      name=str(x)+","+str(y),
+                                      **widgetcfg[x][y])
+    
                 lbl.grid(row=x,column=y,sticky=NSEW)
-                               
+                   
                 ylbls.append(lbl)
             self.widgets.append(ylbls)
          
@@ -214,15 +233,42 @@ class TkImageLabelGrid():
         if rowhdrcfg <> None: self.header_set(1,**rowhdrcfg)
         if colhdrcfg <> None: self.header_set(2,**colhdrcfg)   
 
+        self.focus(0,0)
         self.ic = ImageCreate()
         
+    def refocus(self,event):
+        
+        print event.keycode
+        
+        y,x = str(event.widget).split(".")[-1].split(",")
+        
+        x=int(x)
+        y=int(y)
+        
+        if event.keycode==113 or event.keysym=='u':
+                x=x-1
+        elif event.keycode == 114 or event.keysym=='o':
+                x=x+1
+        elif event.keycode == 111 or event.keysym=='i':
+                y=y-1
+        elif event.keycode == 117 or event.keysym=='j':
+                y=y+1
+                
+        if x<0: x=self.maxcols-1
+        if y<0: y=self.maxrows-1
+        if x>self.maxcols-1: x=0
+        if y>self.maxrows-1: y=0
+        
+        self.focus(x,y)
+        
+    def focus(self,x,y):        
+        self.widgets[int(y)][int(x)].focus()
+
     def _draw(self,event):
         if self.idle == False:
             self.master.after(250,self.image_set)
             
             self.idle = True
-                
-        #self.master.bind('<Configure>',_draw)
         
     def image_set(self):
         
@@ -331,9 +377,22 @@ class TkCombobox(Combobox):
         Combobox.__init__(self,master,values=self.values,
                            textvariable=self.sv,
                            **kwargs)
+        
+        self.s = Style()
+        self.s.configure('Focus.TCombobox',
+                         fieldbackground='yellow')
+        
+        self.s2 = Style()
+        self.s2.configure('NotFocus.TCombobox',
+                         fieldbackground='white')
+
+        #self.config(')
 
         self.grid(row=0,column=0,sticky=NSEW)
-                
+        
+        self.bind("<Down>",self.propogate)
+        self.bind("<Control-Down>",self.postdropdown)
+        self.bind("<Control-Up>",self.unpostdropdown)
         #self.frame.grid_columnconfigure(0, weight=1, uniform="foo")
         #self.frame.grid_columnconfigure(1, weight=1, uniform="foo")
         #self.frame.grid_rowconfigure(0, weight=1, uniform="foo")
@@ -349,6 +408,33 @@ class TkCombobox(Combobox):
         self.sv.trace("w",lambda name, index, mode, 
                   sv=self.sv: self.complete())
         
+        self.bind('<FocusIn>',self.highlight)
+        self.bind('<FocusOut>',self.highlight)
+        
+        self.master.bind("<Prior>",self.selectall)
+
+    def selectall(self,event=None):
+        self.selection_range(0, END) 
+        
+    def postdropdown(self,event):
+        self.post
+        
+    def unpostdropdown(self,event):
+        self.unpost
+        
+    def propogate(self,event):
+        self.master.event_generate("<Next>")
+        return "break"
+    
+    def highlight(self,event):
+        
+        if event.type == '9':
+            self['style']='Focus.TCombobox'
+        elif event.type == '10':
+            self['style']='NotFocus.TCombobox'
+            
+        self.selectall()
+            
     def complete(self):
         input = self.sv.get()
         if input <> "":

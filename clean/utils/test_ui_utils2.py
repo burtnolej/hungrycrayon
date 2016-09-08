@@ -34,6 +34,43 @@ defaultframe = dict(height=300,width=200,
 fullscreenmaster = dict(height=2500,width=3500,
                      x=0,y=0)
 
+
+class TestTkComboBox(unittest.TestCase):
+    def setUp(self):
+
+        self.master = Tk()
+        self.master.geometry(geometry_get_dict(defaultmaster))
+        
+        s = Style()
+        s.configure('NotFocus.TCombobox',selectbackground='blue',
+                    fieldbackground='red',
+                    background='green')
+
+        s2 = Style()
+        s2.configure('Focus.TCombobox',selectbackground='blue',
+                    fieldbackground='green',
+                    background='green')
+        
+    def test_(self):
+        
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
+                                                                 'peach','pomegranate','passionfruit',
+                                                                 'pear','grape','strawberry','raspberry',
+                                                                 'rhubarb','mango','guava','apple',
+                                                                 'Orange'])
+        
+        combo = TkCombobox(self.master,self.setmemberp)
+        combo.grid(row=0,column=0,sticky=NSEW)
+
+        combo2 = TkCombobox(self.master,self.setmemberp)
+        combo2.grid(row=1,column=0,sticky=NSEW)
+        combo2['style']='Hlight.TCombobox'
+          
+        self.master.mainloop()
+        
+    def tearDown(self):
+        self.master.destroy()    
+        
 class TestTkWidgetFactory(unittest.TestCase):
     def setUp(self):
         self.master = Tk()
@@ -419,6 +456,37 @@ class TestUIGrid2x2evenlarge(TestWidget):
     def tearDown(self):
         self.master.destroy()
         
+        
+class TestUIGridFocus(TestWidget):
+    def setUp(self):
+        self.master = Tk()
+        self.maxrows=10 # rows in the grid
+        self.maxcols=10 # cols in the grid
+        self.maxwidgets=self.maxrows*self.maxcols
+        self.wwidth=48 # default button width with text of 3 chars
+        self.wheight=29 # default button height
+        self.wmheight=self.wheight*self.maxrows # master height
+        self.wmwidth=self.wwidth*self.maxcols # master width
+
+        widget_args=dict(background='white')
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+
+
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
+                                                                 'peach','pomegranate','passionfruit',
+                                                                 'pear','grape','strawberry','raspberry',
+                                                                 'rhubarb','mango','guava','apple',
+                                                                 'Orange'])
+        
+        self.tkilg = TkImageLabelGrid(self.master,self.setmemberp,self.wmwidth,self.wmheight,
+                                      0,0,7,5,{},widgetcfg)
+        
+        
+
+    def test_master(self):
+        self.master.mainloop()
+
+                                    
 class TestUIGrid7x5odd(TestWidget):
     def setUp(self):
         self.master = Tk()
@@ -1057,13 +1125,18 @@ if __name__ == "__main__":
     '''
     
     # Combo
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))
-    
-
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkComboBox))
     
     # Entry
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIVentryImageGrid))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
+    
+    
+    # Focus
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridFocus))
+    
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite)
