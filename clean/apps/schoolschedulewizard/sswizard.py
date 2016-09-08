@@ -52,6 +52,8 @@ student_enum = ['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY',
                 'ASHLEY','YOSEF','LUCY','JAKE','ASHER',
                 'DONOVAN','LIAM','SIMON B','NICK']
 
+student_map = dict((se,student_enum.index(se)) for se in student_enum)
+
 teacher_lesson_type = {"Stan":"","Galina":"","Samantha":"","Amelia":"","Paraic":""}
 
 #teacher_lesson_type = {'MELISSA':'psych','EMILY':'psych','ALEXA':'other','ASHLEY':'other',
@@ -239,7 +241,9 @@ class WizardUI(object):
         self.dbload_button.grid(row=2,column=5)
         self.dbload_button.focus_get()
         
-        
+        self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
+        self.clear_button.grid(row=2,column=6)
+        self.clear_button.focus_get()    
         
         self.bgmaxrows=len(period_enum)+1
         self.bgmaxcols=len(student_enum)+1 
@@ -338,15 +342,39 @@ class WizardUI(object):
             self.save_button.focus_set()
         return("break")
     
+    def clear(self):
+        
+        for x in range(self.maxrows):
+            for y in range(self.maxcols):
+                self.entrygrid.widgets[x][y].sv.set("")
+        
+        for x in range(self.bgmaxrows):
+            for y in range(self.bgmaxcols):
+                self.balancegrid.widgets[x][y].config(text="")    
+                self.balancegrid.widgets[x][y].config(background="white") 
+
     def load(self,values=None):
         
+        cols = ['period','student','teacher','dow']
         
         if values==None:
             #load from database
             with database:
-                colndefn,rows = tbl_rows_get(database,'lesson',['period','student','teacher','dow'],
-                                    ('saveversion',str(self.lastsaveversion)))
-            print rows
+                colndefn,rows = tbl_rows_get(database,'lesson',cols,
+                                    ('saveversion',str(self.dbload_entry_sv.get())))
+            
+            for row in rows:
+                x = period_map[row[cols.index('period')]]
+                y = teacher_map[row[cols.index('teacher')]]
+                v = student_map[row[cols.index('student')]]
+                
+                self.entrygrid.widgets[x+1][y+1].sv.set(v)
+                
+                self.entrygrid.widgets[0][y+1].sv.set(row[cols.index('teacher')])
+                self.entrygrid.widgets[x+1][0].sv.set(row[cols.index('period')])
+                
+            self.save()
+                
         else:
                 
             for x in range(len(values)):
