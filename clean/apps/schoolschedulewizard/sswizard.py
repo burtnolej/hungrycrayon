@@ -56,11 +56,6 @@ student_map = dict((se,student_enum.index(se)) for se in student_enum)
 
 teacher_lesson_type = {"Stan":"","Galina":"","Samantha":"","Amelia":"","Paraic":""}
 
-#teacher_lesson_type = {'MELISSA':'psych','EMILY':'psych','ALEXA':'other','ASHLEY':'other',
-#                       'DYLAN':'other','FRAN':'other','ISAAC':'other','KAYLA':'other',
-#                       'MOIRA':'other','NATHANIEL':'other','RACHEL':'other','RAHUL':'other',
-#                       'RICKY':'other','TRISTAN':'other','YOSEF':'other','CHRIS':'other'}
-
 teacher_enum = teacher_lesson_type.keys()
 
 teacher_map = dict((te,teacher_enum.index(te)) for te in teacher_enum)
@@ -208,12 +203,12 @@ class WizardUI(object):
                                                             'rhubarb','mango','guava','apple',
                                                             'Orange'])
 
-        self.entrygridframe = Frame(self.master)
-        self.entrygrid = TkImageLabelGrid(self.entrygridframe,setmemberp,wmwidth,wmheight,
+        #self.entrygridframe = Frame(self.master)
+        self.entrygrid = TkImageLabelGrid(self.master,setmemberp,wmwidth,wmheight,
                              0,0,self.maxrows,self.maxcols,
                              {},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)
-        self.entrygridframe.grid(row=0,column=0,sticky=NSEW)
+        self.entrygrid.grid(row=0,column=0,sticky=NSEW)
 
         controlpanel = Frame(master)
         controlpanel.grid(row=2)
@@ -245,16 +240,21 @@ class WizardUI(object):
         self.clear_button.grid(row=2,column=6)
         self.clear_button.focus_get()    
         
+        self.debug_button = Button(controlpanel,command=self.debug,text="debug",name="dbg")
+        self.debug_button.grid(row=2,column=7)
+        self.debug_button.focus_get()    
+        
+        
         self.bgmaxrows=len(period_enum)+1
         self.bgmaxcols=len(student_enum)+1 
         mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
-        self.balancegridframe = Frame(self.master)
-        self.balancegrid = TkImageLabelGrid(self.balancegridframe,mytextalphanum,wmwidth,wmheight,
+        #self.balancegridframe = Frame(self.master)
+        self.balancegrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
                              0,0,self.bgmaxrows,self.bgmaxcols,
                              {},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)
-        self.balancegridframe.grid(row=1,column=0,sticky=NSEW)
+        self.balancegrid.grid(row=1,column=0,sticky=NSEW)
         self._draw_balancegrid_labels()
         
         self.master.grid_columnconfigure(0, weight=1, uniform="foo")
@@ -262,6 +262,9 @@ class WizardUI(object):
         self.master.grid_rowconfigure(1, weight=1, uniform="foo")
             
         
+    def debug(self):
+        pass
+    
     def _draw_balancegrid_labels(self):
         
         for x in range(len(period_enum)+1):
