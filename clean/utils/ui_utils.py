@@ -164,7 +164,9 @@ class TkImageWidget(object):
         self.photo = PhotoImage(file=self.image)
         self.config(image=self.photo)
 
-class TkImageLabelGrid():
+#class TkImageLabelGrid():
+
+class TkImageLabelGrid(Frame):
     
     
     ''' need to pass in a var here not a widget type
@@ -174,8 +176,13 @@ class TkImageLabelGrid():
                  gridcfg=None,widgetcfg=None,
                  gridcolstart=0,gridrowstart=0,
                  rowhdrcfg={},colhdrcfg={}):
-        self.master = master
+        
+        Frame.__init__(self,master)
 
+        self.master = master
+        self.current_yfocus=0
+        self.current_xfocus=0
+        
         self.gridcfg = gridcfg
         self.widgetcfg = widgetcfg
         self.gridcolstart = gridcolstart
@@ -185,9 +192,9 @@ class TkImageLabelGrid():
         self.height=height
         self.x=x
         self.y=y
-        self.geom = geometry_get(self.height,self.width,
-                                      self.x,self.y)
-        self.master.geometry(self.geom)
+        #self.geom = geometry_get(self.height,self.width,
+        #                              self.x,self.y)
+        #self.master.geometry(self.geom)
                 
         self.idle = False
         
@@ -202,12 +209,10 @@ class TkImageLabelGrid():
         
         self.label='foobar'
 
-        self.master.bind("<Left>",self.refocus)
-        self.master.bind("<Right>",self.refocus)
-        self.master.bind("<Up>",self.refocus)
-        self.master.bind("<Next>",self.refocus)
-        
-        
+        self.bind("<Left>",self.refocus)
+        self.bind("<Right>",self.refocus)
+        self.bind("<Up>",self.refocus)
+        self.bind("<Next>",self.refocus)
 
         self.widgets=[]
         for x in range(self.maxrows):
@@ -215,7 +220,7 @@ class TkImageLabelGrid():
             for y in range(self.maxcols):
                 
                 #lbl = tkwidgetfactory(var,self.master,'aaa',**widgetcfg[x][y])
-                lbl = tkwidgetfactory(var,self.master,
+                lbl = tkwidgetfactory(var,self,
                                       name=str(x)+","+str(y),
                                       **widgetcfg[x][y])
     
@@ -225,10 +230,10 @@ class TkImageLabelGrid():
             self.widgets.append(ylbls)
          
         for i in range(self.gridcolstart,self.maxcols):
-            self.master.grid_columnconfigure(i, weight=1, uniform="foo")
+            self.grid_columnconfigure(i, weight=1, uniform="foo")
             
         for i in range(self.gridrowstart,self.maxrows):        
-            self.master.grid_rowconfigure(i, weight=1, uniform="foo")
+            self.grid_rowconfigure(i, weight=1, uniform="foo")
 
         if rowhdrcfg <> None: self.header_set(1,**rowhdrcfg)
         if colhdrcfg <> None: self.header_set(2,**colhdrcfg)   
@@ -261,8 +266,14 @@ class TkImageLabelGrid():
         
         self.focus(x,y)
         
-    def focus(self,x,y):        
+    def focus(self,x=None,y=None):
+        
+        if x==None: x = self.current_xfocus
+        if y==None: y = self.current_yfocus
+        
         self.widgets[int(y)][int(x)].focus()
+        self.current_yfocus=y
+        self.current_xfocus=x
 
     def _draw(self,event):
         if self.idle == False:
@@ -389,8 +400,10 @@ class TkCombobox(Combobox):
         #self.config(')
 
         self.grid(row=0,column=0,sticky=NSEW)
-        
+                
         self.bind("<Down>",self.propogate)
+        self.bind("<Left>",self.focus_left)
+        
         self.bind("<Control-Down>",self.postdropdown)
         self.bind("<Control-Up>",self.unpostdropdown)
         #self.frame.grid_columnconfigure(0, weight=1, uniform="foo")
@@ -411,7 +424,7 @@ class TkCombobox(Combobox):
         self.bind('<FocusIn>',self.highlight)
         self.bind('<FocusOut>',self.highlight)
         
-        self.master.bind("<Prior>",self.selectall)
+        #self.master.bind("<Prior>",self.selectall)
 
     def selectall(self,event=None):
         self.selection_range(0, END) 
@@ -424,6 +437,11 @@ class TkCombobox(Combobox):
         
     def propogate(self,event):
         self.master.event_generate("<Next>")
+        return "break"
+    
+    def focus_left(self,event):
+        parent = self.winfo_parent()
+        self._nametowidget(parent).refocus(event)
         return "break"
     
     def highlight(self,event):

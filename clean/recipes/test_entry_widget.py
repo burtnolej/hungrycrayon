@@ -14,48 +14,6 @@ from ui_utils import TkImageWidget, TkImageLabelGrid, geometry_get, font_scale, 
 
 defaultmaster = dict(height=100,width=100,
                      x=400,y=100)
-
-class TestValidateGtLt(unittest.TestCase):
-
-    def setUp(self):
-        self.validator = Validator(name='40>=x<=60',
-                                   ubound=60,lbound=40)
-    
-    def test_ubound59true(self):
-        self.assertTrue(self.validator(59))
-                        
-    def test_ubound60true(self):
-        self.assertTrue(self.validator(60))
-                        
-    def test_ubound61false(self):
-        self.assertFalse(self.validator(61))
-        
-    def test_lbound41true(self):
-        self.assertTrue(self.validator(41))
-                        
-    def test_lbound40true(self):
-        self.assertTrue(self.validator(40))
-                        
-    def test_lbound39false(self):
-        self.assertFalse(self.validator(39))
-
-class TestValidateGt(unittest.TestCase):
-
-    def setUp(self):
-        self.validator = Validator(name='40>=x',lbound=40)
-        
-    def test_lboundMassivetrue(self):
-        self.assertTrue(self.validator(10000))
-        
-    def test_lbound41true(self):
-        self.assertTrue(self.validator(41))
-                        
-    def test_lbound40true(self):
-        self.assertTrue(self.validator(40))
-                        
-    def test_lbound39false(self):
-        self.assertFalse(self.validator(39))
-        
         
 class TestTkValidEntry(unittest.TestCase):
     def setUp(self):

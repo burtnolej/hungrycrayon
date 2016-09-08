@@ -53,7 +53,7 @@ class BaseType(object):
         
         # default to using a Tkentry
         #from Tkinter import Entry as Tkentry
-        from ui_utils_tkventry import TkEntry
+        from ui_utils import TkEntry
         self.widgettype = TkEntry
     
     def __call__(self,value):

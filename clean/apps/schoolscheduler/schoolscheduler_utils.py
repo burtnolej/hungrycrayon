@@ -16,6 +16,9 @@ types_enum = ['period','day','other','psych','edu',
 period_enum = ['8:30-9:10','9:11-9:51','9:52-10:32','10:33-11:13',
                '11:13-11:45','11:45-12:25','12:26-1:06','1:07-1:47',
                '1:48-2:28','2:30-3:00']
+
+period_map = dict((period_enum.index(pe),pe) for pe in period_enum)
+
 day_enum = ['Monday','Tuesday','Wednesday','Thursday','Friday']
 other_enum = ['MOVEMENT','CORE','YOGA','MUSIC','CODING/TED TALKS',
               'REGENTS PREP','REGIONS PREP','READING PERIOD',

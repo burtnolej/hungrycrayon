@@ -131,7 +131,7 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
 
     return(exec_str,result) 
 
-def tbl_rows_get(database,tbl_name,fields=None):
+def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
     
     
     fieldstr="*"
@@ -141,6 +141,10 @@ def tbl_rows_get(database,tbl_name,fields=None):
     exec_str = "select {fields} from {table}".format(fields=fieldstr,
                                                      table=tbl_name)
     
+    if whereclause <> None:
+	exec_str = exec_str + " where {0} = {1}".format(whereclause[0],
+	                                               whereclause[1])
+	
     results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]
