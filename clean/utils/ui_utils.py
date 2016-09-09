@@ -125,9 +125,17 @@ def tkwidgetfactory(var,master,**kwargs):
             if kwargs.has_key('name'):
                 d = dict(name=kwargs['name'])
                 kwargs.pop('name')
-
+             
+            # not every widget type accepts every option   
+            if var.widgettype <> TkCombobox:
+                print var.widgettype
+                try:
+                    kwargs.pop('values')
+                except:
+                    pass
+                
             widgettype.__init__(self,master,var,**d)
-
+            
             self.widgettype = widgettype
             
             self.config(**kwargs)
@@ -167,11 +175,7 @@ class TkImageWidget(object):
 #class TkImageLabelGrid():
 
 class TkImageLabelGrid(Frame):
-    
-    
-    ''' need to pass in a var here not a widget type
-        also need to create my own label and button class (like entry) '''
-    
+
     def __init__(self,master,var,width,height,x,y,maxrows,maxcols,
                  gridcfg=None,widgetcfg=None,
                  gridcolstart=0,gridrowstart=0,
@@ -209,17 +213,11 @@ class TkImageLabelGrid(Frame):
         
         self.label='foobar'
 
-        self.bind("<Left>",self.refocus)
-        self.bind("<Right>",self.refocus)
-        self.bind("<Up>",self.refocus)
-        self.bind("<Next>",self.refocus)
-
         self.widgets=[]
         for x in range(self.maxrows):
             ylbls=[]
             for y in range(self.maxcols):
                 
-                #lbl = tkwidgetfactory(var,self.master,'aaa',**widgetcfg[x][y])
                 lbl = tkwidgetfactory(var,self,
                                       name=str(x)+","+str(y),
                                       **widgetcfg[x][y])
@@ -256,7 +254,7 @@ class TkImageLabelGrid(Frame):
                 x=x+1
         elif event.keycode == 111 or event.keysym=='i':
                 y=y-1
-        elif event.keycode == 117 or event.keysym=='j':
+        elif event.keycode == 116 or event.keysym=='j':
                 y=y+1
                 
         if x<0: x=self.maxcols-1
@@ -356,8 +354,65 @@ class TkEntry(_tkentry):
         
         if not isadatatype(var):
             raise Exception('arg datatype must be a valid type')
-        _tkentry.__init__(self,master,**kwargs)
+        self.sv=StringVar()
+        
+        _tkentry.__init__(self,master,
+                          textvariable=self.sv,
+                          **kwargs)
+        
+        
+        
+        self.bind("<Down>",self.refocus)
+        self.bind("<Left>",self.refocus)
+        self.bind("<Right>",self.refocus)
+        self.bind("<Up>",self.refocus)
+        
+        self.bind('<FocusIn>',self.highlight)
+        self.bind('<FocusOut>',self.highlight)
+        
+        self.init_value= ""
+        self.current_value = ""
+        self.sv.trace("w",lambda name,index,mode,sv=self.sv:
+                      self.changed(self.sv))
+                      
+    def changed(self,sv):
+        new_value = sv.get()
+        self.current_value = new_value
 
+        if self.init_value <> "":
+            if str(self.current_value) <> str(self.init_value):
+                parent = self.winfo_parent()
+                gparent = self._nametowidget(parent).winfo_parent()
+                self._nametowidget(gparent).updates[str(self.winfo_name())] = new_value
+
+
+                #print str(self),"changed from",self.current_value," to ",new_value
+                #print
+                
+                self.config(foreground='red')
+            else:
+                self.config(foreground='black')
+            
+        
+    def highlight(self,event):
+        
+        if event.type == '9':
+            #self['style']='Focus.TEntry'
+            self.config(background='yellow')
+        elif event.type == '10':
+            #['style']='NotFocus.TEntry'
+            self.config(background='white')
+            
+        self.selectall()
+        
+    def selectall(self,event=None):
+        self.selection_range(0, END)
+
+    def refocus(self,event):
+        parent = self.winfo_parent()
+        self._nametowidget(parent).refocus(event)
+        return "break"
+        
 class TkLabel(_tklabel):
     def __init__(self,master,var,**kwargs):
         if not isadatatype(var):
@@ -383,11 +438,16 @@ class TkCombobox(Combobox):
         #self.frame = Frame(master)
         #self.frame.grid()
 
-        self.values = var.set
+        #self.values = var.set
         self.sv=StringVar()
-        Combobox.__init__(self,master,values=self.values,
+        #Combobox.__init__(self,master,values=self.values,
+        #                   textvariable=self.sv,
+        #                   **kwargs)
+        
+        Combobox.__init__(self,master,
                            textvariable=self.sv,
                            **kwargs)
+        
         
         self.s = Style()
         self.s.configure('Focus.TCombobox',
@@ -401,22 +461,13 @@ class TkCombobox(Combobox):
 
         self.grid(row=0,column=0,sticky=NSEW)
                 
-        self.bind("<Down>",self.propogate)
-        self.bind("<Left>",self.focus_left)
+        self.bind("<Down>",self.refocus)
+        self.bind("<Left>",self.refocus)
+        self.bind("<Right>",self.refocus)
+        self.bind("<Up>",self.refocus)
         
         self.bind("<Control-Down>",self.postdropdown)
         self.bind("<Control-Up>",self.unpostdropdown)
-        #self.frame.grid_columnconfigure(0, weight=1, uniform="foo")
-        #self.frame.grid_columnconfigure(1, weight=1, uniform="foo")
-        #self.frame.grid_rowconfigure(0, weight=1, uniform="foo")
-        
-        #self.textstr = TextAlphaNumRO(name='textalphanum')
-        #self.textstr(str(len(self.values)))
-        
-        #self.label = TkLabel(self.frame,self.textstr,
-        #                     text=self.textstr)
-        
-        #self.label.grid(row=0,column=1,sticky=NSEW)
 
         self.sv.trace("w",lambda name, index, mode, 
                   sv=self.sv: self.complete())
@@ -436,10 +487,11 @@ class TkCombobox(Combobox):
         self.unpost
         
     def propogate(self,event):
-        self.master.event_generate("<Next>")
+        parent = self.winfo_parent()
+        self._nametowidget(parent).event_generate("<Next>")
         return "break"
     
-    def focus_left(self,event):
+    def refocus(self,event):
         parent = self.winfo_parent()
         self._nametowidget(parent).refocus(event)
         return "break"
@@ -456,7 +508,7 @@ class TkCombobox(Combobox):
     def complete(self):
         input = self.sv.get()
         if input <> "":
-            hits = self.rematch(input,self.values)
+            hits = self.rematch(input,self['values'])
             
             if len(hits) == 1:
                 self.update(hits)
@@ -469,10 +521,10 @@ class TkCombobox(Combobox):
                 #master.event_generate("<Down>")
                 #combo.focus_force()
             else:
-                self.update(self.values)
+                self.update(self['values'])
                 #self.config(values=self.values)
         else:
-            self.update(self.values)
+            self.update(self['values'])
             
                 
     def update(self,newvalues):

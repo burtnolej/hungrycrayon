@@ -170,7 +170,7 @@ def _initdatamembers(clsname,**kw):
     dm['userdefid'] = userdefid
     return(dm)
 
-class WizardUI(object):
+class WizardUI(Frame):
     def __init__(self,master):
 
         self.lastsaveversion=0
@@ -188,23 +188,23 @@ class WizardUI(object):
         #self.master.geometry(self.geom)
         
         master.geometry(geom)
-        master.bind("<Prior>",self.focus_next_widget)
+        #master.bind("<Prior>",self.focus_next_widget)
+        
+        Frame.__init__(self,master)
+        self.bind("<Prior>",self.focus_next_widget)
 
-
-        widget_args=dict(background='white')
+        widget_args=dict(background='white',values=period_enum)
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
         
         #rowcfg = dict(height=2,width=2,text="x")
         #colcfg = dict(height=2,width=2,text="y")
 
-        setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
-                                                            'peach','pomegranate','passionfruit',
-                                                            'pear','grape','strawberry','raspberry',
-                                                            'rhubarb','mango','guava','apple',
-                                                            'Orange'])
+        setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
 
         #self.entrygridframe = Frame(self.master)
-        self.entrygrid = TkImageLabelGrid(self.master,setmemberp,wmwidth,wmheight,
+        #self.entrygrid = TkImageLabelGrid(self.master,setmemberp,wmwidth,wmheight,
+        self.entrygrid = TkImageLabelGrid(self,setmemberp,wmwidth,wmheight,
+                                            
                              0,0,self.maxrows,self.maxcols,
                              {},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)

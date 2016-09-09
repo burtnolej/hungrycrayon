@@ -6,16 +6,26 @@ from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 from misc_utils import nxnarraycreate
 
 from database_util import Database, tbl_create
-from database_table_util import dbtblgeneric, tbl_rows_get
+from database_table_util import dbtblgeneric, tbl_rows_get, tbl_rows_update
 
 from Tkinter import *
 from ttk import *
 import tkFont
 
-class DBTableUI(object):
+class DBTableUI(Frame):
     def __init__(self,master):
 
         self.lastsaveversion=0
+        
+        # any children that change update this 
+        # key is the name and value is the new val
+        # the name is likely to be the tkwidgetid.x,y
+        self.updates = {}
+        
+        # dbm columns are added here as they are loaded
+        # .index+1 will give the col # on the grid that corresponds
+        # useful for looking up pk values for updates
+        self.dbcol_defn = []
         
         self.master = master
         self.maxrows=30 # rows in the grid
@@ -26,11 +36,15 @@ class DBTableUI(object):
         wmheight=wheight*20 # master height
         wmwidth=wwidth*20 # master width 
 
-        geom = geometry_get(wmheight,wmwidth,0,0)
+        #geom = geometry_get(wmheight,wmwidth,0,0)
         #self.master.geometry(self.geom)
         
-        master.geometry(geom)
-        master.bind("<Prior>",self.focus_next_widget)
+        #master.geometry(geom)
+        
+        Frame.__init__(self,master)
+        #master.bind("<Prior>",self.focus_next_widget)
+        self.bind("<Prior>",self.focus_next_widget)
+        self.grid()
 
         widget_args=dict(background='white')
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
@@ -40,7 +54,8 @@ class DBTableUI(object):
 
         mytextalphanum = TextAlphaNum(name='textalphanum')
 
-        self.entrygrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
+        #self.entrygrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
+        self.entrygrid = TkImageLabelGrid(self,mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxrows,self.maxcols,
                              {},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)
@@ -68,10 +83,6 @@ class DBTableUI(object):
         self.tblname_entry.grid(column=3,row=0,sticky=NSEW)
         self.tblname_entry.focus_get()
         self.tblname_entry_sv.set("lesson")
-
-        self.dbload_button = Button(controlpanel,command=self.load,text="dbload",name="dbl")
-        self.dbload_button.grid(column=0,row=1,columnspan=1,sticky=NSEW)
-        self.dbload_button.focus_get()
         
         self.clone_label = Label(controlpanel,text="clone id")
         self.clone_label.grid(column=4,row=0,sticky=NSEW)
@@ -82,6 +93,21 @@ class DBTableUI(object):
         self.clone_entry.grid(column=5,row=0,sticky=NSEW)
         self.clone_entry.focus_get()
         self.clone_entry_sv.set(1)
+        
+        self.pkentry_label = Label(controlpanel,text="pk")
+        self.pkentry_label.grid(column=6,row=0,sticky=NSEW)
+        self.pkentry_label.focus_get()
+        
+        self.pk_entry_sv = StringVar()
+        self.pk_entry = Entry(controlpanel,textvariable=self.pk_entry_sv)
+        self.pk_entry.grid(column=7,row=0,sticky=NSEW)
+        self.pk_entry.focus_get()
+        self.pk_entry_sv.set("__id")
+  
+
+        self.dbload_button = Button(controlpanel,command=self.load,text="dbload",name="dbl")
+        self.dbload_button.grid(column=0,row=1,columnspan=1,sticky=NSEW)
+        self.dbload_button.focus_get()
 
         self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
         self.clear_button.grid(column=2,row=1,columnspan=1,sticky=NSEW)
@@ -90,9 +116,13 @@ class DBTableUI(object):
         self.dbinsert_button = Button(controlpanel,command=self.insert,text="dbinsert",name="dbi")
         self.dbinsert_button.grid(column=3,row=1,columnspan=1,sticky=NSEW)
         self.dbinsert_button.focus_get()
+        
+        self.dbsavechanges_button = Button(controlpanel,command=self.update,text="dbsavechgs",name="dbc")
+        self.dbsavechanges_button.grid(column=4,row=1,columnspan=1,sticky=NSEW)
+        self.dbsavechanges_button.focus_get()
 
         self.clone_button = Button(controlpanel,command=self.clone,text="clone",name="cln")
-        self.clone_button.grid(column=4,row=1,columnspan=1,sticky=NSEW)
+        self.clone_button.grid(column=5,row=1,columnspan=1,sticky=NSEW)
         self.clone_button.focus_get()
         
         self.newrowgrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
@@ -129,6 +159,33 @@ class DBTableUI(object):
             self.save_button.focus_set()
         return("break")
     
+    def update(self):
+        
+        database = Database(self.dbname_entry_sv.get())
+        
+        pkcolnum = self.dbcol_defn.index(self.pk_entry_sv.get())
+                  
+        rows=[]
+        for key in self.updates.keys():
+            row=[]
+            x,y = key.split(",")
+            colname = self.newrowgrid.widgets[0][int(y)].sv.get()
+            pkval = self.entrygrid.widgets[int(x)][pkcolnum].sv.get()
+            rows.append([colname,
+                         self.updates[key],
+                         self.pk_entry_sv.get(),
+                         "\""+pkval+"\""])
+            
+        print rows
+        with database:
+            tbl_rows_update(database,
+                            self.tblname_entry_sv.get(),
+                            rows)
+                            
+                            
+        
+        
+        
     def insert(self):
         database = Database(self.dbname_entry_sv.get())
         
@@ -156,6 +213,9 @@ class DBTableUI(object):
                                     #saveversion',str(self.dbload_entry_sv.get())))
                                     
             for y in range(len(rows[0])):
+        
+                self.dbcol_defn.append(colndefn[y])
+                
                 self.entrygrid.widgets[0][y].sv.set(colndefn[y])
                 self.entrygrid.widgets[0][y].config(background='grey',
                                                     foreground='yellow')
@@ -168,7 +228,11 @@ class DBTableUI(object):
             for x in range(1,len(rows)+1):
                 for y in range(len(rows[x])):
                     try:
-                        self.entrygrid.widgets[x][y].sv.set(rows[x][y])
+                        new_value = rows[x][y]
+                        self.entrygrid.widgets[x][y].init_value = new_value
+                        self.entrygrid.widgets[x][y].current_value = new_value
+                        self.entrygrid.widgets[x][y].sv.set(new_value)
+                        
                     except:
                         pass
                 
