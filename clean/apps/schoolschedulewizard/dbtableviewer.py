@@ -19,12 +19,12 @@ class DBTableUI(object):
         
         self.master = master
         self.maxrows=30 # rows in the grid
-        self.maxcols=10 # cols in the grid
+        self.maxcols=12 # cols in the grid
         maxwidgets=self.maxrows*self.maxcols
         wwidth=48 # default button width with text of 3 chars
         wheight=29 # default button height
-        wmheight=wheight*self.maxrows # master height
-        wmwidth=wwidth*10 # master width 
+        wmheight=wheight*20 # master height
+        wmwidth=wwidth*20 # master width 
 
         geom = geometry_get(wmheight,wmwidth,0,0)
         #self.master.geometry(self.geom)
@@ -70,16 +70,50 @@ class DBTableUI(object):
         self.tblname_entry_sv.set("lesson")
 
         self.dbload_button = Button(controlpanel,command=self.load,text="dbload",name="dbl")
-        self.dbload_button.grid(column=0,row=1,columnspan=2,sticky=NSEW)
+        self.dbload_button.grid(column=0,row=1,columnspan=1,sticky=NSEW)
         self.dbload_button.focus_get()
         
+        self.clone_label = Label(controlpanel,text="clone id")
+        self.clone_label.grid(column=4,row=0,sticky=NSEW)
+        self.clone_label.focus_get()
+        
+        self.clone_entry_sv = StringVar()
+        self.clone_entry = Entry(controlpanel,textvariable=self.clone_entry_sv)
+        self.clone_entry.grid(column=5,row=0,sticky=NSEW)
+        self.clone_entry.focus_get()
+        self.clone_entry_sv.set(1)
+
         self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
-        self.clear_button.grid(column=2,row=1,columnspan=2,sticky=NSEW)
-        self.clear_button.focus_get()    
+        self.clear_button.grid(column=2,row=1,columnspan=1,sticky=NSEW)
+        self.clear_button.focus_get()
+        
+        self.dbinsert_button = Button(controlpanel,command=self.insert,text="dbinsert",name="dbi")
+        self.dbinsert_button.grid(column=3,row=1,columnspan=1,sticky=NSEW)
+        self.dbinsert_button.focus_get()
+
+        self.clone_button = Button(controlpanel,command=self.clone,text="clone",name="cln")
+        self.clone_button.grid(column=4,row=1,columnspan=1,sticky=NSEW)
+        self.clone_button.focus_get()
+        
+        self.newrowgrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
+                             0,0,2,self.maxcols,
+                             {},widgetcfg)
+                             #{},widgetcfg,1,1,rowcfg,colcfg)
+        self.newrowgrid.grid(row=2,sticky=NSEW)
+
                 
         self.master.grid_columnconfigure(0, weight=1, uniform="foo")
         self.master.grid_rowconfigure(0, weight=1, uniform="foo")
             
+            
+    def clone(self):
+        for y in range(self.maxcols):
+            colname = self.entrygrid.widgets[0][y].sv.get()
+            value = self.entrygrid.widgets[int(self.clone_entry_sv.get())][y].sv.get()
+            
+            if colname <> "" and colname.startswith("_") == False:
+                self.newrowgrid.widgets[1][y].sv.set(value)
+    
     def clear(self):
         
         for x in range(self.maxrows):
@@ -95,6 +129,24 @@ class DBTableUI(object):
             self.save_button.focus_set()
         return("break")
     
+    def insert(self):
+        database = Database(self.dbname_entry_sv.get())
+        
+        class lesson(dbtblgeneric):
+            pass
+        
+        dm={}
+        for y in range(self.maxcols):
+            colname = self.newrowgrid.widgets[0][y].sv.get()
+            value = self.newrowgrid.widgets[1][y].sv.get()
+            if colname <> "" and colname.startswith("_") == False:
+                dm[colname] = value
+                
+        dbobj = lesson.datamembers(database=database,dm=dm)        
+
+        with database:
+            dbobj.persist()
+            
     def load(self,values=None):
 
         database = Database(self.dbname_entry_sv.get())
@@ -102,8 +154,18 @@ class DBTableUI(object):
         with database:
             colndefn,rows = tbl_rows_get(database,self.tblname_entry_sv.get())
                                     #saveversion',str(self.dbload_entry_sv.get())))
+                                    
+            for y in range(len(rows[0])):
+                self.entrygrid.widgets[0][y].sv.set(colndefn[y])
+                self.entrygrid.widgets[0][y].config(background='grey',
+                                                    foreground='yellow')
+                
+                self.newrowgrid.widgets[0][y].sv.set(colndefn[y])
+                self.newrowgrid.widgets[0][y].config(background='grey',
+                                                    foreground='yellow')
+                
             
-            for x in range(len(rows)):
+            for x in range(1,len(rows)+1):
                 for y in range(len(rows[x])):
                     try:
                         self.entrygrid.widgets[x][y].sv.set(rows[x][y])
