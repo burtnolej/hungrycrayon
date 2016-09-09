@@ -379,20 +379,21 @@ class TkEntry(_tkentry):
         new_value = sv.get()
         self.current_value = new_value
 
-        if self.init_value <> "":
-            if str(self.current_value) <> str(self.init_value):
-                parent = self.winfo_parent()
-                gparent = self._nametowidget(parent).winfo_parent()
-                self._nametowidget(gparent).updates[str(self.winfo_name())] = new_value
+        #if self.init_value <> "":
+        if str(self.current_value) <> str(self.init_value):
+            parent = self.winfo_parent()
+            gparent = self._nametowidget(parent).winfo_parent()
+            self._nametowidget(gparent).updates[str(self.winfo_name())] = new_value
 
 
-                #print str(self),"changed from",self.current_value," to ",new_value
-                #print
-                
-                self.config(foreground='red')
-            else:
-                self.config(foreground='black')
+            #print str(self),"changed from",self.current_value," to ",new_value
+            #print
             
+            self.config(foreground='red')
+        else:
+            self.config(foreground='black')
+        #else:
+        #print "probably a new column"
         
     def highlight(self,event):
         

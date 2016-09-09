@@ -17,6 +17,13 @@ test_db = enum(name="db_name_test",
                tbl_pk_defn = ["col_name1","col_name2"])
 
 
+def dbtblfactory(name):
+    def __init__(self,**kwargs):
+	dbtblgeneric.__init__(self,**kwargs)
+	
+    newclass = type(name, (dbtblgeneric,),{'__init__':__init__})
+    return newclass    
+    
 class dbtblgeneric(GenericBase):
     '''DBGeneric is fixtures to allow a generic object to write itself into a sqlite3 db'''
 

@@ -6,7 +6,8 @@ from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 from misc_utils import nxnarraycreate
 
 from database_util import Database, tbl_create
-from database_table_util import dbtblgeneric, tbl_rows_get, tbl_rows_update
+from database_table_util import dbtblgeneric, tbl_rows_get, \
+     tbl_rows_update, dbtblfactory
 
 from Tkinter import *
 from ttk import *
@@ -149,6 +150,14 @@ class DBTableUI(Frame):
         for x in range(self.maxrows):
             for y in range(self.maxcols):
                 self.entrygrid.widgets[x][y].sv.set("")
+                self.entrygrid.widgets[x][y].config(background='white')
+
+                
+        for x in range(self.maxrows):
+            for y in range(self.maxcols):
+                self.newrowgrid.widgets[x][y].sv.set("")
+                self.newrowgrid.widgets[x][y].config(background='white')
+
                 
     def focus_next_widget(self,event):
         print "focuschange"
@@ -170,11 +179,30 @@ class DBTableUI(Frame):
             row=[]
             x,y = key.split(",")
             colname = self.newrowgrid.widgets[0][int(y)].sv.get()
-            pkval = self.entrygrid.widgets[int(x)][pkcolnum].sv.get()
-            rows.append([colname,
-                         self.updates[key],
-                         self.pk_entry_sv.get(),
-                         "\""+pkval+"\""])
+            
+            if int(x)==0:
+                # table column alter
+                print "alter",colname,
+                
+                current_value = self.entrygrid.widgets[0][int(y)].sv.get()
+                
+                try:
+                    self.dbcol_defn.index(current_value)
+                except:
+                    print "add"
+            else:
+                pkval = self.entrygrid.widgets[int(x)][pkcolnum].sv.get()
+                
+                value = self.updates[key]
+                try:
+                    value = int(value)
+                except:
+                    value = "\""+value+"\""
+    
+                rows.append([colname,
+                             value,
+                             self.pk_entry_sv.get(),
+                             "\""+pkval+"\""])
             
         print rows
         with database:
@@ -189,8 +217,10 @@ class DBTableUI(Frame):
     def insert(self):
         database = Database(self.dbname_entry_sv.get())
         
-        class lesson(dbtblgeneric):
-            pass
+        dbclass = dbtblfactory(self.tblname_entry_sv.get())
+        
+        #class lesson(dbtblgeneric):
+        #    pass
         
         dm={}
         for y in range(self.maxcols):
@@ -199,7 +229,7 @@ class DBTableUI(Frame):
             if colname <> "" and colname.startswith("_") == False:
                 dm[colname] = value
                 
-        dbobj = lesson.datamembers(database=database,dm=dm)        
+        dbobj = dbclass.datamembers(database=database,dm=dm)        
 
         with database:
             dbobj.persist()
@@ -216,11 +246,16 @@ class DBTableUI(Frame):
         
                 self.dbcol_defn.append(colndefn[y])
                 
-                self.entrygrid.widgets[0][y].sv.set(colndefn[y])
+                new_value = colndefn[y]
+                
+                self.entrygrid.widgets[0][y].init_value = new_value
+                self.entrygrid.widgets[0][y].current_value = new_value
+
+                self.entrygrid.widgets[0][y].sv.set(new_value)
                 self.entrygrid.widgets[0][y].config(background='grey',
                                                     foreground='yellow')
                 
-                self.newrowgrid.widgets[0][y].sv.set(colndefn[y])
+                self.newrowgrid.widgets[0][y].sv.set(new_value)
                 self.newrowgrid.widgets[0][y].config(background='grey',
                                                     foreground='yellow')
                 
@@ -229,6 +264,10 @@ class DBTableUI(Frame):
                 for y in range(len(rows[x])):
                     try:
                         new_value = rows[x][y]
+                        
+                        # this is so the entry widgets can distinguish between
+                        # nothing loaded and a space loaded
+                        if new_value == "": new_value = "<SPACE>"
                         self.entrygrid.widgets[x][y].init_value = new_value
                         self.entrygrid.widgets[x][y].current_value = new_value
                         self.entrygrid.widgets[x][y].sv.set(new_value)
