@@ -209,11 +209,7 @@ class DBTableUI(Frame):
             tbl_rows_update(database,
                             self.tblname_entry_sv.get(),
                             rows)
-                            
-                            
-        
-        
-        
+                                   
     def insert(self):
         database = Database(self.dbname_entry_sv.get())
         
@@ -260,7 +256,7 @@ class DBTableUI(Frame):
                                                     foreground='yellow')
                 
             
-            for x in range(1,len(rows)+1):
+            for x in range(len(rows)):
                 for y in range(len(rows[x])):
                     try:
                         new_value = rows[x][y]
@@ -268,9 +264,11 @@ class DBTableUI(Frame):
                         # this is so the entry widgets can distinguish between
                         # nothing loaded and a space loaded
                         if new_value == "": new_value = "<SPACE>"
-                        self.entrygrid.widgets[x][y].init_value = new_value
-                        self.entrygrid.widgets[x][y].current_value = new_value
-                        self.entrygrid.widgets[x][y].sv.set(new_value)
+                        
+                        # +1 to avoid the header row
+                        self.entrygrid.widgets[x+1][y].init_value = new_value
+                        self.entrygrid.widgets[x+1][y].current_value = new_value
+                        self.entrygrid.widgets[x+1][y].sv.set(new_value)
                         
                     except:
                         pass

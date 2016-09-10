@@ -64,111 +64,37 @@ log = Log()
 
 controlpanelconfig = dict(height=300,width=200,x=100,y=100)
 
-def _lesson_create(datamembers,database,of):
-    _lesson = _obj_create(datamembers,database,of,'lesson')
-    return(_lesson)
-    
-def _obj_create(datamembers,database,of,clsname):
-    return(of.new(clsname,
-                  objid=datamembers['userdefid'],
-                  constructor='datamembers',
-                  database=database,
-                  of=of,
-                  modname=__name__,
-                  dm=datamembers))
-
 class schoolschedgeneric(dbtblgeneric):
 
-    def __init__(self,objid,**kwargs):
-
+    def __init__(self,**kwargs):
         super(schoolschedgeneric,self).__init__(**kwargs)
-        self.objid = objid
 
-        
         for k,v in kwargs['dm'].iteritems():
             if v <> 'None':
-                self.attr_set(v,k)
+                if self.__class__.__name__ == "lesson":
+                    # only create objects for member attr of lesson class
+                    # otherwise we will loop to infinity
+                    self.attr_set(v,k)
                 
-    def attr_set(self,name,clsname):
+    def attr_set(self,name,clsname):        
+        datamembers = dict(objtype=clsname,
+                           userobjid=name,
+                           name=name)
         
-        datamembers = _initdatamembers(clsname,name=name)
-        setattr(self,clsname,_obj_create(datamembers,self.database,self.of,clsname))
+        setattr(self,clsname,of.new(schoolschedgeneric,
+                                    clsname,
+                                    objid=name, # unique key to store obj in of
+                                    constructor='datamembers',
+                                    database=database,
+                                    of=of,
+                                    modname=__name__,
+                                    dm=datamembers))
+
             
         return(getattr(self,clsname))
     
     def __repr__(self):
         return(self.objid)
-    
-class teacher(schoolschedgeneric):
-    pass
-
-class saveversion(schoolschedgeneric):
-    pass
-
-class lessontype(schoolschedgeneric):
-    pass
-
-class subject(schoolschedgeneric):
-    pass
-
-class student(schoolschedgeneric):
-    pass
-
-class dow(schoolschedgeneric):
-    pass
-
-class period(schoolschedgeneric):
-    pass
-
-class userdefid(dbtblgeneric):
-    
-    def __init__(self,objid,**kwargs):
-        
-        super(userdefid,self).__init__(**kwargs)
-        self.objid = objid
-        
-    def __repr__(self):
-        return(self.objid)
-
-class objtype(dbtblgeneric):
-    def __repr__(self):
-        return(self.objid)
-
-class lesson(schoolschedgeneric):
-    pass
-
-
-def _initdatamembers(clsname,**kw):
-    
-    if clsname == 'lesson':       
-        try:
-            userdefid = str(kw['teacher'])+"."+ \
-                str(kw['day_num'])+"."+\
-                str(kw['period_num'])
-            
-            student = student_enum[kw['student_num']]
-        except KeyError:
-            raise KeyError("lesson init requires args: schedule_num, day_num, period_num, student_num")
-        
-        dm = {'teacher':kw['teacher'],
-              'saveversion':kw['saveversion'],
-              'subject':'None',
-              'lessontype':'None',
-              'period':kw['period_num'],
-              'dow':day_enum[kw['day_num']],
-              'student':student}
-    else:
-        try:
-            userdefid = str(kw['name'])
-        except KeyError:
-            print 
-            raise KeyError(clsname,"init requires args: schedule_num, day_num, period_num")
-
-        dm = {}
-        
-    dm['objtype'] = clsname
-    dm['userdefid'] = userdefid
-    return(dm)
 
 class WizardUI(Frame):
     def __init__(self,master):
@@ -185,29 +111,22 @@ class WizardUI(Frame):
         wmwidth=wwidth*self.maxcols # master width 
 
         geom = geometry_get(wmheight,wmwidth,0,0)
-        #self.master.geometry(self.geom)
         
         master.geometry(geom)
-        #master.bind("<Prior>",self.focus_next_widget)
         
         Frame.__init__(self,master)
         self.bind("<Prior>",self.focus_next_widget)
+        self.grid()
 
-        widget_args=dict(background='white',values=period_enum)
+        widget_args=dict(background='white',values=student_enum)
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-        
-        #rowcfg = dict(height=2,width=2,text="x")
-        #colcfg = dict(height=2,width=2,text="y")
 
         setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
 
-        #self.entrygridframe = Frame(self.master)
-        #self.entrygrid = TkImageLabelGrid(self.master,setmemberp,wmwidth,wmheight,
-        self.entrygrid = TkImageLabelGrid(self,setmemberp,wmwidth,wmheight,
-                                            
+        self.entrygrid = TkImageLabelGrid(self,setmemberp,wmwidth,wmheight,    
                              0,0,self.maxrows,self.maxcols,
                              {},widgetcfg)
-                             #{},widgetcfg,1,1,rowcfg,colcfg)
+
         self.entrygrid.grid(row=0,column=0,sticky=NSEW)
 
         controlpanel = Frame(master)
@@ -239,21 +158,15 @@ class WizardUI(Frame):
         self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
         self.clear_button.grid(row=2,column=6)
         self.clear_button.focus_get()    
-        
-        self.debug_button = Button(controlpanel,command=self.debug,text="debug",name="dbg")
-        self.debug_button.grid(row=2,column=7)
-        self.debug_button.focus_get()    
-        
-        
+
         self.bgmaxrows=len(period_enum)+1
         self.bgmaxcols=len(student_enum)+1 
         mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
-        #self.balancegridframe = Frame(self.master)
         self.balancegrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
                              0,0,self.bgmaxrows,self.bgmaxcols,
                              {},widgetcfg)
-                             #{},widgetcfg,1,1,rowcfg,colcfg)
+        
         self.balancegrid.grid(row=1,column=0,sticky=NSEW)
         self._draw_balancegrid_labels()
         
@@ -261,10 +174,6 @@ class WizardUI(Frame):
         self.master.grid_rowconfigure(0, weight=1, uniform="foo")
         self.master.grid_rowconfigure(1, weight=1, uniform="foo")
             
-        
-    def debug(self):
-        pass
-    
     def _draw_balancegrid_labels(self):
         
         for x in range(len(period_enum)+1):
@@ -272,7 +181,6 @@ class WizardUI(Frame):
             
         for y in range(1,len(student_enum)+1):
             self.balancegrid.widgets[0][y].config(text=student_enum[y-1])
-        
         
     def save(self):
 
@@ -286,38 +194,46 @@ class WizardUI(Frame):
                 
                 value =  self.entrygrid.widgets[x][y].sv.get()
                 
-                try:
-                    value = int(value)
-                except:
-                    pass
-                
                 if value <> "":
-                    
-                    print "record"
-                    datamembers = _initdatamembers('lesson',
-                                                   schedule_num = '1',
-                                                   day_num=1, 
-                                                   period_num=ylabel,
-                                                   student_num=value,
-                                                   saveversion=self.lastsaveversion,
-                                                   teacher=xlabel)
-                    
-                    _lesson_create(datamembers,database,of)
-                    
-                    # get the actual row number from the period string
+
+                    # get the actual row and column number from the enum_maps
                     # add one to account for the origin
-                    x = period_map[ylabel]+1
+                    x = period_enum = period_map[ylabel]+1
+                    y = student_enum = student_map[value]+1
+                    z = teacher_enum = teacher_map[xlabel]+1
                     
-                    current_value = self.balancegrid.widgets[x][value].cget("text")
+                    obj_id = ",".join(map(str,[x,y,z]))
+
+                    datamembers = dict(schedule_num = '1',
+                                       day='Tuesday', 
+                                       subject="MATH",
+                                       lessontype="wp",
+                                       objtype='lesson',
+                                       userobjid=obj_id, # unique key to store obj in of
+                                       period=ylabel,
+                                       student=value,
+                                       #saveversion=str(self.lastsaveversion),
+                                       teacher=xlabel)
+                    
+                    of.new(schoolschedgeneric,
+                           'lesson',
+                           objid=obj_id,
+                           constructor='datamembers',
+                           database=database,
+                           of=of,
+                           modname=__name__,
+                           dm=datamembers)
+
+                    current_value = self.balancegrid.widgets[x][y].cget("text")
                     if current_value == xlabel:
                         pass
                     elif current_value == "":
                         
-                        self.balancegrid.widgets[x][value].config(background='lightgreen')
-                        self.balancegrid.widgets[x][value].config(text=xlabel)
+                        self.balancegrid.widgets[x][y].config(background='lightgreen')
+                        self.balancegrid.widgets[x][y].config(text=xlabel)
                     else:
-                        self.balancegrid.widgets[x][value].config(text=current_value+","+xlabel)
-                        self.balancegrid.widgets[x][value].config(background='red')
+                        self.balancegrid.widgets[x][y].config(text=current_value+","+xlabel)
+                        self.balancegrid.widgets[x][y].config(background='red')
                     
         self.student_totals_calc()        
             
@@ -389,17 +305,17 @@ class WizardUI(Frame):
             for obj in of.object_iter():
                 obj.persist()
 
-    
 if __name__ == "__main__":
     master = Tk()
-    
     
     database = Database('htmlparser')
     of = ObjFactory(True)
     
     ui = WizardUI(master)
     values=[["","Stan","Galina","Samantha","Amelia","Paraic"],
-            ['8:30-9:10',1,9,3,5,7],
-            ['9:11-9:51',2,1,4,6,8]]
+            ['8:30-9:10',"NATHANIEL","ORIG","TRISTAN","COBY","YOSEF"],
+            ['9:11-9:51',"LUCY","DONOVAN","BOOKER","ASHER","JAKE"]]
+
+
     ui.load(values)
     master.mainloop()
