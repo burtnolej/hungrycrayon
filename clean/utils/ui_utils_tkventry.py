@@ -9,71 +9,67 @@ sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from ui_utils import  geometry_get, tkwidgetfactory, geometry_get_dict
 from type_utils import isadatatype
     
-class TkValidEntry(object):
+class BaseTkValidEntry(Frame):
     
-    def __init__(self,master,name,width,default,var):
+    def __init__(self,master,name,width,default,var,**kwargs):
         
         if not isadatatype(var):
             raise Exception('arg datatype must be a valid type')
         
-        self.frame = Frame(master)
+        Frame.__init__(self,master)
         self.var = var
-        self.label = Tklabel(self.frame,
-                             text=name,
-                             width=width,
-                             anchor=W,
-                             justify=LEFT)
-        
-        self.label.pack(side=LEFT,padx=5,pady=5,fill=BOTH,expand=1)
         
         sv = StringVar()
         self.sv = sv
-        '''self.entry= tkwidgetfactory(self.var.widgettype,
-                                    self.frame,
-                                    textvariable=self.sv,
-                                    width=15,
-                                    x=100)'''
         
-        self.entry= tkwidgetfactory(self.var,
-                                    self.frame,
-                                    textvariable=self.sv,
-                                    width=15,
-                                    x=100)
-        
+        self.entry= tkwidgetfactory(self.var,self,textvariable=self.sv,**kwargs)
         
         self.sv.set(default)
-        self.entry.pack(side=LEFT,padx=5,pady=5,fill=BOTH,expand=1)
+        self.entry.grid()
         
-        #self.entry.bind("<Tab>",self.focus_next_widget)
-
+        sv.trace("w",lambda name, index, mode, sv=self.sv: self.validate())
+        
         self.entry.bind("<FocusIn>",self.select_all)
+        
+        self.set_callbacks()
+        
+        self.s = Style()
+        
+    def validate(self):
+        
+        if self.var(self.sv.get()) == True:
+            
+            self.s.configure('TCombobox',background='green')
+            self['style']='TCombobox'
+            
+            return
 
-        sv.trace("w",lambda name, index, mode, 
-                 sv=self.sv: self.validate())
-        
-        self.statuslabel = Tklabel(self.frame,
-                                   text='',
-                                   width=1,
-                                   anchor=W,
-                                   background='lightblue',
-                                   justify=LEFT)
-        
-        self.statuslabel.pack(side=LEFT,padx=5,pady=5,
-                             fill=BOTH,expand=1)
-        
-        self.ruleslabel = Tklabel(self.frame,
-                                  text=self.var.name(),
-                                  width=16,
-                                  anchor=W,
-                                  justify=LEFT)
-        
-        self.ruleslabel.pack(side=LEFT,padx=5,pady=5,
-                             fill=BOTH,expand=1)
+        self.s.configure('TCombobox',background='red')
+        self['style']='A.TCombobox'
 
-        self.validate()
+    def select_all(self,event):       
+        event.widget.selection_range(0,END)
+        return("break")
+    
+class TkValidEntry(BaseTkValidEntry):    
+    
+    def __init__(self,master,name,width,default,var):
         
-    def grid(self,**kwargs):
-        self.frame.grid(**kwargs)
+        BaseTkValidEntry.__init__(self,master,name,width,default,var)
+        
+        self.label = Tklabel(self,text=name,width=width,anchor=W,justify=LEFT)
+        
+        self.label.grid(row=0,column=0,sticky=NSEW)
+        
+        self.statuslabel = Tklabel(self,text='',width=1,anchor=W,background='lightblue',justify=LEFT)
+        
+        self.statuslabel.grid(row=0,column=2,sticky=NSEW)
+        
+        self.ruleslabel = Tklabel(self,text=self.var.name(),width=16,anchor=W,justify=LEFT)
+
+        self.ruleslabel.grid(row=0,column=3,sticky=NSEW)
+
+        self.grid_rowconfigure(0, weight=1, uniform="foo")
         
     def validate(self):
         

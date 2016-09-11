@@ -128,7 +128,6 @@ def tkwidgetfactory(var,master,**kwargs):
              
             # not every widget type accepts every option   
             if var.widgettype <> TkCombobox:
-                print var.widgettype
                 try:
                     kwargs.pop('values')
                 except:
@@ -336,17 +335,23 @@ class TkImageLabelGrid(Frame):
         
         for x,y in coords:
             self.cell_set(x,y,**args)
-        
-    '''for x in range(len(self.widgets)):
-        for y in range(len(self.widgets[0])):
-            widget = self.widgets[x][y]
-            widget.config(image=widget.photo)'''
-        
-
-    '''self.widgets[0][1].config(image=self.widgets[0][1].photo)
-    self.widgets[1][0].config(image=self.widgets[1][0].photo)
-    self.widgets[1][1].config(image=self.widgets[1][1].photo)'''
-        #self.widgets[0][0].config(image=self.widgets[0][0].photo)
+            
+    def dump_grid(self):
+        ''' return the text contents of the grid in a n x n array
+        ignores blank spaces'''
+        contents=[]
+        for x in range(self.maxrows):
+            column=[]
+            empty_column=True
+            for y in range(self.maxcols):
+                value = self.widgets[x][y].sv.get()
+                if value <> "":
+                    column.append(value)
+                    empty_column=False
+                    
+            if not empty_column:
+                contents.append(column)
+        return contents
     
     
 class TkEntry(_tkentry):
@@ -435,31 +440,31 @@ class TkCombobox(Combobox):
         if not isadatatype(var):
             raise Exception('arg datatype must be a valid type')
         
-
-        #self.frame = Frame(master)
-        #self.frame.grid()
-
-        #self.values = var.set
         self.sv=StringVar()
-        #Combobox.__init__(self,master,values=self.values,
-        #                   textvariable=self.sv,
-        #                   **kwargs)
-        
+
         Combobox.__init__(self,master,
                            textvariable=self.sv,
                            **kwargs)
         
         
         self.s = Style()
-        self.s.configure('Focus.TCombobox',
-                         fieldbackground='yellow')
+        self.s.configure('InFocus.Valid.TCombobox',
+                         fieldbackground='yellow',
+                         background='green')
         
-        self.s2 = Style()
-        self.s2.configure('NotFocus.TCombobox',
-                         fieldbackground='white')
+        self.s.configure('OutOfFocus.Valid.TCombobox',
+                         fieldbackground='white',
+                         background='green')
+        
+        self.s.configure('InFocus.Invalid.TCombobox',
+                         fieldbackground='yellow',
+                         background='white')
+        
+        self.s.configure('OutOfFocus.Invalid.TCombobox',
+                         fieldbackground='white',
+                         background='white')
 
-        #self.config(')
-
+        self['style']='OutOfFocus.Invalid.TCombobox'
         self.grid(row=0,column=0,sticky=NSEW)
                 
         self.bind("<Down>",self.refocus)
@@ -498,12 +503,13 @@ class TkCombobox(Combobox):
         return "break"
     
     def highlight(self,event):
+        _,state,_ = self['style'].split(".")
         
         if event.type == '9':
-            self['style']='Focus.TCombobox'
+            self['style']=".".join(['InFocus',state,'TCombobox'])
         elif event.type == '10':
-            self['style']='NotFocus.TCombobox'
-            
+            self['style']=".".join(['OutOfFocus',state,'TCombobox'])
+                    
         self.selectall()
             
     def complete(self):
@@ -514,28 +520,27 @@ class TkCombobox(Combobox):
             if len(hits) == 1:
                 self.update(hits)
                 self.sv.set(hits[0])
+                
+                # check if function is because of a system load (ignore focus) or by a user selection
+                if self.master.focus_get() == None:
+                    self['style']='OutOfFocus.Valid.TCombobox'
+                else:
+                    self['style']='InFocus.Valid.TCombobox'
             elif len(hits)>1:
+                    
                 self.update(hits)
-                #self.config(values=hits)
-                #current = self.sv.get()
-                #self.sv.set("{0} ({1})".format(current,str(len(hits))))
-                #master.event_generate("<Down>")
-                #combo.focus_force()
             else:
                 self.update(self['values'])
-                #self.config(values=self.values)
         else:
             self.update(self['values'])
-            
                 
     def update(self,newvalues):
-        print "update",newvalues
         #self.combo.config(values=newvalues)
         self.config(values=newvalues)
         
     def rematch(self,expr,list):
         
-        r = re.compile(expr)
+        r = re.compile(expr.lower())
             
         match = []
         for item in list:

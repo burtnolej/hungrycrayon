@@ -8,8 +8,9 @@ import tkFont
 import unittest
 
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
-from ui_utils_tkventry import TkValidEntry, TkCombobox, TkEntry
-from ui_utils import geometry_get,  tkwidgetfactory, geometry_get_dict
+from ui_utils_tkventry import TkValidEntry, BaseTkValidEntry
+
+from ui_utils import geometry_get,  tkwidgetfactory, geometry_get_dict, TkCombobox, TkEntry
 from type_utils import BoundRealInt, SetMember, SetMemberPartial, DBSetMember
 
 #fontscale = enum(sy = 2500,sx = 3500,
@@ -48,6 +49,32 @@ class TestTkValidEntryBInt(unittest.TestCase):
     def tearDown(self):
         self.master.destroy()
         
+class TestBaseTkValidEntrySetMember(unittest.TestCase):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry(geometry_get_dict(defaultmaster))  
+        
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
+                                                                 'peach','pomegranate','passionfruit',
+                                                                 'pear','grape','strawberry','raspberry',
+                                                                 'rhubarb','mango','guava','apple',
+                                                                 'Orange'])
+        
+        self.ventry = BaseTkValidEntry(self.master,'foobar',8,0,self.setmemberp)
+        #self.ventry.pack()
+        self.ventry.grid(row=0,sticky=NSEW)
+        self.ventry.entry.focus_set()
+        
+        self.master.rowconfigure(0,uniform='foo2')
+        
+    def test_Pomegranate_True(self):
+        self.ventry.sv.set('pomegranate')
+        #self.assertEqual(self.ventry.statuslabel.cget('background'),'lime')
+        #self.master.mainloop()
+        
+    def tearDown(self):
+        self.master.destroy()
+        
 class TestTkValidEntrySetMember(unittest.TestCase):
     def setUp(self):
         self.master = Tk()
@@ -60,6 +87,7 @@ class TestTkValidEntrySetMember(unittest.TestCase):
                                                                  'Orange'])
         
         self.ventry = TkValidEntry(self.master,'foobar',8,0,self.setmemberp)
+        #self.ventry.pack()
         self.ventry.grid(row=0,sticky=NSEW)
         self.ventry.entry.focus_set()
         
@@ -68,7 +96,7 @@ class TestTkValidEntrySetMember(unittest.TestCase):
     def test_Pomegranate_True(self):
         self.ventry.sv.set('pomegranate')
         self.assertEqual(self.ventry.statuslabel.cget('background'),'lime')
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def tearDown(self):
         self.master.destroy()
@@ -109,16 +137,11 @@ class TestTkValidEntryMulti(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    
-
+     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestBaseTkValidEntrySetMember))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkValidEntryBInt))
 
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkValidEntrySetMember))
-
-
-    
-    
-
 
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))

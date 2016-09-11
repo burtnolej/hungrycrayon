@@ -14,8 +14,6 @@ from misc_utils_objectfactory import ObjFactory
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get
 
-#from schoolscheduler_utils import *
-
 from Tkinter import *
 from ttk import *
 
@@ -47,18 +45,26 @@ break_enum = ['END COMPUTER TIME','LUNCH COMPUTER TIME','QUAD CAFE','QUADCAFE',
               'GS MECHANIC','STUDENT NEWS','CHESS']
 lesson_enum = 'wp','nwp','break','edu','other','psych'
 
-student_enum = ['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY',
-                'BOOKER',
-                'ASHLEY','YOSEF','LUCY','JAKE','ASHER',
-                'DONOVAN','LIAM','SIMON B','NICK']
+teachers = ["Stan","Galina","Samantha","Amelia","Paraic"]
 
-student_map = dict((se,student_enum.index(se)) for se in student_enum)
+students = ['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY','BOOKER',
+            'ASHLEY','YOSEF','LUCY','JAKE','ASHER','DONOVAN','LIAM','SIMON B','NICK']
 
-teacher_lesson_type = {"Stan":"","Galina":"","Samantha":"","Amelia":"","Paraic":""}
+def _get_enums(values):
+    type = OrderedDict()
+    map = OrderedDict()
+    enum = []
+    
+    for i in range(len(values)):
+        type[values[i]] = ""
+        map[values[i]] = i
+        enum.append(values[i])
+    
+    return(type,map,enum)
 
-teacher_enum = teacher_lesson_type.keys()
+teacher_lesson_type,teacher_map,teacher_enum = _get_enums(teachers)
 
-teacher_map = dict((te,teacher_enum.index(te)) for te in teacher_enum)
+_,student_map,student_enum = _get_enums(students)
 
 log = Log()
 
@@ -66,29 +72,33 @@ controlpanelconfig = dict(height=300,width=200,x=100,y=100)
 
 class schoolschedgeneric(dbtblgeneric):
 
-    def __init__(self,**kwargs):
-        super(schoolschedgeneric,self).__init__(**kwargs)
-
+    def __init__(self,of,database,recursion=True,**kwargs):
+        super(schoolschedgeneric,self).__init__(database=database,
+                                                **kwargs)
+        
+        self.of = of
+        self.database = database
+        
         for k,v in kwargs['dm'].iteritems():
             if v <> 'None':
-                if self.__class__.__name__ == "lesson":
-                    # only create objects for member attr of lesson class
-                    # otherwise we will loop to infinity
+                if recursion == True:
+                    # create objects for all member attributes
                     self.attr_set(v,k)
-                
+                                   
     def attr_set(self,name,clsname):        
         datamembers = dict(objtype=clsname,
                            userobjid=name,
                            name=name)
         
-        setattr(self,clsname,of.new(schoolschedgeneric,
-                                    clsname,
-                                    objid=name, # unique key to store obj in of
-                                    constructor='datamembers',
-                                    database=database,
-                                    of=of,
-                                    modname=__name__,
-                                    dm=datamembers))
+        setattr(self,clsname,self.of.new(schoolschedgeneric,
+                                         clsname,
+                                         objid=name, # unique key to store obj in of
+                                         constructor='datamembers',
+                                         database=self.database,
+                                         of=self.of,
+                                         modname=__name__,
+                                         recursion=False,
+                                         dm=datamembers))
 
             
         return(getattr(self,clsname))
@@ -97,7 +107,10 @@ class schoolschedgeneric(dbtblgeneric):
         return(self.objid)
 
 class WizardUI(Frame):
-    def __init__(self,master):
+    def __init__(self,master,database,of):
+        
+        self.database = database
+        self.of = of
 
         self.lastsaveversion=0
         
@@ -118,8 +131,49 @@ class WizardUI(Frame):
         self.bind("<Prior>",self.focus_next_widget)
         self.grid()
 
-        widget_args=dict(background='white',values=student_enum)
+
+        '''
+        # default combolist values is student
+        setmemberp = SetMemberPartial(name='x{mylist}',set=student_enum)
+        widget_args=dict(background='white',var=setmemberp)
+        
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        
+        # column headers are teacher
+        setmemberp = SetMemberPartial(name='x{mylist}',set=teacher_enum)
+        _widget_args=dict(background='white',var=setmemberp)      
+        for y in range(1,self.maxcols):
+            widgetcfg[0][y] = _widget_args  
+
+        # row headers are teacher
+        setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
+        _widget_args=dict(background='white',values=setmemberp)    
+        for x in range(1,self.maxrows):
+            widgetcfg[x][0] = _widget_args
+
+        self.entrygrid = TkImageLabelGrid(self,wmwidth,wmheight,    
+                             0,0,self.maxrows,self.maxcols,
+                             {},widgetcfg)
+        '''
+        
+        # default combolist values is student
+        
+        setmemberp = SetMemberPartial(name='x{mylist}',set=student_enum)
+        widget_args=dict(background='white',values=student_enum)
+        
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        
+        # column headers are teacher
+        setmemberp = SetMemberPartial(name='x{mylist}',set=teacher_enum)
+        _widget_args=dict(background='white',values=teacher_enum)     
+        for y in range(1,self.maxcols):
+            widgetcfg[0][y] = _widget_args  
+
+        # row headers are teacher
+        setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
+        _widget_args=dict(background='white',values=period_enum)     
+        for x in range(1,self.maxrows):
+            widgetcfg[x][0] = _widget_args
 
         setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
 
@@ -128,7 +182,7 @@ class WizardUI(Frame):
                              {},widgetcfg)
 
         self.entrygrid.grid(row=0,column=0,sticky=NSEW)
-
+        
         controlpanel = Frame(master)
         controlpanel.grid(row=2)
         
@@ -151,7 +205,10 @@ class WizardUI(Frame):
         self.dbload_entry.grid(row=2,column=4)
         self.dbload_entry.focus_get()
         
-        self.dbload_button = Button(controlpanel,command=self.load,text="dbload",name="dbl")
+        self.dbload_button = Button(controlpanel,
+                                    command=lambda: self.load(self.dbload_entry_sv.get()),
+                                    text="dbload",name="dbl")
+        
         self.dbload_button.grid(row=2,column=5)
         self.dbload_button.focus_get()
         
@@ -184,7 +241,7 @@ class WizardUI(Frame):
         
     def save(self):
 
-        of.reset()
+        self.of.reset()
         
         for x in range(1,self.maxrows):
             ylabel=self.entrygrid.widgets[x][0].sv.get()
@@ -204,25 +261,25 @@ class WizardUI(Frame):
                     
                     obj_id = ",".join(map(str,[x,y,z]))
 
-                    datamembers = dict(schedule_num = '1',
-                                       day='Tuesday', 
+                    datamembers = dict(schedule = '1',
+                                       dow='Tuesday', 
                                        subject="MATH",
                                        lessontype="wp",
                                        objtype='lesson',
                                        userobjid=obj_id, # unique key to store obj in of
                                        period=ylabel,
                                        student=value,
-                                       #saveversion=str(self.lastsaveversion),
+                                       saveversion=str(self.lastsaveversion),
                                        teacher=xlabel)
                     
-                    of.new(schoolschedgeneric,
-                           'lesson',
-                           objid=obj_id,
-                           constructor='datamembers',
-                           database=database,
-                           of=of,
-                           modname=__name__,
-                           dm=datamembers)
+                    self.of.new(schoolschedgeneric,
+                                'lesson',
+                                objid=obj_id,
+                                constructor='datamembers',
+                                database=self.database,
+                                of=self.of,
+                                modname=__name__,
+                                dm=datamembers)
 
                     current_value = self.balancegrid.widgets[x][y].cget("text")
                     if current_value == xlabel:
@@ -253,8 +310,6 @@ class WizardUI(Frame):
                 self.balancegrid.widgets[0][student].config(background='green')
             
     def focus_next_widget(self,event):
-        print "focuschange"
-        #nextwidget = self.master.tk_focusNext()
         if str(event.widget)[-3:] == "svb":
             self.entrygrid.focus()
         else:
@@ -272,28 +327,28 @@ class WizardUI(Frame):
                 self.balancegrid.widgets[x][y].config(text="")    
                 self.balancegrid.widgets[x][y].config(background="white") 
 
-    def load(self,values=None):
+    def load_save(self,saveversion):
+        self.load(saveversion)
+        self.save()
+        
+    def load(self,saveversion,values=None):
         
         cols = ['period','student','teacher','dow']
         
         if values==None:
-            #load from database
-            with database:
-                colndefn,rows = tbl_rows_get(database,'lesson',cols,
-                                    ('saveversion',str(self.dbload_entry_sv.get())))
+            with self.database:
+                colndefn,rows = tbl_rows_get(self.database,'lesson',cols,
+                                    ('saveversion',saveversion))
             
             for row in rows:
                 x = period_map[row[cols.index('period')]]
                 y = teacher_map[row[cols.index('teacher')]]
                 v = student_map[row[cols.index('student')]]
-                
-                self.entrygrid.widgets[x+1][y+1].sv.set(v)
+
+                self.entrygrid.widgets[x+1][y+1].sv.set(row[cols.index('student')])
                 
                 self.entrygrid.widgets[0][y+1].sv.set(row[cols.index('teacher')])
                 self.entrygrid.widgets[x+1][0].sv.set(row[cols.index('period')])
-                
-            self.save()
-                
         else:
                 
             for x in range(len(values)):
@@ -310,12 +365,5 @@ if __name__ == "__main__":
     
     database = Database('htmlparser')
     of = ObjFactory(True)
-    
-    ui = WizardUI(master)
-    values=[["","Stan","Galina","Samantha","Amelia","Paraic"],
-            ['8:30-9:10',"NATHANIEL","ORIG","TRISTAN","COBY","YOSEF"],
-            ['9:11-9:51',"LUCY","DONOVAN","BOOKER","ASHER","JAKE"]]
-
-
-    ui.load(values)
+    ui = WizardUI(master,database,of)
     master.mainloop()

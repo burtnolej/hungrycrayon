@@ -8,7 +8,7 @@ from inspect import isclass
 import unittest
 import time
 from collections import OrderedDict
-
+    
 class ObjFactory(GenericBase):
     
     store = {}
@@ -19,7 +19,16 @@ class ObjFactory(GenericBase):
             
         super(ObjFactory,self).__init__()
     
-    def new(self,clsname,**kwargs):
+    def _factory(self,name,cls):
+        def __init__(self,**kwargs):
+            cls.__init__(self,**kwargs)
+            
+        newclass = type(name, (cls,),{'__init__':__init__})
+        return newclass         
+                
+    def new(self,basecls,clsname,**kwargs):
+        
+        cls = self._factory(clsname,basecls)
 
         for key,value in kwargs.iteritems():
             setattr(self,key,value)
@@ -47,21 +56,24 @@ class ObjFactory(GenericBase):
         # if this is the first instance of this obj then else return existing    
         if  self.store[clsname].has_key(kwargs['objid']) == False:
             # dynamically create the new object
-            clsobj = getattr(sys.modules[self.modname],clsname)
+            #clsobj = getattr(sys.modules[self.modname],clsname)
             
-            if isinstance(clsobj,object) == False:
-                raise Exception('module',self.modname,'is returning',clsname,'as type',type(clsobj), \
+            if isinstance(cls,object) == False:
+                raise Exception('module',self.modname,'is returning',clsname,'as type',type(cls), \
                                 'must be object. member attr may have same name as class')
 
             if constructor <> None:
-                constobj = getattr(clsobj,constructor)
+                constobj = getattr(cls,constructor)
                 newobj =constobj(**kwargs)
             else:
-                newobj =clsobj(**kwargs)
-            
+                newobj =cls(**kwargs)
+
             #newobj = getattr(sys.modules[self.modname],clsname)(objid,**kwargs)
-            self.store[clsname][kwargs['objid']] = newobj
-            self.log.log(newobj,3,"added obj="+newobj.__class__.__name__+" tag="+str(newobj)+" id="+newobj.id)
+            if newobj == "":
+                self.log.log(cls.__class__.__name__,3,"could not create an instance")
+            else:
+                self.store[clsname][kwargs['objid']] = newobj
+                self.log.log(newobj,3,"added obj="+newobj.__class__.__name__+" tag="+str(newobj)+" id="+newobj.id)
 
         return(self.store[clsname][kwargs['objid']])
         
@@ -97,4 +109,7 @@ class ObjFactory(GenericBase):
         
     def __repr__(self):
         return('ObjFactory')
+    
+
+
     

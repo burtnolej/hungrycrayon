@@ -4,12 +4,12 @@ import os
 from os import path as ospath
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from misc_utils_objectfactory import GenericBase, ObjFactory
-from database_table_util import dbtblgeneric
+from database_table_util import dbtblgeneric, dbtblfactory
 from database_util import Database
 
 import unittest
 
-class Student(GenericBase):
+'''class Student(GenericBase):
     def __init__(self,objid,**kwargs):
         self.objid = objid
 
@@ -23,17 +23,19 @@ class Subject(GenericBase):
 class Classroom(GenericBase):
     def __init__(self,objid,**kwargs):
         self.objid = objid
-        super(Classroom,self).__init__(**kwargs)
+        super(Classroom,self).__init__(**kwargs)'''
       
 class Test_ObjFrameworkBasic(unittest.TestCase):
 
     def setUp(self):
         self.of = ObjFactory()
-        foobar= self.of.new('Student',
-                              objid='booker',
-                              modname=__name__,
-                              name='booker',
-                              age=23)      
+
+        foobar= self.of.new(GenericBase,
+                            "Student",
+                            objid='booker',
+                            modname=__name__,
+                            name='booker',
+                            age=23)      
 
     def tearDown(self):
         self.of.reset()
@@ -46,7 +48,7 @@ class Test_ObjFrameworkBasic(unittest.TestCase):
     
     def test_objects_created_stored(self):
         _student = ObjFactory().store['Student']['booker']
-        self.assertTrue(isinstance(_student,Student))
+        self.assertEquals(_student.__class__.__name__,"Student")
 
     def test_objects_have_attributes(self):
         _student = ObjFactory().store['Student']['booker']        
@@ -57,13 +59,15 @@ class Test_ObjFramework_2_records_same_cls(unittest.TestCase):
 
     def setUp(self):
         self.of = ObjFactory()
-        self.obj1= self.of.new('Student',
+        self.obj1= self.of.new(GenericBase,
+                               'Student',
                                objid='booker',
                                modname=__name__,
                                name='booker',
                                age=23)
         
-        self.obj2= self.of.new('Student',
+        self.obj2= self.of.new(GenericBase,
+                               'Student',
                                objid='frank',
                                modname=__name__,
                                name='frank',
@@ -82,13 +86,15 @@ class Test_ObjFramework_2_class(unittest.TestCase):
 
     def setUp(self):
         self.of = ObjFactory()
-        self.obj1= self.of.new('Student',
+        self.obj1= self.of.new(GenericBase,
+                               'Student',
                                objid='booker',
                                modname=__name__,
                                name='booker',
                                age=23)
         
-        self.obj2= self.of.new('Subject',
+        self.obj2= self.of.new(GenericBase,
+                               'Subject',
                                objid='science',
                                modname=__name__,
                                name='science',
@@ -105,11 +111,13 @@ class Test_ObjFrameworkDupeID(unittest.TestCase):
 
     def setUp(self):
         self.of = ObjFactory()
-        self.obj1= self.of.new('Student',
+        self.obj1= self.of.new(GenericBase,
+                               'Student',
                                objid='booker',
                                modname=__name__)
         
-        self.obj2= self.of.new('Student',
+        self.obj2= self.of.new(GenericBase,
+                               'Student',
                                objid='booker',
                                modname=__name__)
         
@@ -124,17 +132,20 @@ class Test_ObjFrameworkIter(unittest.TestCase):
 
     def setUp(self):
         self.of = ObjFactory(True)
-        self.of.new('Student',
-                               objid='booker',
-                               modname=__name__)
+        self.of.new(GenericBase,
+                    'Student',
+                    objid='booker',
+                    modname=__name__)
         
-        self.of.new('Student',
-                               objid='fred',
-                               modname=__name__)
+        self.of.new(GenericBase,
+                    'Student',
+                    objid='fred',
+                    modname=__name__)
         
-        self.of.new('Classroom',
-                               objid='1a',
-                               modname=__name__)
+        self.of.new(GenericBase,
+                    'Classroom',
+                    objid='1a',
+                    modname=__name__)
         
 
     def tearDown(self):
@@ -146,8 +157,8 @@ class Test_ObjFrameworkIter(unittest.TestCase):
         
         self.assertListEqual(result,['1a','booker','fred'])
         
-class DBLesson(dbtblgeneric):
-    pass
+#class DBLesson(dbtblgeneric):
+#    pass
       
 class Test_ObjFramework_Database(unittest.TestCase):
 
@@ -155,7 +166,8 @@ class Test_ObjFramework_Database(unittest.TestCase):
     def setUp(self):
         self.of = ObjFactory(True)
         self.database = Database('foobar')
-        self.foobar= self.of.new('DBLesson',
+        self.foobar= self.of.new(dbtblgeneric,
+                                 'DBLesson',
                                  objid='dblesson0',
                                  constructor='datamembers',
                                  modname=__name__,
@@ -176,7 +188,7 @@ class Test_ObjFramework_Database(unittest.TestCase):
     
     def test_objects_created_stored(self):
         _lesson = self.of.object_get('DBLesson','dblesson0')
-        self.assertTrue(isinstance(_lesson,DBLesson))
+        self.assertEquals(_lesson.__class__.__name__,"DBLesson")
 
     def test_objects_have_attributes(self):
         _lesson = self.of.object_get('DBLesson','dblesson0')  
@@ -184,6 +196,30 @@ class Test_ObjFramework_Database(unittest.TestCase):
         self.assertEquals(_lesson.period,2)
         self.assertEquals(_lesson.dow,3)
         
+class Test_ObjFramework_Database_Derived(unittest.TestCase):
+    # pass in a subclass of dbtblgeneric as a baseclass; testing a bug found
+    # in schoolschedulewizard
+    
+    class Dummy(dbtblgeneric):
+        pass
+    
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        self.foobar= self.of.new(self.Dummy,
+                                 'DBLesson',
+                                 objid='dblesson0',
+                                 constructor='datamembers',
+                                 modname=__name__,
+                                 database=self.database,
+                                 dm={'student':'booker',
+                                     'period':2,
+                                     'dow':3})
+        
+    def test_num_obj_created(self):
+        self.assertEquals(len(self.of.query('DBLesson')),1)
+            
+            
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
@@ -193,6 +229,8 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_records_same_cls))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_class))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkIter))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived))
+    
     
     
     
