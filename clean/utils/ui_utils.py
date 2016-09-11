@@ -125,26 +125,29 @@ def tkwidgetfactory(var,master,**kwargs):
             if kwargs.has_key('name'):
                 d = dict(name=kwargs['name'])
                 kwargs.pop('name')
-             
+            
+            widgettype.__init__(self,master,var,**d)
+            
             # not every widget type accepts every option   
             if var.widgettype <> TkCombobox:
                 try:
                     kwargs.pop('values')
                 except:
                     pass
-                
-            widgettype.__init__(self,master,var,**d)
-            
+            else:
+                # keep a copy of full value list so dropdown values can be reset
+                self.orig_values = kwargs['values']
+
             self.widgettype = widgettype
             
             self.config(**kwargs)
 
         #staticmethod(tkwidgetimage_set)
         
-    tkw = tkwidget(master,var.widgettype)
-    tkw.config(**kwargs)
-    
-    return(tkw)
+    return(tkwidget(master,var.widgettype))
+#tkw = tkwidget(master,var.widgettype)
+#tkw.config(**kwargs)        
+#return(tkw)
 
 class TkImageWidget(object):
 #class TkImageLabel(Tkbutton):
@@ -446,7 +449,6 @@ class TkCombobox(Combobox):
                            textvariable=self.sv,
                            **kwargs)
         
-        
         self.s = Style()
         self.s.configure('InFocus.Valid.TCombobox',
                          fieldbackground='yellow',
@@ -474,7 +476,7 @@ class TkCombobox(Combobox):
         
         self.bind("<Control-Down>",self.postdropdown)
         self.bind("<Control-Up>",self.unpostdropdown)
-
+        
         self.sv.trace("w",lambda name, index, mode, 
                   sv=self.sv: self.complete())
         
@@ -513,6 +515,14 @@ class TkCombobox(Combobox):
         self.selectall()
             
     def complete(self):
+       
+        valid_state = 'Invalid'
+        focus_state = 'InFocus'
+        
+        # check if function is because of a system load (ignore focus) or by a user selection
+        if self.master.focus_get() == None:
+            focus_state = 'OutOfFocus'
+
         input = self.sv.get()
         if input <> "":
             hits = self.rematch(input,self['values'])
@@ -520,19 +530,18 @@ class TkCombobox(Combobox):
             if len(hits) == 1:
                 self.update(hits)
                 self.sv.set(hits[0])
+                valid_state = 'Valid'
                 
-                # check if function is because of a system load (ignore focus) or by a user selection
-                if self.master.focus_get() == None:
-                    self['style']='OutOfFocus.Valid.TCombobox'
-                else:
-                    self['style']='InFocus.Valid.TCombobox'
             elif len(hits)>1:
                     
                 self.update(hits)
             else:
-                self.update(self['values'])
+                self.update(self.orig_values)
         else:
-            self.update(self['values'])
+            self.update(self.orig_values)
+            
+        self['style']=".".join([focus_state,valid_state,'TCombobox'])   
+            
                 
     def update(self,newvalues):
         #self.combo.config(values=newvalues)
