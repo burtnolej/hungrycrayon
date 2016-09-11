@@ -178,13 +178,15 @@ class TkImageWidget(object):
 
 class TkImageLabelGrid(Frame):
 
-    def __init__(self,master,var,width,height,x,y,maxrows,maxcols,
+    def __init__(self,master,gridname,var,width,height,x,y,maxrows,maxcols,
                  gridcfg=None,widgetcfg=None,
                  gridcolstart=0,gridrowstart=0,
                  rowhdrcfg={},colhdrcfg={}):
         
         Frame.__init__(self,master)
 
+        self.gridname = gridname
+        
         self.master = master
         self.current_yfocus=0
         self.current_xfocus=0
@@ -221,7 +223,7 @@ class TkImageLabelGrid(Frame):
             for y in range(self.maxcols):
                 
                 lbl = tkwidgetfactory(var,self,
-                                      name=str(x)+","+str(y),
+                                      name=",".join([gridname,str(x),str(y)]),
                                       **widgetcfg[x][y])
     
                 lbl.grid(row=x,column=y,sticky=NSEW)
@@ -357,7 +359,32 @@ class TkImageLabelGrid(Frame):
         return contents
     
     
-class TkEntry(_tkentry):
+class TKBase(object):
+    def __init__(self,widget,**kwargs):
+        self.widget = widget
+        parent = self.widget.winfo_parent()
+        gparent = self._nametowidget(parent).winfo_parent()
+        
+        self.toplevel = self._nametowidget(gparent)
+            
+        if hasattr(self.toplevel,'update_callback'):
+            self.set_update_trace()
+            
+    def set_update_trace(self):
+        ''' this is the default and works for any widget that has a StringVar assigned to -textvariable
+        otherwise you need to '''
+        
+        widget_class = str(self.widget.winfo_class())
+
+        try:
+            self.sv.trace("w",lambda name,index,mode,sv=self.sv:
+                          self.toplevel.update_callback(self.widget,self.sv.get()))
+            print "success:register callback",widget_class, self.toplevel.update_callback
+        except Exception:
+            print "fail: register callback",widget_class, self.toplevel.update_callback
+
+
+class TkEntry(_tkentry,TKBase):
     def __init__(self,master,var,**kwargs):
         
         if not isadatatype(var):
@@ -368,8 +395,8 @@ class TkEntry(_tkentry):
                           textvariable=self.sv,
                           **kwargs)
         
-        
-        
+        TKBase.__init__(self,self,**kwargs)
+
         self.bind("<Down>",self.refocus)
         self.bind("<Left>",self.refocus)
         self.bind("<Right>",self.refocus)
@@ -383,7 +410,7 @@ class TkEntry(_tkentry):
         self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                       self.changed(self.sv))
                       
-    def changed(self,sv):
+    '''def changed(self,sv):
         new_value = sv.get()
         self.current_value = new_value
 
@@ -401,7 +428,7 @@ class TkEntry(_tkentry):
         else:
             self.config(foreground='black')
         #else:
-        #print "probably a new column"
+        #print "probably a new column"'''
         
     def highlight(self,event):
         
@@ -422,12 +449,20 @@ class TkEntry(_tkentry):
         self._nametowidget(parent).refocus(event)
         return "break"
         
-class TkLabel(_tklabel):
+class TkLabel(_tklabel,TKBase):
     def __init__(self,master,var,**kwargs):
         if not isadatatype(var):
-            raise Exception('arg datatype must be a valid type')        
-        _tklabel.__init__(self,master,**kwargs)
-
+            raise Exception('arg datatype must be a valid type')
+        
+        self.current_value = self.init_value = ""
+        self.sv=StringVar()
+        _tklabel.__init__(self,master,
+                          textvariable=self.sv,
+                          **kwargs)
+                
+        TKBase.__init__(self,self,
+                        **kwargs)
+            
 class TkButton(_tkbutton):
     def __init__(self,master,var,**kwargs):
         
@@ -435,19 +470,24 @@ class TkButton(_tkbutton):
             raise Exception('arg datatype must be a valid type')
         
         _tkbutton.__init__(self,master,**kwargs)
+        
 
-class TkCombobox(Combobox):
+class TkCombobox(Combobox,TKBase):
     
     def __init__(self,master,var,**kwargs):
         
         if not isadatatype(var):
             raise Exception('arg datatype must be a valid type')
         
+        #self.init_value= ""
+        self.current_value = self.init_value = ""
         self.sv=StringVar()
 
         Combobox.__init__(self,master,
                            textvariable=self.sv,
                            **kwargs)
+        
+        TKBase.__init__(self,self,**kwargs)
         
         self.s = Style()
         self.s.configure('InFocus.Valid.TCombobox',
@@ -485,6 +525,16 @@ class TkCombobox(Combobox):
         
         #self.master.bind("<Prior>",self.selectall)
 
+    '''def callback(self,widget,new_value):
+        print "update to",new_value,"from",self.current_value
+        self.current_value = new_value
+
+        if str(self.current_value) <> str(self.init_value):
+                        
+            widget.config(foreground='red')
+        else:
+            widget.config(foreground='black')'''
+            
     def selectall(self,event=None):
         self.selection_range(0, END) 
         
