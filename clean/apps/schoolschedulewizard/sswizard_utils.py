@@ -18,11 +18,10 @@ def updates_get(ui,gridname,ignoreaxes=False):
     xsize= max([int(key[1]) for key in update_keys]) + offset
     ysize= max([int(key[2]) for key in update_keys]) + offset
     
-    print xsize,ysize
+
     # text values of widgets
     values = nxnarraycreate(int(xsize),int(ysize),"")
     for key in update_keys:
-        print key,int(key[1]),int(key[2]),ui.updates[str(",".join(key))]
         
         if ignoreaxes == False:
             offset = 0
