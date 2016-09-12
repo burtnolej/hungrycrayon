@@ -11,6 +11,8 @@ from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 from misc_utils import Log
 from misc_utils_objectfactory import ObjFactory
 
+import sswizard_utils
+
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get
 
@@ -378,26 +380,8 @@ class WizardUI(Tk):
                     self.entrygrid.widgets[x][y].sv.set(values[x][y])
 
     def updates_get(self,gridname,ignoreaxes=False):
-        maxx = maxy = -1
-        if ignoreaxes == True: maxx = maxy = 0
-        update_keys = [ [gridname,update.split(",")[1],update.split(",")[2]] for update in self.updates.keys() if update.split(",")[0] == gridname if int(update.split(",")[1]) > maxx if int(update.split(",")[2]) > maxy]
         
-        xsize= max([int(key[1]) for key in update_keys])
-        ysize= max([int(key[2]) for key in update_keys])
-        
-        # text values of widgets
-        values = nxnarraycreate(int(xsize),int(ysize),"")
-        for key in update_keys:
-            values[int(key[1])-1][int(key[2])-1] = self.updates[str(",".join(key))]
-        
-        # background color of widgets
-        bgcolor = nxnarraycreate(int(xsize),int(ysize),"")
-        for key in update_keys:
-            
-            _color = self.balancegrid.widgets[int(key[1])][int(key[2])].cget('background')
-            bgcolor[int(key[1])-1][int(key[2])-1] = _color
-
-        return values,bgcolor
+        return(sswizard_utils.updates_get(self,gridname,ignoreaxes))
         
     def persist(self):
         with self.database:

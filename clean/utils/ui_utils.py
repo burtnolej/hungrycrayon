@@ -360,15 +360,53 @@ class TkImageLabelGrid(Frame):
     
 class TKBase(object):
     def __init__(self,widget,**kwargs):
+        
         self.widget = widget
         parent = self.widget.winfo_parent()
         gparent = self._nametowidget(parent).winfo_parent()
         
         self.toplevel = self._nametowidget(gparent)
-            
+        
         if hasattr(self.toplevel,'update_callback'):
             self.set_update_trace()
             
+        #self.sv=StringVar() 
+        
+        self.current_value = self.init_value = ""    
+
+        self.widget.s = Style()
+        
+        self.widget.s.configure(".".join(['InFocus','Notchanged',self.widget.winfo_class()]),
+                         fieldbackground='yellow',
+                         foreground='black')
+        
+        self.widget.s.configure(".".join(['OutOfFocus','Notchanged',self.widget.winfo_class()]),
+                         fieldbackground='white',
+                         foreground='black')
+        
+        self.widget.s.configure(".".join(['InFocus','Changed',self.widget.winfo_class()]),
+                         fieldbackground='yellow',
+                         foreground='red')
+        
+        self.widget.s.configure(".".join(['OutOfFocus','Changed',self.widget.winfo_class()]),
+                         fieldbackground='white',
+                         foreground='red')
+        
+        #self.init_value= self.current_value = ""
+
+        self.widget.bind("<Down>",self.refocus)
+        self.widget.bind("<Left>",self.refocus)
+        self.widget.bind("<Right>",self.refocus)
+        self.widget.bind("<Up>",self.refocus)
+        
+        # for some reason TEntry does not treat Style same as combo so can make these calls in TkBase
+        if self.winfo_class() == 'TEntry':
+            self.widget['style']=".".join(['OutOfFocus','Notchanged',self.widget.winfo_class()])
+            
+            self.widget.bind('<FocusIn>',self.highlight)
+            self.widget.bind('<FocusOut>',self.highlight)
+            
+        
     def set_update_trace(self):
         ''' this is the default and works for any widget that has a StringVar assigned to -textvariable
         otherwise you need to '''
@@ -381,71 +419,61 @@ class TKBase(object):
         except Exception:
             log.log(self,"fail: register callback",widget_class, self.toplevel.update_callback)
 
-class TkEntry(_tkentry,TKBase):
+    def highlight(self,event):
+        _,state,_ = self['style'].split(".")
+           
+        if event.type == '9':
+            self['style']=".".join(['InFocus',state,self.winfo_class()])
+        elif event.type == '10':
+            self['style']=".".join(['OutOfFocus',state,self.winfo_class()])
+
+
+        self.selectall()
+        
+    def selectall(self,event=None):
+        self.selection_range(0, END)
+        
+        
+    def refocus(self,event):
+        parent = self.winfo_parent()
+        self._nametowidget(parent).refocus(event)
+        return "break"
+
+class TkEntry(Entry,TKBase):
     def __init__(self,master,var,**kwargs):
         
         if not isadatatype(var):
             raise Exception('arg datatype must be a valid type')
-        self.sv=StringVar()
-        
-        _tkentry.__init__(self,master,
+
+        self.sv=StringVar()    
+        Entry.__init__(self,master,
                           textvariable=self.sv,
                           **kwargs)
         
         TKBase.__init__(self,self,**kwargs)
 
-        self.bind("<Down>",self.refocus)
-        self.bind("<Left>",self.refocus)
-        self.bind("<Right>",self.refocus)
-        self.bind("<Up>",self.refocus)
-        
-        self.bind('<FocusIn>',self.highlight)
-        self.bind('<FocusOut>',self.highlight)
-        
-        self.init_value= ""
-        self.current_value = ""
         self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                       self.changed(self.sv))
                       
-    '''def changed(self,sv):
+    def changed(self,sv):
         new_value = sv.get()
         self.current_value = new_value
-
-        #if self.init_value <> "":
+        focus_state = "InFocus"
+        
+        # check if function is because of a system load (ignore focus) or by a user selection
+        if str(self.master.focus_get()) <> str(self):
+            focus_state = 'OutOfFocus'
+             
         if str(self.current_value) <> str(self.init_value):
             parent = self.winfo_parent()
             gparent = self._nametowidget(parent).winfo_parent()
             self._nametowidget(gparent).updates[str(self.winfo_name())] = new_value
 
-
-            #print str(self),"changed from",self.current_value," to ",new_value
-            #print
-            
-            self.config(foreground='red')
+            self['style']=".".join([focus_state,'Changed',self.winfo_class()])
         else:
-            self.config(foreground='black')
-        #else:
-        #print "probably a new column"'''
-        
-    def highlight(self,event):
-        
-        if event.type == '9':
-            #self['style']='Focus.TEntry'
-            self.config(background='yellow')
-        elif event.type == '10':
-            #['style']='NotFocus.TEntry'
-            self.config(background='white')
-            
-        self.selectall()
-        
-    def selectall(self,event=None):
-        self.selection_range(0, END)
+            self['style']=".".join([focus_state,'Notchanged',self.winfo_class()])
+                                      #'InFocus.Notchanged.TEntry'
 
-    def refocus(self,event):
-        parent = self.winfo_parent()
-        self._nametowidget(parent).refocus(event)
-        return "break"
-        
 class TkLabel(_tklabel,TKBase):
     def __init__(self,master,var,**kwargs):
         if not isadatatype(var):
@@ -476,64 +504,38 @@ class TkCombobox(Combobox,TKBase):
         if not isadatatype(var):
             raise Exception('arg datatype must be a valid type')
         
-        #self.init_value= ""
-        self.current_value = self.init_value = ""
-        self.sv=StringVar()
+        self.sv=StringVar() 
+    
+        Combobox.__init__(self,master,textvariable=self.sv,
+                          **kwargs)
 
-        Combobox.__init__(self,master,
-                           textvariable=self.sv,
-                           **kwargs)
-        
         TKBase.__init__(self,self,**kwargs)
-        
-        self.s = Style()
-        self.s.configure('InFocus.Valid.TCombobox',
-                         fieldbackground='yellow',
-                         background='green')
-        
-        self.s.configure('OutOfFocus.Valid.TCombobox',
-                         fieldbackground='white',
-                         background='green')
-        
-        self.s.configure('InFocus.Invalid.TCombobox',
-                         fieldbackground='yellow',
-                         background='white')
-        
-        self.s.configure('OutOfFocus.Invalid.TCombobox',
-                         fieldbackground='white',
-                         background='white')
 
+        # over writing TKBase
+        self.s.configure(".".join(['InFocus','Valid',self.winfo_class()]),
+                         fieldbackground='yellow',background='green')
+        
+        self.s.configure(".".join(['OutOfFocus','Valid',self.winfo_class()]),
+                         fieldbackground='white',background='green')
+        
+        self.s.configure(".".join(['InFocus','Invalid',self.winfo_class()]),
+                        fieldbackground='yellow',background='white')
+        
+        self.s.configure(".".join(['OutOfFocus','Invalid',self.winfo_class()]),
+                        fieldbackground='white',background='white')
+
+        # this line needs to stay in TkComboBox - otherwise cannot call self['style']
         self['style']='OutOfFocus.Invalid.TCombobox'
-        self.grid(row=0,column=0,sticky=NSEW)
-                
-        self.bind("<Down>",self.refocus)
-        self.bind("<Left>",self.refocus)
-        self.bind("<Right>",self.refocus)
-        self.bind("<Up>",self.refocus)
+
+        self.sv.trace("w",lambda name, index, mode,
+                      sv=self.sv: self.complete())
         
-        self.bind("<Control-Down>",self.postdropdown)
-        self.bind("<Control-Up>",self.unpostdropdown)
-        
-        self.sv.trace("w",lambda name, index, mode, 
-                  sv=self.sv: self.complete())
-        
+        # this line needs to stay in TkComboBox - otherwise cannot call self['style'] in highlight
         self.bind('<FocusIn>',self.highlight)
         self.bind('<FocusOut>',self.highlight)
-        
-        #self.master.bind("<Prior>",self.selectall)
 
-    '''def callback(self,widget,new_value):
-        print "update to",new_value,"from",self.current_value
-        self.current_value = new_value
-
-        if str(self.current_value) <> str(self.init_value):
-                        
-            widget.config(foreground='red')
-        else:
-            widget.config(foreground='black')'''
-            
-    def selectall(self,event=None):
-        self.selection_range(0, END) 
+        self.bind("<Control-Down>",self.postdropdown)
+        self.bind("<Control-Up>",self.unpostdropdown)   
         
     def postdropdown(self,event):
         self.post
@@ -545,22 +547,6 @@ class TkCombobox(Combobox,TKBase):
         parent = self.winfo_parent()
         self._nametowidget(parent).event_generate("<Next>")
         return "break"
-    
-    def refocus(self,event):
-        
-        parent = self.winfo_parent()
-        self._nametowidget(parent).refocus(event)
-        return "break"
-    
-    def highlight(self,event):
-        _,state,_ = self['style'].split(".")
-        
-        if event.type == '9':
-            self['style']=".".join(['InFocus',state,'TCombobox'])
-        elif event.type == '10':
-            self['style']=".".join(['OutOfFocus',state,'TCombobox'])
-                    
-        self.selectall()
             
     def complete(self):
        

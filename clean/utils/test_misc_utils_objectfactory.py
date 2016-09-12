@@ -8,22 +8,6 @@ from database_table_util import dbtblgeneric, dbtblfactory
 from database_util import Database
 
 import unittest
-
-'''class Student(GenericBase):
-    def __init__(self,objid,**kwargs):
-        self.objid = objid
-
-        super(Student,self).__init__(**kwargs)
-        
-class Subject(GenericBase):
-    def __init__(self,objid,**kwargs):
-        self.objid = objid
-        super(Subject,self).__init__(**kwargs)
-        
-class Classroom(GenericBase):
-    def __init__(self,objid,**kwargs):
-        self.objid = objid
-        super(Classroom,self).__init__(**kwargs)'''
       
 class Test_ObjFrameworkBasic(unittest.TestCase):
 

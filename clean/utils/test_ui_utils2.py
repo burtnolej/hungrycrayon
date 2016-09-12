@@ -908,7 +908,42 @@ class TestUIComboImageGrid(TestWidget):
         self.master.destroy()
         
 class TestUIVentryImageGrid(TestWidget):
-    pass
+    def setUp(self):
+        self.master = Tk()
+        
+        self.maxrows=2 # rows in the grid
+        self.maxcols=2 # cols in the grid
+        self.wmheight=400 # master height
+        self.wmwidth=400 # master width
+        
+        image_args = dict(pointsize=48,font='Helvetica',gravity='center',
+                          rotate=90,label='foobar')
+        gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
+        
+        widget_args={}
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
+                                                                 'peach','pomegranate','passionfruit',
+                                                                 'pear','grape','strawberry','raspberry',
+                                                                 'rhubarb','mango','guava','apple',
+                                                                 'Orange'])
+        
+        self.tkilg = TkImageLabelGrid(self.master,self.setmemberp,self.wmwidth,self.wmheight,
+                                      0,0,self.maxrows,self.maxcols,
+                                      gridcfg,widgetcfg)
+
+        #self.tkilg.image_set()
+        
+    def test_topleft(self):
+
+        self.tkilg.widgets[0][0].sv.set('passion')
+        self.assertEqual(self.tkilg.widgets[0][0].sv.get(),'passionfruit')
+        self.master.mainloop()
+        
+        
+    def tearDown(self):
+        self.master.destroy()
 
 class TestUILabelImageGrid(TestWidget):
                     

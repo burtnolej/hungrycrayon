@@ -5,6 +5,8 @@ from type_utils import SetMemberPartial, DBSetMember, TextAlphaNum
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 from misc_utils import nxnarraycreate
 
+import sswizard_utils
+
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, \
      tbl_rows_update, dbtblfactory
@@ -14,8 +16,10 @@ from Tkinter import *
 from ttk import *
 import tkFont
 
-class DBTableUI(Frame):
-    def __init__(self,master):
+class DBTableUI(Tk):
+    def __init__(self):
+        
+        Tk.__init__(self)
 
         self.lastsaveversion=0
         
@@ -28,8 +32,7 @@ class DBTableUI(Frame):
         # .index+1 will give the col # on the grid that corresponds
         # useful for looking up pk values for updates
         self.dbcol_defn = []
-        
-        self.master = master
+
         self.maxrows=30 # rows in the grid
         self.maxcols=12 # cols in the grid
         maxwidgets=self.maxrows*self.maxcols
@@ -38,12 +41,9 @@ class DBTableUI(Frame):
         wmheight=wheight*20 # master height
         wmwidth=wwidth*20 # master width 
 
-        #geom = geometry_get(wmheight,wmwidth,0,0)
-        #self.master.geometry(self.geom)
-        
-        #master.geometry(geom)
-        
-        Frame.__init__(self,master)
+        geom = geometry_get(wmheight,wmwidth,0,0)
+        self.geometry(geom)
+               
         #master.bind("<Prior>",self.focus_next_widget)
         self.bind("<Prior>",self.focus_next_widget)
         self.grid()
@@ -57,13 +57,13 @@ class DBTableUI(Frame):
         mytextalphanum = TextAlphaNum(name='textalphanum')
 
         #self.entrygrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
-        self.entrygrid = TkImageLabelGrid(self,mytextalphanum,wmwidth,wmheight,
+        self.entrygrid = TkImageLabelGrid(self,'entrygrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxrows,self.maxcols,
                              {},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)
         self.entrygrid.grid(row=0,sticky=NSEW)
 
-        controlpanel = Frame(master)
+        controlpanel = Frame(self)
         controlpanel.grid(row=1,sticky=NSEW)
                 
         self.dbname_label = Label(controlpanel,text="database")
@@ -127,15 +127,15 @@ class DBTableUI(Frame):
         self.clone_button.grid(column=5,row=1,columnspan=1,sticky=NSEW)
         self.clone_button.focus_get()
         
-        self.newrowgrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
+        self.newrowgrid = TkImageLabelGrid(self,'newrowgrid',mytextalphanum,wmwidth,wmheight,
                              0,0,2,self.maxcols,
                              {},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)
         self.newrowgrid.grid(row=2,sticky=NSEW)
 
                 
-        self.master.grid_columnconfigure(0, weight=1, uniform="foo")
-        self.master.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.grid_columnconfigure(0, weight=1, uniform="foo")
+        self.grid_rowconfigure(0, weight=1, uniform="foo")
             
             
     def clone(self):
@@ -245,7 +245,6 @@ class DBTableUI(Frame):
                 
                 new_value = colndefn[y]
                 
-                self.entrygrid.widgets[0][y].init_value = new_value
                 self.entrygrid.widgets[0][y].current_value = new_value
 
                 self.entrygrid.widgets[0][y].sv.set(new_value)
@@ -255,8 +254,10 @@ class DBTableUI(Frame):
                 self.newrowgrid.widgets[0][y].sv.set(new_value)
                 self.newrowgrid.widgets[0][y].config(background='grey',
                                                     foreground='yellow')
+                # reset init_value after we have updated entry box so we can
+                # updates recorded in self.updates                
+                self.entrygrid.widgets[0][y].init_value = new_value
                 
-            
             for x in range(len(rows)):
                 for y in range(len(rows[x])):
                     try:
@@ -267,18 +268,20 @@ class DBTableUI(Frame):
                         if new_value == "": new_value = "<SPACE>"
                         
                         # +1 to avoid the header row
-                        self.entrygrid.widgets[x+1][y].init_value = new_value
                         self.entrygrid.widgets[x+1][y].current_value = new_value
                         self.entrygrid.widgets[x+1][y].sv.set(new_value)
                         
+                        # reset init_value after we have updated entry box so we can
+                        # updates recorded in self.updates
+                        self.entrygrid.widgets[0][y].init_value = new_value
+                        
                     except:
                         pass
-                
-if __name__ == "__main__":
-    master = Tk()
-    
-    
-    
-    ui = DBTableUI(master)
 
-    master.mainloop()
+    def updates_get(self,gridname,ignoreaxes=False):
+        
+        return(sswizard_utils.updates_get(self,gridname,ignoreaxes))
+    
+if __name__ == "__main__":   
+    app = DBTableUI()
+    app.mainloop()
