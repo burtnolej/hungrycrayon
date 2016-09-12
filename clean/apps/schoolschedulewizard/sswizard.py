@@ -106,15 +106,21 @@ class schoolschedgeneric(dbtblgeneric):
     def __repr__(self):
         return(self.objid)
 
-class WizardUI(Frame):
-    def __init__(self,master,database,of):
+class WizardUI(Tk):
+    def __init__(self,database,of):
+        
+        Tk.__init__(self)
         
         self.database = database
         self.of = of
 
         self.lastsaveversion=0
-        
-        self.master = master
+
+        # any children that change update this 
+        # key is the name and value is the new val
+        # the name is likely to be the tkwidgetid.x,y
+        self.updates = OrderedDict()    
+
         self.maxrows=14 # rows in the grid
         self.maxcols=20 # cols in the grid
         maxwidgets=self.maxrows*self.maxcols
@@ -125,12 +131,9 @@ class WizardUI(Frame):
 
         geom = geometry_get(wmheight,wmwidth,0,0)
         
-        master.geometry(geom)
-        
-        Frame.__init__(self,master)
-        self.bind("<Prior>",self.focus_next_widget)
-        self.grid()
+        self.geometry(geom)
 
+        self.bind("<Prior>",self.focus_next_widget)
 
         '''
         # default combolist values is student
@@ -161,7 +164,8 @@ class WizardUI(Frame):
         setmemberp = SetMemberPartial(name='x{mylist}',set=student_enum)
         widget_args=dict(background='white',values=student_enum)
         
-        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,
+                                   widget_args)
         
         # column headers are teacher
         setmemberp = SetMemberPartial(name='x{mylist}',set=teacher_enum)
@@ -177,14 +181,15 @@ class WizardUI(Frame):
 
         setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
 
-        self.entrygrid = TkImageLabelGrid(self,setmemberp,wmwidth,wmheight,    
-                             0,0,self.maxrows,self.maxcols,
-                             {},widgetcfg)
+        self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,
+                                          wmwidth,wmheight,    
+                                          0,0,self.maxrows,self.maxcols,
+                                          {},widgetcfg)
 
         self.entrygrid.grid(row=0,column=0,sticky=NSEW)
         
-        controlpanel = Frame(master)
-        controlpanel.grid(row=2)
+        controlpanel = Frame(self)
+        controlpanel.grid(row=2,sticky=NSEW)
         
         self.save_button = Button(controlpanel,command=self.save,text="save",name="svb")
         self.save_button.grid(row=2,column=0)
@@ -220,29 +225,47 @@ class WizardUI(Frame):
         self.bgmaxcols=len(student_enum)+1 
         mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
-        self.balancegrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
-                             0,0,self.bgmaxrows,self.bgmaxcols,
-                             {},widgetcfg)
+        self.balancegrid = TkImageLabelGrid(self,'balancegrid',
+                                            mytextalphanum,wmwidth,wmheight,
+                                            0,0,self.bgmaxrows,self.bgmaxcols,
+                                            {},widgetcfg)
+        
         
         self.balancegrid.grid(row=1,column=0,sticky=NSEW)
         self._draw_balancegrid_labels()
         
-        self.master.grid_columnconfigure(0, weight=1, uniform="foo")
-        self.master.grid_rowconfigure(0, weight=1, uniform="foo")
-        self.master.grid_rowconfigure(1, weight=1, uniform="foo")
+        self.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.grid_rowconfigure(1, weight=1, uniform="foo")
+        self.grid_columnconfigure(0, weight=1, uniform="foo")
+         
+    def update_callback(self,widget,new_value):        
+        ''' via BaseTk class; all entry widgets assign a callback to the change event
+        to call this function if it exists '''
+        widget.current_value = new_value
+
+        if str(widget.current_value) <> str(widget.init_value):
+                        
+            widget.config(foreground='red')
+        else:
+            widget.config(foreground='black')
+            
+        self.updates[str(widget.winfo_name())] = new_value
             
     def _draw_balancegrid_labels(self):
         
         for x in range(len(period_enum)+1):
-            self.balancegrid.widgets[x][0].config(text=period_enum[x-1])
+            self.balancegrid.widgets[x][0].sv.set(period_enum[x-1])
             
         for y in range(1,len(student_enum)+1):
-            self.balancegrid.widgets[0][y].config(text=student_enum[y-1])
+            self.balancegrid.widgets[0][y].sv.set(student_enum[y-1])
         
-    def save(self):
+    def save(self,saveversion=None):
 
         self.of.reset()
         
+        if saveversion == None:
+            saveversion=str(self.lastsaveversion)
+            
         for x in range(1,self.maxrows):
             ylabel=self.entrygrid.widgets[x][0].sv.get()
             
@@ -269,7 +292,7 @@ class WizardUI(Frame):
                                        userobjid=obj_id, # unique key to store obj in of
                                        period=ylabel,
                                        student=value,
-                                       saveversion=str(self.lastsaveversion),
+                                       saveversion=saveversion,
                                        teacher=xlabel)
                     
                     self.of.new(schoolschedgeneric,
@@ -285,11 +308,10 @@ class WizardUI(Frame):
                     if current_value == xlabel:
                         pass
                     elif current_value == "":
-                        
                         self.balancegrid.widgets[x][y].config(background='lightgreen')
-                        self.balancegrid.widgets[x][y].config(text=xlabel)
+                        self.balancegrid.widgets[x][y].sv.set(xlabel)
                     else:
-                        self.balancegrid.widgets[x][y].config(text=current_value+","+xlabel)
+                        self.balancegrid.widgets[x][y].sv.set(current_value+","+xlabel)
                         self.balancegrid.widgets[x][y].config(background='red')
                     
         self.student_totals_calc()        
@@ -355,15 +377,37 @@ class WizardUI(Frame):
                 for y in range(len(values[0])):
                     self.entrygrid.widgets[x][y].sv.set(values[x][y])
 
+    def updates_get(self,gridname,ignoreaxes=False):
+        maxx = maxy = -1
+        if ignoreaxes == True: maxx = maxy = 0
+        update_keys = [ [gridname,update.split(",")[1],update.split(",")[2]] for update in self.updates.keys() if update.split(",")[0] == gridname if int(update.split(",")[1]) > maxx if int(update.split(",")[2]) > maxy]
+        
+        xsize= max([int(key[1]) for key in update_keys])
+        ysize= max([int(key[2]) for key in update_keys])
+        
+        # text values of widgets
+        values = nxnarraycreate(int(xsize),int(ysize),"")
+        for key in update_keys:
+            values[int(key[1])-1][int(key[2])-1] = self.updates[str(",".join(key))]
+        
+        # background color of widgets
+        bgcolor = nxnarraycreate(int(xsize),int(ysize),"")
+        for key in update_keys:
+            
+            _color = self.balancegrid.widgets[int(key[1])][int(key[2])].cget('background')
+            bgcolor[int(key[1])-1][int(key[2])-1] = _color
+
+        return values,bgcolor
+        
     def persist(self):
-        with database:
-            for obj in of.object_iter():
+        with self.database:
+            for obj in self.of.object_iter():
                 obj.persist()
 
 if __name__ == "__main__":
-    master = Tk()
+    #master = Tk()
     
     database = Database('htmlparser')
     of = ObjFactory(True)
-    ui = WizardUI(master,database,of)
-    master.mainloop()
+    app = WizardUI(database,of)
+    app.mainloop()

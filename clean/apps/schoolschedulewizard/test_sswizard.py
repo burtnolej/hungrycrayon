@@ -10,17 +10,82 @@ import unittest
 
 from sswizard import schoolschedgeneric, WizardUI, teachers
 from database_util import Database
+from database_table_util import tbl_rows_get
 from misc_utils_objectfactory import ObjFactory
 from misc_utils import Log
 
-class Test_Load_From_Database(unittest.TestCase):
+from shutil import copyfile
+from os import remove, path
 
+class Test_Grid_Behaviour_Focus(unittest.TestCase):
     def setUp(self):
-        self.master = Tk()
         
         self.database = Database('test')
         self.of = ObjFactory(True)
-        self.ui = WizardUI(self.master, self.database, self.of)
+        self.ui = WizardUI(self.database, self.of)
+        
+        parent_name = self.ui.entrygrid.widgets[0][0].winfo_parent()
+        self.parent_widget = self.ui.entrygrid.widgets[0][0]._nametowidget(parent_name)
+        self.parent_widget.update()
+    
+    def test_rightarrow_moveright(self):
+        
+        self.ui.entrygrid.widgets[0][0].event_generate("<Right>")
+        _,new_x,new_y = str(self.parent_widget.focus_get()).split(",")
+               
+        self.assertEqual(new_x,'0')
+        self.assertEqual(new_y,'1')
+        
+        
+    def test_rightarrow_moveright1_down1(self):
+        
+        self.ui.entrygrid.widgets[0][0].event_generate("<Right>")
+        self.parent_widget.focus_get().event_generate("<Down>")
+        
+        _,new_x,new_y = str(self.parent_widget.focus_get()).split(",")
+              
+        self.assertEqual(new_x,'1')
+        self.assertEqual(new_y,'1')
+        
+    def tearDown(self):
+        self.ui.destroy()
+        
+class Test_Grid_Behaviour_Update_Combobox(unittest.TestCase):
+    def setUp(self):
+        
+        self.database = Database('test')
+        self.of = ObjFactory(True)
+        self.ui = WizardUI(self.database, self.of)
+        
+        parent_name = self.ui.entrygrid.widgets[0][0].winfo_parent()
+        self.parent_widget = self.ui.entrygrid.widgets[0][0]._nametowidget(parent_name)
+        self.parent_widget.update()
+        
+        self.ui.entrygrid.widgets[0][0].event_generate("<Right>")
+        self.parent_widget.focus_get().event_generate("<Down>")
+        
+        self.widget = self.parent_widget.focus_get()
+    
+    def test_rightarrow_moveright(self):
+
+        # need to input char by char for the complete to fire
+        self.widget.insert(0,'n')
+        self.widget.insert(1,'a')
+
+        self.assertEqual(self.widget.sv.get(),'NATHANIEL')
+
+        self.assertEqual(self.widget['style'],'InFocus.Valid.TCombobox')
+        
+    def tearDown(self):
+        self.ui.destroy()
+        
+class Test_Load_From_Database(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.database = Database('test')
+        self.of = ObjFactory(True)
+        self.ui = WizardUI(self.database, self.of)
         
     def test_from_db_to_grid(self):
         
@@ -42,9 +107,7 @@ class Test_Load_From_Database(unittest.TestCase):
         
         results = self.of.query()
         results.sort()
-        
-        self.master.mainloop()
-        
+
         self.assertListEqual(results, expected_results)
         
     def test_student_object_after_save(self):
@@ -93,15 +156,149 @@ class Test_Load_From_Database(unittest.TestCase):
         self.assertEqual('ObjFactory', getattr(lesson_obj,'of').__class__.__name__)
         self.assertEqual('Log', getattr(lesson_obj,'log').__class__.__name__)
         
-                                  
+    def test_num_lesson_objects_save(self):
+        # test that the objects created have the correct member attr and attrvals
+        self.ui.load_save(0)
+        results = self.of.query('lesson')
+        self.assertEqual(len(results),10)
+        
+    def test_num_teacher_objects_save(self):
+        # test that the objects created have the correct member attr and attrvals
+        self.ui.load_save(0)
+        results = self.of.query('teacher')
+        self.assertEqual(len(results),5)
+        
+    def test_num_student_objects_save(self):
+        # test that the objects created have the correct member attr and attrvals
+        self.ui.load_save(0)
+        results = self.of.query('student')
+        self.assertEqual(len(results),10)
+        
+    def test_balancegrid_after_save(self):
+        #self.master.mainloop()
+        #[['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY','BOOKER','ASHLEY','YOSEF','LUCY','JAKE','ASHER','DONOVAN','LIAM','SIMON B','NICK'],
+        
+        expected_results = [['Stan','Samantha','','Galina','Amelia','','','Paraic','','','',''],
+                            ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina']]
+        
+        self.ui.load_save(0)
+    
+        values,_ = self.ui.updates_get('balancegrid',ignoreaxes=True)
+        
+        self.assertListEqual(expected_results,values)
+        
+    def test_balancegrid_after_save_overload_Nathaniel(self):
+        
+        expected_values = [['Stan,Galina','Samantha','','Galina','Amelia','','','Paraic','','','',''],
+                            ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina']]
+        
+        expected_colors = [['red','lightgreen','','lightgreen','lightgreen','','','lightgreen','','','',''],
+                            ['','','','','','lightgreen','','','lightgreen','lightgreen','lightgreen','lightgreen']]
+        
+        self.ui.load_save(0)
+        
+        self.ui.entrygrid.widgets[1][2].sv.set('NATHANIEL')
+        
+        self.ui.save()
+        
+        values,bgcolor = self.ui.updates_get('balancegrid',ignoreaxes=True)
+        
+        self.assertListEqual(expected_values,values)
+        self.assertListEqual(expected_colors,bgcolor)
+        
+    def test_balancegrid_after_save_add_newrow_952_save(self):
+        # test that changes made are written to in memory objects correctly
+        # test that a new row (period) can be created
+
+        
+        #[['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY','BOOKER','ASHLEY','YOSEF','LUCY','JAKE','ASHER','DONOVAN','LIAM','SIMON B','NICK'],
+
+        expected_values = [['Stan','Samantha','','Galina','Amelia','','','Paraic','','','','','','',''],
+                        ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina','','',''],
+                        ['','','','','','','','Paraic','','Amelia','Samantha','Galina','','','Stan']]
+        
+        expected_colors = [['lightgreen','lightgreen','','lightgreen','lightgreen','','','lightgreen','','','','','','',''],
+                           ['','','','','','lightgreen','','','lightgreen','lightgreen','lightgreen','lightgreen','','',''],
+                           ['','','','','','','','lightgreen','','lightgreen','lightgreen','lightgreen','','','lightgreen']]
+        
+        self.ui.load_save(0)
+        
+        self.ui.entrygrid.widgets[3][0].sv.set('9:52-10:32')
+        self.ui.entrygrid.widgets[3][1].sv.set('NICK')
+        self.ui.entrygrid.widgets[3][2].sv.set('DONOVAN')
+        self.ui.entrygrid.widgets[3][3].sv.set('ASHER')
+        self.ui.entrygrid.widgets[3][4].sv.set('JAKE')
+        self.ui.entrygrid.widgets[3][5].sv.set('YOSEF')
+        
+        self.ui.save()
+        
+        values,bgcolor = self.ui.updates_get('balancegrid',ignoreaxes=True)
+        
+        self.assertListEqual(expected_values,values)
+        self.assertListEqual(expected_colors,bgcolor)
+
+        results = self.of.query('lesson')
+        self.assertEqual(len(results),15)
+        
+        self.assertEquals(self.of.object_get('lesson','3,15,1').student,'NICK')
+        self.assertEquals(self.of.object_get('lesson','3,12,2').student,'DONOVAN')
+        self.assertEquals(self.of.object_get('lesson','3,8,5').student,'YOSEF')
+        
     def tearDown(self):
-        pass
+        self.ui.destroy()
+        
+class Test_Load_Change_Save_Load(unittest.TestCase):
+    
+    def setUp(self):
+        dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
+        dbname = path.join(dbpath,'test')
+        self.tmpdbname = path.join(dbpath,'test_tmp')
+        copyfile(dbname+".sqlite",self.tmpdbname+".sqlite")
+    
+        self.database = Database(self.tmpdbname)
+        self.of = ObjFactory(True)
+        self.ui = WizardUI(self.database, self.of)
+        
+        
+    def test_(self):
+        self.ui.load_save(0)
+        self.ui.entrygrid.widgets[1][2].sv.set('NATHANIEL')
+        self.ui.save("1")
+        self.ui.persist()
+        
+        cols = ['period','student','teacher','dow']
+        
+        expected_results =[['8:30-9:10', 'NATHANIEL','Stan','Tuesday'],
+                           ['8:30-9:10', 'NATHANIEL','Galina','Tuesday'],
+                           ['8:30-9:10', 'TRISTAN','Samantha','Tuesday'],
+                           ['8:30-9:10', 'COBY','Amelia','Tuesday'],
+                           ['8:30-9:10', 'YOSEF','Paraic','Tuesday'],
+                           ['9:11-9:51', 'LUCY','Stan','Tuesday'],
+                           ['9:11-9:51', 'DONOVAN','Galina','Tuesday'],
+                           ['9:11-9:51', 'BOOKER','Samantha','Tuesday'],
+                           ['9:11-9:51', 'ASHER','Amelia','Tuesday'],
+                           ['9:11-9:51', 'JAKE','Paraic','Tuesday']]    
+
+        with self.database:
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols,
+                                         ('saveversion',"1"))
+            
+        self.assertListEqual(expected_results,rows)
+
+    def tearDown(self):
+        os.remove(self.tmpdbname+".sqlite")
+        self.ui.destroy()
+    
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Combobox))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_From_Database))
 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save_Load))
+    
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
     

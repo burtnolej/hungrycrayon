@@ -16,12 +16,17 @@ sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
         
 
 def nxnarraycreate(maxrows,maxcols,args={}):
-    ''' creates a n x n array containing args; args can be none '''
+    ''' creates a n x n array containing args; args can be none, args can be dict, list, string'''
     grid=[]
     for row in range(maxrows):
         row=[]
         for col in range(maxcols):
-            argcopy = args.copy()
+            # if its a dict make a copy
+            try:
+                argcopy = args.copy()
+            except AttributeError:
+                argcopy = args
+                
             row.append(argcopy)
         grid.append(row)
     return(grid)

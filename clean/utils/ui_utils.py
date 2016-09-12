@@ -182,12 +182,13 @@ class TkImageLabelGrid(Frame):
                  gridcfg=None,widgetcfg=None,
                  gridcolstart=0,gridrowstart=0,
                  rowhdrcfg={},colhdrcfg={}):
-        
+
+        self.master = master # reference to ui root
         Frame.__init__(self,master)
 
         self.gridname = gridname
         
-        self.master = master
+        
         self.current_yfocus=0
         self.current_xfocus=0
         
@@ -245,9 +246,7 @@ class TkImageLabelGrid(Frame):
         
     def refocus(self,event):
         
-        print event.keycode
-        
-        y,x = str(event.widget).split(".")[-1].split(",")
+        name,y,x = str(event.widget).split(".")[-1].split(",")
         
         x=int(x)
         y=int(y)
@@ -379,10 +378,8 @@ class TKBase(object):
         try:
             self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                           self.toplevel.update_callback(self.widget,self.sv.get()))
-            print "success:register callback",widget_class, self.toplevel.update_callback
         except Exception:
-            print "fail: register callback",widget_class, self.toplevel.update_callback
-
+            log.log(self,"fail: register callback",widget_class, self.toplevel.update_callback)
 
 class TkEntry(_tkentry,TKBase):
     def __init__(self,master,var,**kwargs):
@@ -550,6 +547,7 @@ class TkCombobox(Combobox,TKBase):
         return "break"
     
     def refocus(self,event):
+        
         parent = self.winfo_parent()
         self._nametowidget(parent).refocus(event)
         return "break"
@@ -573,27 +571,30 @@ class TkCombobox(Combobox,TKBase):
         if self.master.focus_get() == None:
             focus_state = 'OutOfFocus'
 
-        input = self.sv.get()
+        # always use the chars up to the most recent char only to start the complete
+        # otherwise we create a dupe char if the input continues to be correct after a match is created
+        input = self.sv.get()[:self.index(INSERT)]
+        #input = self.sv.get()
         if input <> "":
             hits = self.rematch(input,self['values'])
             
             if len(hits) == 1:
-                self.update(hits)
+                self.update_values(hits)
                 self.sv.set(hits[0])
                 valid_state = 'Valid'
                 
             elif len(hits)>1:
                     
-                self.update(hits)
+                self.update_values(hits)
             else:
-                self.update(self.orig_values)
+                self.update_values(self.orig_values)
         else:
-            self.update(self.orig_values)
+            self.update_values(self.orig_values)
             
         self['style']=".".join([focus_state,valid_state,'TCombobox'])   
             
                 
-    def update(self,newvalues):
+    def update_values(self,newvalues):
         #self.combo.config(values=newvalues)
         self.config(values=newvalues)
         

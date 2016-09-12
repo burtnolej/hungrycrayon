@@ -9,6 +9,7 @@ from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, \
      tbl_rows_update, dbtblfactory
 
+from collections import OrderedDict
 from Tkinter import *
 from ttk import *
 import tkFont
@@ -21,7 +22,7 @@ class DBTableUI(Frame):
         # any children that change update this 
         # key is the name and value is the new val
         # the name is likely to be the tkwidgetid.x,y
-        self.updates = {}
+        self.updates = OrderedDict()
         
         # dbm columns are added here as they are loaded
         # .index+1 will give the col # on the grid that corresponds
