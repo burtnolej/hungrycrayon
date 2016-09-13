@@ -8,11 +8,13 @@ import tkFont
 from math import ceil,floor
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils import nxnarraycreate
+from misc_utils import nxnarraycreate, Log
 from misc_utils_enum import enum
 from type_utils import isadatatype, TextAlphaNumRO
 from image_utils import ImageCreate, rgbstr_get
 ic = ImageCreate()
+
+log=Log()
 
 fontscale = enum(sy = 2500,sx = 3500,
                  minfpt = 8,maxfpt = 64,
@@ -348,7 +350,8 @@ class TkImageLabelGrid(Frame):
             column=[]
             empty_column=True
             for y in range(self.maxcols):
-                value = self.widgets[x][y].sv.get()
+                widget = self.widgets[x][y]
+                value = widget.sv.get()
                 if value <> "":
                     column.append(value)
                     empty_column=False
@@ -369,9 +372,12 @@ class TKBase(object):
         
         if hasattr(self.toplevel,'update_callback'):
             self.set_update_trace()
+        else:
+            log.log(self,3,'no update_callback method found on',str(self.toplevel))
             
         #self.sv=StringVar() 
         
+        self.version = 0
         self.current_value = self.init_value = ""    
 
         self.widget.s = Style()
@@ -416,8 +422,10 @@ class TKBase(object):
         try:
             self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                           self.toplevel.update_callback(self.widget,self.sv.get()))
+            log.log(self,3,"success: registered callback",str(widget_class), str(self.toplevel.update_callback))
+
         except Exception:
-            log.log(self,"fail: register callback",widget_class, self.toplevel.update_callback)
+            log.log(self,1,"fail: register callback",str(widget_class), str(self.toplevel.update_callback),e.msg)
 
     def highlight(self,event):
         _,state,_ = self['style'].split(".")
@@ -454,10 +462,12 @@ class TkEntry(Entry,TKBase):
 
         self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                       self.changed(self.sv))
+        
+        log.log(self,4,'created')
                       
     def changed(self,sv):
-        new_value = sv.get()
-        self.current_value = new_value
+        #new_value = sv.get()
+        #self.current_value = new_value
         focus_state = "InFocus"
         
         # check if function is because of a system load (ignore focus) or by a user selection
@@ -467,7 +477,7 @@ class TkEntry(Entry,TKBase):
         if str(self.current_value) <> str(self.init_value):
             parent = self.winfo_parent()
             gparent = self._nametowidget(parent).winfo_parent()
-            self._nametowidget(gparent).updates[str(self.winfo_name())] = new_value
+            #self._nametowidget(gparent).updates[str(self.winfo_name())] = new_value
 
             self['style']=".".join([focus_state,'Changed',self.winfo_class()])
         else:

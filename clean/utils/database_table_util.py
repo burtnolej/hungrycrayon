@@ -113,10 +113,12 @@ class dbtblgeneric(GenericBase):
 	               self.tbl_col_defn)
 
 	
-	tbl_rows_insert(self.database,
-                        self.tbl_name,
-                        self.tbl_col_names,
-                        self.tbl_row_values)
+	result,exec_str = tbl_rows_insert(self.database,
+	                         self.tbl_name,
+	                         self.tbl_col_names,
+	                         self.tbl_row_values)
+	
+	return(result,exec_str)
 
 	
 def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
@@ -141,19 +143,20 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
 
     return(exec_str,result) 
 
-def tbl_rows_update(database,tbl_name,values):
+def tbl_rows_update(database,tbl_name,row):
     ''' col_name is name of field to update. pkcol_name is the primary key
     values is a 4 x n grid; 1=field,2=fieldval,3=pkname,4=pkval'''
-    for row in values:
-	exec_str = "UPDATE {table} SET {field}={value} WHERE {pkfield}={pkvalue}".format(table=tbl_name,
-	                                                                                 field=row[0],
-	                                                                                 value=row[1],
-	                                                                                 pkfield=row[2],
-	                                                                                 pkvalue=row[3])
-	
+    exec_str = "UPDATE {table} SET {field}={value} WHERE {pkfield}={pkvalue}".format(table=tbl_name,
+                                                                                     field=row[0],
+                                                                                     value=row[1],
+                                                                                     pkfield=row[2],
+                                                                                     pkvalue=row[3])
+    
 
-	#print exec_str
-	database.execute(exec_str)
+    #print exec_str
+    result = database.execute(exec_str)
+    
+    return(exec_str,result) 
 	                                                                                 
                                                                                      
                                                                                      
