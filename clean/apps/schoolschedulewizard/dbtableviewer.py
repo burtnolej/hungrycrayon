@@ -139,6 +139,9 @@ class DBTableUI(Tk):
                 
         self.grid_columnconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(0, weight=1, uniform="foo")
+
+    def widget_current_values_get(self,gridname,rownum):
+        sswizard_utils.widget_current_values_get(self,gridname,rownum)
             
     def update_callback(self,widget,new_value):
         sswizard_utils.update_callback(self,widget,new_value)
@@ -191,51 +194,73 @@ class DBTableUI(Tk):
             row=[]
             gridname,x,y = key.split(",")
             colname = self.entrygrid.widgets[0][int(y)].sv.get()
+            new_value,version = self.updates[key]
             
+            # ignore any updates that are initial version (version=1)
             if int(x)==0:
-                # table column alter
-                init_value = getattr(self,gridname).widgets[0][int(y)].init_value
-                new_value = getattr(self,gridname).widgets[0][int(y)].sv.get()
+                #init_value = getattr(self,gridname).widgets[0][int(y)].init_value
+                current_value = getattr(self,gridname).widgets[0][int(y)].current_value
+                #new_value = getattr(self,gridname).widgets[0][int(y)].sv.get()
                 
-                if new_value <> init_value:
+                if new_value <> current_value:
                     if init_value == "":
                         with database:
-                            tbl_col_add(database,
-                                       self.tblname_entry_sv.get(),
-                                       new_value)
+                            
+                            try:
+                                tbl_col_add(database,
+                                            self.tblname_entry_sv.get(),
+                                            new_value)
+                                log.log(self,1,"error","dbtable col add","exec_str=",exec_str,"result=",str(result),"error=",e.msg)
+                    
+                            except Exception,e:                            
+                                log.log(self,3,"dbtable col add","^".join(map(str,_row)))
                     else:
-                       
-                        with database:
-                            tbl_col_update(database,
-                                       self.tblname_entry_sv.get(),
-                                       init_value,
-                                       new_value)
+                        try:
+                            with database:
+                                tbl_col_update(database,
+                                               self.tblname_entry_sv.get(),
+                                               init_value,
+                                               new_value)
+                            
+                                log.log(self,3,"dbtable col update","init_value=",init_value)
+                        except Exception,e:                            
+                            log.log(self,3,"dbtable col update","^".join(map(str,_row)))
+                                
             else:
                 pkval = self.entrygrid.widgets[int(x)][pkcolnum].sv.get()
                 
                 # ignore updates that are not different from init_value
                 # could be changed and then changed back or could be just inital load
-                value = self.updates[key]
-                if str(value) <> str(self.entrygrid.widgets[int(x)][int(y)].init_value):
+                
+                if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].current_value):
+                #if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].init_value):
 
                     try:
-                        value = int(value)
+                        new_value = int(new_value)
                     except:
-                        value = "\""+value+"\""
+                        new_value = "\""+new_value+"\""
         
                     _row= [colname,
-                            value,
+                            new_value,
                             self.pk_entry_sv.get(),
                             "\""+pkval+"\""]   
 
                     rows.append(_row)
+                    log.log(self,3,"dbfield value update","newvalue=",new_value,"^".join(map(str,_row)))
                     
-                    log.log(self,3,"adding row to update queue","^".join(map(str,_row)))
+                    
                 
         with database:
-            tbl_rows_update(database,
-                            self.tblname_entry_sv.get(),
-                            rows)
+            for row in rows:
+                
+                try:
+                    exec_str,result = tbl_rows_update(database,
+                                                      self.tblname_entry_sv.get(),
+                                                      rows)
+                    log.log(self,3,"success","dbupdate","exec_str=",exec_str,"result=",str(result))
+                except Exception,e:
+                    log.log(self,1,"error","dbupdate","exec_str=",exec_str,"result=",str(result),"error=",e.msg)
+                
                                    
     def insert(self,database=None):
         
@@ -264,7 +289,13 @@ class DBTableUI(Tk):
 
                 with database:
                     log.log(self,3,"persisting","^".join(map(str,zip(dm,dm.values()))))
-                    dbobj.persist()
+                    
+                    try:
+                        exec_str,result = dbobj.persist()
+                        log.log(self,3,"success","dbinsert","exec_str=",exec_str,"result=",str(result))
+                    except Exception, e:
+                        log.log(self,1,"error","dbinsert","exec_str=",exec_str,"result=",str(result),"error=",e.msg)
+                    
                     
         self._clear_newrowgrid()
         self.load()
@@ -287,7 +318,7 @@ class DBTableUI(Tk):
                 
                 new_value = colndefn[y]
                 
-                self.entrygrid.widgets[0][y].current_value = new_value
+                #self.entrygrid.widgets[0][y].current_value = new_value
 
                 self.entrygrid.widgets[0][y].sv.set(new_value)
                 self.entrygrid.widgets[0][y].config(background='grey',
@@ -296,8 +327,8 @@ class DBTableUI(Tk):
                 self.newrowgrid.widgets[0][y].sv.set(new_value)
                 self.newrowgrid.widgets[0][y].config(background='grey',
                                                     foreground='yellow')
-                # reset init_value after we have updated entry box so we can
-                # updates recorded in self.updates                
+                
+                # reset init_value for headers after we have loaded                
                 self.entrygrid.widgets[0][y].init_value = new_value
                 self.newrowgrid.widgets[0][y].init_value = new_value
                 
@@ -311,12 +342,11 @@ class DBTableUI(Tk):
                         if new_value == "": new_value = "<SPACE>"
                         
                         # +1 to avoid the header row
-                        self.entrygrid.widgets[x+1][y].current_value = new_value
+                        #self.entrygrid.widgets[x+1][y].current_value = new_value
                         self.entrygrid.widgets[x+1][y].sv.set(new_value)
                         
-                        # reset init_value after we have updated entry box so we can
-                        # updates recorded in self.updates
-                        #self.entrygrid.widgets[0][y].init_value = new_value
+                        # reset init_value after we have loaded
+                        self.entrygrid.widgets[0][y].init_value = new_value
                         self.entrygrid.widgets[x+1][y].init_value = new_value
                         
                         # and set the style back to not updated

@@ -105,16 +105,17 @@ class Test_Load(Test_Base):
                 
         self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)
 
-    '''def test_update_queue(self):
+    def test_update_queue(self):
         self.ui.load(0)
+        expected_results = [['',('Stan', 1), ('Galina', 1),('Samantha', 1),('Amelia',1),('Paraic',1)],
+                            [('8:30-9:10', 1),('NATHANIEL', 1),('ORIG', 1),('TRISTAN', 1),('COBY', 1),('YOSEF', 1)],
+                            [('9:11-9:51', 1),('LUCY', 1),('DONOVAN', 1),('BOOKER', 1), ('ASHER', 1),('JAKE', 1)]]
+                              
         
-        print self.updates()
-        expected_results =[['Stan', 'Galina', 'Samantha', 'Amelia', 'Paraic'],
-                                   ['8:30-9:10', 'NATHANIEL', 'ORIG', 'TRISTAN', 'COBY', 'YOSEF'],
-                                   ['9:11-9:51', 'LUCY', 'DONOVAN', 'BOOKER', 'ASHER', 'JAKE']]
-                
-        self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)'''
-
+        values,bgcolor =  self.ui.updates_get('entrygrid')
+        
+        self.assertListEqual(values,expected_results)
+     
 class Test_Load_Save(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -192,6 +193,17 @@ class Test_Load_Save(Test_Base):
         results = self.of.query('student')
         self.assertEqual(len(results),10)
         
+    def test_update_queue(self):
+        self.ui.load_save(0)
+        expected_results = [['',('Stan', 1), ('Galina', 1),('Samantha', 1),('Amelia',1),('Paraic',1)],
+                            [('8:30-9:10', 1),('NATHANIEL', 1),('ORIG', 1),('TRISTAN', 1),('COBY', 1),('YOSEF', 1)],
+                            [('9:11-9:51', 1),('LUCY', 1),('DONOVAN', 1),('BOOKER', 1), ('ASHER', 1),('JAKE', 1)]]
+                              
+        
+        values,bgcolor =  self.ui.updates_get('entrygrid')
+        
+        self.assertListEqual(values,expected_results)
+        
 class Test_BalanceGrid_After_Load_Save(Test_Base):
 
     def setUp(self):
@@ -199,8 +211,8 @@ class Test_BalanceGrid_After_Load_Save(Test_Base):
         
     def test_balancegrid_after_save(self):
 
-        expected_results = [['Stan','Samantha','','Galina','Amelia','','','Paraic','','','',''],
-                            ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina']]
+        expected_results = [[('Stan',1),('Samantha',1),'',('Galina',1),('Amelia',1),'','',('Paraic',1),'','','',''],
+                            ['','','','','',('Samantha',1),'','',('Stan',1),('Paraic',1),('Amelia',1),('Galina',1)]]
         
         self.ui.load_save(0)
     
@@ -215,8 +227,8 @@ class Test_BalanceGrid_After_Load_Save_Change_Save(Test_Base):
         
     def test_overload_Nathaniel(self):
         
-        expected_values = [['Stan,Galina','Samantha','','Galina','Amelia','','','Paraic','','','',''],
-                            ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina']]
+        expected_results = [[('Stan,Galina',2),('Samantha',1),'',('Galina',1),('Amelia',1),'','',('Paraic',1),'','','',''],
+                            ['','','','','',('Samantha',1),'','',('Stan',1),('Paraic',1),('Amelia',1),('Galina',1)]]
         
         expected_colors = [['red','lightgreen','','lightgreen','lightgreen','','','lightgreen','','','',''],
                             ['','','','','','lightgreen','','','lightgreen','lightgreen','lightgreen','lightgreen']]
@@ -229,14 +241,14 @@ class Test_BalanceGrid_After_Load_Save_Change_Save(Test_Base):
         
         values,bgcolor = self.ui.updates_get('balancegrid',ignoreaxes=True)
         
-        self.assertListEqual(expected_values,values)
+        self.assertListEqual(expected_results,values)
         self.assertListEqual(expected_colors,bgcolor)
         
     def test_newrow(self):
    
-        expected_values = [['Stan','Samantha','','Galina','Amelia','','','Paraic','','','','','','',''],
-                        ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina','','',''],
-                        ['','','','','','','','Paraic','','Amelia','Samantha','Galina','','','Stan']]
+        expected_values = [[('Stan',1),('Samantha',1),'',('Galina',1),('Amelia',1),'','',('Paraic',1),'','','','','','',''],
+                           ['','','','','',('Samantha',1),'','',('Stan',1),('Paraic',1),('Amelia',1),('Galina',1),'','',''],
+                           ['','','','','','','',('Paraic',1),'',('Amelia',1),('Samantha',1),('Galina',1),'','',('Stan',1)]]
         
         expected_colors = [['lightgreen','lightgreen','','lightgreen','lightgreen','','','lightgreen','','','','','','',''],
                            ['','','','','','lightgreen','','','lightgreen','lightgreen','lightgreen','lightgreen','','',''],
@@ -294,6 +306,21 @@ class Test_Load_Change_Save_Load(Test_Base):
                                          ('saveversion',"1"))
             
         self.assertListEqual(expected_results,rows)
+        
+    def test_update_queue(self):
+        self.ui.load_save(0)
+        self.ui.entrygrid.widgets[1][2].sv.set('NATHANIEL')
+        self.ui.save("1")
+        self.ui.persist()
+        expected_results = [['',('Stan', 1), ('Galina', 1),('Samantha', 1),('Amelia',1),('Paraic',1)],
+                            [('8:30-9:10', 1),('NATHANIEL', 1),('NATHANIEL', 2),('TRISTAN', 1),('COBY', 1),('YOSEF', 1)],
+                            [('9:11-9:51', 1),('LUCY', 1),('DONOVAN', 1),('BOOKER', 1), ('ASHER', 1),('JAKE', 1)]]
+                              
+        
+        values,bgcolor =  self.ui.updates_get('entrygrid')
+        
+        self.assertListEqual(values,expected_results)
+        
 
         
 if __name__ == "__main__":
