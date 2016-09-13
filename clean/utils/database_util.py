@@ -125,7 +125,22 @@ def tbl_count_get(database,tbl_name):
     sql_str = "select count(*) from \"{tbl_name}\"".format(tbl_name=tbl_name)
     
     return(database.execute(sql_str,True))
-            
+   
+def tbl_remove(database,tbl_name):
+    
+    sql_str = "DROP TABLE {tbl_name}".format(tbl_name=tbl_name)
+    
+    sql_result = database.execute(sql_str)
+    return(sql_result) 
+
+def tbl_rename(database,tbl_name,new_tbl_name):
+    
+    sql_str = "ALTER TABLE {tbl_name} RENAME TO {new_tbl_name}".format(tbl_name=tbl_name,
+                                                         new_tbl_name=new_tbl_name)
+    
+    sql_result = database.execute(sql_str)
+    return(sql_result) 
+    
 def tbl_create(database,tbl_name,col_defn,tbl_pk_defn=[]):
     
     '''purpose: create a table in the database; create index if specificied

@@ -3,7 +3,7 @@ import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_enum import enum
 from database_util import schema_data_get, db_enum, Database, \
-     tbl_create, tbl_exists
+     tbl_create, tbl_exists, tbl_remove, tbl_rename
 from misc_utils_generic import GenericBase
 from datetime import datetime
 from types import StringType,IntType
@@ -134,6 +134,9 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
     exec_str = "INSERT INTO {table} ({keys}) VALUES {rows}".format(table=tbl_name, \
                                                                        keys=col_name_str,\
                                                                        rows=tbl_rows_str)
+    
+    #print exec_str
+    
     result = database.execute(exec_str)
 
     return(exec_str,result) 
@@ -149,7 +152,7 @@ def tbl_rows_update(database,tbl_name,values):
 	                                                                                 pkvalue=row[3])
 	
 
-	print exec_str
+	#print exec_str
 	database.execute(exec_str)
 	                                                                                 
                                                                                      
@@ -191,13 +194,68 @@ def tbl_cols_get(database,tbl_name):
     return([(row[db_enum.s3_col_attrib.column_name], row[db_enum.s3_col_attrib.data_type])
             for row in sql_result])
 
-def tbl_col_add(database,tbl_name,col_name,col_type):
+def tbl_col_add(database,tbl_name,col_name,col_type="TEXT"):
 
     exec_str = "ALTER TABLE {table} ADD COLUMN '{column}' {column_type}".format(table=tbl_name,\
                                                                                 column=col_name,\
                                                                                 column_type=col_type)
     result = database.execute(exec_str)
     return(result) 
+
+
+
+def _quotestrs(rows):
+    ''' needed if you want to prepare a list of strings for insertion as they will
+    need to be double double quoted to be written correctly'''
+    newrows=[]
+    for row in rows:
+	newrow=[]
+	for field in row:
+	    
+	    ''' uncomment this section if you want to keep int's as int's '''
+	    try:
+	    	int(field)
+		newrow.append(field)
+	    except:
+		newrow.append("'"+field+"'")
+	newrows.append(newrow)
+    return(newrows)
+	
+def tbl_col_update(database,tbl_name,old_col_name,new_col_name):
+    ''' sqlite does not support change column name so have implemented a simple
+    version; does not handle complex db features which we will not be needing currently'''
+       
+    col_defn = tbl_cols_get(database,tbl_name)
+
+    new_col_defn=[]
+    
+    for colname,coltype in col_defn:
+	if colname == old_col_name:
+	    new_col_defn.append((new_col_name,coltype))
+	else:
+	    new_col_defn.append((colname,coltype))
+	    
+    tbl_create(database,
+               tbl_name+"_new",
+               new_col_defn)
+    
+    
+    colnames,rows = tbl_rows_get(database,tbl_name)
+    colindex = colnames.index(old_col_name)
+    
+    colnames.remove(old_col_name)
+    colnames.insert(colindex,new_col_name)
+
+    rows = _quotestrs(rows)
+    
+    tbl_rows_insert(database,
+                        tbl_name+"_new",
+                        colnames,
+                        rows)
+    
+    tbl_remove(database,tbl_name)
+    
+    tbl_rename(database,tbl_name+"_new",tbl_name)
 
 if __name__ == "__main__":
     pass

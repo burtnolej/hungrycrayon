@@ -247,16 +247,20 @@ class Test_Insert_Multiple_Rows_onto_Loaded_Rows(unittest.TestCase):
 class Test_Insert_Multiple_Rows_onto_Loaded_Rows_Then_Update(unittest.TestCase):
     def setUp(self):
         
+        self.dbfilename = 'test_1row'
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        dbname = path.join(dbpath,'test')
-        self.ui = DBTableUI()        
-        self.ui.dbname_entry_sv.set('test')
+        dbname = path.join(dbpath,self.dbfilename)
+        
+        self.ui = DBTableUI()
+        self.ui.dbname_entry_sv.set(self.dbfilename)
         self.ui.load()
-        self.tmpdbname = path.join(dbpath,'test_tmp')
-        copyfile(dbname+".sqlite",self.tmpdbname+".sqlite")
-        self.database = Database(self.tmpdbname)    
+
+        self.database = Database(dbname)
+
 
     def test_insert_row(self):
+
+        
         
         self.ui.newrowgrid.widgets[1][0].sv.set('Friday')
         self.ui.newrowgrid.widgets[1][1].sv.set('wp')
@@ -269,62 +273,44 @@ class Test_Insert_Multiple_Rows_onto_Loaded_Rows_Then_Update(unittest.TestCase):
         self.ui.newrowgrid.widgets[1][8].sv.set('Brian')
         self.ui.newrowgrid.widgets[1][9].sv.set('9,9,9')
         
-        self.ui.newrowgrid.widgets[2][0].sv.set('Friday')
-        self.ui.newrowgrid.widgets[2][1].sv.set('wp')
-        self.ui.newrowgrid.widgets[2][2].sv.set('lesson')
-        self.ui.newrowgrid.widgets[2][3].sv.set('9:52-10:32')
-        self.ui.newrowgrid.widgets[2][4].sv.set('1')
-        self.ui.newrowgrid.widgets[2][5].sv.set('1')
-        self.ui.newrowgrid.widgets[2][6].sv.set('PETER')
-        self.ui.newrowgrid.widgets[2][7].sv.set('ELA')
-        self.ui.newrowgrid.widgets[2][8].sv.set('Foobar')
-        self.ui.newrowgrid.widgets[2][9].sv.set('9,9,9')
-        
-        self.ui.newrowgrid.widgets[3][0].sv.set('Friday')
-        self.ui.newrowgrid.widgets[3][1].sv.set('wp')
-        self.ui.newrowgrid.widgets[3][2].sv.set('lesson')
-        self.ui.newrowgrid.widgets[3][3].sv.set('9:52-10:32')
-        self.ui.newrowgrid.widgets[3][4].sv.set('1')
-        self.ui.newrowgrid.widgets[3][5].sv.set('1')
-        self.ui.newrowgrid.widgets[3][6].sv.set('PAUL')
-        self.ui.newrowgrid.widgets[3][7].sv.set('ELA')
-        self.ui.newrowgrid.widgets[3][8].sv.set('Galina')
-        self.ui.newrowgrid.widgets[3][9].sv.set('9,9,9')
-        
-       
-        
-        expected_results = [['Tuesday','wp','lesson','8:30-9:10',0,1,'NATHANIEL','MATH','Stan','1,1,1','19:43:00','04C3B4EF'],
-                                   ['Tuesday','wp','lesson','8:30-9:10',0,1,'ORIG','MATH','Galina','1,4,2','19:43:01','009AB6A8'],
-                                   ['Tuesday','wp','lesson','8:30-9:10',0,1,'TRISTAN','MATH','Samantha','1,2,3','19:43:01','0500B49E'],
-                                   ['Tuesday','wp','lesson','8:30-9:10',0,1,'COBY','MATH','Amelia','1,5,4','19:43:01','049C2F17'],
-                                   ['Tuesday','wp','lesson','8:30-9:10',0,1,'YOSEF','MATH','Paraic','1,8,5','19:43:01','00DC72C2'],
-                                   ['Tuesday','wp','lesson','9:11-9:51',0,1,'LUCY','MATH','Stan','2,9,1','19:43:01','03E6EDFD'],
-                                   ['Tuesday','wp','lesson','9:11-9:51',0,1,'DONOVAN','MATH','Galina','2,12,2','19:43:01','00CF3412'],
-                                   ['Tuesday','wp','lesson','9:11-9:51',0,1,'BOOKER','MATH','Samantha','2,6,3','19:43:01','1600099'],
-                                   ['Tuesday','wp','lesson','9:11-9:51',0,1,'ASHER','MATH','Amelia','2,11,4','19:43:01','040E9236'],
-                                   ['Tuesday','wp','lesson','9:11-9:51',0,1,'JAKE','MATH','Paraic','2,10,5','19:43:01','03537F99'],
-                                   ['Friday','wp','lesson','9:52-10:32',0,1,'FOOBAR','MATH','Brian','2,6,3','19:43:01','1600099'],
-                                   ['Friday','wp','lesson','9:52-10:32',0,1,'ASHER','MATH','Foobar','2,11,4','19:43:01','040E9236'],
-                                   ['Friday','wp','lesson','9:52-10:32',0,1,'PETER','MATH','Galina','2,10,5','19:43:01','03537F99']]
-     
-
         self.ui.insert(self.database)
-        #self.ui.update()
-        self.ui.entrygrid.widgets[11][6].sv.set("FOOBAR")
-        #self.ui.update_idletasks()
-        #self.ui.mainloop()
-        self.ui.update()
+        
+        self.ui.entrygrid.widgets[2][6].sv.set("FOOBAR")
+        self.ui.process_updates(self.database)
+        
+
+        self.ui.newrowgrid.widgets[1][0].sv.set('Friday')
+        self.ui.newrowgrid.widgets[1][1].sv.set('wp')
+        self.ui.newrowgrid.widgets[1][2].sv.set('lesson')
+        self.ui.newrowgrid.widgets[1][3].sv.set('9:52-10:32')
+        self.ui.newrowgrid.widgets[1][4].sv.set('1')
+        self.ui.newrowgrid.widgets[1][5].sv.set('1')
+        self.ui.newrowgrid.widgets[1][6].sv.set('PETER')
+        self.ui.newrowgrid.widgets[1][7].sv.set('ELA')
+        self.ui.newrowgrid.widgets[1][8].sv.set('Foobar')
+        self.ui.newrowgrid.widgets[1][9].sv.set('9,6,9')
+    
+        
+        self.ui.insert(self.database)
+        
+        
+        
+        expected_results = [['8:30-9:10','COBY','Amelia','Tuesday'],
+                            ['9:52-10:32','FOOBAR','Brian','Friday'],
+                            ['9:52-10:32','PETER','Foobar','Friday']]
+     
+        
 
         cols = ['period','student','teacher','dow']
         
         with self.database:
-            colndefn,rows = tbl_rows_get(self.database,'lesson')
-        
-        #print expected_result,rows
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols)
+
+        print expected_results,rows
         self.assertListEqual(expected_results,rows)
         
     def tearDown(self):
-        os.remove(self.tmpdbname+".sqlite")
+        copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")
         self.ui.destroy()
         
 class Test_Change_Column_of_Loaded_Rows(unittest.TestCase):

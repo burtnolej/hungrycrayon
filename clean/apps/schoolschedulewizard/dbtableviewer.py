@@ -121,7 +121,7 @@ class DBTableUI(Tk):
         self.dbinsert_button.grid(column=3,row=1,columnspan=1,sticky=NSEW)
         self.dbinsert_button.focus_get()
         
-        self.dbsavechanges_button = Button(controlpanel,command=self.update,text="dbsavechgs",name="dbc")
+        self.dbsavechanges_button = Button(controlpanel,command=self.process_updates,text="dbsavechgs",name="dbc")
         self.dbsavechanges_button.grid(column=4,row=1,columnspan=1,sticky=NSEW)
         self.dbsavechanges_button.focus_get()
 
@@ -177,7 +177,7 @@ class DBTableUI(Tk):
             self.save_button.focus_set()
         return("break")
     
-    def update(self,database=None):
+    def process_updates(self,database=None):
         
         if database == None:
             database = Database(self.dbname_entry_sv.get())
@@ -276,6 +276,8 @@ class DBTableUI(Tk):
         with database:
             colndefn,rows = tbl_rows_get(database,self.tblname_entry_sv.get())
                                     #saveversion',str(self.dbload_entry_sv.get())))
+                                    
+            log.log(self,3,str(len(rows)),"rows loaded from",database.name,self.tblname_entry_sv.get())
                                     
             for y in range(len(rows[0])):
         
