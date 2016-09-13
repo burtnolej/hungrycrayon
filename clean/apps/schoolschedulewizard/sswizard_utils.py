@@ -2,6 +2,19 @@
 
 from misc_utils import nxnarraycreate
 
+def update_callback(self,widget,new_value):        
+    ''' via BaseTk class; all entry widgets assign a callback to the change event
+    to call this function if it exists '''
+    widget.current_value = new_value
+
+    if str(widget.current_value) <> str(widget.init_value):
+                    
+        widget.config(foreground='red')
+    else:
+        widget.config(foreground='black')
+        
+    self.updates[str(widget.winfo_name())] = new_value
+
 def updates_get(ui,gridname,ignoreaxes=False):
     maxx = maxy = -1
     if ignoreaxes == True: maxx = maxy = 0

@@ -240,9 +240,13 @@ class WizardUI(Tk):
         self.grid_rowconfigure(1, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
          
-    def update_callback(self,widget,new_value):        
-        ''' via BaseTk class; all entry widgets assign a callback to the change event
-        to call this function if it exists '''
+         
+    def update_callback(self,widget,new_value):
+        sswizard_utils.update_callback(self,widget,new_value)
+         
+    '''def update_callback(self,widget,new_value):        
+        #via BaseTk class; all entry widgets assign a callback to the change event
+        #to call this function if it exists
         widget.current_value = new_value
 
         if str(widget.current_value) <> str(widget.init_value):
@@ -251,7 +255,7 @@ class WizardUI(Tk):
         else:
             widget.config(foreground='black')
             
-        self.updates[str(widget.winfo_name())] = new_value
+        self.updates[str(widget.winfo_name())] = new_value'''
             
     def _draw_balancegrid_labels(self):
         

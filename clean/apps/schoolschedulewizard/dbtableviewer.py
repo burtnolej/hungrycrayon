@@ -140,7 +140,9 @@ class DBTableUI(Tk):
         self.grid_columnconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(0, weight=1, uniform="foo")
             
-            
+    def update_callback(self,widget,new_value):
+        sswizard_utils.update_callback(self,widget,new_value)
+      
     def clone(self):
         for y in range(self.maxcols):
             colname = self.entrygrid.widgets[0][y].sv.get()
@@ -276,7 +278,7 @@ class DBTableUI(Tk):
         with database:
             colndefn,rows = tbl_rows_get(database,self.tblname_entry_sv.get())
                                     #saveversion',str(self.dbload_entry_sv.get())))
-                                    
+            
             log.log(self,3,str(len(rows)),"rows loaded from",database.name,self.tblname_entry_sv.get())
                                     
             for y in range(len(rows[0])):

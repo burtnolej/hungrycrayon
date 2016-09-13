@@ -79,25 +79,47 @@ class Test_Grid_Behaviour_Update_Combobox(unittest.TestCase):
     def tearDown(self):
         self.ui.destroy()
         
-class Test_Load_From_Database(unittest.TestCase):
-
+class Test_Base(unittest.TestCase):
     def setUp(self):
-        
-        self.database = Database('test')
+        dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
+        self.dbname = 'test_10rows'
+        self.dbfilename = path.join(dbpath,self.dbname)
+        self.database = Database(self.dbfilename)
         self.of = ObjFactory(True)
-        self.ui = WizardUI(self.database, self.of)
+        self.ui = WizardUI(self.database, self.of)       
         
-    def test_from_db_to_grid(self):
+    def tearDown(self):
+        self.ui.destroy()
+        copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")
         
-        expected_results =[['Stan', 'Galina', 'Samantha', 'Amelia', 'Paraic'],
-                           ['8:30-9:10', 'NATHANIEL', 'ORIG', 'TRISTAN', 'COBY', 'YOSEF'],
-                           ['9:11-9:51', 'LUCY', 'DONOVAN', 'BOOKER', 'ASHER', 'JAKE']]
+class Test_Load(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_grid_contents(self):
         self.ui.load(0)
         
+        expected_results =[['Stan', 'Galina', 'Samantha', 'Amelia', 'Paraic'],
+                                   ['8:30-9:10', 'NATHANIEL', 'ORIG', 'TRISTAN', 'COBY', 'YOSEF'],
+                                   ['9:11-9:51', 'LUCY', 'DONOVAN', 'BOOKER', 'ASHER', 'JAKE']]
+                
         self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)
+
+    '''def test_update_queue(self):
+        self.ui.load(0)
         
-    def test_create_all_object_types_after_save(self):
-        # test just that of has created an index for each type of object expected #
+        print self.updates()
+        expected_results =[['Stan', 'Galina', 'Samantha', 'Amelia', 'Paraic'],
+                                   ['8:30-9:10', 'NATHANIEL', 'ORIG', 'TRISTAN', 'COBY', 'YOSEF'],
+                                   ['9:11-9:51', 'LUCY', 'DONOVAN', 'BOOKER', 'ASHER', 'JAKE']]
+                
+        self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)'''
+
+class Test_Load_Save(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_created_objects_type(self):
         expected_results = ['lesson','schedule','dow','subject','lessontype','objtype',
                             'userobjid','period','student','saveversion','teacher']
         
@@ -110,18 +132,15 @@ class Test_Load_From_Database(unittest.TestCase):
 
         self.assertListEqual(results, expected_results)
         
-    def test_student_object_after_save(self):
-        # test that objects of type student are being created
-        
+    def test_created_student_object(self):
         self.ui.load_save(0)
         
         results = self.of.query('student')
         
         for obj in results:
             self.assertEqual(obj.__class__.__name__,'student')
-            
-    def test_student_object_attr_after_save(self):
-        # test that the objects created have the correct member attr and attrvals
+        
+    def test_created_student_attr(self):
         
         self.ui.load_save(0)
         
@@ -135,11 +154,10 @@ class Test_Load_From_Database(unittest.TestCase):
         self.assertEquals('student',getattr(student_obj,'objtype'))
         
         self.assertEqual('ObjFactory', getattr(student_obj,'of').__class__.__name__)
-        self.assertEqual('Log', getattr(student_obj,'log').__class__.__name__)\
-            
-    def test_lesson_object_attr_after_save(self):
-        # test that the objects created have the correct member attr and attrvals
-        
+        self.assertEqual('Log', getattr(student_obj,'log').__class__.__name__)
+
+    def test_created_lesson_attr(self):
+             
         self.ui.load_save(0)
         
         results = self.of.query('lesson')
@@ -155,29 +173,32 @@ class Test_Load_From_Database(unittest.TestCase):
         self.assertIn(getattr(lesson_obj,'teacher'),teachers)
         self.assertEqual('ObjFactory', getattr(lesson_obj,'of').__class__.__name__)
         self.assertEqual('Log', getattr(lesson_obj,'log').__class__.__name__)
-        
-    def test_num_lesson_objects_save(self):
+     
+    def test_num_lesson_objects(self):
         # test that the objects created have the correct member attr and attrvals
         self.ui.load_save(0)
         results = self.of.query('lesson')
         self.assertEqual(len(results),10)
         
-    def test_num_teacher_objects_save(self):
+    def test_num_teacher_objects(self):
         # test that the objects created have the correct member attr and attrvals
         self.ui.load_save(0)
         results = self.of.query('teacher')
         self.assertEqual(len(results),5)
         
-    def test_num_student_objects_save(self):
+    def test_num_student_objects(self):
         # test that the objects created have the correct member attr and attrvals
         self.ui.load_save(0)
         results = self.of.query('student')
         self.assertEqual(len(results),10)
         
-    def test_balancegrid_after_save(self):
-        #self.master.mainloop()
-        #[['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY','BOOKER','ASHLEY','YOSEF','LUCY','JAKE','ASHER','DONOVAN','LIAM','SIMON B','NICK'],
+class Test_BalanceGrid_After_Load_Save(Test_Base):
+
+    def setUp(self):
+        Test_Base.setUp(self)
         
+    def test_balancegrid_after_save(self):
+
         expected_results = [['Stan','Samantha','','Galina','Amelia','','','Paraic','','','',''],
                             ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina']]
         
@@ -187,7 +208,12 @@ class Test_Load_From_Database(unittest.TestCase):
         
         self.assertListEqual(expected_results,values)
         
-    def test_balancegrid_after_save_overload_Nathaniel(self):
+class Test_BalanceGrid_After_Load_Save_Change_Save(Test_Base):
+    
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_overload_Nathaniel(self):
         
         expected_values = [['Stan,Galina','Samantha','','Galina','Amelia','','','Paraic','','','',''],
                             ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina']]
@@ -206,13 +232,8 @@ class Test_Load_From_Database(unittest.TestCase):
         self.assertListEqual(expected_values,values)
         self.assertListEqual(expected_colors,bgcolor)
         
-    def test_balancegrid_after_save_add_newrow_952_save(self):
-        # test that changes made are written to in memory objects correctly
-        # test that a new row (period) can be created
-
-        
-        #[['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY','BOOKER','ASHLEY','YOSEF','LUCY','JAKE','ASHER','DONOVAN','LIAM','SIMON B','NICK'],
-
+    def test_newrow(self):
+   
         expected_values = [['Stan','Samantha','','Galina','Amelia','','','Paraic','','','','','','',''],
                         ['','','','','','Samantha','','','Stan','Paraic','Amelia','Galina','','',''],
                         ['','','','','','','','Paraic','','Amelia','Samantha','Galina','','','Stan']]
@@ -244,21 +265,10 @@ class Test_Load_From_Database(unittest.TestCase):
         self.assertEquals(self.of.object_get('lesson','3,12,2').student,'DONOVAN')
         self.assertEquals(self.of.object_get('lesson','3,8,5').student,'YOSEF')
         
-    def tearDown(self):
-        self.ui.destroy()
-        
-class Test_Load_Change_Save_Load(unittest.TestCase):
-    
+class Test_Load_Change_Save_Load(Test_Base):
+
     def setUp(self):
-        dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        dbname = path.join(dbpath,'test')
-        self.tmpdbname = path.join(dbpath,'test_tmp')
-        copyfile(dbname+".sqlite",self.tmpdbname+".sqlite")
-    
-        self.database = Database(self.tmpdbname)
-        self.of = ObjFactory(True)
-        self.ui = WizardUI(self.database, self.of)
-        
+        Test_Base.setUp(self)
         
     def test_(self):
         self.ui.load_save(0)
@@ -285,19 +295,19 @@ class Test_Load_Change_Save_Load(unittest.TestCase):
             
         self.assertListEqual(expected_results,rows)
 
-    def tearDown(self):
-        os.remove(self.tmpdbname+".sqlite")
-        self.ui.destroy()
-    
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Combobox))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_From_Database))
-
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save_Load))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_BalanceGrid_After_Load_Save_Change_Save))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_BalanceGrid_After_Load_Save))
+    
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
