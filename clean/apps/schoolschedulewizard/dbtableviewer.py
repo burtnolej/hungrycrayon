@@ -172,8 +172,8 @@ class DBTableUI(Tk):
     def _clear_grid(self,gridname,firstrow):
         grid = getattr(self,gridname)
         
-        for x in range(firstrow,self.maxnewrows):
-            for y in range(self.maxcols):
+        for x in range(firstrow,grid.maxrows):
+            for y in range(grid.maxcols):
                 grid.widgets[x][y].sv.set("")
                 grid.widgets[x][y].config(background='white')
                 grid.widgets[x][y].init_value = ""
@@ -219,7 +219,7 @@ class DBTableUI(Tk):
                 init_value = getattr(self,gridname).widgets[0][int(y)].init_value
                 current_value = getattr(self,gridname).widgets[0][int(y)].current_value
                 #new_value = getattr(self,gridname).widgets[0][int(y)].sv.get()
-                
+
                 if new_value <> current_value:
                     if init_value == "":
                         with database:
@@ -230,7 +230,7 @@ class DBTableUI(Tk):
                                             new_value)
                                 log.log(self,1,"success","dbtable col add","current_value","new_value=",new_value,"init_value=",init_value)
                                 
-                    
+                                getattr(self,gridname).widgets[0][int(y)].version += 1 
                             except Exception,e:                            
                                 log.log(self,3,"error","dbtable col add","error=",str(e))
                     else:
@@ -255,7 +255,6 @@ class DBTableUI(Tk):
                 if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].current_value):
                 #if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].init_value):
                     
-                    self.entrygrid.widgets[int(x)][int(y)].current_value = new_value
 
                     try:
                         new_value = int(new_value)
@@ -269,6 +268,10 @@ class DBTableUI(Tk):
 
                     rows.append(_row)
                     log.log(self,3,"dbfield value update","newvalue=",str(new_value),"^".join(map(str,_row)))             
+                    
+                    self.entrygrid.widgets[int(x)][int(y)].current_value = new_value
+                    self.entrygrid.widgets[int(x)][int(y)].version += 1
+
                 
         with database:
             for row in rows:
@@ -338,19 +341,19 @@ class DBTableUI(Tk):
                 
                 new_value = colndefn[y]
                 
-                #self.entrygrid.widgets[0][y].current_value = new_value
+                self.entrygrid.widgets[0][y].current_value = new_value
 
                 self.entrygrid.widgets[0][y].sv.set(new_value)
-                self.entrygrid.widgets[0][y].config(background='grey',
-                                                    foreground='yellow')
+                #self.entrygrid.widgets[0][y].config(background='grey',
+                #                                    foreground='yellow')
                 
                 self.newrowgrid.widgets[0][y].sv.set(new_value)
-                self.newrowgrid.widgets[0][y].config(background='grey',
-                                                    foreground='yellow')
+                #self.newrowgrid.widgets[0][y].config(background='grey',
+                #                                    foreground='yellow')
                 
                 # reset init_value for headers after we have loaded                
-                self.entrygrid.widgets[0][y].init_value = new_value
-                self.newrowgrid.widgets[0][y].init_value = new_value
+                #self.entrygrid.widgets[0][y].init_value = new_value
+                #self.newrowgrid.widgets[0][y].init_value = new_value
                 
             for x in range(len(rows)):
                 for y in range(len(rows[x])):
@@ -362,12 +365,12 @@ class DBTableUI(Tk):
                         if new_value == "": new_value = "<SPACE>"
                         
                         # +1 to avoid the header row
-                        #self.entrygrid.widgets[x+1][y].current_value = new_value
+                        self.entrygrid.widgets[x+1][y].current_value = new_value
                         self.entrygrid.widgets[x+1][y].sv.set(new_value)
                         
                         # reset init_value after we have loaded
-                        self.entrygrid.widgets[0][y].init_value = new_value
-                        self.entrygrid.widgets[x+1][y].init_value = new_value
+                        #self.entrygrid.widgets[0][y].init_value = new_value
+                        #self.entrygrid.widgets[x+1][y].init_value = new_value
                         
                         # and set the style back to not updated
                         self.entrygrid.widgets[x+1][y]['style'] = 'OutOfFocus.Notchanged.TEntry'

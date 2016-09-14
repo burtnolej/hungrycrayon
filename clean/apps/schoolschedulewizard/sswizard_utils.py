@@ -8,21 +8,20 @@ def update_callback(ui,widget,new_value):
     #put event on here too
     if str(widget.current_value) <> str(new_value):
         
-        widget.version += 1 # only increment widget version if contents are changing
-        log.log(widget,3,"updating","key=",str(widget.winfo_name()),"current_value=",widget.current_value,"new_value=",new_value,"version=",str(widget.version))
+        log.log(widget,3,"updating","key=",str(widget.winfo_name()),"current_value=",str(widget.current_value),"new_value=",new_value,"version=",str(widget.version))
         
         widget.config(foreground='red')
         
         # if this is the first update
-        if widget.version == 1: 
-            widget.current_value = new_value
+        #if widget.version == 1: 
+        #widget.current_value = new_value
         
         # record event in update log
         ui.updates[str(widget.winfo_name())] = (new_value,widget.version)
     else:
         widget.config(foreground='black')
         
-        log.log(widget,3,"skipping as","key=",str(widget.winfo_name()),"current_value=",widget.current_value,"new value=",new_value,"version=",str(widget.version)) 
+        log.log(widget,3,"skipping as","key=",str(widget.winfo_name()),"current_value=",str(widget.current_value),"new value=",new_value,"version=",str(widget.version)) 
 
 def updates_get(ui,gridname,ignoreaxes=False):
     maxx = maxy = -1
@@ -42,7 +41,7 @@ def updates_get(ui,gridname,ignoreaxes=False):
         xsize= max([int(key[1]) for key in update_keys]) + offset
         ysize= max([int(key[2]) for key in update_keys]) + offset
         
-    
+        print xsize, ysize
         # text values of widgets
         values = nxnarraycreate(int(xsize),int(ysize),"")
         for key in update_keys:
@@ -52,8 +51,10 @@ def updates_get(ui,gridname,ignoreaxes=False):
             else:
                 offset = -1
             
+            #print int(key[1]),int(key[2]),key,ui.updates[str(",".join(key))]
             values[int(key[1])+offset][int(key[2])+offset] = ui.updates[str(",".join(key))]
             #values[int(key[1])-1][int(key[2])-1] = ui.updates[str(",".join(key))]
+            #print values
         
         # background color of widgets
         bgcolor = nxnarraycreate(int(xsize),int(ysize),"")
