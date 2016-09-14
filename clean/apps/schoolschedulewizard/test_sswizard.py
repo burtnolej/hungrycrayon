@@ -211,8 +211,8 @@ class Test_BalanceGrid_After_Load_Save(Test_Base):
         
     def test_balancegrid_after_save(self):
 
-        expected_results = [[('Stan',1),('Samantha',1),'',('Galina',1),('Amelia',1),'','',('Paraic',1),'','','',''],
-                            ['','','','','',('Samantha',1),'','',('Stan',1),('Paraic',1),('Amelia',1),('Galina',1)]]
+        expected_results = [[('Stan',0),('Samantha',0),'',('Galina',0),('Amelia',0),'','',('Paraic',0),'','','',''],
+                            ['','','','','',('Samantha',0),'','',('Stan',0),('Paraic',0),('Amelia',0),('Galina',0)]]
         
         self.ui.load_save(0)
     
