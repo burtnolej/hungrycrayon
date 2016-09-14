@@ -121,21 +121,20 @@ class Test_Load_Change(unittest.TestCase):
     def test_last_widget_values(self):
         # checking the .current_value status
         
-        expected_results = [('Tuesday','Tuesday'),('wp','wp'),('lesson',lesson'),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1),('19:43:01',1),('049C2F17',1)]
+        expected_results = [('Tuesday','Tuesday'),('wp','wp'),('lesson','lesson'),('8:30-9:10','8:30-9:10'),(0,'0'),(1,'1'),('COBY','COBY'),('MATH','MATH'),('Amelia','Amelia'),('1,5,4','1,5,4'),('19:43:01','19:43:01'),('049C2F17','049C2F17')]
         
         self.ui.load()
         
         self.ui.entrygrid.widgets[1][0].sv.set('Thursday')
         
-        self.ui.process_updates(self.database)
-
-        print self.ui.widget_current_values_get('entrygrid',1)
+        values = self.ui.widget_current_values_get('entrygrid',1)
+        
+        #self.ui.process_updates(self.database)
+        
+        self.assertListEqual(values, expected_results)
         
     def test_dbwrite(self):
-        
-        expected_results = [[('dow',1), ('lessontype',1), ('objtype',1), ('period',1), ('saveversion',1), ('schedule',1), ('student',1),('subject',1), ('teacher',1),('userobjid',1),('__timestamp',1),('__id',1)],
-                            [('Thursday',2),('wp',1),('lesson',1),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1),('19:43:01',1),('049C2F17',1)]]
-        
+         
         self.ui.load()
         
         self.ui.entrygrid.widgets[1][0].sv.set('Thursday')
@@ -151,9 +150,58 @@ class Test_Load_Change(unittest.TestCase):
         
         self.assertListEqual(expected_result,rows)
         
+    def test_dbwrite_int(self):
+        
+        self.ui.load()
+        
+        self.ui.entrygrid.widgets[1][0].sv.set(123)
+        
+        self.ui.process_updates(self.database)
+        
+        expected_result = [['8:30-9:10','COBY','Amelia','123']]
+        
+        cols = ['period','student','teacher','dow']
+        
+        with self.database:
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols)
+        
+        self.assertListEqual(expected_result,rows)
+        
     def tearDown(self):
         self.ui.destroy()
         copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")        
+        
+class Test_Load_Clear_Load(unittest.TestCase):
+
+    def setUp(self):
+        
+        self.ui = DBTableUI()
+        self.dbfilename = 'test_1row'
+        self.ui.dbname_entry_sv.set(self.dbfilename)
+        self.database = Database(self.dbfilename)
+        
+    def test_update_queue(self):
+        
+        expected_results = [[('dow',1), ('lessontype',1), ('objtype',1), ('period',1), ('saveversion',1), ('schedule',1), ('student',1),('subject',1), ('teacher',1),('userobjid',1),('__timestamp',1),('__id',1)],
+                            [('Tuesday',1),('wp',1),('lesson',1),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1),('19:43:01',1),('049C2F17',1)]]
+        
+        self.ui.load()
+        
+        #self.ui.clear()
+        
+        self.ui.load()
+        
+        #self.ui.entrygrid.widgets[1][0].sv.set('Thursday')
+        
+        #self.ui.process_updates(self.database)
+
+        values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
+
+        self.assertListEqual(values, expected_results)
+        
+    def tearDown(self):
+        self.ui.destroy()
+        copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")   
         
 class Test_Update_Loaded_Rows(unittest.TestCase):
     def setUp(self):
@@ -541,8 +589,11 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Entry))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Clear_Load))
 
+    
+    
 
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update_Loaded_Rows))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert))

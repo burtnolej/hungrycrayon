@@ -141,7 +141,7 @@ class DBTableUI(Tk):
         self.grid_rowconfigure(0, weight=1, uniform="foo")
 
     def widget_current_values_get(self,gridname,rownum):
-        sswizard_utils.widget_current_values_get(self,gridname,rownum)
+        return sswizard_utils.widget_current_values_get(self,gridname,rownum)
             
     def update_callback(self,widget,new_value):
         sswizard_utils.update_callback(self,widget,new_value)
@@ -154,7 +154,7 @@ class DBTableUI(Tk):
             if colname <> "" and colname.startswith("_") == False:
                 self.newrowgrid.widgets[1][y].sv.set(value)
     
-    def _clear_entrygrid(self):
+    '''def _clear_entrygrid(self):
         for x in range(self.maxrows):
             for y in range(self.maxcols):
                 self.entrygrid.widgets[x][y].sv.set("")
@@ -167,11 +167,29 @@ class DBTableUI(Tk):
         for x in range(firstrow,self.maxnewrows):
             for y in range(self.maxcols):
                 self.newrowgrid.widgets[x][y].sv.set("")
-                self.newrowgrid.widgets[x][y].config(background='white')
+                self.newrowgrid.widgets[x][y].config(background='white')'''
                 
-    def clear(self):
-        self._clear_entrygrid()
-        self._clear_newrowgrid()
+    def _clear_grid(self,gridname,firstrow):
+        grid = getattr(self,gridname)
+        
+        for x in range(firstrow,self.maxnewrows):
+            for y in range(self.maxcols):
+                grid.widgets[x][y].sv.set("")
+                grid.widgets[x][y].config(background='white')
+                grid.widgets[x][y].init_value = ""
+                grid.widgets[x][y].current_value = ""
+                grid.widgets[x][y].version = 0
+                
+
+    def clear(self,firstrow=0,gridname=None):
+        if gridname == None:
+            self._clear_grid('entrygrid',firstrow)
+            self._clear_grid('newrowgrid',firstrow)
+        else:
+            self._clear_grid(gridname,firstrow)
+        
+        self.updates={}
+            
                 
     def focus_next_widget(self,event):
         print "focuschange"
@@ -198,7 +216,7 @@ class DBTableUI(Tk):
             
             # ignore any updates that are initial version (version=1)
             if int(x)==0:
-                #init_value = getattr(self,gridname).widgets[0][int(y)].init_value
+                init_value = getattr(self,gridname).widgets[0][int(y)].init_value
                 current_value = getattr(self,gridname).widgets[0][int(y)].current_value
                 #new_value = getattr(self,gridname).widgets[0][int(y)].sv.get()
                 
@@ -210,22 +228,24 @@ class DBTableUI(Tk):
                                 tbl_col_add(database,
                                             self.tblname_entry_sv.get(),
                                             new_value)
-                                log.log(self,1,"error","dbtable col add","exec_str=",exec_str,"result=",str(result),"error=",e.msg)
+                                log.log(self,1,"success","dbtable col add","current_value","new_value=",new_value,"init_value=",init_value)
+                                
                     
                             except Exception,e:                            
-                                log.log(self,3,"dbtable col add","^".join(map(str,_row)))
+                                log.log(self,3,"error","dbtable col add","error=",str(e))
                     else:
                         try:
                             with database:
                                 tbl_col_update(database,
                                                self.tblname_entry_sv.get(),
-                                               init_value,
+                                               current_value,
                                                new_value)
                             
-                                log.log(self,3,"dbtable col update","init_value=",init_value)
+                                log.log(self,3,"success","dbtable col update","current_value=",current_value,"new_value=",new_value,"init_value=",init_value)
                         except Exception,e:                            
-                            log.log(self,3,"dbtable col update","^".join(map(str,_row)))
-                                
+                            log.log(self,3,"error","dbtable col update","error=",str(e))
+                            
+                    getattr(self,gridname).widgets[0][int(y)].current_value = new_value
             else:
                 pkval = self.entrygrid.widgets[int(x)][pkcolnum].sv.get()
                 
@@ -234,6 +254,8 @@ class DBTableUI(Tk):
                 
                 if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].current_value):
                 #if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].init_value):
+                    
+                    self.entrygrid.widgets[int(x)][int(y)].current_value = new_value
 
                     try:
                         new_value = int(new_value)
@@ -246,9 +268,7 @@ class DBTableUI(Tk):
                             "\""+pkval+"\""]   
 
                     rows.append(_row)
-                    log.log(self,3,"dbfield value update","newvalue=",new_value,"^".join(map(str,_row)))
-                    
-                    
+                    log.log(self,3,"dbfield value update","newvalue=",str(new_value),"^".join(map(str,_row)))             
                 
         with database:
             for row in rows:
@@ -256,10 +276,10 @@ class DBTableUI(Tk):
                 try:
                     exec_str,result = tbl_rows_update(database,
                                                       self.tblname_entry_sv.get(),
-                                                      rows)
+                                                      row)
                     log.log(self,3,"success","dbupdate","exec_str=",exec_str,"result=",str(result))
                 except Exception,e:
-                    log.log(self,1,"error","dbupdate","exec_str=",exec_str,"result=",str(result),"error=",e.msg)
+                    log.log(self,1,"error","dbupdate","error=",str(e))
                 
                                    
     def insert(self,database=None):
@@ -297,12 +317,12 @@ class DBTableUI(Tk):
                         log.log(self,1,"error","dbinsert","exec_str=",exec_str,"result=",str(result),"error=",e.msg)
                     
                     
-        self._clear_newrowgrid()
+        self.clear(1,'newrowgrid')
         self.load()
             
     def load(self,values=None):
         
-        self._clear_entrygrid()
+        self.clear()
 
         database = Database(self.dbname_entry_sv.get())
         

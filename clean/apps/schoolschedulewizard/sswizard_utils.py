@@ -7,10 +7,15 @@ def update_callback(ui,widget,new_value):
     
     #put event on here too
     if str(widget.current_value) <> str(new_value):
+        
         widget.version += 1 # only increment widget version if contents are changing
         log.log(widget,3,"updating","key=",str(widget.winfo_name()),"current_value=",widget.current_value,"new_value=",new_value,"version=",str(widget.version))
-        widget.current_value = new_value
+        
         widget.config(foreground='red')
+        
+        # if this is the first update
+        if widget.version == 1: 
+            widget.current_value = new_value
         
         # record event in update log
         ui.updates[str(widget.winfo_name())] = (new_value,widget.version)
@@ -72,6 +77,7 @@ def widget_current_values_get(ui,gridname,rownum,minversion=1):
         init_value = grid.widgets[rownum][y].init_value
         current_value = grid.widgets[rownum][y].current_value
         
-        if current_value == 0 or 
-        values.append(init_value,current_value)
+        if current_value <> "" or init_value <> "":
+            values.append((init_value,current_value))
+            
     return values
