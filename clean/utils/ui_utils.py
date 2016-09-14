@@ -360,7 +360,6 @@ class TkImageLabelGrid(Frame):
                 contents.append(column)
         return contents
     
-    
 class TKBase(object):
     def __init__(self,widget,**kwargs):
         
