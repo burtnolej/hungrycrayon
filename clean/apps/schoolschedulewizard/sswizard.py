@@ -14,7 +14,7 @@ from misc_utils_objectfactory import ObjFactory
 import sswizard_utils
 
 from database_util import Database, tbl_create
-from database_table_util import dbtblgeneric, tbl_rows_get
+from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 
 from Tkinter import *
 from ttk import *
@@ -221,7 +221,17 @@ class WizardUI(Tk):
         
         self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
         self.clear_button.grid(row=2,column=6)
-        self.clear_button.focus_get()    
+        self.clear_button.focus_get()
+        
+        self.dbname_entry_label = Label(controlpanel,text="dbname")
+        self.dbname_entry_label.grid(row=2,column=7)
+        self.dbname_entry_label.focus_get()
+        self.dbname_entry_sv = StringVar()
+        self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv)
+        self.dbname_entry.grid(row=2,column=8)
+        self.dbname_entry.focus_get()
+        self.dbname_entry_sv.set('htmlparser')
+        
 
         self.bgmaxrows=len(period_enum)+1
         self.bgmaxcols=len(student_enum)+1 
@@ -268,9 +278,14 @@ class WizardUI(Tk):
     def save(self,saveversion=None):
 
         self.of.reset()
+        self.clear(1,1,'balancegrid')
         
-        if saveversion == None:
-            saveversion=str(self.lastsaveversion)
+        if saveversion==None:
+            saveversion = str(self._lastsaveversion_get()+1)
+            log.log(self,3,"saving save version=",str(saveversion))
+            
+        #if saveversion == None:
+        #    saveversion=str(self.lastsaveversion)
             
         for x in range(1,self.maxrows):
             ylabel=self.entrygrid.widgets[x][0].sv.get()
@@ -344,7 +359,29 @@ class WizardUI(Tk):
             self.save_button.focus_set()
         return("break")
     
-    def clear(self):
+    def _clear_grid(self,gridname,firstrow,firstcol):
+        grid = getattr(self,gridname)
+        
+        for x in range(firstrow,grid.maxrows):
+            for y in range(firstcol,grid.maxcols):
+                grid.widgets[x][y].sv.set("")
+                grid.widgets[x][y].config(background='white')
+                grid.widgets[x][y].config(foreground='black')
+                grid.widgets[x][y].init_value = ""
+                grid.widgets[x][y].current_value = ""
+                grid.widgets[x][y].version = 0
+                
+
+    def clear(self,firstrow=0,firstcol=0,gridname=None):
+        if gridname == None:
+            self._clear_grid('entrygrid',firstrow,firstcol)
+            self._clear_grid('balancegrid',firstrow,firstcol)
+        else:
+            self._clear_grid(gridname,firstrow,firstcol)
+        
+        self.updates={}
+        
+    '''def clear(self):
         
         for x in range(self.maxrows):
             for y in range(self.maxcols):
@@ -353,13 +390,18 @@ class WizardUI(Tk):
         for x in range(self.bgmaxrows):
             for y in range(self.bgmaxcols):
                 self.balancegrid.widgets[x][y].config(text="")    
-                self.balancegrid.widgets[x][y].config(background="white") 
+                self.balancegrid.widgets[x][y].config(background="white") '''
 
-    def load_save(self,saveversion):
-        self.load(saveversion)
+    def load_save(self,saveversion=None):
+        self.load()
+        #self.load(saveversion)
         self.save()
         
-    def load(self,saveversion,values=None):
+    def load(self,saveversion=None,values=None):
+        
+        if saveversion==None:
+            saveversion = self._lastsaveversion_get()
+            log.log(self,3,"loading last save version=",str(saveversion))
         
         cols = ['period','student','teacher','dow']
         
@@ -391,6 +433,16 @@ class WizardUI(Tk):
         with self.database:
             for obj in self.of.object_iter():
                 obj.persist()
+                
+    def _lastsaveversion_get(self):
+        
+        try:
+            with self.database:
+            
+                colndefn,rows = tbl_query(self.database,"select max(saveversion) from lesson")                   
+            return(rows[0][0])
+        except Exception:
+            return(0)
 
 if __name__ == "__main__":
     #master = Tk()
