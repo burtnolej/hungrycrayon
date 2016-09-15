@@ -246,7 +246,95 @@ class Test_Input_New_Save_Change_Save_Persist_Overbook_Teacher_Period(Test_Base)
     def tearDown(self):
         self.ui.destroy()
         os.remove(self.dbname+".sqlite")
+
+class Test_Fill_Student(Test_Base):
+    
+    def setUp(self):
+        Test_Base.setUp(self,'tmp')
         
+        self.ui.dbname_entry_sv.set(self.dbname)
+        
+        self.ui.entrygrid.widgets[1][0].sv.set('8:30-9:10')
+        self.ui.entrygrid.widgets[2][0].sv.set('9:11-9:51')
+        self.ui.entrygrid.widgets[3][0].sv.set('9:52-10:32')
+        self.ui.entrygrid.widgets[4][0].sv.set('10:33-11:13')
+        self.ui.entrygrid.widgets[5][0].sv.set('11:13-11:45')
+        self.ui.entrygrid.widgets[6][0].sv.set('11:45-12:25')
+        self.ui.entrygrid.widgets[7][0].sv.set('12:26-1:06')
+        self.ui.entrygrid.widgets[8][0].sv.set('1:07-1:47')
+        self.ui.entrygrid.widgets[9][0].sv.set('1:48-2:28')
+        self.ui.entrygrid.widgets[10][0].sv.set('2:30-3:00')        
+
+        self.ui.entrygrid.widgets[0][1].sv.set('Stan')
+        self.ui.entrygrid.widgets[1][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[2][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[3][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[4][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[5][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[6][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[7][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[8][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[9][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[10][1].sv.set('NATHANIEL')
+
+        self.ui.save()
+        self.ui.persist()
+        
+        
+    def test_background(self):
+        self.assertEqual('green',
+                         self.ui.balancegrid.widgets[0][1].cget('background'))
+        
+    def tearDown(self):
+        self.ui.destroy()
+        os.remove(self.dbname+".sqlite")
+    
+class Test_Fill_Student_Unfill(Test_Base):
+    
+    def setUp(self):
+        Test_Base.setUp(self,'tmp')
+        
+        self.ui.dbname_entry_sv.set(self.dbname)
+        
+        self.ui.entrygrid.widgets[1][0].sv.set('8:30-9:10')
+        self.ui.entrygrid.widgets[2][0].sv.set('9:11-9:51')
+        self.ui.entrygrid.widgets[3][0].sv.set('9:52-10:32')
+        self.ui.entrygrid.widgets[4][0].sv.set('10:33-11:13')
+        self.ui.entrygrid.widgets[5][0].sv.set('11:13-11:45')
+        self.ui.entrygrid.widgets[6][0].sv.set('11:45-12:25')
+        self.ui.entrygrid.widgets[7][0].sv.set('12:26-1:06')
+        self.ui.entrygrid.widgets[8][0].sv.set('1:07-1:47')
+        self.ui.entrygrid.widgets[9][0].sv.set('1:48-2:28')
+        self.ui.entrygrid.widgets[10][0].sv.set('2:30-3:00')        
+
+        self.ui.entrygrid.widgets[0][1].sv.set('Stan')
+        self.ui.entrygrid.widgets[1][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[2][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[3][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[4][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[5][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[6][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[7][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[8][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[9][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[10][1].sv.set('NATHANIEL')
+
+        self.ui.save()
+        
+        self.ui.entrygrid.widgets[2][1].sv.set('COBY')
+  
+        self.ui.persist()
+        
+        
+    def test_background(self):
+        self.assertEqual('white',
+                         self.ui.balancegrid.widgets[0][1].cget('background'))
+        
+    def tearDown(self):
+        self.ui.destroy()
+        os.remove(self.dbname+".sqlite")
+
+    
 class Test_Fix_Overbooking(Test_Base):
     
     def setUp(self):
@@ -313,7 +401,7 @@ class Test_Fix_Overbooking(Test_Base):
              
 class Test_Load(Test_Base):
     def setUp(self):
-        Test_Base.setUp(self)
+        Test_Base.setUp(self,'test_10rows')
         
     def test_grid_contents(self):
         self.ui.load()
@@ -337,7 +425,7 @@ class Test_Load(Test_Base):
      
 class Test_Load_Save(Test_Base):
     def setUp(self):
-        Test_Base.setUp(self)
+        Test_Base.setUp(self,'test_10rows')
 
         self.ui.load_save()
         
@@ -446,7 +534,7 @@ class Test_Load_Save(Test_Base):
 class Test_Load_Change_Save_Single_Value(Test_Base):
     
     def setUp(self):
-        Test_Base.setUp(self)
+        Test_Base.setUp(self,'test_10rows')
         
         self.ui.load()
     
@@ -529,7 +617,7 @@ class Test_Load_Change_Save_Single_Value(Test_Base):
 class Test_Load_Save_Change_Save_Change_Save_Single_Value(Test_Base):
     
     def setUp(self):
-        Test_Base.setUp(self)
+        Test_Base.setUp(self,'test_10rows')
         
         self.ui.load_save()
     
@@ -546,7 +634,7 @@ class Test_Load_Save_Change_Save_Change_Save_Single_Value(Test_Base):
         self.ui.save()
 
 
-        
+        self.ui.mainloop()
         self.ui.persist()
         
     '''def test_update_queue(self):
@@ -577,11 +665,11 @@ class Test_Load_Save_Change_Save_Change_Save_Single_Value(Test_Base):
                            [u'9:11-9:51', u'JAKE', u'Paraic', u'Tuesday', 0], 
                            [u'8:30-9:10', u'NATHANIEL', u'Stan', u'Tuesday', 1], 
                            [u'8:30-9:10', u'NATHANIEL', u'Galina', u'Tuesday', 1], 
-                           [u'8:30-9:10', u'TRISTAN', u'Samantha', u'Tuesday', 1], 
+                           [u'8:30-9:10', u'COBY', u'Samantha', u'Tuesday', 1], 
                            [u'8:30-9:10', u'COBY', u'Amelia', u'Tuesday', 1], 
                            [u'8:30-9:10', u'YOSEF', u'Paraic', u'Tuesday', 1], 
                            [u'9:11-9:51', u'LUCY', u'Stan', u'Tuesday', 1], 
-                           [u'9:11-9:51', u'DONOVAN', u'Galina', u'Tuesday', 1], 
+                           [u'9:11-9:51', u'LUCY', u'Galina', u'Tuesday', 1], 
                            [u'9:11-9:51', u'BOOKER', u'Samantha', u'Tuesday', 1], 
                            [u'9:11-9:51', u'ASHER', u'Amelia', u'Tuesday', 1], 
                            [u'9:11-9:51', u'JAKE', u'Paraic', u'Tuesday', 1]]
@@ -606,8 +694,8 @@ class Test_Load_Save_Change_Save_Change_Save_Single_Value(Test_Base):
     def test_balancegrid_contents(self):
         
         expected_results = [['2:30-3:00', 'NATHANIEL', 'TRISTAN', 'SIMON A.', 'ORIG', 'COBY', 'BOOKER', 'ASHLEY', 'YOSEF', 'LUCY', 'JAKE', 'ASHER', 'DONOVAN', 'LIAM', 'SIMON B', 'NICK'], 
-                            ['8:30-9:10', u'Stan,Galina', u'Samantha,Amelia', u'Galina', u'Amelia', u'Paraic'], 
-                            ['9:11-9:51', u'Samantha', u'Stan', u'Paraic', u'Amelia', u'Galina,Samantha'], 
+                            ['8:30-9:10', u'Stan,Galina','Samantha,Amelia','Paraic'], 
+                            ['9:11-9:51', u'Samantha', u'Stan,Galina', u'Paraic', u'Amelia'], 
                             ['9:52-10:32'], 
                             ['10:33-11:13'], 
                             ['11:13-11:45'], 
@@ -622,7 +710,7 @@ class Test_Load_Save_Change_Save_Change_Save_Single_Value(Test_Base):
 class Test_Load_Save_Change_Save_Single_Value(Test_Base):
     
     def setUp(self):
-        Test_Base.setUp(self)
+        Test_Base.setUp(self,'test_10rows')
         
         self.ui.load_save()
     
@@ -660,11 +748,11 @@ class Test_Load_Save_Change_Save_Single_Value(Test_Base):
                            [u'9:11-9:51', u'JAKE', u'Paraic', u'Tuesday', 0], 
                            [u'8:30-9:10', u'NATHANIEL', u'Stan', u'Tuesday', 1], 
                            [u'8:30-9:10', u'NATHANIEL', u'Galina', u'Tuesday', 1], 
-                           [u'8:30-9:10', u'TRISTAN', u'Samantha', u'Tuesday', 1], 
+                           [u'8:30-9:10', u'COBY', u'Samantha', u'Tuesday', 1], 
                            [u'8:30-9:10', u'COBY', u'Amelia', u'Tuesday', 1], 
                            [u'8:30-9:10', u'YOSEF', u'Paraic', u'Tuesday', 1], 
                            [u'9:11-9:51', u'LUCY', u'Stan', u'Tuesday', 1], 
-                           [u'9:11-9:51', u'DONOVAN', u'Galina', u'Tuesday', 1], 
+                           [u'9:11-9:51', u'LUCY', u'Galina', u'Tuesday', 1], 
                            [u'9:11-9:51', u'BOOKER', u'Samantha', u'Tuesday', 1], 
                            [u'9:11-9:51', u'ASHER', u'Amelia', u'Tuesday', 1], 
                            [u'9:11-9:51', u'JAKE', u'Paraic', u'Tuesday', 1]]
@@ -689,7 +777,7 @@ class Test_Load_Save_Change_Save_Single_Value(Test_Base):
     def test_balancegrid_contents(self):
         
         expected_results = [['2:30-3:00', 'NATHANIEL', 'TRISTAN', 'SIMON A.', 'ORIG', 'COBY', 'BOOKER', 'ASHLEY', 'YOSEF', 'LUCY', 'JAKE', 'ASHER', 'DONOVAN', 'LIAM', 'SIMON B', 'NICK'], 
-                            ['8:30-9:10', u'Stan,Galina', u'Samantha', u'Galina', u'Amelia', u'Paraic'], 
+                            ['8:30-9:10', u'Stan,Galina', u'Samantha', u'Amelia', u'Paraic'], 
                             ['9:11-9:51', u'Samantha', u'Stan', u'Paraic', u'Amelia', u'Galina'], 
                             ['9:52-10:32'], 
                             ['10:33-11:13'], 
@@ -705,7 +793,7 @@ class Test_Load_Save_Change_Save_Single_Value(Test_Base):
 class Test_Load_Save_Change_Save_New_Row(Test_Base):
     
     def setUp(self):
-        Test_Base.setUp(self)
+        Test_Base.setUp(self,'test_10rows')
         
         self.ui.load_save()
     
@@ -810,14 +898,16 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_Single_Value))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_New_Row))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_Change_Save_Single_Value))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Fill_Student))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Fill_Student_Unfill))
 
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Persist))
     
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist))
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist_Overbook_Teacher_Period))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Fix_Overbooking))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist_Overbook_Teacher_Period))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Fix_Overbooking))
     
     
     

@@ -349,6 +349,11 @@ class WizardUI(Tk):
                 current_value = self.balancegrid.widgets[x][student].cget("text")
                 if current_value == "":
                     student_full=False
+                    
+                # for now force foreground back to black as default
+                # in TkBase makes in 'red' on change
+                self.balancegrid.widgets[x][student].config(foreground='black')
+                
             if student_full == True:
                 self.balancegrid.widgets[0][student].config(background='green')
             
