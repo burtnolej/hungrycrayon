@@ -1,4 +1,5 @@
 from misc_utils import nxnarraycreate, Log
+from database_table_util import tbl_query
 
 log = Log()
 def update_callback(ui,widget,new_value):        
@@ -82,3 +83,19 @@ def widget_current_values_get(ui,gridname,rownum,minversion=1):
             values.append((init_value,current_value))
             
     return values
+
+
+def dropdown_build(database,widgetargs):
+    
+    output = []
+    with database:
+        for x in range(len(widgetargs)):
+            exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(x+1)
+            colndefn,values = tbl_query(database,exec_str) 
+            
+            values = [value[0] for value in values]
+    
+            for y in range(len(widgetargs[x])):
+                widgetargs[x][y]['values'] = values
+                
+    return(widgetargs)

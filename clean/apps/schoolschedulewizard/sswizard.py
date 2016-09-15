@@ -28,7 +28,7 @@ types_enum = ['period','day','other','psych','edu',
               'break','lesson','student','teacher']
 
 period_enum = ['8:30-9:10','9:11-9:51','9:52-10:32','10:33-11:13',
-               '11:13-11:45','11:45-12:25','12:26-1:06','1:07-1:47',
+               '11:13-11AP:45','11:45-12:25','12:26-1:06','1:07-1:47',
                '1:48-2:28','2:30-3:00']
 period_map = dict((pe,period_enum.index(pe)) for pe in period_enum)
 
@@ -162,7 +162,8 @@ class WizardUI(Tk):
         '''
         
         # default combolist values is student
-        
+
+        #dbsetmember = DBSetMember('quadref','classes','
         setmemberp = SetMemberPartial(name='x{mylist}',set=student_enum)
         widget_args=dict(background='white',values=student_enum)
         

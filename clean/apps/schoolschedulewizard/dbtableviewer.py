@@ -35,8 +35,8 @@ class DBTableUI(Tk):
         # useful for looking up pk values for updates
         self.dbcol_defn = []
 
-        self.maxrows=30 # rows in the grid
-        self.maxcols=18 # cols in the grid
+        self.maxrows=57 # rows in the grid
+        self.maxcols=8 # cols in the grid
         maxwidgets=self.maxrows*self.maxcols
         wwidth=48 # default button width with text of 3 chars
         wheight=29 # default button height
@@ -129,16 +129,20 @@ class DBTableUI(Tk):
         self.clone_button.grid(column=5,row=1,columnspan=1,sticky=NSEW)
         self.clone_button.focus_get()
         
-        self.maxnewrows=8
+        self.maxnewrows=20
         self.newrowgrid = TkImageLabelGrid(self,'newrowgrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxnewrows,self.maxcols,
                              {},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)
-        self.newrowgrid.grid(row=2,sticky=NSEW)
-
+        #self.newrowgrid.grid(row=2,sticky=NSEW)
+        self.newrowgrid.grid(row=0,column=1,sticky=NSEW)
                 
         self.grid_columnconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.grid_columnconfigure(1, weight=1, uniform="foo2")
+        #self.grid_rowconfigure(2, weight=1, uniform="foo")
+          
+
 
     def widget_current_values_get(self,gridname,rownum):
         return sswizard_utils.widget_current_values_get(self,gridname,rownum)
