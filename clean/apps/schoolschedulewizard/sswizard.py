@@ -442,7 +442,7 @@ class WizardUI(Tk):
                 colndefn,rows = tbl_query(self.database,"select max(saveversion) from lesson")                   
             return(rows[0][0])
         except Exception:
-            return(0)
+            return(-1)
 
 if __name__ == "__main__":
     #master = Tk()

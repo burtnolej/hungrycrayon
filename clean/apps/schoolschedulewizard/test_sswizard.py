@@ -80,9 +80,9 @@ class Test_Grid_Behaviour_Update_Combobox(unittest.TestCase):
         self.ui.destroy()
         
 class Test_Base(unittest.TestCase):
-    def setUp(self):
+    def setUp(self,dbname):
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbname = 'test_10rows'
+        self.dbname = dbname
         self.dbfilename = path.join(dbpath,self.dbname)
         self.database = Database(self.dbfilename)
         self.of = ObjFactory(True)
@@ -93,10 +93,11 @@ class Test_Base(unittest.TestCase):
         copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")
         
 class Test_Input_New_Save_Persist(Test_Base):
+    
     def setUp(self):
-        Test_Base.setUp(self)
-        
-        self.ui.dbname_entry_sv.set('tmp')
+        Test_Base.setUp(self,'tmp')
+           
+        self.ui.dbname_entry_sv.set(self.dbname)
         
         self.ui.entrygrid.widgets[1][0].sv.set('8:30-9:10')
         self.ui.entrygrid.widgets[0][1].sv.set('Stan')
@@ -133,12 +134,16 @@ class Test_Input_New_Save_Persist(Test_Base):
                         ['8:30-9:10', 'NATHANIEL']]
                 
         self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)
-    
+
+    def tearDown(self):
+        self.ui.destroy()
+        os.remove(self.dbname+".sqlite")
+
 class Test_Input_New_Save_Change_Save_Persist(Test_Base):
     def setUp(self):
-        Test_Base.setUp(self)
+        Test_Base.setUp(self,'tmp')
         
-        self.ui.dbname_entry_sv.set('tmp')
+        self.ui.dbname_entry_sv.set(self.dbname)
         
         self.ui.entrygrid.widgets[1][0].sv.set('8:30-9:10')
         self.ui.entrygrid.widgets[0][1].sv.set('Stan')
@@ -179,8 +184,133 @@ class Test_Input_New_Save_Change_Save_Persist(Test_Base):
                         ['8:30-9:10', 'TRISTAN']]
                 
         self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)
+
+    def tearDown(self):
+        self.ui.destroy()
+        os.remove(self.dbname+".sqlite")
+        
+class Test_Input_New_Save_Change_Save_Persist_Overbook_Teacher_Period(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,'tmp')
+        
+        self.ui.dbname_entry_sv.set(self.dbname)
+        
+        self.ui.entrygrid.widgets[1][0].sv.set('8:30-9:10')
+        self.ui.entrygrid.widgets[0][1].sv.set('Stan')
+        self.ui.entrygrid.widgets[1][1].sv.set('NATHANIEL')
+        
+        self.ui.save()
+        self.ui.entrygrid.widgets[0][2].sv.set('Galina')
+        self.ui.entrygrid.widgets[1][2].sv.set('NATHANIEL')
+        self.ui.save()
+        self.ui.persist()
+    
+    def test_balancegrid_contents(self):
+        
+        expected_results = [['2:30-3:00', 'NATHANIEL', 'TRISTAN', 'SIMON A.', 'ORIG', 'COBY', 'BOOKER', 'ASHLEY', 'YOSEF', 'LUCY', 'JAKE', 'ASHER', 'DONOVAN', 'LIAM', 'SIMON B', 'NICK'], 
+                            ['8:30-9:10', 'Stan,Galina'], 
+                            ['9:11-9:51'], 
+                            ['9:52-10:32'], 
+                            ['10:33-11:13'], 
+                            ['11:13-11:45'], 
+                            ['11:45-12:25'], 
+                            ['12:26-1:06'], 
+                            ['1:07-1:47'], 
+                            ['1:48-2:28'], 
+                            ['2:30-3:00']]
+                
+        self.assertListEqual(self.ui.balancegrid.dump_grid(), expected_results)    
+        
+    def test_dbwrite(self):
+        
+        expected_result = [[u'8:30-9:10', u'NATHANIEL', u'Stan', u'Tuesday', 0],
+                           [u'8:30-9:10', u'NATHANIEL', u'Galina', u'Tuesday', 0]]
+        
+        cols = ['period','student','teacher','dow','saveversion']  
+        
+        with self.database:
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols)
+        
+        self.assertListEqual(expected_result,rows)        
+        
+    def test_grid_contents(self):
+        
+        expected_results =[['Stan','Galina'],
+                           ['8:30-9:10', 'NATHANIEL','NATHANIEL']]
+                
+        self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)
  
-     
+    def test_grid_color(self):
+        self.assertEqual(self.ui.balancegrid.widgets[1][1].cget('background'),'red')
+
+    def tearDown(self):
+        self.ui.destroy()
+        os.remove(self.dbname+".sqlite")
+        
+class Test_Fix_Overbooking(Test_Base):
+    
+    def setUp(self):
+        Test_Base.setUp(self,'tmp')
+        
+        self.ui.dbname_entry_sv.set(self.dbname)
+        
+        self.ui.dbname_entry_sv.set(self.dbname)
+        
+        self.ui.entrygrid.widgets[1][0].sv.set('8:30-9:10')
+        self.ui.entrygrid.widgets[0][1].sv.set('Stan')
+        self.ui.entrygrid.widgets[1][1].sv.set('NATHANIEL')
+        
+        self.ui.save()
+        self.ui.entrygrid.widgets[0][2].sv.set('Galina')
+        self.ui.entrygrid.widgets[1][2].sv.set('NATHANIEL')
+        self.ui.save()
+        self.ui.entrygrid.widgets[1][2].sv.set('TRISTAN')
+        self.ui.save()
+        self.ui.persist()
+    
+    def test_balancegrid_contents(self):
+        
+        expected_results = [['2:30-3:00', 'NATHANIEL', 'TRISTAN', 'SIMON A.', 'ORIG', 'COBY', 'BOOKER', 'ASHLEY', 'YOSEF', 'LUCY', 'JAKE', 'ASHER', 'DONOVAN', 'LIAM', 'SIMON B', 'NICK'], 
+                            ['8:30-9:10', 'Stan','Galina'], 
+                            ['9:11-9:51'], 
+                            ['9:52-10:32'], 
+                            ['10:33-11:13'], 
+                            ['11:13-11:45'], 
+                            ['11:45-12:25'], 
+                            ['12:26-1:06'], 
+                            ['1:07-1:47'], 
+                            ['1:48-2:28'], 
+                            ['2:30-3:00']]
+                
+        self.assertListEqual(self.ui.balancegrid.dump_grid(), expected_results)
+        
+    def test_dbwrite(self):
+        
+        expected_result = [[u'8:30-9:10', u'NATHANIEL', u'Stan', u'Tuesday', 0],
+                           [u'8:30-9:10', u'TRISTAN', u'Galina', u'Tuesday', 0]]
+        
+        cols = ['period','student','teacher','dow','saveversion']
+        
+        with self.database:
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols)
+        
+        self.assertListEqual(expected_result,rows)        
+        
+    def test_grid_contents(self):
+        
+        expected_results =[['Stan','Galina'],
+                           ['8:30-9:10', 'NATHANIEL','TRISTAN']]
+                
+        self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)
+ 
+    def test_grid_color(self):
+        
+        self.assertEqual(self.ui.balancegrid.widgets[1][1].cget('background'),'lightgreen')
+        
+    def tearDown(self):
+        self.ui.destroy()
+        os.remove(self.dbname+".sqlite")
+             
 class Test_Load(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -686,6 +816,8 @@ if __name__ == "__main__":
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist))
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist_Overbook_Teacher_Period))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Fix_Overbooking))
     
     
     
