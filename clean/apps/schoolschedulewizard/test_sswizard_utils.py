@@ -83,9 +83,62 @@ class Test_(unittest.TestCase):
         widgetcfg = nxnarraycreate(8,10,widget_args)
         widgetcfg = dropdown_build(self.database,widgetcfg)
         
-        expected_results = ['Da-Hum','Br-STEM','Jk-WP']
+        expected_results = ['Da-Hum','Br-STEM']
         self.assertEqual(widgetcfg[1][0]['values'],expected_results)
          
+    def test_col3(self):
+        widget_args=dict(background='white')
+         
+        widgetcfg = nxnarraycreate(8,10,widget_args)
+        widgetcfg = dropdown_build(self.database,widgetcfg)
+        
+        expected_results = ['Da-Hum','Br-STEM','Jk-SPED','Th-STEM','Js-Hum']
+        self.assertEqual(widgetcfg[2][0]['values'],expected_results)
+
+    def test_col4(self):
+        widget_args=dict(background='white')
+         
+        widgetcfg = nxnarraycreate(8,10,widget_args)
+        widgetcfg = dropdown_build(self.database,widgetcfg)
+        
+        expected_results = ['Jk-SPED','Th-STEM','Js-Hum']
+        self.assertEqual(widgetcfg[3][0]['values'],expected_results)
+
+    def test_col5(self):
+        widget_args=dict(background='white')
+         
+        widgetcfg = nxnarraycreate(8,10,widget_args)
+        widgetcfg = dropdown_build(self.database,widgetcfg)
+        
+        expected_results = ['Da-Hum','Br-STEM','Jk-Mvmt']
+        self.assertEqual(widgetcfg[4][0]['values'],expected_results)
+
+    def test_col6(self):
+        widget_args=dict(background='white')
+         
+        widgetcfg = nxnarraycreate(8,10,widget_args)
+        widgetcfg = dropdown_build(self.database,widgetcfg)
+        
+        expected_results = ['Da-Hum','Br-STEM','Jk-SPED']
+        self.assertEqual(widgetcfg[5][0]['values'],expected_results)
+    
+    def test_col7(self):
+        widget_args=dict(background='white')
+         
+        widgetcfg = nxnarraycreate(8,10,widget_args)
+        widgetcfg = dropdown_build(self.database,widgetcfg)
+        
+        expected_results = ['Da-Hum','Br-STEM']
+        self.assertEqual(widgetcfg[6][0]['values'],expected_results)
+
+    def test_col8(self):
+        widget_args=dict(background='white')
+         
+        widgetcfg = nxnarraycreate(8,10,widget_args)
+        widgetcfg = dropdown_build(self.database,widgetcfg)
+        
+        expected_results = ['Da-Hum','Br-STEM','Jk-AP']
+        self.assertEqual(widgetcfg[7][0]['values'],expected_results)
 
 class Test_UI(unittest.TestCase):
     def setUp(self):
