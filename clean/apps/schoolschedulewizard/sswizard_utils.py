@@ -1,5 +1,7 @@
 from misc_utils import nxnarraycreate, Log
 from database_table_util import tbl_query
+from database_util import Database
+from collections import OrderedDict
 
 log = Log()
 def update_callback(ui,widget,new_value):        
@@ -129,3 +131,45 @@ def dropdown_build(database,
                     ui.widgets[0][y].sv.set(values[y])
 
     return(widgetargs)
+
+
+def getdbenum(dbname,fldname,tblname,pred1=None,predval1=None):
+    database = Database(dbname)
+    exec_str = "select {1} from {0}".format(tblname,fldname)
+    if pred1 <> None:
+        exec_str = exec_str + " where {0} = {1}".format(pred1,predval1)
+
+    with database:
+        coldefn,values = tbl_query(database,exec_str)
+    
+    values = [value[0] for value in values]
+    
+    exec_str = "select code from {0}".format(tblname,fldname)
+    if pred1 <> None:
+        exec_str = exec_str + " where {0} = {1}".format(pred1,predval1)
+
+    with database:
+        coldefn,codes = tbl_query(database,exec_str)
+    
+    codes = [int(code[0]) for code in codes]
+
+    map = dict(zip(values,range(len(values))))
+    codemap = dict(zip(values,range(len(codes))))
+
+    return  values,map, codemap
+
+
+def setenums(dow,prep,dbname):
+
+    enums = {}
+    map_enums={}
+    
+    enums['period'],map_enums['period'] = getdbenum(dbname,'name','period')
+    enums['students'],map_enums['students'] = getdbenum(dbname,'name','student','prep',prep)
+    enums['teachers'],map_enums['teachers'] = getdbenum(dbname,'name','adult','prep',prep)
+    enums['session'],map_enums['session'] = getdbenum(dbname,'tag','session')
+    enums['lessontype'],map_enums['lessontype'] = getdbenum(dbname,'name','lessontype')
+    enums['subject'],map_enums['subject'] = getdbenum(dbname,'name','subject')
+    enums['dow'],map_enums['dow'] = getdbenum(dbname,'name','dow')
+  
+    return enums,map_enums

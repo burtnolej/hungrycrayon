@@ -16,7 +16,7 @@ from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
 from database_util import Database
 from database_table_util import tbl_rows_get, tbl_query
 
-from sswizard_utils import dropdown_build
+from sswizard_utils import dropdown_build, setenums
             
 def _execfunc(database,value):
     exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(value)
@@ -217,6 +217,31 @@ class Test_UI(unittest.TestCase):
         print self.ui.entrygrid.widgets[0][0]['values']
         self.ui.mainloop()
         #pass
+        
+class Test_GetEnums(unittest.TestCase):
+    def setUp(self):
+        
+        self.database = Database('quadref_test')
+        
+    def test_prep3_students_enum(self):
+        enums,maps,_ =  setenums('All','3','quadref')
+        
+        expected_results = ['A','B','C','D','E','F','G','H','I','J']
+        
+        self.assertListEqual(expected_results,enums['students'])
+
+    def test_prep3_students_map(self):
+        enums,maps,_ =  setenums('All','3','quadref')
+        
+        expected_results = {'A':1,'B':2,'C':3,'D':4, \
+                            'E':5,'F':6,'G':7,'H':8, \
+                            'I':9,'J':10}
+        
+        print expected_results
+        print maps['students']
+        
+        self.assertEqual(expected_results,maps['students'])
+
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
@@ -224,8 +249,11 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_UI))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_UI))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetEnums))
 
+    
+    
     unittest.TextTestRunner(verbosity=2).run(suite) 
 
 

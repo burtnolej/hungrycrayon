@@ -36,7 +36,7 @@ class DBTableUI(Tk):
         self.dbcol_defn = []
 
         self.maxrows=57 # rows in the grid
-        self.maxcols=8 # cols in the grid
+        self.maxcols=15 # cols in the grid
         maxwidgets=self.maxrows*self.maxcols
         wwidth=48 # default button width with text of 3 chars
         wheight=29 # default button height
@@ -50,7 +50,7 @@ class DBTableUI(Tk):
         self.bind("<Prior>",self.focus_next_widget)
         self.grid()
 
-        widget_args=dict(background='white')
+        widget_args=dict(background='white',width=8)
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
         
         #rowcfg = dict(height=2,width=2,text="x")
@@ -206,12 +206,19 @@ class DBTableUI(Tk):
     
     def process_updates(self,database=None):
         
+        log.log(self,1,"in processupdates")
+
         if database == None:
             database = Database(self.dbname_entry_sv.get())
         
         pkcolnum = self.dbcol_defn.index(self.pk_entry_sv.get())
                   
         rows=[]
+        
+        
+        if len(self.updates.keys()) == 0:
+            log.log(self,3,"wierd","len(updates)=0")
+            
         for key in self.updates.keys():
             row=[]
             gridname,x,y = key.split(",")
@@ -250,6 +257,8 @@ class DBTableUI(Tk):
                             log.log(self,3,"error","dbtable col update","error=",str(e))
                             
                     getattr(self,gridname).widgets[0][int(y)].current_value = new_value
+                else:
+                    log.log(self,3,"nothing to do","new_value=",str(new_value),"=","current_value=",current_value)
             else:
                 pkval = self.entrygrid.widgets[int(x)][pkcolnum].sv.get()
                 

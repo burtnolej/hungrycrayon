@@ -24,53 +24,25 @@ from collections import OrderedDict
 import tkFont
 import unittest
 
-types_enum = ['period','day','other','psych','edu',
-              'break','lesson','student','teacher']
 
-period_enum = ['8:30-9:10','9:11-9:51','9:52-10:32','10:33-11:13',
-               '11:13-11AP:45','11:45-12:25','12:26-1:06','1:07-1:47',
-               '1:48-2:28','2:30-3:00']
-period_map = dict((pe,period_enum.index(pe)) for pe in period_enum)
-
-day_enum = ['Monday','Tuesday','Wednesday','Thursday','Friday']
-other_enum = ['MOVEMENT','CORE','YOGA','MUSIC','CODING/TED TALKS',
-              'REGENTS PREP','REGIONS PREP','READING PERIOD',
-              'INDEPENDENT READING','MENTORING','READING','CAR BLOG',
-              'INDEPENDENT STUDY','SUBWAY BLOG','VIDEO GAME BLOG']
-
-psych_enum = ['COUNSELING','SPEECH']
-edu_enum = ['SCIENCE','STEM','MATH','HUMANITIES','PSYCHOLOGY',
-            'ELA','ITALIAN','ART','SOCIAL STUDIES','LITERACY','OT',
-            'ANIMAL RESEARCH','ESPANOL']
-break_enum = ['END COMPUTER TIME','LUNCH COMPUTER TIME','QUAD CAFE','QUADCAFE',
-              'GAME STAR MECHANIC','BOARD GAMES','SEWING',
-              'GS MECHANIC','STUDENT NEWS','CHESS']
-lesson_enum = 'wp','nwp','break','edu','other','psych'
-
-teachers = ["Stan","Galina","Samantha","Amelia","Paraic"]
-
-students = ['NATHANIEL','TRISTAN','SIMON A.','ORIG','COBY','BOOKER',
-            'ASHLEY','YOSEF','LUCY','JAKE','ASHER','DONOVAN','LIAM','SIMON B','NICK']
-
-def _get_enums(values):
-    type = OrderedDict()
-    map = OrderedDict()
-    enum = []
-    
-    for i in range(len(values)):
-        type[values[i]] = ""
-        map[values[i]] = i
-        enum.append(values[i])
-    
-    return(type,map,enum)
-
-teacher_lesson_type,teacher_map,teacher_enum = _get_enums(teachers)
-
-_,student_map,student_enum = _get_enums(students)
 
 log = Log()
 
 controlpanelconfig = dict(height=300,width=200,x=100,y=100)
+
+def _execfunc(database,value):
+    exec_str = "select tag from session where period = {0} and subject <> \"None\"".format(value)
+    return(tbl_query(database,exec_str))
+
+def _rowheaderexecfunc(database):
+    exec_str = "select name from period"
+    return(tbl_query(database,exec_str))
+
+def _columnheaderexecfunc(database,pred=None,predvalue=None):
+    exec_str = "select name from student"
+    if pred <> None:
+        exec_str = exec_str + " where {0} = {1}".format(pred,predval)
+    return(tbl_query(database,exec_str))
 
 class schoolschedgeneric(dbtblgeneric):
 
@@ -113,9 +85,13 @@ class WizardUI(Tk):
         
         Tk.__init__(self)
         
+        self.enums,self.maps =  sswizard_utils.setenums('All','3','quadref')
+        
         self.database = database
         self.of = of
 
+        self.refdatabase = Database('quadref')
+        
         self.lastsaveversion=0
 
         # any children that change update this 
@@ -161,16 +137,44 @@ class WizardUI(Tk):
                              {},widgetcfg)
         '''
         
+        configpanel = Frame(self)
+        configpanel.grid(row=0,sticky=NSEW)
+        
+        self.prep_label = Label(configpanel,text="prep")
+        self.prep_label.grid(row=0,column=0)
+        self.prep_label.focus_get()
+        
+        self.prep_entry_sv = StringVar()
+        self.prep_entry = Entry(configpanel,textvariable=self.prep_entry_sv)
+        self.prep_entry.grid(row=0,column=1)
+        self.prep_entry.focus_get()
+        
+        self.dow_label = Label(configpanel,text="dow")
+        self.dow_label.grid(row=0,column=2)
+        self.dow_label.focus_get()
+        
+        self.dow_label_sv = StringVar()
+        self.dow_label = Entry(configpanel,textvariable=self.dow_label_sv)
+        self.dow_label.grid(row=0,column=3)
+        self.dow_label.focus_get()
+        
+        
         # default combolist values is student
 
         #dbsetmember = DBSetMember('quadref','classes','
-        setmemberp = SetMemberPartial(name='x{mylist}',set=student_enum)
-        widget_args=dict(background='white',values=student_enum)
+        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['students'])
+        widget_args=dict(background='white',width=7,values=self.enums['students'])
         
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,
                                    widget_args)
         
-        # column headers are teacher
+        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,
+                                                  widgetcfg,
+                                                  _execfunc,
+                                                  _rowheaderexecfunc,
+                                                  _columnheaderexecfunc)
+
+        '''# column headers are teacher
         setmemberp = SetMemberPartial(name='x{mylist}',set=teacher_enum)
         _widget_args=dict(background='white',values=teacher_enum)     
         for y in range(1,self.maxcols):
@@ -180,16 +184,16 @@ class WizardUI(Tk):
         setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
         _widget_args=dict(background='white',values=period_enum)     
         for x in range(1,self.maxrows):
-            widgetcfg[x][0] = _widget_args
+            widgetcfg[x][0] = _widget_args'''
 
-        setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
+        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])
 
         self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,
                                           wmwidth,wmheight,    
                                           0,0,self.maxrows,self.maxcols,
                                           {},widgetcfg)
 
-        self.entrygrid.grid(row=0,column=0,sticky=NSEW)
+        self.entrygrid.grid(row=1,column=0,sticky=NSEW)
         
         controlpanel = Frame(self)
         controlpanel.grid(row=2,sticky=NSEW)
@@ -234,8 +238,8 @@ class WizardUI(Tk):
         self.dbname_entry_sv.set('htmlparser')
         
 
-        self.bgmaxrows=len(period_enum)+1
-        self.bgmaxcols=len(student_enum)+1 
+        self.bgmaxrows=len(self.enums['period'])+1
+        self.bgmaxcols=len(self.enums['students'])+1 
         mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
         self.balancegrid = TkImageLabelGrid(self,'balancegrid',
@@ -244,10 +248,10 @@ class WizardUI(Tk):
                                             {},widgetcfg)
         
         
-        self.balancegrid.grid(row=1,column=0,sticky=NSEW)
+        self.balancegrid.grid(row=3,column=0,sticky=S)
         self._draw_balancegrid_labels()
         
-        self.grid_rowconfigure(0, weight=1, uniform="foo")
+        #self.grid_rowconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(1, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
          
@@ -270,11 +274,11 @@ class WizardUI(Tk):
             
     def _draw_balancegrid_labels(self):
         
-        for x in range(len(period_enum)+1):
-            self.balancegrid.widgets[x][0].sv.set(period_enum[x-1])
+        for x in range(len(self.enums['period'])+1):
+            self.balancegrid.widgets[x][0].sv.set(self.enums['period'][x-1])
             
-        for y in range(1,len(student_enum)+1):
-            self.balancegrid.widgets[0][y].sv.set(student_enum[y-1])
+        for y in range(1,len(self.enums['students'])+1):
+            self.balancegrid.widgets[0][y].sv.set(self.enums['students'][y-1])
         
     def save(self,saveversion=None):
 
@@ -300,22 +304,29 @@ class WizardUI(Tk):
 
                     # get the actual row and column number from the enum_maps
                     # add one to account for the origin
-                    x = period_enum = period_map[ylabel]+1
+                    '''x = period_enum = period_map[ylabel]+1
                     y = student_enum = student_map[value]+1
-                    z = teacher_enum = teacher_map[xlabel]+1
+                    z = teacher_enum = teacher_map[xlabel]+1'''
+                    
+                    x = period_enum = self.maps['period'][ylabel]+1
+                    y = student_enum = self.maps['students'][xlabel]+1
+                    z = session_enum = self.maps['session'][value]+1
                     
                     obj_id = ",".join(map(str,[x,y,z]))
 
+                    teacher,subject = value.split(".")
+                    
                     datamembers = dict(schedule = '1',
                                        dow='Tuesday', 
-                                       subject="MATH",
+                                       subject=subject,
                                        lessontype="wp",
                                        objtype='lesson',
                                        userobjid=obj_id, # unique key to store obj in of
                                        period=ylabel,
-                                       student=value,
+                                       student=xlabel,
+                                       teacher=teacher,
                                        saveversion=saveversion,
-                                       teacher=xlabel)
+                                       tag=value)
                     
                     self.of.new(schoolschedgeneric,
                                 'lesson',
@@ -344,9 +355,9 @@ class WizardUI(Tk):
 
     def student_totals_calc(self):
         
-        for student in range(1,len(student_enum)+1):
+        for student in range(1,len(self.enums['students'])+1):
             student_full = True
-            for x in range(len(period_enum)+1):
+            for x in range(len(self.enums['period'])+1):
                 current_value = self.balancegrid.widgets[x][student].cget("text")
                 if current_value == "":
                     student_full=False
@@ -409,7 +420,7 @@ class WizardUI(Tk):
             saveversion = self._lastsaveversion_get()
             log.log(self,3,"loading last save version=",str(saveversion))
         
-        cols = ['period','student','teacher','dow']
+        cols = ['period','student','tag','dow']
         
         if values==None:
             with self.database:
@@ -417,13 +428,17 @@ class WizardUI(Tk):
                                     ('saveversion',saveversion))
             
             for row in rows:
-                x = period_map[row[cols.index('period')]]
+                x = period_enum = self.maps['period'][row[cols.index('period')]]+1
+                y = student_enum = self.maps['students'][row[cols.index('student')]]+1
+                z = class_enum = self.maps['session'][row[cols.index('tag')]]+1
+    
+                '''x = period_map[]
                 y = teacher_map[row[cols.index('teacher')]]
-                v = student_map[row[cols.index('student')]]
+                v = student_map[row[cols.index('student')]]'''
 
-                self.entrygrid.widgets[x+1][y+1].sv.set(row[cols.index('student')])
+                self.entrygrid.widgets[x+1][y+1].sv.set(row[cols.index('tag')])
                 
-                self.entrygrid.widgets[0][y+1].sv.set(row[cols.index('teacher')])
+                self.entrygrid.widgets[0][y+1].sv.set(row[cols.index('student')])
                 self.entrygrid.widgets[x+1][0].sv.set(row[cols.index('period')])
         else:
                 
