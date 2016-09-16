@@ -117,13 +117,14 @@ def tkwidgetimage_set(ic,widget,label,overwrite=False,**kwargs):
     return(tkw)'''
 
 
-def tkwidgetfactory(app,var,master,**kwargs):
+def tkwidgetfactory(app,var,master,toplevel,**kwargs):
     
     class tkwidget(var.widgettype):
     
         def __init__(self,master,widgettype):
             
             self.app = app
+            self.toplevel = toplevel
             
             d={}
             if kwargs.has_key('name'):
@@ -173,7 +174,6 @@ class TkImageLabelGrid(Frame):
         self.master = master # reference to ui root
         Frame.__init__(self,master)
         self.grid(row=0,column=0,sticky=NSEW)
-
         
         canvas = Canvas(self)
         frame = Frame(canvas)
@@ -188,7 +188,7 @@ class TkImageLabelGrid(Frame):
         canvas.configure(yscrollcommand=hscrollbar.set,xscrollcommand=hscrollbar.set)
     
         canvas.pack(side="left",fill="both",expand=True)
-        canvas.create_window((4,4),window=frame,anchor="nw",tags="frame")
+        canvas.create_window((2,2),window=frame,anchor="nw",tags="frame")
 
         self.gridname = gridname
         
@@ -223,7 +223,7 @@ class TkImageLabelGrid(Frame):
             ylbls=[]
             for y in range(self.maxcols):
                 
-                lbl = tkwidgetfactory(self,var,frame,
+                lbl = tkwidgetfactory(self,var,frame,master,
                                       name=",".join([gridname,str(x),str(y)]),
                                       **widgetcfg[x][y])
     
@@ -365,8 +365,9 @@ class TKBase(object):
         parent = self.widget.winfo_parent()
         gparent = self._nametowidget(parent).winfo_parent()
         
-        self.toplevel = self._nametowidget(gparent)
-        
+        #self.toplevel = self._nametowidget(gparent)
+        #self.toplevel = self.app
+
         if hasattr(self.toplevel,'update_callback'):
             self.set_update_trace()
         else:

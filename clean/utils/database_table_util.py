@@ -154,12 +154,14 @@ def tbl_rows_update(database,tbl_name,row):
                                                                                      pkvalue=row[3])
     
 
-    print exec_str
     result = database.execute(exec_str)
     
     return(exec_str,result) 
 
 def tbl_query(database,exec_str):
+    
+    #print exec_str
+    
     results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]
