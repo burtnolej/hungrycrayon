@@ -9,7 +9,7 @@ from misc_utils_process import *
 from misc_utils_enum import enum
 from misc_utils import nxnarraycreate
 
-from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
+from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO, TrueFalse
 
 
 from ui_utils import TkImageWidget, TkImageLabelGrid, geometry_get, font_scale, \
@@ -69,7 +69,7 @@ class TestTkComboBox(unittest.TestCase):
         combo2.grid(row=1,column=0,sticky=NSEW)
         combo2['style']='Hlight.TCombobox'
           
-        self.master.mainloop()
+        #self.master.mainloop()
         
     def tearDown(self):
         self.master.destroy()    
@@ -80,15 +80,21 @@ class TestTkWidgetFactory(unittest.TestCase):
         self.master.geometry(geometry_get_dict(defaultmaster))
         
     def test_button(self):
-        widget = tkwidgetfactory(Tkbutton,self.master,text='foobar')
+        
+        tftype = TrueFalse(name="")
+        
+        widget = tkwidgetfactory(tftype,self.master,text='foobar')
         widget.pack(fill=BOTH,expand=1)
         
-        self.assertIsInstance(widget,Tkbutton)
+        self.assertIsInstance(widget,TkButton)
         
     def test_label(self):
-        widget = tkwidgetfactory(Tklabel,self.master,text='foobar')
+        
+        textro = TextAlphaNumRO(name="")
+        
+        widget = tkwidgetfactory(textro,self.master,text='foobar')
         widget.pack(fill=BOTH,expand=1)
-        self.assertIsInstance(widget,Tklabel)
+        self.assertIsInstance(widget,TkLabel)
         
     def tearDown(self):
         self.master.destroy()
@@ -489,11 +495,15 @@ class TestUIGridFocus(TestWidget):
     def test_master(self):
         #self.master.mainloop()
         pass
+    
+    def tearDown(self):
+        self.master.destroy()
 
                                     
 class TestUIGrid7x5odd(TestWidget):
     def setUp(self):
         self.master = Tk()
+   
         self.maxrows=7 # rows in the grid
         self.maxcols=5 # cols in the grid
         self.maxwidgets=self.maxrows*self.maxcols
@@ -501,15 +511,18 @@ class TestUIGrid7x5odd(TestWidget):
         self.wheight=29 # default button height
         self.wmheight=self.wheight*self.maxrows # master height
         self.wmwidth=self.wwidth*self.maxcols # master width
+      
 
         self.mytextalphanum = TextAlphaNum(name='textalphanum')
-        self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanum,self.wmwidth,self.wmheight,
+        self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanum,
+                                      self.wmwidth,self.wmheight,
                                       0,0,7,5)
-        
+        self.tkilg.grid(row=0,column=0,sticky=NSEW)
+        self.tkilg.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.tkilg.grid_columnconfigure(0, weight=1, uniform="foo") 
         
 
     def test_master(self):
-        #self.master.mainloop()
         
         exp_results = dict(height=self.wmheight,
                            width=self.wmwidth,
@@ -578,8 +591,15 @@ class TestUIGridCustom(TestWidget):
         
         self.tkilg.cell_set(0,0,**dict(background='white',width=2,height=2))
         self.tkilg.cell_set(1,1,**dict(background='pink',width=2,height=2))
+        
+        self.tkilg.grid(row=0,column=0,sticky=NSEW)
+        self.tkilg.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.tkilg.grid_columnconfigure(0, weight=1, uniform="foo") 
+        
                             
     def test_origin(self):
+        
+        #self.master.mainloop()
         exp_results = dict(height=36,width=22,x=0,y=0)
         self.assertWidgetDimensions(self.tkilg.widgets[0][0],0.01,**exp_results)
         
@@ -683,21 +703,20 @@ class TestUILabelImage(TestWidget):
 
         tkwidgetimage_set(self.ic,self.lbl,label,True,**self.image_args)
         
-        self.master.mainloop() 
         
         exp_res = get_gif_filename('/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs',
                                    label,self.lbl.image_args)
     
         self.assertFilesEqual(exp_res,self.lbl.image)
-        self.assertTrue(isinstance(self.lbl,Tklabel))
+        self.assertTrue(isinstance(self.lbl,TkLabel))
         
     def test_button(self):
         
         label='foobar'
         
-        self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+        self.bool = TrueFalse(name='true-false')
         
-        self.lbl = tkwidgetfactory(self.mytextalphanumro,self.master)
+        self.lbl = tkwidgetfactory(self.bool,self.master)
         self.lbl.pack(fill=BOTH,expand=1)
 
         tkwidgetimage_set(self.ic,self.lbl,label,True,**self.image_args)
@@ -709,7 +728,7 @@ class TestUILabelImage(TestWidget):
                                    label,self.image_args)
     
         self.assertFilesEqual(exp_res,self.lbl.image)
-        self.assertTrue(isinstance(self.lbl,Tkbutton))
+        self.assertTrue(isinstance(self.lbl,TkButton))
         
         
     def tearDown(self):
@@ -718,39 +737,50 @@ class TestUILabelImage(TestWidget):
 
 class TestUIFrameResizeFont(TestWidget):
     def setUp(self):
-        self.master = Tk()
       
-        self.maxrows=20 # rows in the grid
-        self.maxcols=20 # cols in the grid
-        self.wmheight=1300 # master height
-        self.wmwidth=1200 # master width  
-
-        custommaster = dict(height=self.wmheight,width=self.wmwidth,
-                            x=0,y=0)        
-    
-        self.master.geometry(geometry_get(**custommaster))
+        class UI(Tk):
+            
+            def __init__(self):
+                Tk.__init__(self)
+                
+                self.maxrows=10 # rows in the grid
+                self.maxcols=10 # cols in the grid
+                self.wmheight=1300 # master height
+                self.wmwidth=1200 # master width  
         
-        image_args = dict(pointsize=8,font='Helvetica',gravity='center',
-                          rotate=0,label='foobar')
-        gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
-
-        widget_args={'background':'white'}
-        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-
-        self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+                custommaster = dict(height=self.wmheight,width=self.wmwidth,
+                                    x=0,y=0)        
+            
+                self.geometry(geometry_get(**custommaster))
+                
+                image_args = dict(pointsize=6,font='Helvetica',gravity='center',
+                                  rotate=0,label='foobar')
+                gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
         
-        self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanumro,self.wmwidth,self.wmheight,
-                                      0,0,self.maxrows,self.maxcols,
-                                      gridcfg,widgetcfg)
-        #self.tkilg = False
+                widget_args={'background':'white'}
+                widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        
+                self.mytextalphanumro = TextAlphaNumRO(name='textalphanum')
+                
+                self.tkilg = TkImageLabelGrid(self,'grid',self.mytextalphanumro,self.wmwidth,self.wmheight,
+                                              0,0,self.maxrows,self.maxcols,
+                                              gridcfg,widgetcfg)
+                
+                self.tkilg.grid(row=0,column=0,sticky=NSEW)
+                self.grid_rowconfigure(0, weight=1, uniform="foo")
+                self.grid_columnconfigure(0, weight=1, uniform="foo")
+                
+        self.ui = UI()
+        
         
     def test_(self):
         
-        self.master.bind('<Configure>',self.tkilg._draw)
+        self.ui.bind('<Configure>',self.ui.tkilg._draw)
         
-        self.tkilg.image_set()
-        self.master.mainloop()
+        self.ui.tkilg.image_set()
 
+    def tearDown(self):
+        self.ui.destroy()
     
 class TestUIFrameResize(TestWidget):
 
@@ -776,10 +806,13 @@ class TestUIFrameResize(TestWidget):
         self.frame.grid_columnconfigure(0, weight=1, uniform="foo")
         self.frame.grid_rowconfigure(0, weight=1, uniform="foo2")
 
-        self.lbl = TkImageLabel(self.frame)
+
+        labelstr = TextAlphaNumRO(name="")
+        
+        self.lbl = TkImageWidget(self.frame,labelstr)
         self.lbl.grid(row=0,column=0,sticky=NSEW) 
     
-        self.image_args = dict(pointsize=16,
+        self.image_args = dict(pointsize=24,
                           font='Helvetica',
                           gravity='center',
                           rotate=90)
@@ -824,7 +857,7 @@ class TestUIFrameResize(TestWidget):
     
         self.assertFilesEqual(exp_res,self.lbl.image)    
         
-        self.master.mainloop()
+        #self.master.mainloop()
 
     def tearDown(self):
         self.master.destroy()
@@ -838,7 +871,8 @@ class TestUIButton(TestWidget):
 
         font = tkFont.Font(family="Monospace", size=20)
         
-        button = Tkbutton(self.master,font=font,text='foobar')
+        truefalse = TrueFalse(name="")
+        button = TkButton(self.master,truefalse,font=font,text='foobar')
         button.pack(side=LEFT, fill=BOTH,expand=1)
         
     def tearDown(self):
@@ -880,41 +914,57 @@ class TestUILabel(TestWidget):
 class TestUIComboImageGrid(TestWidget):
     
     def setUp(self):
-        self.master = Tk()
         
-        self.maxrows=2 # rows in the grid
-        self.maxcols=2 # cols in the grid
-        self.wmheight=400 # master height
-        self.wmwidth=400 # master width
+        class UI(Tk):
+            
+            def __init__(self):
+                Tk.__init__(self)
         
-        image_args = dict(pointsize=48,font='Helvetica',gravity='center',
-                          rotate=90,label='foobar')
-        gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
-        
-        widget_args={}
-        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-        
-        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
-                                                                 'peach','pomegranate','passionfruit',
-                                                                 'pear','grape','strawberry','raspberry',
-                                                                 'rhubarb','mango','guava','apple',
-                                                                 'Orange'])
-        
-        self.tkilg = TkImageLabelGrid(self.master,'grid',self.setmemberp,self.wmwidth,self.wmheight,
-                                      0,0,self.maxrows,self.maxcols,
-                                      gridcfg,widgetcfg)
+                
+                self.maxrows=2 # rows in the grid
+                self.maxcols=2 # cols in the grid
+                self.wmheight=400 # master height
+                self.wmwidth=400 # master width
+                
+                image_args = dict(pointsize=48,font='Helvetica',gravity='center',
+                                  rotate=90,label='foobar')
+                gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
+                
+                widget_args=dict(values= ['peach','pomegranate','passionfruit',
+                                          'pear','grape','strawberry','raspberry',
+                                          'rhubarb','mango','guava','apple',
+                                          'Orange']) 
+                widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+                
+                self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
+                                                                         'peach','pomegranate','passionfruit',
+                                                                         'pear','grape','strawberry','raspberry',
+                                                                         'rhubarb','mango','guava','apple',
+                                                                         'Orange'])
+                
+                self.tkilg = TkImageLabelGrid(self.master,'grid',self.setmemberp,self.wmwidth,self.wmheight,
+                                              0,0,self.maxrows,self.maxcols,
+                                              gridcfg,widgetcfg)
+                
+                self.tkilg.grid(row=0,column=0,sticky=NSEW)
+                self.grid_rowconfigure(0, weight=1, uniform="foo")
+                self.grid_columnconfigure(0, weight=1, uniform="foo")
 
-        #self.tkilg.image_set()
+                #self.tkilg.image_set()
+                
+        self.ui = UI()
         
     def test_topleft(self):
 
-        self.tkilg.widgets[0][0].sv.set('passion')
-        self.assertEqual(self.tkilg.widgets[0][0].sv.get(),'passionfruit')
-        self.master.mainloop()
+        self.ui.tkilg.widgets[0][0].insert(0,'p')
+        self.ui.tkilg.widgets[0][0].insert(1,'a')
+        
+        #self.ui.mainloop()
+        self.assertEqual(self.ui.tkilg.widgets[0][0].sv.get(),'passionfruit')
         
         
     def tearDown(self):
-        self.master.destroy()
+        self.ui.destroy()
         
 class TestUIVentryImageGrid(TestWidget):
     def setUp(self):
@@ -927,16 +977,19 @@ class TestUIVentryImageGrid(TestWidget):
         
         image_args = dict(pointsize=48,font='Helvetica',gravity='center',
                           rotate=90,label='foobar')
-        gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
         
-        widget_args={}
+        gridcfg = nxnarraycreate(self.maxrows,self.maxcols,image_args)
+
+        values = ['pineapple','grapefruit','banana',
+                  'peach','pomegranate','passionfruit',
+                  'pear','grape','strawberry','raspberry',
+                  'rhubarb','mango','guava','apple',
+                  'Orange']
+        
+        widget_args=dict(values=values)
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
         
-        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
-                                                                 'peach','pomegranate','passionfruit',
-                                                                 'pear','grape','strawberry','raspberry',
-                                                                 'rhubarb','mango','guava','apple',
-                                                                 'Orange'])
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=values)
         
         self.tkilg = TkImageLabelGrid(self.master,'grid',self.setmemberp,self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols,
@@ -946,9 +999,11 @@ class TestUIVentryImageGrid(TestWidget):
         
     def test_topleft(self):
 
-        self.tkilg.widgets[0][0].sv.set('passion')
+        self.tkilg.widgets[0][0].insert(0,'p')
+        self.tkilg.widgets[0][0].insert(1,'a')
+        
         self.assertEqual(self.tkilg.widgets[0][0].sv.get(),'passionfruit')
-        self.master.mainloop()
+        #self.master.mainloop()
         
         
     def tearDown(self):
@@ -984,13 +1039,17 @@ class TestUILabelImageGrid(TestWidget):
         self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanumro,self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols,
                                       gridcfg,widgetcfg)
+        
+        self.tkilg.grid(row=0,column=0,sticky=NSEW)
+        self.master.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.master.grid_columnconfigure(0, weight=1, uniform="foo")
 
         self.tkilg.image_set()
-        self.tkilg.grid(row=0,column=0,sticky=NSEW)
+        #self.tkilg.grid(row=0,column=0,sticky=NSEW)
 
     def test_topleft(self):
 
-        self.master.mainloop()
+        #self.master.mainloop()
         widget = self.tkilg.widgets[0][0]
         
         exp_res = get_gif_filename('/home/burtnolej/Development/pythonapps3/clean/utils/test_gifs',
@@ -1033,6 +1092,11 @@ class TestUILabelImageGridCustom(TestWidget):
                     
     def setUp(self):
         self.master = Tk()
+        
+        self.geom = geometry_get(300,300,0,0)
+        self.master.geometry(self.geom)
+
+        
         self.maxrows=7 # rows in the grid
         self.maxcols=5 # cols in the grid
         #self.maxwidgets=self.maxrows*self.maxcols
@@ -1054,13 +1118,21 @@ class TestUILabelImageGridCustom(TestWidget):
         self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanumro,self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols,
                                       gridcfg,widgetcfg,1,1,rowcfg,colcfg)
+        
+        self.tkilg.grid(row=0,column=0,sticky=NSEW)
 
         self.tkilg.cell_set(0,0,**dict(background='yellow',width=2,height=2))
         self.tkilg.cell_set(1,1,**dict(background='pink',width=2,height=2))
+        
+        self.master.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.master.grid_columnconfigure(0, weight=1, uniform="foo")
+        
+        
+        self.tkilg.image_set()
 
     def test_origin(self):
         
-        self.tkilg.image_set()
+        #self.tkilg.image_set()
         #self.tkilg.image_show()
         exp_results = dict(height=34,width=20,x=0,y=0)
         self.assertWidgetDimensions(self.tkilg.widgets[0][0],0.01,**exp_results)
@@ -1089,17 +1161,22 @@ class TestTkcomboSetMember(unittest.TestCase):
         self.master = Tk()
         self.master.geometry(geometry_get_dict(defaultmaster))  
         
-        self.setmemberp = SetMemberPartial(name='x{mylist}',set=['pineapple','grapefruit','banana',
-                                                                 'peach','pomegranate','passionfruit',
-                                                                 'pear','grape','strawberry','raspberry',
-                                                                 'rhubarb','mango','guava','apple',
-                                                                 'Orange'])
+        set = ['pineapple','grapefruit','banana',
+               'peach','pomegranate','passionfruit',
+               'pear','grape','strawberry','raspberry',
+               'rhubarb','mango','guava','apple',
+               'Orange']
         
-        self.combo = TkCombobox(self.master,self.setmemberp)
+        self.setmemberp = SetMemberPartial(name='x{mylist}',set=set)
+        self.combo = tkwidgetfactory(self.setmemberp,self.master,values=set)
+        self.combo.grid(row=0,column=0,sticky=NSEW)
         
     def test_(self):
-        self.combo.sv.set('p')
-        self.assertEqual(self.combo.label.cget('text'),9)
+        self.combo.update()
+        self.combo.insert(0,'s')
+        self.combo.insert(1,'t')
+
+        self.assertEqual(self.combo.sv.get(),'strawberry')        
         
     def tearDown(self):
         self.master.destroy()
@@ -1116,12 +1193,19 @@ class TestTkcomboDBSetMember(unittest.TestCase):
         self.master = Tk()
         self.master.geometry(geometry_get_dict(defaultmaster))  
         
-        self.combo = TkCombobox(self.master,self.dbsetmember)
+        self.combo = tkwidgetfactory(self.dbsetmember,self.master)
+        self.combo.grid(row=0,column=0,sticky=NSEW)
+       #self.combo = TkCombobox(self.master,self.)
         
     def test_(self):
         
-        self.combo.sv.set('d')
-        self.assertEqual(self.combo.label.cget('text'),65)
+        self.combo.insert(0,'g')
+        self.combo.insert(1,'r')
+        self.combo.insert(2,'a')
+        self.combo.insert(3,'p')
+        self.combo.insert(4,'e')
+        #elf.master.mainloop()
+        self.assertEqual(self.combo.sv.get(),'grape jelly')
         
         
     def tearDown(self):
@@ -1130,10 +1214,13 @@ class TestTkcomboDBSetMember(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGridCustom))
+    #unittest.TextTestRunner(verbosity=2).run(suite)
+    #exit()
     
     # Test helper
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTestWidget))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTestWidget))
     
     # Widget Factory
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkWidgetFactory))
@@ -1151,41 +1238,41 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIPack))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIPack2x2))
 
-    # ImageWidget'''
+    # ImageWidget
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImage))
 
-    '''# Grid
+    # Grid
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid2x2even))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid2x2evenlarge))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid7x5odd))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridCustom))'''
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid2x2span))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid2x2spanlarge))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridCustom))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid2x2span))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid2x2spanlarge))
     
     # ImageWidgetGrid
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGrid))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGridCustom))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGridCustom))
 
     # Button
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIButton))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIButton))
     
     # LabelImageResizing    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResize))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResize))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
     
     
-    '''# Combo
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkComboBox))
+    # Combo
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboSetMember))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkcomboDBSetMember))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTkComboBox))
     
     # Entry
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIVentryImageGrid))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIVentryImageGrid))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIComboImageGrid))
     
     
     # Focus
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridFocus))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridFocus))
     
     
     

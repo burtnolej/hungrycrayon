@@ -29,6 +29,10 @@ class _RealIntVdt(_Validator):
         except:
             return False
         
+class _TrueFalseBoolVdt(_Validator):
+    def validate(self,value):
+        if value in [True,False]: return True
+        
 class _BoundRealIntVdt(_Validator):
     ''' Bounded int validator '''
     
@@ -116,6 +120,21 @@ class _SetMemberPartialVdt(_Validator):
         if hits==1: return True
         return False
     
+    
+class BaseBoolean(BaseType):
+    def __init__(self,**kwargs):
+
+        super(BaseBoolean,self).__init__()
+        
+        from ui_utils import TkButton
+        self.widgettype = TkButton
+    
+class TrueFalse(BaseBoolean):
+    def __init__(self,**kwargs):
+        
+        super(TrueFalse,self).__init__(**kwargs)    
+        
+        self.validations.append( _TrueFalseBoolVdt(**kwargs))
     
 class BaseSetMember(BaseType):
     def __init__(self,**kwargs):

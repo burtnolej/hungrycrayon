@@ -137,8 +137,15 @@ def tkwidgetfactory(var,master,**kwargs):
                 except:
                     pass
             else:
-                # keep a copy of full value list so dropdown values can be reset
-                self.orig_values = kwargs['values']
+                
+                # if not passes in on values; try set attribute of the var
+                if kwargs.has_key('values') == False:
+                    kwargs['values'] = var.set
+                    self.orig_values = var.set# keep a copy of full value list so dropdown values can be reset
+                elif kwargs.has_key('values'):
+                    self.orig_values = kwargs['values']
+                else:
+                    raise Exception('cannot find combo list either on var or passed in on kwargs')
 
             self.widgettype = widgettype
             
@@ -151,30 +158,6 @@ def tkwidgetfactory(var,master,**kwargs):
 #tkw.config(**kwargs)        
 #return(tkw)
 
-class TkImageWidget(object):
-#class TkImageLabel(Tkbutton):
-    
-    def __init__(self,master,**kwargs):
-        Tklabel.__init__(self,master)
-        #Tkbutton.__init__(self,master)
-        
-        self.config(**kwargs)
-        self.ic = ImageCreate()
-    
-    def image_set(self,label,**kwargs):
-        
-        self.update_idletasks()
-        self.width = self.winfo_width()
-        self.height = self.winfo_height()
-        self.image_size = "{0}x{1}".format(self.width,self.height)
-        
-        kwargs['extent'] = self.image_size
-        self.image= self.ic.create_image_file(label,
-                                         #overwrite=True,
-                                         **kwargs)[0]
-        
-        self.photo = PhotoImage(file=self.image)
-        self.config(image=self.photo)
 
 #class TkImageLabelGrid():
 
@@ -497,6 +480,32 @@ class TkLabel(_tklabel,TKBase):
         TKBase.__init__(self,self,
                         **kwargs)
             
+class TkImageWidget(TkLabel):
+#class TkImageLabel(Tkbutton):
+    
+    def __init__(self,master,var,**kwargs):
+        TkLabel.__init__(self,master,var)
+        #Tkbutton.__init__(self,master)
+        
+        self.config(**kwargs)
+        self.ic = ImageCreate()
+    
+    def image_set(self,label,**kwargs):
+        
+        self.update_idletasks()
+        self.width = self.winfo_width()
+        self.height = self.winfo_height()
+        self.image_size = "{0}x{1}".format(self.width,self.height)
+        
+        kwargs['extent'] = self.image_size
+        self.image= self.ic.create_image_file(label,
+                                         #overwrite=True,
+                                         **kwargs)[0]
+        
+        self.photo = PhotoImage(file=self.image)
+        self.config(image=self.photo)
+
+
 class TkButton(_tkbutton):
     def __init__(self,master,var,**kwargs):
         
