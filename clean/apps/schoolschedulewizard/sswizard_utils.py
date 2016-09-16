@@ -85,17 +85,47 @@ def widget_current_values_get(ui,gridname,rownum,minversion=1):
     return values
 
 
-def dropdown_build(database,widgetargs):
+def dropdown_build(database,
+                   widgetargs,
+                   exec_func,
+                   rowheaderexecfunc=None,
+                   columnheaderexecfunc=None,
+                   ui=None):
     
+    xoffset=0
+    yoffset=0
+    
+    if rowheaderexecfunc <> None: yoffset=1    
+    if columnheaderexecfunc <> None: xoffset=1
+
     output = []
     with database:
-        for x in range(len(widgetargs)):
-            exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(x+1)
-            colndefn,values = tbl_query(database,exec_str) 
+        for x in range(xoffset,len(widgetargs)):
+            colndefn,values = exec_func(database,x)
             
             values = [value[0] for value in values]
     
-            for y in range(len(widgetargs[x])):
+            for y in range(yoffset,len(widgetargs[x])):
                 widgetargs[x][y]['values'] = values
                 
+        if rowheaderexecfunc <> None:
+            colndefn,values = rowheaderexecfunc(database)
+            
+            values = [value[0] for value in values]
+            
+            for x in range(len(widgetargs)):
+                widgetargs[x][0]['values'] = values
+                if ui <> None:
+                    ui.widgets[x][0].sv.set(values[x])
+
+        if columnheaderexecfunc <> None:
+            colndefn,values = columnheaderexecfunc(database)
+            
+            values = [value[0] for value in values]
+            
+            for y in range(len(widgetargs[0])):
+                widgetargs[0][y]['values'] = values
+                if ui <> None:
+                    ui.widgets[0][y].sv.set(values[y])
+
     return(widgetargs)

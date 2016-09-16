@@ -17,6 +17,18 @@ from database_util import Database
 from database_table_util import tbl_rows_get, tbl_query
 
 from sswizard_utils import dropdown_build
+            
+def _execfunc(database,value):
+    exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(value)
+    return(tbl_query(database,exec_str))
+
+def _rowheaderexecfunc(database):
+    exec_str = "select name from period"
+    return(tbl_query(database,exec_str))
+
+def _columnheaderexecfunc(database):
+    exec_str = "select nickname from student"
+    return(tbl_query(database,exec_str))
 
 class UI(Tk):
     def __init__(self,database):       
@@ -36,7 +48,10 @@ class UI(Tk):
         widget_args=dict(background='white')
         
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-        widgetcfg = dropdown_build(database,widgetcfg)
+        widgetcfg = dropdown_build(database,widgetcfg,
+                                   _execfunc,
+                                   _rowheaderexecfunc,
+                                   _columnheaderexecfunc)
 
         setmemberp = SetMemberPartial(name='x{mylist}',set=[])
 
@@ -46,99 +61,150 @@ class UI(Tk):
         self.entrygrid.grid(row=0,sticky=NSEW)      
 
 
+class Test_With_Headers(unittest.TestCase):
+    def setUp(self):
+        
+        self.database = Database('quadref')
+        self.classtbl = 'class'
+        self.maxx = 8
+        self.maxy = 10
+        
+        widget_args=dict(background='white')
+    
+        self.widgetcfg = nxnarraycreate(self.maxx+1,self.maxy+1,widget_args)
+        self.widgetcfg = dropdown_build(self.database,
+                                  self.widgetcfg,
+                                   _execfunc,
+                                   _rowheaderexecfunc,
+                                   _columnheaderexecfunc)
+
+
+    def test_col1(self):
+        testx=0
+       
+        expected_results = ['Da-Hum','Br-STEM','Jk-Mvmt','Th-STEM','Js-Hum']
+        self.assertEqual(self.widgetcfg[testx+1][1]['values'],expected_results)
+
+    def test_col2(self):
+        testx=7
+       
+        expected_results = ['Da-Hum','Br-STEM','Jk-AP']
+        self.assertEqual(self.widgetcfg[testx+1][1]['values'],expected_results)
+        
+    def test_col7_rowheader(self):
+        testx=7
+        expected_results = ['830-920','920-1000','1000-1040','1040-1130','1240-1320',
+                           '1320-1400','1400-1440','1440-1530']
+       
+        self.assertEqual(self.widgetcfg[testx+1][0]['values'],expected_results)
+
+    def test_row1_colheader(self):
+    
+        expected_results = ['A3','B3','C3','D3','E3',
+                            'F3','G3','H3','I3','J3','A4','B4',
+                            'C4','D4','E4','F4','G4','H4','I4',
+                            'J4']
+       
+        self.assertEqual(self.widgetcfg[0][1]['values'],expected_results)
+
+ 
 class Test_(unittest.TestCase):
     def setUp(self):
         
         self.database = Database('quadref')
         self.classtbl = 'class'
-        
-    '''def test_(self):
-        
-        input = [[{},{}],
-                 [{},{}]]
-        
-        p1 = {'values':['Da-Hum','Br-STEM','Jk-Mvmt']}
-        p2 = {'values':['Da-Hum','Br-STEM','Jk-WP']}
+        self.maxx = 8
+        self.maxy = 10
 
-        expected_results = [[p1,p1],
-                            [p2,p2]]
-        
-        results = dropdown_build(self.database,input)
-        
-        self.assertEqual(expected_results,results)'''
-        
-        
     def test_col1(self):
+        testx=0
         widget_args=dict(background='white')
         
-        widgetcfg = nxnarraycreate(8,10,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg)
+        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
+        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
        
         expected_results = ['Da-Hum','Br-STEM','Jk-Mvmt','Th-STEM','Js-Hum']
-        self.assertEqual(widgetcfg[0][0]['values'],expected_results)
+        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
 
     def test_col2(self):
+        testx=1
         widget_args=dict(background='white')
          
-        widgetcfg = nxnarraycreate(8,10,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg)
+        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
+        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
         expected_results = ['Da-Hum','Br-STEM']
-        self.assertEqual(widgetcfg[1][0]['values'],expected_results)
+        
+        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
          
     def test_col3(self):
+        testx=2
         widget_args=dict(background='white')
          
-        widgetcfg = nxnarraycreate(8,10,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg)
+        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
+        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
         expected_results = ['Da-Hum','Br-STEM','Jk-SPED','Th-STEM','Js-Hum']
-        self.assertEqual(widgetcfg[2][0]['values'],expected_results)
+        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
 
     def test_col4(self):
+        testx=3
         widget_args=dict(background='white')
          
-        widgetcfg = nxnarraycreate(8,10,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg)
+        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
+        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
         expected_results = ['Jk-SPED','Th-STEM','Js-Hum']
-        self.assertEqual(widgetcfg[3][0]['values'],expected_results)
+        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
 
     def test_col5(self):
+        testx=4
         widget_args=dict(background='white')
          
-        widgetcfg = nxnarraycreate(8,10,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg)
+        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
+        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
         expected_results = ['Da-Hum','Br-STEM','Jk-Mvmt']
-        self.assertEqual(widgetcfg[4][0]['values'],expected_results)
+        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
 
     def test_col6(self):
+        testx=5
         widget_args=dict(background='white')
          
-        widgetcfg = nxnarraycreate(8,10,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg)
+        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
+        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
         expected_results = ['Da-Hum','Br-STEM','Jk-SPED']
-        self.assertEqual(widgetcfg[5][0]['values'],expected_results)
+        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
     
     def test_col7(self):
+        testx=6
         widget_args=dict(background='white')
          
-        widgetcfg = nxnarraycreate(8,10,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg)
+        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
+        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
         expected_results = ['Da-Hum','Br-STEM']
-        self.assertEqual(widgetcfg[6][0]['values'],expected_results)
+        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
 
     def test_col8(self):
+        
+        testx=7
         widget_args=dict(background='white')
          
-        widgetcfg = nxnarraycreate(8,10,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg)
+        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
+        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
         expected_results = ['Da-Hum','Br-STEM','Jk-AP']
-        self.assertEqual(widgetcfg[7][0]['values'],expected_results)
+        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
 
 class Test_UI(unittest.TestCase):
     def setUp(self):
@@ -155,8 +221,10 @@ class Test_UI(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_UI))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_UI))
 
     unittest.TextTestRunner(verbosity=2).run(suite) 
 
