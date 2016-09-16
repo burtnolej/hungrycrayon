@@ -464,6 +464,92 @@ class TestUIGrid2x2evenlarge(TestWidget):
         
     def tearDown(self):
         self.master.destroy()
+
+class TestUIGridFocusAppObject(TestWidget):
+    def setUp(self):
+        
+        class UI(Tk):
+            
+            def __init__(self):
+                
+                Tk.__init__(self)
+                
+                self.maxrows=10 # rows in the grid
+                self.maxcols=10 # cols in the grid
+                self.maxwidgets=self.maxrows*self.maxcols
+                self.wwidth=48 # default button width with text of 3 chars
+                self.wheight=29 # default button height
+                self.wmheight=self.wheight*self.maxrows # master height
+                self.wmwidth=self.wwidth*self.maxcols # master width
+        
+                members = ['pineapple','grapefruit','banana',
+                           'peach','pomegranate','passionfruit',
+                           'pear','grape','strawberry','raspberry',
+                           'rhubarb','mango','guava','apple',
+                           'Orange']      
+                widget_args=dict(background='white',values=members)
+                widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        
+        
+                self.setmemberp = SetMemberPartial(name='x{mylist}',set=members)
+                
+                self.tkilg = TkImageLabelGrid(self.master,'grid',self.setmemberp,self.wmwidth,self.wmheight,
+                                              0,0,7,5,{},widgetcfg)
+                
+                self.tkilg.grid(row=0,column=0,sticky=NSEW)
+    
+                self.grid_rowconfigure(0, weight=1, uniform="foo")
+                self.grid_columnconfigure(0, weight=1, uniform="foo")
+            
+        self.ui = UI()
+    
+        self.ui.update()
+        parent_name = self.ui.tkilg.widgets[0][0].winfo_parent()
+        self.parent_widget = self.ui.tkilg.widgets[0][0]._nametowidget(parent_name)
+        #self.parent_widget.update()    
+
+    def test_rightarrow_moveright(self):
+        self.ui.mainloop()
+        self.ui.tkilg.widgets[0][0].event_generate("<Right>")
+        _,new_x,new_y = str(self.parent_widget.focus_get()).split(",")
+               
+        self.assertEqual(new_x,'0')
+        self.assertEqual(new_y,'1')
+        
+    def test_rightarrow_moveright_highlightcolor(self):
+        
+        self.ui.tkilg.widgets[0][0].event_generate("<Right>")
+        _,new_x,new_y = str(self.parent_widget.focus_get()).split(",")
+        
+        self.assertEqual(new_x,'0')
+        self.assertEqual(new_y,'1')
+        
+        self.ui.update()
+
+        self.assertEqual(self.ui.tkilg.widgets[int(new_x)][int(new_y)]['style'].split(".")[0],'InFocus')
+        
+    def test_rightarrow_moveright_unhighlightcolor(self):
+        
+        self.ui.tkilg.widgets[0][0].event_generate("<Right>")
+        self.parent_widget.focus_get().event_generate("<Left>")
+        _,new_x,new_y = str(self.parent_widget.focus_get()).split(",")
+        self.ui.update()
+
+        self.assertEqual(self.ui.tkilg.widgets[0][1]['style'].split(".")[0],'OutOfFocus')
+    
+    def test_rightarrow_moveright1_down1(self):
+        
+        self.ui.tkilg.widgets[0][0].event_generate("<Right>")
+        self.parent_widget.focus_get().event_generate("<Down>")
+        
+        _,new_x,new_y = str(self.parent_widget.focus_get()).split(",")
+              
+        self.assertEqual(new_x,'1')
+        self.assertEqual(new_y,'1')
+        
+    def tearDown(self):
+        self.ui.destroy()
+            
         
 class TestUIGridFocus(TestWidget):
     def setUp(self):
@@ -1214,10 +1300,11 @@ class TestTkcomboDBSetMember(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridFocusAppObject))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGridCustom))
-    #unittest.TextTestRunner(verbosity=2).run(suite)
-    #exit()
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    exit()
     
     # Test helper
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTestWidget))

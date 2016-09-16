@@ -117,11 +117,13 @@ def tkwidgetimage_set(ic,widget,label,overwrite=False,**kwargs):
     return(tkw)'''
 
 
-def tkwidgetfactory(var,master,**kwargs):
+def tkwidgetfactory(app,var,master,**kwargs):
     
     class tkwidget(var.widgettype):
     
         def __init__(self,master,widgettype):
+            
+            self.app = app
             
             d={}
             if kwargs.has_key('name'):
@@ -170,9 +172,25 @@ class TkImageLabelGrid(Frame):
 
         self.master = master # reference to ui root
         Frame.__init__(self,master)
+        self.grid(row=0,column=0,sticky=NSEW)
+
+        
+        canvas = Canvas(self)
+        frame = Frame(canvas)
+        frame.grid(row=0,column=0,sticky=NSEW)
+
+        vscrollbar = Scrollbar(self,orient="vertical",command=canvas.yview)
+        vscrollbar.pack(side='right',fill='y')       
+        canvas.configure(yscrollcommand=vscrollbar.set)
+    
+        hscrollbar = Scrollbar(self,orient="horizontal",command=canvas.xview)
+        hscrollbar.pack(side='bottom',fill='x')        
+        canvas.configure(yscrollcommand=hscrollbar.set,xscrollcommand=hscrollbar.set)
+    
+        canvas.pack(side="left",fill="both",expand=True)
+        canvas.create_window((4,4),window=frame,anchor="nw",tags="frame")
 
         self.gridname = gridname
-        
         
         self.current_yfocus=0
         self.current_xfocus=0
@@ -186,9 +204,6 @@ class TkImageLabelGrid(Frame):
         self.height=height
         self.x=x
         self.y=y
-        #self.geom = geometry_get(self.height,self.width,
-        #                              self.x,self.y)
-        #self.master.geometry(self.geom)
                 
         self.idle = False
         
@@ -208,7 +223,7 @@ class TkImageLabelGrid(Frame):
             ylbls=[]
             for y in range(self.maxcols):
                 
-                lbl = tkwidgetfactory(var,self,
+                lbl = tkwidgetfactory(self,var,frame,
                                       name=",".join([gridname,str(x),str(y)]),
                                       **widgetcfg[x][y])
     
@@ -422,11 +437,11 @@ class TKBase(object):
         
     def selectall(self,event=None):
         self.selection_range(0, END)
-        
-        
+           
     def refocus(self,event):
-        parent = self.winfo_parent()
-        self._nametowidget(parent).refocus(event)
+        #parent = self.winfo_parent()
+        #self._nametowidget(parent).refocus(event)
+        self.app.refocus(event)
         return "break"
 
 class TkEntry(Entry,TKBase):
