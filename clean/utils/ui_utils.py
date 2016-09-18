@@ -8,13 +8,14 @@ import tkFont
 from math import ceil,floor
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils import nxnarraycreate, Log
+from misc_utils import nxnarraycreate, thisfuncname
+from misc_utils_log import Log, logger
 from misc_utils_enum import enum
 from type_utils import isadatatype, TextAlphaNumRO
 from image_utils import ImageCreate, rgbstr_get
 ic = ImageCreate()
 
-log=Log()
+log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
 
 fontscale = enum(sy = 2500,sx = 3500,
                  minfpt = 8,maxfpt = 64,
@@ -371,7 +372,7 @@ class TKBase(object):
         if hasattr(self.toplevel,'update_callback'):
             self.set_update_trace()
         else:
-            log.log(self,3,'no update_callback method found on',str(self.toplevel))
+            log.log(thisfuncname(),3,msg='no update_callback method found on',widget=str(self.toplevel))
             
         #self.sv=StringVar() 
         
@@ -420,10 +421,10 @@ class TKBase(object):
         try:
             self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                           self.toplevel.update_callback(self.widget,self.sv.get()))
-            log.log(self,10,"success: registered callback",str(widget_class), str(self.toplevel.update_callback))
+            log.log(thisfuncname(),10,func=self.sv.trace,widgetclass=widget_class, widget=self.toplevel)
 
-        except Exception:
-            log.log(self,1,"fail: register callback",str(widget_class), str(self.toplevel.update_callback),e.msg)
+        except Exception, e:
+            log.log(thisfuncname(),1,func=self.sv.trace,widgetclass=widget_class, widget=self.toplevel,error=str(e))
 
     def highlight(self,event):
         _,state,_ = self['style'].split(".")
@@ -432,7 +433,6 @@ class TKBase(object):
             self['style']=".".join(['InFocus',state,self.winfo_class()])
         elif event.type == '10':
             self['style']=".".join(['OutOfFocus',state,self.winfo_class()])
-
 
         self.selectall()
         
@@ -461,7 +461,7 @@ class TkEntry(Entry,TKBase):
         self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                       self.changed(self.sv))
         
-        log.log(self,10,'created')
+        log.log(thisfuncname(),10,func=self.__init__)
                       
     def changed(self,sv):
         #new_value = sv.get()

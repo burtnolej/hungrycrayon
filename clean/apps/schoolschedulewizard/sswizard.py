@@ -85,7 +85,7 @@ class WizardUI(Tk):
         
         Tk.__init__(self)
         
-        self.enums,self.maps =  sswizard_utils.setenums('All','3','quadref')
+        self.enums = sswizard_utils.setenums('All','3','quadref')
         
         self.database = database
         self.of = of
@@ -308,13 +308,13 @@ class WizardUI(Tk):
                     y = student_enum = student_map[value]+1
                     z = teacher_enum = teacher_map[xlabel]+1'''
                     
-                    x = period_enum = self.maps['period'][ylabel]+1
+                    x = period_enum = self.enums['enums'][ylabel]+1
                     y = student_enum = self.maps['students'][xlabel]+1
                     z = session_enum = self.maps['session'][value]+1
                     
                     obj_id = ",".join(map(str,[x,y,z]))
 
-                    teacher,subject = value.split(".")
+                    teacher_code,lessontype_code,subject_code = value.split(".")
                     
                     datamembers = dict(schedule = '1',
                                        dow='Tuesday', 

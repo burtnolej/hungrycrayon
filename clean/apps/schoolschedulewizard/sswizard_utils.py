@@ -1,9 +1,13 @@
-from misc_utils import nxnarraycreate, Log
+from misc_utils import nxnarraycreate
+
 from database_table_util import tbl_query
 from database_util import Database
 from collections import OrderedDict
+from misc_utils_log import Log, logger
+from misc_utils import thisfuncname
 
-log = Log()
+log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
+
 def update_callback(ui,widget,new_value):        
     ''' via BaseTk class; all entry widgets assign a callback to the change event
     to call this function if it exists '''
@@ -11,28 +15,22 @@ def update_callback(ui,widget,new_value):
     #put event on here too
     if str(widget.current_value) <> str(new_value):
         
-        log.log(widget,3,"updating","key=",str(widget.winfo_name()),"current_value=",str(widget.current_value),"new_value=",new_value,"version=",str(widget.version))
-        
+        log.log(thisfuncname(),3,msg="updating "+str(widget.winfo_name()),current_value=str(widget.current_value),new_value=new_value,version=str(widget.version))
         widget.config(foreground='red')
-        
-        # if this is the first update
-        #if widget.version == 1: 
-        #widget.current_value = new_value
         
         # record event in update log
         ui.updates[str(widget.winfo_name())] = (new_value,widget.version)
     else:
         widget.config(foreground='black')
-        
-        log.log(widget,3,"skipping as","key=",str(widget.winfo_name()),"current_value=",str(widget.current_value),"new value=",new_value,"version=",str(widget.version)) 
-
+        log.log(thisfuncname(),9,msg="skipping "+str(widget.winfo_name()),current_value=str(widget.current_value),new_value=new_value,version=str(widget.version))       
+            
 def updates_get(ui,gridname,ignoreaxes=False):
     maxx = maxy = -1
     if ignoreaxes == True: maxx = maxy = 0
     update_keys = [ [gridname,update.split(",")[1],update.split(",")[2]] for update in ui.updates.keys() if update.split(",")[0] == gridname if int(update.split(",")[1]) > maxx if int(update.split(",")[2]) > maxy]
     
     if len(update_keys)==0:
-        log.log(ui,3,"updates requested but none found",gridname)
+        log.log(thisfuncname(),3,"updates requested but none found",gridname)
         #raise Exception("no updates registered for",gridname)
     else:
        
@@ -133,43 +131,51 @@ def dropdown_build(database,
     return(widgetargs)
 
 
-def getdbenum(dbname,fldname,tblname,pred1=None,predval1=None):
+def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
+    '''
+    every table has a code column which is a 2 digit unique mnemonic
+    
+    given a name lookup a code
+    given a code lookup a name
+    given a code/name get an enumeration
+    get names, codes
+    '''
     database = Database(dbname)
-    exec_str = "select {1} from {0}".format(tblname,fldname)
+    exec_str = "select {1},code from {0}".format(tblname,fldname)
     if pred1 <> None:
         exec_str = exec_str + " where {0} = {1}".format(pred1,predval1)
 
     with database:
         coldefn,values = tbl_query(database,exec_str)
     
-    values = [value[0] for value in values]
-    
-    exec_str = "select code from {0}".format(tblname,fldname)
-    if pred1 <> None:
-        exec_str = exec_str + " where {0} = {1}".format(pred1,predval1)
-
-    with database:
-        coldefn,codes = tbl_query(database,exec_str)
-    
-    codes = [int(code[0]) for code in codes]
-
-    map = dict(zip(values,range(len(values))))
-    codemap = dict(zip(values,range(len(codes))))
-
-    return  values,map, codemap
-
-
+    enums[tblname] = {}
+    name2code = dict((row[0],row[1]) for row in values)
+    enums[tblname]['name2code'] = name2code
+    enums[tblname]['code2name'] = zip(name2code.values(),name2code.keys())
+    enums[tblname]['name2enum'] = dict((value,enum) for enum,value in enumerate(name2code.keys()))
+    enums[tblname]['code2enum'] = dict((value,enum) for enum,value in enumerate(name2code.values()))
+    enums[tblname]['name'] = enums[tblname]['name2code'].keys()
+    enums[tblname]['code'] = enums[tblname]['name2code'].values()            
+            
 def setenums(dow,prep,dbname):
 
-    enums = {}
-    map_enums={}
+    enums = {'maps':{},'enums':{},'codes':{}}
     
-    enums['period'],map_enums['period'] = getdbenum(dbname,'name','period')
-    enums['students'],map_enums['students'] = getdbenum(dbname,'name','student','prep',prep)
-    enums['teachers'],map_enums['teachers'] = getdbenum(dbname,'name','adult','prep',prep)
-    enums['session'],map_enums['session'] = getdbenum(dbname,'tag','session')
-    enums['lessontype'],map_enums['lessontype'] = getdbenum(dbname,'name','lessontype')
-    enums['subject'],map_enums['subject'] = getdbenum(dbname,'name','subject')
-    enums['dow'],map_enums['dow'] = getdbenum(dbname,'name','dow')
+    getdbenum(enums,dbname,'name','period')
+    getdbenum(enums,dbname,'name','period')
+    getdbenum(enums,dbname,'name','student','prep',prep)
+    getdbenum(enums,dbname,'name','adult','prep',prep)
+    getdbenum(enums,dbname,'tag','session')
+    getdbenum(enums,dbname,'name','lessontype')
+    getdbenum(enums,dbname,'name','subject')
+    getdbenum(enums,dbname,'name','dow')
   
-    return enums,map_enums
+    return enums
+
+def sessiontagtoid(tag,enums):
+    
+    teacher_code,lessontype_code,subject_code = value.split(".")
+    teacher_enum = enums['teacher'][teacher_code]
+    lessontype_enum = enums['teacher'][lessontype_code]
+    subject_enum = enums['subject'][subject_code]
+    

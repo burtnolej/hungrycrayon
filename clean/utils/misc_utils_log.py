@@ -106,6 +106,21 @@ class Log():
                     args = list(args)
                     args.remove(arg)
                     args.insert(0,newarg)
+        
+        elif type(args) is DictType:
+            for k,v in args.iteritems():
+                if type(v) not in [TupleType, StringType, IntType,DictionaryType,ListType, FloatType]:
+                    if type(v) in [FunctionType,MethodType]:
+                        newarg = v.__name__
+                        args[k] = newarg
+                    else:
+                        try:
+                            newarg = v.__name__
+                        except:
+                            newarg = v.__class__.__name__
+                            
+                        args[k] = newarg
+                        
         return(args)
         
     def log(self,funcname,priority,**kwargs):
@@ -117,7 +132,7 @@ class Log():
  
         callerframe = stack()[1]
     
-        config = OrderedDict([('now',12),('thread',6),('type',8),('module',10),('funcname',20),('etime',6),('result',10),('fargs',20),('fkw',20),('logmesg',-1)])
+        config = OrderedDict([('now',12),('thread',6),('type',8),('module',20),('funcname',30),('etime',6),('result',10),('fargs',20),('fkw',20),('logmesg',-1)])
 
         logmesg = OrderedDict()
         
@@ -175,13 +190,17 @@ class Log():
                 kwargs.pop('etime')
                 kwargs.pop('result')
             else:
-                
-                if priority in [3,4,5,6]:
+
+                if priority in [4]:
+                    logmesg['type'] ="SUCCESS"                
+                elif priority in [3]:
                     logmesg['type'] ="INFO"
                 elif priority in [7,8,9]:
                     logmesg['type'] ="DEBUG"
-                elif priority in [0,1,2]:
+                elif priority in [0,1]:
                     logmesg['type'] = "ERROR"
+                elif priority in [2]:
+                    logmesg['type'] = "FAILURE"
                 else:
                     logmesg['type'] ="UNKNOWN"
             
@@ -190,6 +209,7 @@ class Log():
             logmesg['now'] = ":".join(map(str,[now,datetime.now().microsecond/1000]))
             
             # add into logmesg any other info passed into the log function as kwargs
+            kwargs = self._args_readable(kwargs)
             logmesg['logmesg'] = str(zip(map(str,kwargs.keys()),map(str,kwargs.values())))
             logmesg['logmesg'] =  logmesg['logmesg'].replace(" ","")
             
@@ -199,7 +219,7 @@ class Log():
                 if logmesg.has_key(name):
                     if size != -1:
                         if logmesg[name] <> None:
-                            s = self.shrink(logmesg[name],size)
+                            s = self.shrink(str(logmesg[name]),size)
                             output.append(s.ljust(size))
                         else:
                             output.append("None".ljust(size))

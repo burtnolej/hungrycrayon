@@ -3,7 +3,8 @@ sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNum
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
-from misc_utils import nxnarraycreate, Log
+from misc_utils import nxnarraycreate, thisfuncname
+from misc_utils_log import Log, logger
 
 import sswizard_utils
 
@@ -16,7 +17,7 @@ from Tkinter import *
 from ttk import *
 import tkFont
 
-log = Log()
+log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
 
 class DBTableUI(Tk):
     def __init__(self):
@@ -50,7 +51,9 @@ class DBTableUI(Tk):
         self.bind("<Prior>",self.focus_next_widget)
         self.grid()
 
-        widget_args=dict(background='white',width=8)
+        font = tkFont.Font(family="monospace", size=18)  
+        
+        widget_args=dict(background='white',width=10,font=font)
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
         
         #rowcfg = dict(height=2,width=2,text="x")
@@ -143,13 +146,14 @@ class DBTableUI(Tk):
         #self.grid_rowconfigure(2, weight=1, uniform="foo")
           
 
-
+    @logger(log)            
     def widget_current_values_get(self,gridname,rownum):
         return sswizard_utils.widget_current_values_get(self,gridname,rownum)
-            
+                 
     def update_callback(self,widget,new_value):
         sswizard_utils.update_callback(self,widget,new_value)
-      
+        
+    @logger(log)        
     def clone(self):
         for y in range(self.maxcols):
             colname = self.entrygrid.widgets[0][y].sv.get()
@@ -172,7 +176,7 @@ class DBTableUI(Tk):
             for y in range(self.maxcols):
                 self.newrowgrid.widgets[x][y].sv.set("")
                 self.newrowgrid.widgets[x][y].config(background='white')'''
-                
+    @logger(log)                    
     def _clear_grid(self,gridname,firstrow):
         grid = getattr(self,gridname)
         
@@ -184,7 +188,7 @@ class DBTableUI(Tk):
                 grid.widgets[x][y].current_value = ""
                 grid.widgets[x][y].version = 0
                 
-
+    @logger(log)        
     def clear(self,firstrow=0,gridname=None):
         if gridname == None:
             self._clear_grid('entrygrid',firstrow)
@@ -194,7 +198,7 @@ class DBTableUI(Tk):
         
         self.updates={}
             
-                
+    @logger(log)                    
     def focus_next_widget(self,event):
         print "focuschange"
         #nextwidget = self.master.tk_focusNext()
@@ -204,6 +208,7 @@ class DBTableUI(Tk):
             self.save_button.focus_set()
         return("break")
     
+    @logger(log)        
     def process_updates(self,database=None):
         
         log.log(self,1,"in processupdates")
@@ -215,99 +220,91 @@ class DBTableUI(Tk):
                   
         rows=[]
         
-        
         if len(self.updates.keys()) == 0:
-            log.log(self,3,"wierd","len(updates)=0")
+            log.log(thisfuncname(),3,"wierd","len(updates)=0")
             
         for key in self.updates.keys():
             row=[]
             gridname,x,y = key.split(",")
-            colname = self.entrygrid.widgets[0][int(y)].sv.get()
-            new_value,version = self.updates[key]
             
-            # ignore any updates that are initial version (version=1)
-            if int(x)==0:
-                init_value = getattr(self,gridname).widgets[0][int(y)].init_value
-                current_value = getattr(self,gridname).widgets[0][int(y)].current_value
-                #new_value = getattr(self,gridname).widgets[0][int(y)].sv.get()
-
-                if new_value <> current_value:
-                    if init_value == "":
-                        with database:
-                            
-                            try:
-                                tbl_col_add(database,
-                                            self.tblname_entry_sv.get(),
-                                            new_value)
-                                log.log(self,1,"success","dbtable col add","current_value","new_value=",new_value,"init_value=",init_value)
-                                
-                                getattr(self,gridname).widgets[0][int(y)].version += 1 
-                            except Exception,e:                            
-                                log.log(self,3,"error","dbtable col add","error=",str(e))
-                    else:
-                        try:
+            # newrowgrid updates processed by insert; at some point
+            # add a flag to grid constructor as to whether or not it
+            # needs to put updates on the update queue
+            if gridname == "entrygrid":
+                colname = self.entrygrid.widgets[0][int(y)].sv.get()
+                new_value,version = self.updates[key]
+                
+                # ignore any updates that are initial version (version=1)
+                if int(x)==0:
+                    init_value = getattr(self,gridname).widgets[0][int(y)].init_value
+                    current_value = getattr(self,gridname).widgets[0][int(y)].current_value
+                    #new_value = getattr(self,gridname).widgets[0][int(y)].sv.get()
+    
+                    if new_value <> current_value:
+                        if init_value == "":
                             with database:
-                                tbl_col_update(database,
-                                               self.tblname_entry_sv.get(),
-                                               current_value,
-                                               new_value)
-                            
-                                log.log(self,3,"success","dbtable col update","current_value=",current_value,"new_value=",new_value,"init_value=",init_value)
-                        except Exception,e:                            
-                            log.log(self,3,"error","dbtable col update","error=",str(e))
-                            
-                    getattr(self,gridname).widgets[0][int(y)].current_value = new_value
+                                
+                                try:
+                                    tbl_col_add(database,
+                                                self.tblname_entry_sv.get(),
+                                                new_value)
+                                    log.log(thisfuncname(),4,func=tbl_col_add,current_value=current_value,new_value=new_value)
+                                    
+                                    getattr(self,gridname).widgets[0][int(y)].version += 1 
+                                except Exception,e:                            
+                                    log.log(thisfuncname(),1,func=tbl_col_add,error=str(e))
+                        else:
+                            try:
+                                with database:
+                                    tbl_col_update(database,
+                                                   self.tblname_entry_sv.get(),
+                                                   current_value,
+                                                   new_value)
+                                
+                                    log.log(thisfuncname(),4,func=tbl_col_update,current_value=current_value,new_value=new_value)
+                            except Exception,e:               
+                                log.log(thisfuncname(),1,func=tbl_col_update,error=str(e))
+                                
+                        getattr(self,gridname).widgets[0][int(y)].current_value = new_value
+                    else:
+                        log.log(thisfuncname(),3,msg="ignoring as values have not changed",current_value=current_value,new_value=new_value)
                 else:
-                    log.log(self,3,"nothing to do","new_value=",str(new_value),"=","current_value=",current_value)
-            else:
-                pkval = self.entrygrid.widgets[int(x)][pkcolnum].sv.get()
-                
-                # ignore updates that are not different from init_value
-                # could be changed and then changed back or could be just inital load
-                
-                if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].current_value):
-                #if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].init_value):
+                    pkval = self.entrygrid.widgets[int(x)][pkcolnum].sv.get()
                     
+                    # ignore updates that are not different from init_value
+                    # could be changed and then changed back or could be just inital load
+                    
+                    if str(new_value) <> str(self.entrygrid.widgets[int(x)][int(y)].current_value):
 
+                        try:
+                            new_value = int(new_value)
+                        except:
+                            new_value = "\""+new_value+"\""
+            
+                        _row= [colname,new_value,self.pk_entry_sv.get(),"\""+pkval+"\""]   
+                        rows.append(_row)
+
+                        self.entrygrid.widgets[int(x)][int(y)].current_value = new_value
+                        self.entrygrid.widgets[int(x)][int(y)].version += 1
+
+            with database:
+                for row in rows:
+                    
                     try:
-                        new_value = int(new_value)
-                    except:
-                        new_value = "\""+new_value+"\""
-        
-                    _row= [colname,
-                            new_value,
-                            self.pk_entry_sv.get(),
-                            "\""+pkval+"\""]   
-
-                    rows.append(_row)
-                    log.log(self,3,"dbfield value update","newvalue=",str(new_value),"^".join(map(str,_row)))             
-                    
-                    self.entrygrid.widgets[int(x)][int(y)].current_value = new_value
-                    self.entrygrid.widgets[int(x)][int(y)].version += 1
-
+                        exec_str,result = tbl_rows_update(database,self.tblname_entry_sv.get(),
+                                                          row)
+                        log.log(thisfuncname(),4,func=tbl_rows_update,exec_str="exec_str",result=str(result))
+                    except Exception,e:
+                        log.log(thisfuncname(),1,func=tbl_rows_update,error=str(e))
                 
-        with database:
-            for row in rows:
-                
-                try:
-                    exec_str,result = tbl_rows_update(database,
-                                                      self.tblname_entry_sv.get(),
-                                                      row)
-                    log.log(self,3,"success","dbupdate","exec_str=",exec_str,"result=",str(result))
-                except Exception,e:
-                    log.log(self,1,"error","dbupdate","error=",str(e))
-                
-                                   
+    @logger(log)                       
     def insert(self,database=None):
         
         if database==None:
             database = Database(self.dbname_entry_sv.get())
         
         dbclass = dbtblfactory(self.tblname_entry_sv.get())
-        
-        #class lesson(dbtblgeneric):
-        #    pass
-        
+
         for x in range(1,self.maxnewrows):
             dm={}
             emptyrow=True
@@ -320,22 +317,20 @@ class DBTableUI(Tk):
                         emptyrow=False
                     
             if emptyrow == False:
-                dbobj = dbclass.datamembers(database=database,
-                                            dm=dm)
+                dbobj = dbclass.datamembers(database=database,dm=dm)
 
                 with database:
-                    log.log(self,3,"persisting","^".join(map(str,zip(dm,dm.values()))))
                     
                     try:
                         exec_str,result = dbobj.persist()
-                        log.log(self,3,"success","dbinsert","exec_str=",exec_str,"result=",str(result))
+                        log.log(thisfuncname(),4,func=dbobj.persist,exec_str="exec_str",result=str(result))
                     except Exception, e:
-                        log.log(self,1,"error","dbinsert","exec_str=",exec_str,"result=",str(result),"error=",e.msg)
-                    
+                        log.log(thisfuncname(),1,func=dbobj.persist,error=str(e))
                     
         self.clear(1,'newrowgrid')
         self.load()
             
+    @logger(log)        
     def load(self,values=None):
         
         self.clear()
@@ -346,7 +341,7 @@ class DBTableUI(Tk):
             colndefn,rows = tbl_rows_get(database,self.tblname_entry_sv.get())
                                     #saveversion',str(self.dbload_entry_sv.get())))
             
-            log.log(self,3,str(len(rows)),"rows loaded from",database.name,self.tblname_entry_sv.get())
+            log.log(thisfuncname(),3,func=tbl_rows_get,msg=str(len(rows))+"rows loaded",table=self.tblname_entry_sv.get())
                                     
             for y in range(len(rows[0])):
         
@@ -355,11 +350,11 @@ class DBTableUI(Tk):
                 new_value = colndefn[y]
                 
                 self.entrygrid.widgets[0][y].current_value = new_value
-
                 self.entrygrid.widgets[0][y].sv.set(new_value)
                 #self.entrygrid.widgets[0][y].config(background='grey',
                 #                                    foreground='yellow')
                 
+                self.newrowgrid.widgets[0][y].current_value = new_value
                 self.newrowgrid.widgets[0][y].sv.set(new_value)
                 #self.newrowgrid.widgets[0][y].config(background='grey',
                 #                                    foreground='yellow')
@@ -391,6 +386,7 @@ class DBTableUI(Tk):
                     except:
                         pass
 
+    @logger(log)        
     def updates_get(self,gridname,ignoreaxes=False):
         
         return(sswizard_utils.updates_get(self,gridname,ignoreaxes))

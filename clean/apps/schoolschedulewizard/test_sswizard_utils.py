@@ -222,27 +222,31 @@ class Test_GetEnums(unittest.TestCase):
     def setUp(self):
         
         self.database = Database('quadref_test')
+        self.enums =  setenums('All','3','quadref_test')
         
-    def test_prep3_students_enum(self):
-        enums,maps,_ =  setenums('All','3','quadref')
-        
-        expected_results = ['A','B','C','D','E','F','G','H','I','J']
-        
-        self.assertListEqual(expected_results,enums['students'])
+    def test_prep3_students_name(self):
 
-    def test_prep3_students_map(self):
-        enums,maps,_ =  setenums('All','3','quadref')
+        expected_results = ['A','B','D','C','E','F','G','H','I','J']
         
-        expected_results = {'A':1,'B':2,'C':3,'D':4, \
-                            'E':5,'F':6,'G':7,'H':8, \
-                            'I':9,'J':10}
-        
-        print expected_results
-        print maps['students']
-        
-        self.assertEqual(expected_results,maps['students'])
+        self.assertListEqual(expected_results,self.enums['student']['name'])
 
+    def test_prep3_students_name2enum(self):
+        
+        expected_results = {'A':0,'B':1,'D':2,'C':3, \
+                            'E':4,'F':5,'G':6,'H':7, \
+                            'I':8,'J':9}
+        
+        self.assertEqual(expected_results,self.enums['student']['name2enum'])
 
+    def test_prep3_get_code_name2code(self):
+        
+        expected_results = {'A':'AA','B':'BA','D':'DA','C':'CA', \
+                            'E':'EA','F':'FA','G':'GA','H':'HA', \
+                            'I':'IA','J':'JA'}
+        
+        self.assertEqual(expected_results,self.enums['student']['name2code'])
+
+    
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 

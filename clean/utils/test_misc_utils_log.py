@@ -1,6 +1,6 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils_log import Log, logger, Singleton
+from misc_utils_log import Singleton
 from misc_utils import thisfuncname, os_file_to_list
 from time import sleep
 import unittest
@@ -124,6 +124,31 @@ class Test_Log(unittest.TestCase):
         pass
            
 
+class Test_Misc(unittest.TestCase):
+    
+    def setUp(self):
+        self.logdir = "/tmp/log"
+        self.log = Log(verbosity=10,
+                       cacheflag=True,logdir="/tmp/log",
+                       pidlogname=False,proclogname=False,
+                       reset="") # this forces the singleton to allow a new instance
+        
+    def test_func_arg(self):
+        
+        from database_table_util import tbl_col_add
+        self.log.log(self,4,func=tbl_col_add,current_value="aaa",new_value="bbb")
+        
+        logfile = os_file_to_list(self.log.logpath)
+        
+        expected_results = "[('current_value','aaa'),('new_value','bbb'),('func','tbl_col_add')]"
+
+        self.assertEquals(logfile[0].split("|")[9].strip(),expected_results)
+        
+    def tearDown(self):
+        #self.log.log_clean()
+        pass
+           
+           
 class Test_Log_Multiple_Entries(unittest.TestCase):
     
     def setUp(self):
@@ -168,7 +193,11 @@ class Test_Log_Multiple_Entries(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Logger_Member_Function))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log_Multiple_Entries))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Logger_Member_Function))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log_Multiple_Entries))
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Misc))
+    
+    
     unittest.TextTestRunner(verbosity=2).run(suite)
