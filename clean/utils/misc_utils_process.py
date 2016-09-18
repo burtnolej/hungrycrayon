@@ -3,15 +3,13 @@ from time import sleep
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
 from misc_utils_enum import enum
-from misc_utils import Log
 from os import remove, kill
 import signal
 import unittest
 
 
-__all__ = ['process_start','process_stdin','process_kill','process_instances_get']
-
-log = Log()
+__all__ = ['process_start','process_stdin','process_kill','process_instances_get', \
+           'process_get_stdout']
 
 def process_start(cmdlineargs,stdin=True):
     ''' pass stdin=True when you want the process to wait for 
@@ -22,10 +20,12 @@ def process_start(cmdlineargs,stdin=True):
         args['stdin'] = PIPE
     
     p = Popen(cmdlineargs,**args)
-    
-    log.log(__name__,3,"started process","pid=",str(p.pid),"cmd="," ".join(cmdlineargs))
+
     return(p)
 
+def process_get_stdout(process):
+    return(process.stdout.read()) 
+    
 def process_stdin(process,stdinstr):
     ''' pass stdin to a process waiting for stdin '''
     return(process.communicate(input=stdinstr))
@@ -43,7 +43,6 @@ def process_kill(p):
         except ValueError:
             raise Exception('requires an int or int as string')
 
-    log.log(__name__,3,"killed process","pid=",str(_pid))
     return()
     
 def process_instances_get(match):

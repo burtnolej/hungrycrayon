@@ -1,6 +1,6 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
-from misc_utils import Log,IDGenerator
+from misc_utils import IDGenerator
 
 class GenericBase(object):
     
@@ -10,7 +10,6 @@ class GenericBase(object):
             
     def __init__(self,**kwarg):
         self._setattr(kwarg)
-        self.log = Log()
         self.id =  IDGenerator().getid()
         
     def attr_get_keyval(self,include_callable=True, 

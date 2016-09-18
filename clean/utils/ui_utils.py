@@ -420,7 +420,7 @@ class TKBase(object):
         try:
             self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                           self.toplevel.update_callback(self.widget,self.sv.get()))
-            log.log(self,3,"success: registered callback",str(widget_class), str(self.toplevel.update_callback))
+            log.log(self,10,"success: registered callback",str(widget_class), str(self.toplevel.update_callback))
 
         except Exception:
             log.log(self,1,"fail: register callback",str(widget_class), str(self.toplevel.update_callback),e.msg)
@@ -461,7 +461,7 @@ class TkEntry(Entry,TKBase):
         self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                       self.changed(self.sv))
         
-        log.log(self,4,'created')
+        log.log(self,10,'created')
                       
     def changed(self,sv):
         #new_value = sv.get()

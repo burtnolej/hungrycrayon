@@ -1,19 +1,21 @@
 from random import randint
 import sys
-
+from collections import OrderedDict
 import sys
+from types import *
+from inspect import stack
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 
-#class generic(GenericBase):
-#    def __init__(self,**kwargs):
-#        super(generic,self).__init__(**kwargs)
-#        
-#        self.log = Log()
-#        self.id =  IDGenerator().getid()
-#        
-#        
-#        print "generic","__init__"
-        
+
+def thisfuncname(cls=None):
+    
+    funcname = stack()[1][3]
+    
+    if cls <> None:
+        clsname = cls.__class__.__name__
+        funcname = clsname + "." + funcname
+    
+    return(funcname)
 
 def nxnarraycreate(maxrows,maxcols,args={}):
     ''' creates a n x n array containing args; args can be none, args can be dict, list, string'''
@@ -34,6 +36,11 @@ def nxnarraycreate(maxrows,maxcols,args={}):
 class Singleton(type):
     _instances = {}
     def __call__(cls,*args,**kwargs):
+        
+        if kwargs.has_key('reset') == True:
+            cls._instances = {}
+            kwargs.pop('reset')
+                
         if cls not in cls._instances:
             #print "info: singleton object being created"
             cls._instances[cls] = super(Singleton, cls).__call__(*args,**kwargs)
@@ -45,84 +52,6 @@ class Singleton(type):
 def attr_get_keyval(obj):
     from inspect import getmembers
     return[(k,v) for k,v in getmembers(obj) if not k.startswith('__')]
-    
-class Log():    
-    __metaclass__ = Singleton
-    
-    logpath = '/home/burtnolej/log.log'
-    logfile = open(logpath,"a")
-    verbosity = 5
-    cache=[]
-        
-    def __repr__(self):
-        return ('log')
-    
-    def log_cache_reset(self):
-        self.cache=[]
-        
-    def log(self,obj,priority,*args):
-        from inspect import stack
-        from os.path import basename
-        from datetime import datetime
-        
-        try:
-            int(priority)
-        except:
-            raise Exception('priority arg needs to be an int, got',priority)
-        
-        if priority < self.verbosity:
-            logitem = []
-            
-            if priority == 3:
-                logitem.append("sev=info")
-            
-            now = datetime.now().strftime("%H:%M:%S")
-            msecs = str(int(datetime.now().microsecond/1000)).rjust(4,"0")
-            
-            callerframe = stack()[2]
-            
-            class myclass():
-                def __init__(self,**kwargs):
-                    for k,v in kwargs.iteritems():
-                        setattr(self,k,v)
-                        
-            _logitem = myclass(clr=str(obj.__class__),
-                               t=now+"."+msecs,
-                               clrf=callerframe[3],
-                               clrfnln=str(callerframe[2]),   
-                               msg=" ".join(list(args)),
-                               clrfr="("+basename(callerframe[1])+")")
-                               
-                                 
-            
-            logitem = logitem + ["clr="   + str(obj),
-                                 "t="     + now+"."+msecs,
-                                 "clrfn=" + callerframe[3],
-                                 "clrfnln=",str(callerframe[2]),   
-                                 "msg="   + " ".join(list(args)),
-                                 "clrf="  + "("+basename(callerframe[1]) + ")"]
-    
-            _content = [(_key+"="+str(_val)) for _key,_val in attr_get_keyval(_logitem)]
-            content = ";".join(_content)+"\n"
-            self.logfile.write(content)
-            self.cache.append(_logitem)
-                
-    def log_get_session_content(self):
-        return(self.cache)
-    
-    def logexists(self):
-        return(os_file_exists(self.logpath))
-
-    def log_get_session_num_entries(self):
-        return(len(self.cache))
-    
-    def log_file_length(self):
-        for i,l in enumerate(self.logfile):
-            pass
-        return(i)
-    
-    def __del__(self):
-        self.logfile.close()
 
 def os_file_exists(os_file_name):
     from os.path import exists
@@ -151,6 +80,14 @@ def os_file_to_string(filename,remove=None):
        
     fh.close()
     return s
+
+def os_file_to_list(filename,remove=None):
+    
+    fh = open(filename, 'r+')
+
+    l = [line for line in fh]       
+    fh.close()
+    return l
 
 def write_pickle(object,filename=None):
     import pickle
