@@ -147,7 +147,16 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
         coldefn,values = tbl_query(database,exec_str)
     
     enums[tblname] = {}
-    name2code = dict((row[0],row[1]) for row in values)
+    #name2code = dict((row[0],row[1]) for row in values)
+    
+    # explicit loop as OrderedDict only keeps order when items are added after initialization
+    name2code = OrderedDict()
+    for k,v in values:
+        name2code[k] = v
+    
+    # unknown/none is represented with '??'
+    name2code['??'] = '??'
+        
     enums[tblname]['name2code'] = name2code
     enums[tblname]['code2name'] = zip(name2code.values(),name2code.keys())
     enums[tblname]['name2enum'] = dict((value,enum) for enum,value in enumerate(name2code.keys()))
@@ -160,10 +169,10 @@ def setenums(dow,prep,dbname):
     enums = {'maps':{},'enums':{},'codes':{}}
     
     getdbenum(enums,dbname,'name','period')
-    getdbenum(enums,dbname,'name','period')
+    #getdbenum(enums,dbname,'name','period')
     getdbenum(enums,dbname,'name','student','prep',prep)
     getdbenum(enums,dbname,'name','adult','prep',prep)
-    getdbenum(enums,dbname,'tag','session')
+    getdbenum(enums,dbname,'code','session')
     getdbenum(enums,dbname,'name','lessontype')
     getdbenum(enums,dbname,'name','subject')
     getdbenum(enums,dbname,'name','dow')

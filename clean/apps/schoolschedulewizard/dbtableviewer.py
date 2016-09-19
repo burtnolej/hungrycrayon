@@ -271,7 +271,7 @@ class DBTableUI(Tk):
                                 except Exception,e:                            
                                     log.log(thisfuncname(),1,func=tbl_col_add,error=str(e))
                         else:
-                            try:
+                            #try:
                                 with database:
                                     tbl_col_update(database,
                                                    self.tblname_entry_sv.get(),
@@ -279,8 +279,8 @@ class DBTableUI(Tk):
                                                    new_value)
                                 
                                     log.log(thisfuncname(),4,func=tbl_col_update,current_value=current_value,new_value=new_value)
-                            except Exception,e:               
-                                log.log(thisfuncname(),1,func=tbl_col_update,error=str(e))
+                            #except Exception,e:               
+                                #log.log(thisfuncname(),1,func=tbl_col_update,error=str(e))
                                 
                         getattr(self,gridname).widgets[0][int(y)].current_value = new_value
                     else:
@@ -408,6 +408,7 @@ class DBTableUI(Tk):
         
         return(sswizard_utils.updates_get(self,gridname,ignoreaxes))
     
-if __name__ == "__main__":   
-    app = DBTableUI()
+if __name__ == "__main__":
+        
+    app = DBTableUI(maxentryrows=60)
     app.mainloop()

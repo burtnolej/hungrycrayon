@@ -77,7 +77,7 @@ class Test_Load(unittest.TestCase):
     def setUp(self):
         
         self.ui = DBTableUI()
-        self.dbfilename = 'test_1row'
+        self.dbfilename = 'test_dbtableviewer'
         self.ui.dbname_entry_sv.set(self.dbfilename)
         
     def test_update_queue(self):
@@ -109,7 +109,7 @@ class Test_Load_Change_Save(unittest.TestCase):
     def setUp(self):
         
         self.ui = DBTableUI()
-        self.dbfilename = 'test_1row'
+        self.dbfilename = 'test_dbtableviewer'
         self.ui.dbname_entry_sv.set(self.dbfilename)
         self.database = Database(self.dbfilename)
         
@@ -188,7 +188,7 @@ class Test_Load_Clear_Load(unittest.TestCase):
     def setUp(self):
         
         self.ui = DBTableUI()
-        self.dbfilename = 'test_1row'
+        self.dbfilename = 'test_dbtableviewer'
         self.ui.dbname_entry_sv.set(self.dbfilename)
         self.database = Database(self.dbfilename)
         
@@ -213,7 +213,7 @@ class Test_Load_Insert_Save(unittest.TestCase):
     def setUp(self):
         
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbname = 'test_1row'
+        self.dbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbname)
         self.ui = DBTableUI()        
         self.ui.dbname_entry_sv.set(self.dbname)
@@ -292,7 +292,7 @@ class Test_Load_Insert_Change_Save(unittest.TestCase):
     def setUp(self):
         
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbname = 'test_1row'
+        self.dbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbname)
         self.ui = DBTableUI()        
         self.ui.dbname_entry_sv.set(self.dbname)
@@ -389,7 +389,7 @@ class Test_Load_Insert_Change_Save_Insert_Save(unittest.TestCase):
     def setUp(self):
         
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbname = 'test_1row'
+        self.dbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbname)
         self.ui = DBTableUI()        
         self.ui.dbname_entry_sv.set(self.dbname)
@@ -494,7 +494,7 @@ class Test_Load_Insert(unittest.TestCase):
     def setUp(self):
         
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbname = 'test_1row'
+        self.dbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbname)
         self.ui = DBTableUI()        
         self.ui.dbname_entry_sv.set(self.dbname)
@@ -542,7 +542,7 @@ class Test_Insert_Multiple_Rows_onto_Loaded_Rows(unittest.TestCase):
     def setUp(self):
         
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbname = 'test_1row'
+        self.dbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbname)
         self.ui = DBTableUI()        
         self.ui.dbname_entry_sv.set(self.dbname)
@@ -611,7 +611,7 @@ class Test_Insert_Multiple_Rows_onto_Loaded_Rows(unittest.TestCase):
 class Test_Load_Insert_Update_Insert(unittest.TestCase):
     def setUp(self):
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'        
-        self.dbname = 'test_1row'
+        self.dbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbname)
         self.ui = DBTableUI()
         self.ui.dbname_entry_sv.set(self.dbfilename)
@@ -673,7 +673,7 @@ class Test_Load_Insert_Update_Insert(unittest.TestCase):
 class Test_Load_Insert_Update(unittest.TestCase):
     def setUp(self):
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'        
-        self.dbname = 'test_1row'
+        self.dbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbname)
         self.ui = DBTableUI()
         self.ui.dbname_entry_sv.set(self.dbfilename)
@@ -723,7 +723,7 @@ class Test_Change_Column_of_Loaded_Rows(unittest.TestCase):
     def setUp(self):
         
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbbname = 'test_1row'
+        self.dbbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbbname)
         self.ui = DBTableUI()        
         self.ui.dbname_entry_sv.set(self.dbbname)
@@ -773,7 +773,7 @@ class Test_Add_Column_of_Loaded_Rows(unittest.TestCase):
     def setUp(self):
         
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbbname = 'test_1row'
+        self.dbbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbbname)
         self.ui = DBTableUI()        
         self.ui.dbname_entry_sv.set(self.dbbname)
@@ -825,7 +825,7 @@ class Test_Add_Column_of_Loaded_Rows_With_Values(unittest.TestCase):
     def setUp(self):
         
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbname = 'test_1row'
+        self.dbname = 'test_dbtableviewer'
         self.dbfilename = path.join(dbpath,self.dbname)
         self.ui = DBTableUI()        
         self.ui.dbname_entry_sv.set(self.dbname)
@@ -863,19 +863,19 @@ class Test_Add_Column_of_Loaded_Rows_With_Values(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Entry))
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Clear_Load))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Clear_Load))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save))
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Save))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save_Insert_Save))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Save))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save_Insert_Save))
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Change_Column_of_Loaded_Rows))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Column_of_Loaded_Rows))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Change_Column_of_Loaded_Rows))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Column_of_Loaded_Rows))
     
     '''
     these may be defunc

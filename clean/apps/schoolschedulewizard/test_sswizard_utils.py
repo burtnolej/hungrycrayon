@@ -19,7 +19,7 @@ from database_table_util import tbl_rows_get, tbl_query
 from sswizard_utils import dropdown_build, setenums
             
 def _execfunc(database,value):
-    exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(value)
+    exec_str = "select code from session where period = {0} and subject <> \"None\"".format(value)
     return(tbl_query(database,exec_str))
 
 def _rowheaderexecfunc(database):
@@ -64,7 +64,7 @@ class UI(Tk):
 class Test_With_Headers(unittest.TestCase):
     def setUp(self):
         
-        self.database = Database('quadref')
+        self.database = Database('test_sswizard_utils')
         self.classtbl = 'class'
         self.maxx = 8
         self.maxy = 10
@@ -111,7 +111,7 @@ class Test_With_Headers(unittest.TestCase):
 class Test_(unittest.TestCase):
     def setUp(self):
         
-        self.database = Database('quadref')
+        self.database = Database('test_sswizard_utils')
         self.classtbl = 'class'
         self.maxx = 8
         self.maxy = 10
@@ -121,120 +121,94 @@ class Test_(unittest.TestCase):
         widget_args=dict(background='white')
         
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
         widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
        
-        expected_results = ['Da-Hum','Br-STEM','Jk-Mvmt','Th-STEM','Js-Hum']
-        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
+        expected_results =[u'DA.AC.HU', u'BR.AC.ST', u'JA.CO.MV', u'TH.AC.ST', u'JE.AC.HU']
+
+        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
 
     def test_col2(self):
         testx=1
         widget_args=dict(background='white')
          
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
         widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
-        expected_results = ['Da-Hum','Br-STEM']
+        expected_results = [u'DA.AC.HU', u'BR.AC.ST']
+
         
-        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
+        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
          
     def test_col3(self):
         testx=2
         widget_args=dict(background='white')
          
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
         widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
-        expected_results = ['Da-Hum','Br-STEM','Jk-SPED','Th-STEM','Js-Hum']
-        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
+        expected_results = [u'DA.AC.HU', u'BR.AC.ST', u'JA.??.SP', u'TH.AC.ST', u'JE.AC.HU']
+
+        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
 
     def test_col4(self):
         testx=3
         widget_args=dict(background='white')
          
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
         widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
-        expected_results = ['Jk-SPED','Th-STEM','Js-Hum']
-        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
+        expected_results = [u'DA.PR.HU', u'BR.PR.ST', u'JA.??.SP', u'TH.AC.ST', u'JE.AC.HU']
+        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
 
     def test_col5(self):
         testx=4
         widget_args=dict(background='white')
          
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
         widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
-        expected_results = ['Da-Hum','Br-STEM','Jk-Mvmt']
-        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
+        expected_results = [u'DA.AC.HU', u'BR.AC.ST', u'JA.CO.MV']
+
+        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
 
     def test_col6(self):
         testx=5
         widget_args=dict(background='white')
          
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
         widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
-        expected_results = ['Da-Hum','Br-STEM','Jk-SPED']
-        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
+        expected_results = [u'DA.AC.HU', u'BR.AC.ST', u'JA.??.SP']
+        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
     
     def test_col7(self):
         testx=6
         widget_args=dict(background='white')
          
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
         widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
         
-        expected_results = ['Da-Hum','Br-STEM']
-        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
+        expected_results = [u'DA.AC.HU', u'BR.AC.ST']
 
-    def test_col8(self):
-        
-        testx=7
-        widget_args=dict(background='white')
-         
-        widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        exec_str = "select tag from class where period = {0} and subject <> \"None\"".format(testx+1)
-        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
-        
-        expected_results = ['Da-Hum','Br-STEM','Jk-AP']
-        self.assertEqual(widgetcfg[testx][0]['values'],expected_results)
-
-class Test_UI(unittest.TestCase):
-    def setUp(self):
-        
-        self.database = Database('quadref')
-        self.ui = UI(self.database)
-        
-    def test_(self):
-        
-        print self.ui.entrygrid.widgets[0][0]['values']
-        self.ui.mainloop()
-        #pass
+        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
         
 class Test_GetEnums(unittest.TestCase):
     def setUp(self):
         
-        self.database = Database('quadref_test')
-        self.enums =  setenums('All','3','quadref_test')
+        self.database = Database('test_sswizard_utils')
+        self.enums =  setenums('All','3','test_sswizard_utils')
         
     def test_prep3_students_name(self):
 
-        expected_results = ['A','B','D','C','E','F','G','H','I','J']
+        expected_results = ['A','B','C','D','E','F','G','H','I','J','??']
         
         self.assertListEqual(expected_results,self.enums['student']['name'])
 
     def test_prep3_students_name2enum(self):
         
-        expected_results = {'A':0,'B':1,'D':2,'C':3, \
+        expected_results = {'A':0,'B':1,'C':2,'D':3, \
                             'E':4,'F':5,'G':6,'H':7, \
-                            'I':8,'J':9}
+                            'I':8,'J':9,'??':10}
         
         self.assertEqual(expected_results,self.enums['student']['name2enum'])
 
@@ -242,7 +216,7 @@ class Test_GetEnums(unittest.TestCase):
         
         expected_results = {'A':'AA','B':'BA','D':'DA','C':'CA', \
                             'E':'EA','F':'FA','G':'GA','H':'HA', \
-                            'I':'IA','J':'JA'}
+                            'I':'IA','J':'JA','??':'??'}
         
         self.assertEqual(expected_results,self.enums['student']['name2code'])
 
@@ -250,10 +224,8 @@ class Test_GetEnums(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_UI))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetEnums))
 
     
