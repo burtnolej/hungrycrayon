@@ -46,8 +46,10 @@ class Log():
         
         if self.logdir == None:
             self.logdir = '/home/burtnolej/log'
+            print "no log dirname provided so defaulting to",self.logdir
         
         if os.path.isdir(logdir) == False:
+            print "creating directory",self.logdir
             os.mkdir(logdir)
 
         self.logpath = os.path.join(self.logdir,"log")
@@ -60,11 +62,16 @@ class Log():
         if pidlogname == True:
             self.logpath = self.logpath + "." + str(self._getpid())
             
+        print "using logfile:",self.logpath
         fileattr = "a"
         if os.path.exists(self.logpath) == False:
+            self.log(self.__init__,3,msg="creating logfile",name=self.logpath)
             fileattr = "w"
         
         self.logfile = open(self.logpath,fileattr)
+        
+        self.log(self.__init__,3,logdir=self.logdir,verbosity=verbosity,pidlogname=str(pidlogname),
+                 proclogname=str(proclogname))
 
     def _getpid(self):
         thread = currentThread().name
@@ -150,7 +157,7 @@ class Log():
             logitem = []
             
             logmesg['funcname'] = funcname
-            logmesg['module'] = basename(callerframe[1])
+            logmesg['module'] = basename(stack()[2][1])
 
             # setup stats for this given function if not called before
             if _stats.has_key(logmesg['funcname']) == False:

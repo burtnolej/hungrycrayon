@@ -15,7 +15,7 @@ from type_utils import isadatatype, TextAlphaNumRO
 from image_utils import ImageCreate, rgbstr_get
 ic = ImageCreate()
 
-log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
+log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=True,proclogname=True)
 
 fontscale = enum(sy = 2500,sx = 3500,
                  minfpt = 8,maxfpt = 64,

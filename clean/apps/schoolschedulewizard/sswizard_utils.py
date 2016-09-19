@@ -15,7 +15,9 @@ def update_callback(ui,widget,new_value):
     #put event on here too
     if str(widget.current_value) <> str(new_value):
         
-        log.log(thisfuncname(),3,msg="updating "+str(widget.winfo_name()),current_value=str(widget.current_value),new_value=new_value,version=str(widget.version))
+        widget.version += 1
+        
+        log.log(thisfuncname(),10,msg="updating "+str(widget.winfo_name()),current_value=str(widget.current_value),new_value=new_value,version=str(widget.version))
         widget.config(foreground='red')
         
         # record event in update log
@@ -30,7 +32,7 @@ def updates_get(ui,gridname,ignoreaxes=False):
     update_keys = [ [gridname,update.split(",")[1],update.split(",")[2]] for update in ui.updates.keys() if update.split(",")[0] == gridname if int(update.split(",")[1]) > maxx if int(update.split(",")[2]) > maxy]
     
     if len(update_keys)==0:
-        log.log(thisfuncname(),3,"updates requested but none found",gridname)
+        log.log(thisfuncname(),3,msg="updates requested but none found",gridname=gridname)
         #raise Exception("no updates registered for",gridname)
     else:
        
@@ -42,7 +44,6 @@ def updates_get(ui,gridname,ignoreaxes=False):
         xsize= max([int(key[1]) for key in update_keys]) + offset
         ysize= max([int(key[2]) for key in update_keys]) + offset
         
-        print xsize, ysize
         # text values of widgets
         values = nxnarraycreate(int(xsize),int(ysize),"")
         for key in update_keys:
@@ -52,10 +53,7 @@ def updates_get(ui,gridname,ignoreaxes=False):
             else:
                 offset = -1
             
-            #print int(key[1]),int(key[2]),key,ui.updates[str(",".join(key))]
             values[int(key[1])+offset][int(key[2])+offset] = ui.updates[str(",".join(key))]
-            #values[int(key[1])-1][int(key[2])-1] = ui.updates[str(",".join(key))]
-            #print values
         
         # background color of widgets
         bgcolor = nxnarraycreate(int(xsize),int(ysize),"")

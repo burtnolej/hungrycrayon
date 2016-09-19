@@ -1,10 +1,13 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
+from misc_utils_log import Log, logger
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
+          pidlogname=True,proclogname=False)
 
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNum
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 from misc_utils import nxnarraycreate, thisfuncname
-from misc_utils_log import Log, logger
+
 
 import sswizard_utils
 
@@ -17,10 +20,11 @@ from Tkinter import *
 from ttk import *
 import tkFont
 
-log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
+
 
 class DBTableUI(Tk):
-    def __init__(self):
+    def __init__(self,maxentrycols=13,maxentryrows=12,
+                 maxnewrowcols=13,maxnewrowrows=3):
         
         Tk.__init__(self)
 
@@ -35,9 +39,12 @@ class DBTableUI(Tk):
         # .index+1 will give the col # on the grid that corresponds
         # useful for looking up pk values for updates
         self.dbcol_defn = []
+        
+        self.maxrows=maxentryrows # rows in the grid
+        self.maxcols=maxentrycols # cols in the grid        
 
-        self.maxrows=57 # rows in the grid
-        self.maxcols=15 # cols in the grid
+        #self.maxrows=57 # rows in the grid
+        #self.maxcols=15 # cols in the grid
         maxwidgets=self.maxrows*self.maxcols
         wwidth=48 # default button width with text of 3 chars
         wheight=29 # default button height
@@ -132,7 +139,7 @@ class DBTableUI(Tk):
         self.clone_button.grid(column=5,row=1,columnspan=1,sticky=NSEW)
         self.clone_button.focus_get()
         
-        self.maxnewrows=20
+        self.maxnewrows=maxnewrowrows
         self.newrowgrid = TkImageLabelGrid(self,'newrowgrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxnewrows,self.maxcols,
                              {},widgetcfg)
@@ -180,13 +187,25 @@ class DBTableUI(Tk):
     def _clear_grid(self,gridname,firstrow):
         grid = getattr(self,gridname)
         
-        for x in range(firstrow,grid.maxrows):
-            for y in range(grid.maxcols):
+        for key in self.updates.keys():
+            row=[]
+            _gridname,x,y = key.split(",")
+            x = int(x)
+            y = int(y)
+            if gridname == _gridname:
                 grid.widgets[x][y].sv.set("")
                 grid.widgets[x][y].config(background='white')
                 grid.widgets[x][y].init_value = ""
                 grid.widgets[x][y].current_value = ""
-                grid.widgets[x][y].version = 0
+                grid.widgets[x][y].version = 0    
+            
+        #for x in range(firstrow,grid.maxrows):
+        #    for y in range(grid.maxcols):
+        #        grid.widgets[x][y].sv.set("")
+        #        grid.widgets[x][y].config(background='white')
+        #        grid.widgets[x][y].init_value = ""
+        #        grid.widgets[x][y].current_value = ""
+        #        grid.widgets[x][y].version = 0
                 
     @logger(log)        
     def clear(self,firstrow=0,gridname=None):
@@ -200,7 +219,6 @@ class DBTableUI(Tk):
             
     @logger(log)                    
     def focus_next_widget(self,event):
-        print "focuschange"
         #nextwidget = self.master.tk_focusNext()
         if str(event.widget)[-3:] == "svb":
             self.entrygrid.focus()
@@ -210,8 +228,6 @@ class DBTableUI(Tk):
     
     @logger(log)        
     def process_updates(self,database=None):
-        
-        log.log(self,1,"in processupdates")
 
         if database == None:
             database = Database(self.dbname_entry_sv.get())
@@ -241,6 +257,7 @@ class DBTableUI(Tk):
                     #new_value = getattr(self,gridname).widgets[0][int(y)].sv.get()
     
                     if new_value <> current_value:
+                        log.log(thisfuncname(),3,msg="update_required",y=y,x=x,colname=colname,key=key)
                         if init_value == "":
                             with database:
                                 
@@ -284,18 +301,19 @@ class DBTableUI(Tk):
                         _row= [colname,new_value,self.pk_entry_sv.get(),"\""+pkval+"\""]   
                         rows.append(_row)
 
+                        log.log(thisfuncname(),3,msg="add to dbupdate queue",x=x,y=y,colname=colname,new_value=new_value,pkval=pkval)
+        
                         self.entrygrid.widgets[int(x)][int(y)].current_value = new_value
                         self.entrygrid.widgets[int(x)][int(y)].version += 1
 
-            with database:
-                for row in rows:
-                    
-                    try:
-                        exec_str,result = tbl_rows_update(database,self.tblname_entry_sv.get(),
-                                                          row)
-                        log.log(thisfuncname(),4,func=tbl_rows_update,exec_str="exec_str",result=str(result))
-                    except Exception,e:
-                        log.log(thisfuncname(),1,func=tbl_rows_update,error=str(e))
+        with database:
+            for row in rows:
+                try:
+                    exec_str,result = tbl_rows_update(database,self.tblname_entry_sv.get(),
+                                                      row)
+                    log.log(thisfuncname(),4,func=tbl_rows_update,exec_str=exec_str,result=str(result))
+                except Exception,e:
+                    log.log(thisfuncname(),1,func=tbl_rows_update,error=str(e))
                 
     @logger(log)                       
     def insert(self,database=None):
@@ -323,17 +341,19 @@ class DBTableUI(Tk):
                     
                     try:
                         exec_str,result = dbobj.persist()
-                        log.log(thisfuncname(),4,func=dbobj.persist,exec_str="exec_str",result=str(result))
+                        log.log(thisfuncname(),4,func=dbobj.persist,exec_str=exec_str,result=result)
                     except Exception, e:
                         log.log(thisfuncname(),1,func=dbobj.persist,error=str(e))
                     
-        self.clear(1,'newrowgrid')
-        self.load()
+        #self.clear(1,'newrowgrid')
+        self.load(afterinsert=True)
             
     @logger(log)        
-    def load(self,values=None):
+    def load(self,afterinsert=False,values=None):
         
-        self.clear()
+        if afterinsert==True:
+            # we dont need to reload the headers as this an update of existing table
+            self.clear(1)
 
         database = Database(self.dbname_entry_sv.get())
         
@@ -349,19 +369,16 @@ class DBTableUI(Tk):
                 
                 new_value = colndefn[y]
                 
-                self.entrygrid.widgets[0][y].current_value = new_value
                 self.entrygrid.widgets[0][y].sv.set(new_value)
-                #self.entrygrid.widgets[0][y].config(background='grey',
-                #                                    foreground='yellow')
+                self.entrygrid.widgets[0][y].current_value = new_value
                 
-                self.newrowgrid.widgets[0][y].current_value = new_value
                 self.newrowgrid.widgets[0][y].sv.set(new_value)
-                #self.newrowgrid.widgets[0][y].config(background='grey',
-                #                                    foreground='yellow')
+                self.newrowgrid.widgets[0][y].current_value = new_value
                 
-                # reset init_value for headers after we have loaded                
-                #self.entrygrid.widgets[0][y].init_value = new_value
-                #self.newrowgrid.widgets[0][y].init_value = new_value
+                # reset init_value for headers after we have loaded   
+                # so we can determine a new column from an updated column
+                self.entrygrid.widgets[0][y].init_value = new_value
+                self.newrowgrid.widgets[0][y].init_value = new_value
                 
             for x in range(len(rows)):
                 for y in range(len(rows[x])):
@@ -373,8 +390,8 @@ class DBTableUI(Tk):
                         if new_value == "": new_value = "<SPACE>"
                         
                         # +1 to avoid the header row
-                        self.entrygrid.widgets[x+1][y].current_value = new_value
                         self.entrygrid.widgets[x+1][y].sv.set(new_value)
+                        self.entrygrid.widgets[x+1][y].current_value = new_value
                         
                         # reset init_value after we have loaded
                         #self.entrygrid.widgets[0][y].init_value = new_value

@@ -12,7 +12,7 @@ from dbtableviewer import DBTableUI
 from database_util import Database
 from database_table_util import tbl_rows_get, tbl_cols_get
 from misc_utils_objectfactory import ObjFactory
-from misc_utils import Log
+from misc_utils_log import Log
 
 from shutil import copyfile
 from os import remove, path
@@ -84,15 +84,15 @@ class Test_Load(unittest.TestCase):
         
         self.ui.load()
 
-        expected_results = 0
+        expected_results = [('dow',1),('lessontype',1),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1)]      
         
         values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
 
-        self.assertEqual(values, expected_results)
+        self.assertEqual(values[0][:-2], expected_results)
         
     def test_last_widget_values(self):
         
-        expected_results = [('','dow'), ('','lessontype'), ('','objtype'), ('','period'), ('','saveversion'), ('','schedule'), ('','student'),('','subject'), ('','teacher'),('','userobjid'),('','__timestamp'),('','__id')]
+        expected_results = [('dow','dow'),('lessontype','lessontype'),  ('objtype','objtype'), ('period','period'), ('saveversion','saveversion'), ('schedule','schedule'), ('student','student'),('subject','subject'), ('teacher','teacher'),('userobjid','userobjid'),('__timestamp','__timestamp'),('__id','__id')]
 
         self.ui.load()
                
@@ -115,7 +115,10 @@ class Test_Load_Change_Save(unittest.TestCase):
         
     def test_update_queue(self):
         
-        expected_results = [[''],[('Thursday',0)]]
+        #expected_results = [[''],[('Thursday',0)]]
+        
+        expected_results =  [('dow',1),('lessontype',1),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1)]      
+        
         
         self.ui.load()
         
@@ -125,12 +128,12 @@ class Test_Load_Change_Save(unittest.TestCase):
 
         values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
 
-        self.assertListEqual(values, expected_results)
+        self.assertListEqual(values[0][:-2], expected_results)
         
     def test_last_widget_values(self):
         # checking the .current_value status
         
-        expected_results = [('','Tuesday'),('','wp'),('','lesson'),('','8:30-9:10'),('',0),('',1),('','COBY'),('','MATH'),('','Amelia'),('','1,5,4'),('','19:43:01'),('','049C2F17')]
+        expected_results = [('','Tuesday'),('','wp'),('','lesson'),('','8:30-9:10'),('',0),('',1),('','COBY'),('','MATH'),('','Amelia'),('','1,5,4')]
         
         self.ui.load()
         
@@ -140,7 +143,7 @@ class Test_Load_Change_Save(unittest.TestCase):
         
         #self.ui.process_updates(self.database)
         
-        self.assertListEqual(values, expected_results)
+        self.assertListEqual(values[:-2], expected_results)
         
     def test_dbwrite(self):
          
@@ -191,7 +194,7 @@ class Test_Load_Clear_Load(unittest.TestCase):
         
     def test_update_queue(self):
         
-        expected_results = 0
+        expected_results = [('dow',1),('lessontype',1),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1)]      
         
         self.ui.load()
         
@@ -199,7 +202,7 @@ class Test_Load_Clear_Load(unittest.TestCase):
         
         values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
 
-        self.assertEqual(values, expected_results)
+        self.assertEqual(values[0][:-2], expected_results)
         
     def tearDown(self):
         self.ui.destroy()
@@ -234,19 +237,20 @@ class Test_Load_Insert_Save(unittest.TestCase):
         
     def test_update_queue(self):
         
-        expected_results = 0
-        #[[('dow',1), ('lessontype',1), ('objtype',1), ('period',1), ('saveversion',1), ('schedule',1), ('student',1),('subject',1), ('teacher',1),('userobjid',1)],
-        #                    [('Tuesday',1),('wp',1),('lesson',1),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1)],
-        #                    [('Wednesday',1),('wp',1),('lesson',1),('9:52-10:32',1),('0',1),('1',1),('ORIG',1),('ELA',1),('Galina',1),('9,9,9',1)]]
-        
+        expected_results = [[('dow',1),('lessontype',1),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1)],
+                            [('Tuesday',1),('wp',1),('lesson',1),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1)],
+                            [('Wednesday',1),('wp',1),('lesson',1),('9:52-10:32',1),('0',1),('1',1),('ORIG',1),('ELA',1),('Galina',1),('9,9,9',1)]]
+
+
         values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
 
         # for inserts we cannot know the __timestamp, __id values so ignore last 2 system fields
         # need to go back and do this properyl
-        #nonsystemvalues = [value[:-2] for value in values]
-            
-        #self.assertListEqual(nonsystemvalues, expected_results)
-        self.assertEqual(values, expected_results)
+
+        self.assertEqual(values[0][:-2], expected_results[0])
+        self.assertEqual(values[1][:-2], expected_results[1])        
+        self.assertEqual(values[2][:-2], expected_results[2])
+        
         
 
     def test_last_widget_values(self):
@@ -314,17 +318,37 @@ class Test_Load_Insert_Change_Save(unittest.TestCase):
                         
     def test_update_queue(self):
         
-        expected_results = [[''],[''],[('Thursday',1)]]
-                             
+        # version number will be zero as an insert is creating in the db
+        # version number only increments as db repr changes
+        
+        expected_results = [[('dow',1),('lessontype',1),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1)],
+                            [('Tuesday',1),('wp',1),('lesson',1),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1)],
+                            [('Thursday',2),('wp',1),('lesson',1),('9:52-10:32',1),('0',1),('1',1),('ORIG',1),('ELA',1),('Galina',1),('9,9,9',1)]]
+
         values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
 
         # for inserts we cannot know the __timestamp, __id values so ignore last 2 system fields
-        # need to go back and do this properyl
-        #nonsystemvalues = [value[:-2] for value in values]
-            
-        #self.assertListEqual(nonsystemvalues, expected_results)
-        self.assertListEqual(values, expected_results)
+        
+        self.assertEqual(values[0][:-2], expected_results[0])
+        self.assertEqual(values[1][:-2], expected_results[1])  
+        self.assertListEqual(values[2][:-2], expected_results[2]) # no updates for row 2
+        
+    def test_update_queue_after_process_updates(self):
 
+        # should not change from before updates
+        
+        self.ui.process_updates(self.database)
+        
+        expected_results = [[('dow',1),('lessontype',1),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1)],
+                            [('Tuesday',1),('wp',1),('lesson',1),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1)],
+                            [('Thursday',2),('wp',1),('lesson',1),('9:52-10:32',1),('0',1),('1',1),('ORIG',1),('ELA',1),('Galina',1),('9,9,9',1)]]
+
+        values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
+
+        # for inserts we cannot know the __timestamp, __id values so ignore last 2 system fields
+        self.assertEqual(values[0][:-2], expected_results[0])
+        self.assertEqual(values[1][:-2], expected_results[1])  
+        self.assertListEqual(values[2][:-2], expected_results[2]) # no updates for row 2
 
     def test_last_widget_values(self):
         # checking the .current_value status
@@ -406,20 +430,20 @@ class Test_Load_Insert_Change_Save_Insert_Save(unittest.TestCase):
                         
     def test_update_queue(self):
         
-        expected_results = 0
-        #[[('dow',1), ('lessontype',1), ('objtype',1), ('period',1), ('saveversion',1), ('schedule',1), ('student',1),('subject',1), ('teacher',1),('userobjid',1)],
-        #                    [('Tuesday',1),('wp',1),('lesson',1),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1)],
-        #                    [('Thursday',1),('wp',1),('lesson',1),('9:52-10:32',1),('0',1),('1',1),('ORIG',1),('ELA',1),('Galina',1),('9,9,9',1)],
-        #                    [('Monday',1),('wp',1),('lesson',1),('9:52-10:32',1),('0',1),('1',1),('JAKE',1),('ELA',1),('Stan',1),('8,8,8',1)]]
+        expected_results = [[('dow',1),('lessontype',1),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1)],
+                            [('Tuesday',1),('wp',1),('lesson',1),('8:30-9:10',1),('0',1),('1',1),('COBY',1),('MATH',1),('Amelia',1),('1,5,4',1)],
+                            [('Thursday',1),('wp',1),('lesson',1),('9:52-10:32',1),('0',1),('1',1),('ORIG',1),('ELA',1),('Galina',1),('9,9,9',1)],
+                            [('Monday',1),('wp',1),('lesson',1),('9:52-10:32',1),('0',1),('1',1),('JAKE',1),('ELA',1),('Stan',1),('8,8,8',1)]]
         
         values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
 
         # for inserts we cannot know the __timestamp, __id values so ignore last 2 system fields
-        # need to go back and do this properyl
-        #nonsystemvalues = [value[:-2] for value in values]
-            
-        #self.assertListEqual(nonsystemvalues, expected_results)
-        self.assertEqual(values, expected_results)
+
+        self.assertEqual(values[0][:-2], expected_results[0])
+        self.assertEqual(values[1][:-2], expected_results[1])        
+        self.assertEqual(values[2][:-2], expected_results[2])
+        self.assertEqual(values[3][:-2], expected_results[3])
+        
 
     def test_last_widget_values(self):
         # checking the .current_value status
@@ -462,6 +486,7 @@ class Test_Load_Insert_Change_Save_Insert_Save(unittest.TestCase):
         #os.remove(self.tmpdbname+".sqlite")
         copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")        
         self.ui.destroy()
+
 
         
 class Test_Load_Insert(unittest.TestCase):        
@@ -706,33 +731,33 @@ class Test_Change_Column_of_Loaded_Rows(unittest.TestCase):
         self.database = Database(self.dbfilename)
         self.ui.entrygrid.widgets[0][1].sv.set('foobar')
 
-    '''def test_update_queue(self):
+    def test_update_queue(self):
         
-        expected_results = [['',('foobar',0)]]
+        expected_results =  [('dow',1),('foobar',2),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1)]
         
         values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
 
-        self.assertListEqual(values, expected_results)
+        self.assertListEqual(values[0][:-2], expected_results)
 
     def test_last_widget_values(self):
 
-        expected_results =  [('','dow'),('','lessontype'),  ('','objtype'), ('','period'), ('','saveversion'), ('','schedule'), ('','student'),('','subject'), ('','teacher'),('','userobjid'),('','__timestamp'),('','__id')]
+        expected_results =  [('dow','dow'),('lessontype','lessontype'),  ('objtype','objtype'), ('period','period'), ('saveversion','saveversion'), ('schedule','schedule'), ('student','student'),('subject','subject'), ('teacher','teacher'),('userobjid','userobjid'),('__timestamp','__timestamp'),('__id','__id')]
 
         values = self.ui.widget_current_values_get('entrygrid',0)
         
-        self.assertListEqual(values, expected_results)'''
+        self.assertListEqual(values, expected_results)
 
     def test_dbwrite(self):
         
         expected_results_coldefn = ['dow', 'foobar', 'objtype','period', 'saveversion', 'schedule', 'student', 'subject', 'teacher', 'userobjid', '__timestamp', '__id']
-        expected_results_rows = [['Tuesday','wp','lesson','8:30-9:10',0,1,'COBY','MATH','Amelia','1,5,4','19:43:01','049C2F17',None]]
+        expected_results_rows = ['Tuesday','wp','lesson','8:30-9:10',0,1,'COBY','MATH','Amelia','1,5,4']
         
         self.ui.process_updates(self.database)
         
         with self.database:
             colndefn,rows = tbl_rows_get(self.database,'lesson')  
            
-        self.assertListEqual(expected_results_rows,rows)
+        self.assertListEqual(expected_results_rows,rows[0][:-2])
         self.assertListEqual(expected_results_coldefn,colndefn)
         
         
@@ -760,17 +785,20 @@ class Test_Add_Column_of_Loaded_Rows(unittest.TestCase):
     def test_update_queue(self):
         
         # until save reload column name is actually in 2 places
-        expected_results = [['', '', '', '', '', '', '', '', '', '', '', '', ('foobar', 0)]]
+        expected_results = [('dow',1),('lessontype',1),('objtype',1),('period',1),('saveversion',1),('schedule',1),('student',1),('subject',1),('teacher',1),('userobjid',1),('__timestamp',1),('__id',1),('foobar',1)]
+        
+        #expected_results = [['', '', '', '', '', '', '', '', '', '', '', '', ('foobar', 0)]]
                 
         values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
 
-        self.assertListEqual(values, expected_results)
+        self.assertListEqual(values[0], expected_results)
 
     def test_last_widget_values(self):
         
         # ('','') not on the end as blank, blanks get suppressed by current_value_get
-        expected_results =  [('','dow'),('','lessontype'),  ('','objtype'), ('','period'), ('','saveversion'), ('','schedule'), ('','student'),('','subject'), ('','teacher'),('','userobjid'),('','__timestamp'),('','__id')]
-        
+        #expected_results =  [('dow','dow'),('','lessontype'),  ('','objtype'), ('','period'), ('','saveversion'), ('','schedule'), ('','student'),('','subject'), ('','teacher'),('','userobjid'),('','__timestamp'),('','__id')]
+        expected_results =  [('dow','dow'),('lessontype','lessontype'),  ('objtype','objtype'), ('period','period'), ('saveversion','saveversion'), ('schedule','schedule'), ('student','student'),('subject','subject'), ('teacher','teacher'),('userobjid','userobjid'),('__timestamp','__timestamp'),('__id','__id')]
+
         values = self.ui.widget_current_values_get('entrygrid',0)
 
         self.assertListEqual(values, expected_results)
@@ -836,10 +864,10 @@ if __name__ == "__main__":
     suite = unittest.TestSuite()
 
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Entry))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Entry))
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Clear_Load))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Clear_Load))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save))
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Save))

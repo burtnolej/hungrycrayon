@@ -1,6 +1,6 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
-from misc_utils_log import Singleton
+from misc_utils_log import Log, logger, Singleton
 from misc_utils import thisfuncname, os_file_to_list
 from time import sleep
 import unittest
@@ -188,8 +188,30 @@ class Test_Log_Multiple_Entries(unittest.TestCase):
         pid = os.getpid()
         self.assertEqual(self.log.stats[str(pid)]['func1']['no'],1000)
         self.log.log_clean()
-            
         
+class Test_Log_Names(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.logdir = "/tmp/log"
+        self.log = Log(verbosity=10,
+                       cacheflag=True,logdir="/tmp/log",
+                       pidlogname=True,proclogname=True,
+                       reset="")
+        
+        @logger(self.log)
+        def func1(*args,**kwargs):
+            return(100)
+        
+        self.func1  = func1
+        
+    def test_(self):
+        
+        logname = os.path.basename(self.log.logpath).split(".")
+        self.assertEquals(logname[1],'test_misc_utils_log')
+        
+        
+    
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
@@ -197,7 +219,7 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log_Multiple_Entries))
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Misc))
-    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Misc))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log_Names))
     
     unittest.TextTestRunner(verbosity=2).run(suite)

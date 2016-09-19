@@ -144,7 +144,6 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
     return(exec_str,result) 
 
 def tbl_rows_update(database,tbl_name,row):
-    print row
     ''' col_name is name of field to update. pkcol_name is the primary key
     values is a 4 x n grid; 1=field,2=fieldval,3=pkname,4=pkval'''
     exec_str = "UPDATE {table} SET {field}={value} WHERE {pkfield}={pkvalue}".format(table=tbl_name,
