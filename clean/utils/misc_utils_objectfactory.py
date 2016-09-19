@@ -1,8 +1,12 @@
 import sys
+sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
+from misc_utils_log import Log, logger
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
+          pidlogname=True,proclogname=False)
 
 import os
 from os import path as ospath
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
+from misc_utils import thisfuncname
 from misc_utils_generic import GenericBase
 from inspect import isclass
 import unittest
@@ -26,6 +30,7 @@ class ObjFactory(GenericBase):
         newclass = type(name, (cls,),{'__init__':__init__})
         return newclass         
                 
+    #@logger(log) 
     def new(self,basecls,clsname,**kwargs):
         
         cls = self._factory(clsname,basecls)
@@ -70,10 +75,10 @@ class ObjFactory(GenericBase):
 
             #newobj = getattr(sys.modules[self.modname],clsname)(objid,**kwargs)
             if newobj == "":
-                self.log.log(cls.__class__.__name__,3,"could not create an instance")
+                log.log(thisfuncname(),2,msg="could not create an instance")
             else:
                 self.store[clsname][kwargs['objid']] = newobj
-                self.log.log(newobj,3,"added obj="+newobj.__class__.__name__+" tag="+str(newobj)+" id="+newobj.id)
+                log.log(thisfuncname(),3,newobj=newobj)
 
         return(self.store[clsname][kwargs['objid']])
         

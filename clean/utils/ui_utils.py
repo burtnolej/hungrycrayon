@@ -167,11 +167,15 @@ def tkwidgetfactory(app,var,master,toplevel,**kwargs):
 
 class TkImageLabelGrid(Frame):
 
-    def __init__(self,master,gridname,var,width,height,x,y,maxrows,maxcols,
+    def __init__(self,*args,**kwargs):
+        self._createwidget(*args,**kwargs)
+        
+    @logger(log)
+    def _createwidget(self,master,gridname,var,width,height,x,y,maxrows,maxcols,
                  gridcfg=None,widgetcfg=None,
                  gridcolstart=0,gridrowstart=0,
                  rowhdrcfg={},colhdrcfg={}):
-
+    
         self.master = master # reference to ui root
         Frame.__init__(self,master)
         self.grid(row=0,column=0,sticky=NSEW)
@@ -179,7 +183,7 @@ class TkImageLabelGrid(Frame):
         canvas = Canvas(self)
         frame = Frame(canvas)
         frame.grid(row=0,column=0,sticky=NSEW)
-
+    
         vscrollbar = Scrollbar(self,orient="vertical",command=canvas.yview)
         vscrollbar.pack(side='right',fill='y')       
         canvas.configure(yscrollcommand=vscrollbar.set)
@@ -190,7 +194,7 @@ class TkImageLabelGrid(Frame):
     
         canvas.pack(side="left",fill="both",expand=True)
         canvas.create_window((2,2),window=frame,anchor="nw",tags="frame")
-
+    
         self.gridname = gridname
         
         self.current_yfocus=0
@@ -218,7 +222,7 @@ class TkImageLabelGrid(Frame):
         self.maxcols = maxcols
         
         self.label='foobar'
-
+    
         self.widgets=[]
         for x in range(self.maxrows):
             ylbls=[]
@@ -238,10 +242,10 @@ class TkImageLabelGrid(Frame):
             
         for i in range(self.gridrowstart,self.maxrows):        
             self.grid_rowconfigure(i, weight=1, uniform="foo")
-
+    
         if rowhdrcfg <> None: self.header_set(1,**rowhdrcfg)
         if colhdrcfg <> None: self.header_set(2,**colhdrcfg)   
-
+    
         self.focus(0,0)
         self.ic = ImageCreate()
         

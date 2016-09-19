@@ -2,6 +2,7 @@ import sys
 import os
 from os import path as ospath
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
+from shutil import copyfile
 
 from Tkinter import *
 from ttk import *
@@ -16,7 +17,7 @@ from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
 from database_util import Database
 from database_table_util import tbl_rows_get, tbl_query
 
-from sswizard_utils import dropdown_build, setenums
+from sswizard_utils import dropdown_build, setenums, session_code_gen
             
 def _execfunc(database,value):
     exec_str = "select code from session where period = {0} and subject <> \"None\"".format(value)
@@ -220,14 +221,38 @@ class Test_GetEnums(unittest.TestCase):
         
         self.assertEqual(expected_results,self.enums['student']['name2code'])
 
-    
+class Test_GetSessionCodes(unittest.TestCase):
+    def setUp(self):
+        self.dbfilename = 'test_sswizard_utils'
+        self.database = Database(self.dbfilename)
+        
+    def test_(self):
+        session_code_gen(self.dbfilename)
+        
+        exec_str = "select distinct code from session "
+        exec_str += " where subject = \"Humanities\""
+        exec_str += " and teacher = \"Danielle\""
+        
+        with self.database:
+            colnames,rows = tbl_query(self.database,exec_str)
+
+        print rows
+        
+        self.assertEqual(rows,[['DA.AC.HU']])
+        
+    def tearDown(self):
+        #copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")
+        pass
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetEnums))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetEnums))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetSessionCodes))
 
+    
     
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

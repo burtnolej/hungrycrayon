@@ -410,5 +410,5 @@ class DBTableUI(Tk):
     
 if __name__ == "__main__":
         
-    app = DBTableUI(maxentryrows=60)
+    app = DBTableUI(maxentryrows=260, maxnewrowrows=10)
     app.mainloop()

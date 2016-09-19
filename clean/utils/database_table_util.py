@@ -1,6 +1,10 @@
 import sqlite3
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
+from misc_utils_log import Log, logger
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
+          pidlogname=True,proclogname=False)
+
 from misc_utils_enum import enum
 from database_util import schema_data_get, db_enum, Database, \
      tbl_create, tbl_exists, tbl_remove, tbl_rename
@@ -103,6 +107,7 @@ class dbtblgeneric(GenericBase):
 	if self.tbl_name == None:
 	    self.tbl_name_get()
 	    
+    @logger(log)
     def persist(self,createtable=True):
 
 	self._metadata_set()
@@ -143,7 +148,8 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
 
     return(exec_str,result) 
 
-def tbl_rows_update(database,tbl_name,row):
+@logger(log)
+def tbl_rows_update(database,tbl_name,row,dryrun=False):
     ''' col_name is name of field to update. pkcol_name is the primary key
     values is a 4 x n grid; 1=field,2=fieldval,3=pkname,4=pkval'''
     exec_str = "UPDATE {table} SET {field}={value} WHERE {pkfield}={pkvalue}".format(table=tbl_name,
@@ -152,11 +158,13 @@ def tbl_rows_update(database,tbl_name,row):
                                                                                      pkfield=row[2],
                                                                                      pkvalue=row[3])
     
-
-    result = database.execute(exec_str)
     
-    return(exec_str,result) 
+    if dryrun==False:
+	result = database.execute(exec_str)
+	return(exec_str,result) 
+    return(exec_str)
 
+@logger(log)
 def tbl_query(database,exec_str):
     
     #print exec_str
@@ -165,7 +173,8 @@ def tbl_query(database,exec_str):
     
     keys = [description[0] for description in database.description()]
     return(keys,results)    
-    
+
+@logger(log)
 def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
     
     
@@ -179,7 +188,7 @@ def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
     if whereclause <> None:
 	exec_str = exec_str + " where {0} = {1}".format(whereclause[0],
 	                                               whereclause[1])
-	
+    
     results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]
@@ -202,6 +211,7 @@ def tbl_cols_get(database,tbl_name):
     return([(row[db_enum.s3_col_attrib.column_name], row[db_enum.s3_col_attrib.data_type])
             for row in sql_result])
 
+@logger(log)
 def tbl_col_add(database,tbl_name,col_name,col_type="TEXT"):
 
     exec_str = "ALTER TABLE {table} ADD COLUMN '{column}' {column_type}".format(table=tbl_name,\
@@ -225,7 +235,7 @@ def _quotestrs(rows):
 	    	int(field)
 		newrow.append(field)
 	    except:
-		newrow.append("'"+field+"'")
+		newrow.append("'"+str(field)+"'")
 	newrows.append(newrow)
     return(newrows)
 	
@@ -243,6 +253,12 @@ def tbl_col_update(database,tbl_name,old_col_name,new_col_name):
 	else:
 	    new_col_defn.append((colname,coltype))
 	    
+    # try to drop tmp table in case left behind from prev run
+    try:
+	tbl_remove(database,tbl_name+"_new")
+    except:
+	pass
+    
     tbl_create(database,
                tbl_name+"_new",
                new_col_defn)

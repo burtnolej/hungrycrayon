@@ -2,6 +2,10 @@
 import sqlite3
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
+from misc_utils_log import Log, logger
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
+          pidlogname=True,proclogname=False)
+
 from xml_utils import element_find_tags,element_find_children
 
 from misc_utils import os_file_exists
@@ -141,6 +145,7 @@ def tbl_rename(database,tbl_name,new_tbl_name):
     sql_result = database.execute(sql_str)
     return(sql_result) 
     
+@logger(log)
 def tbl_create(database,tbl_name,col_defn,tbl_pk_defn=[]):
     
     '''purpose: create a table in the database; create index if specificied

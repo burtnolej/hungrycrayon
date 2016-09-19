@@ -1,14 +1,16 @@
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
+from misc_utils_log import Log, logger
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
+          pidlogname=True,proclogname=False)
 
 from misc_utils_process import *
 from misc_utils_enum import enum
-from misc_utils import nxnarraycreate
+from misc_utils import nxnarraycreate, thisfuncname
 
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 
-from misc_utils import Log
 from misc_utils_objectfactory import ObjFactory
 
 import sswizard_utils
@@ -25,13 +27,10 @@ import tkFont
 import unittest
 
 
-
-log = Log()
-
 controlpanelconfig = dict(height=300,width=200,x=100,y=100)
 
 def _execfunc(database,value):
-    exec_str = "select tag from session where period = {0} and subject <> \"None\"".format(value)
+    exec_str = "select code from session where period = {0} and subject <> \"None\"".format(value)
     return(tbl_query(database,exec_str))
 
 def _rowheaderexecfunc(database):
@@ -81,13 +80,17 @@ class schoolschedgeneric(dbtblgeneric):
         return(self.objid)
 
 class WizardUI(Tk):
-    def __init__(self,database,of):
+    #def __init__(self,database,of):
+    def __init__(self,dbname,of,maxentrycols=3,maxentryrows=4,
+                 maxnewrowcols=3,maxnewrowrows=3):
         
         Tk.__init__(self)
         
-        self.enums = sswizard_utils.setenums('All','3','quadref')
+        self.enums = sswizard_utils.setenums('All','5','quadref')
         
-        self.database = database
+        self.dbname = dbname
+        
+        self.database = Database(self.dbname)
         self.of = of
 
         self.refdatabase = Database('quadref')
@@ -99,8 +102,8 @@ class WizardUI(Tk):
         # the name is likely to be the tkwidgetid.x,y
         self.updates = OrderedDict()    
 
-        self.maxrows=14 # rows in the grid
-        self.maxcols=20 # cols in the grid
+        self.maxrows=maxentryrows # rows in the grid
+        self.maxcols=maxentrycols # cols in the grid
         maxwidgets=self.maxrows*self.maxcols
         wwidth=48 # default button width with text of 3 chars
         wheight=29 # default button height
@@ -162,8 +165,8 @@ class WizardUI(Tk):
         # default combolist values is student
 
         #dbsetmember = DBSetMember('quadref','classes','
-        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['students'])
-        widget_args=dict(background='white',width=7,values=self.enums['students'])
+        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['student'])
+        widget_args=dict(background='white',width=7,values=self.enums['student'])
         
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,
                                    widget_args)
@@ -238,8 +241,12 @@ class WizardUI(Tk):
         self.dbname_entry_sv.set('htmlparser')
         
 
-        self.bgmaxrows=len(self.enums['period'])+1
-        self.bgmaxcols=len(self.enums['students'])+1 
+        self.bgmaxrows=len(self.enums['period']['name'])+1
+        self.bgmaxcols=len(self.enums['student']['name'])+1 
+        
+        widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,
+                                   widget_args)
+        
         mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
         self.balancegrid = TkImageLabelGrid(self,'balancegrid',
@@ -258,36 +265,30 @@ class WizardUI(Tk):
          
     def update_callback(self,widget,new_value):
         sswizard_utils.update_callback(self,widget,new_value)
-         
-    '''def update_callback(self,widget,new_value):        
-        #via BaseTk class; all entry widgets assign a callback to the change event
-        #to call this function if it exists
-        widget.current_value = new_value
 
-        if str(widget.current_value) <> str(widget.init_value):
-                        
-            widget.config(foreground='red')
-        else:
-            widget.config(foreground='black')
-            
-        self.updates[str(widget.winfo_name())] = new_value'''
             
     def _draw_balancegrid_labels(self):
-        
-        for x in range(len(self.enums['period'])+1):
-            self.balancegrid.widgets[x][0].sv.set(self.enums['period'][x-1])
+        for name,enum in self.enums['period']['name2enum'].iteritems():
+            self.balancegrid.widgets[enum][0].sv.set(str(name))
             
-        for y in range(1,len(self.enums['students'])+1):
-            self.balancegrid.widgets[0][y].sv.set(self.enums['students'][y-1])
-        
+        for name,enum in self.enums['student']['name2enum'].iteritems():
+            self.balancegrid.widgets[0][enum].sv.set(str(name))
+       
+    @logger(log)    
     def save(self,saveversion=None):
 
         self.of.reset()
         self.clear(1,1,'balancegrid')
         
+        if self.dbname <> self.dbname_entry_sv.get():
+            log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
+            self.database = Database(self.dbname_entry_sv.get())
+            self.dbname = self.dbname_entry_sv.get()
+        
         if saveversion==None:
             saveversion = str(self._lastsaveversion_get()+1)
-            log.log(self,3,"saving save version=",str(saveversion))
+            #log.log(self,3,"saving save version=",str(saveversion))
+            log.log(thisfuncname(),3,msg="saving save version=",saveversion=str(saveversion))
             
         #if saveversion == None:
         #    saveversion=str(self.lastsaveversion)
@@ -298,35 +299,37 @@ class WizardUI(Tk):
             for y in range(1,self.maxcols):
                 xlabel=self.entrygrid.widgets[0][y].sv.get()
                 
-                value =  self.entrygrid.widgets[x][y].sv.get()
+                session =  self.entrygrid.widgets[x][y].sv.get()
                 
-                if value <> "":
+                if session <> "":
+                    
+                    period_enum = x
+                    student_enum = y
+                    session_enum = self.enums['session']['name2enum'][session]
 
-                    # get the actual row and column number from the enum_maps
-                    # add one to account for the origin
-                    '''x = period_enum = period_map[ylabel]+1
-                    y = student_enum = student_map[value]+1
-                    z = teacher_enum = teacher_map[xlabel]+1'''
-                    
-                    x = period_enum = self.enums['enums'][ylabel]+1
-                    y = student_enum = self.maps['students'][xlabel]+1
-                    z = session_enum = self.maps['session'][value]+1
-                    
-                    obj_id = ",".join(map(str,[x,y,z]))
+                    obj_id = ",".join(map(str,[period_enum,student_enum,session_enum]))
 
-                    teacher_code,lessontype_code,subject_code = value.split(".")
+                    teacher_code,lessontype_code,subject_code = session.split(".")
                     
+                    # get the column and row headers associated with this cell
+                    student = self.entrygrid.widgets[0][y].sv.get()
+                    student = self.entrygrid.widgets[x][0].sv.get()
+
+                    teacher = self.enums['adult']['code2enum'][teacher_code]
+                    lessontype = self.enums['lessontype']['code2enum'][lessontype_code]
+                    subject = self.enums['subject']['code2enum'][subject_code]
+                                                               
                     datamembers = dict(schedule = '1',
                                        dow='Tuesday', 
                                        subject=subject,
-                                       lessontype="wp",
+                                       lessontype=lessontype,
                                        objtype='lesson',
                                        userobjid=obj_id, # unique key to store obj in of
                                        period=ylabel,
                                        student=xlabel,
                                        teacher=teacher,
                                        saveversion=saveversion,
-                                       tag=value)
+                                       session=session)
                     
                     self.of.new(schoolschedgeneric,
                                 'lesson',
@@ -355,20 +358,21 @@ class WizardUI(Tk):
 
     def student_totals_calc(self):
         
-        for student in range(1,len(self.enums['students'])+1):
+        
+        for sname,y in self.enums['student']['name2enum'].iteritems():
             student_full = True
-            for x in range(len(self.enums['period'])+1):
-                current_value = self.balancegrid.widgets[x][student].cget("text")
+            for pname,x in self.enums['period']['name2enum'].iteritems():
+                current_value = self.balancegrid.widgets[x][y].cget("text")
                 if current_value == "":
                     student_full=False
                     
-                # for now force foreground back to black as default
-                # in TkBase makes in 'red' on change
-                self.balancegrid.widgets[x][student].config(foreground='black')
+                self.balancegrid.widgets[x][y].config(foreground='black')
                 
             if student_full == True:
-                self.balancegrid.widgets[0][student].config(background='green')
-            
+                self.balancegrid.widgets[0][y].config(background='green')
+
+    
+    @logger(log)   
     def focus_next_widget(self,event):
         if str(event.widget)[-3:] == "svb":
             self.entrygrid.focus()
@@ -376,6 +380,7 @@ class WizardUI(Tk):
             self.save_button.focus_set()
         return("break")
     
+    @logger(log)
     def _clear_grid(self,gridname,firstrow,firstcol):
         grid = getattr(self,gridname)
         
@@ -387,8 +392,8 @@ class WizardUI(Tk):
                 grid.widgets[x][y].init_value = ""
                 grid.widgets[x][y].current_value = ""
                 grid.widgets[x][y].version = 0
-                
-
+                    
+    @logger(log)     
     def clear(self,firstrow=0,firstcol=0,gridname=None):
         if gridname == None:
             self._clear_grid('entrygrid',firstrow,firstcol)
@@ -397,30 +402,25 @@ class WizardUI(Tk):
             self._clear_grid(gridname,firstrow,firstcol)
         
         self.updates={}
-        
-    '''def clear(self):
-        
-        for x in range(self.maxrows):
-            for y in range(self.maxcols):
-                self.entrygrid.widgets[x][y].sv.set("")
-        
-        for x in range(self.bgmaxrows):
-            for y in range(self.bgmaxcols):
-                self.balancegrid.widgets[x][y].config(text="")    
-                self.balancegrid.widgets[x][y].config(background="white") '''
 
     def load_save(self,saveversion=None):
         self.load()
         #self.load(saveversion)
         self.save()
         
+    @logger(log)       
     def load(self,saveversion=None,values=None):
+        
+        if self.dbname <> self.dbname_entry_sv.get():
+            log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
+            self.database = Database(self.dbname_entry_sv.get())
+            self.dbname = self.dbname_entry_sv.get()
         
         if saveversion==None:
             saveversion = self._lastsaveversion_get()
-            log.log(self,3,"loading last save version=",str(saveversion))
+            log.log(thisfuncname(),3,msg="loading last save version",saveversion=str(saveversion))
         
-        cols = ['period','student','tag','dow']
+        cols = ['period','student','session','dow']
         
         if values==None:
             with self.database:
@@ -428,18 +428,17 @@ class WizardUI(Tk):
                                     ('saveversion',saveversion))
             
             for row in rows:
-                x = period_enum = self.maps['period'][row[cols.index('period')]]+1
-                y = student_enum = self.maps['students'][row[cols.index('student')]]+1
-                z = class_enum = self.maps['session'][row[cols.index('tag')]]+1
-    
-                '''x = period_map[]
-                y = teacher_map[row[cols.index('teacher')]]
-                v = student_map[row[cols.index('student')]]'''
-
-                self.entrygrid.widgets[x+1][y+1].sv.set(row[cols.index('tag')])
                 
-                self.entrygrid.widgets[0][y+1].sv.set(row[cols.index('student')])
-                self.entrygrid.widgets[x+1][0].sv.set(row[cols.index('period')])
+                z = session =  row[cols.index('session')]
+                period =  row[cols.index('period')]
+                student =  row[cols.index('student')]
+                
+                x = self.enums['period']['name2enum'][str(period)]
+                y = self.enums['student']['name2enum'][student]
+
+                self.entrygrid.widgets[x+1][y+1].sv.set(session)
+                self.entrygrid.widgets[0][y+1].sv.set(student)
+                self.entrygrid.widgets[x+1][0].sv.set(period)
         else:
                 
             for x in range(len(values)):
@@ -450,9 +449,11 @@ class WizardUI(Tk):
         
         return(sswizard_utils.updates_get(self,gridname,ignoreaxes))
         
+    @logger(log)
     def persist(self):
         with self.database:
             for obj in self.of.object_iter():
+                log.log(thisfuncname(),9,msg="persisting of obj",objid=obj.userobjid)
                 obj.persist()
                 
     def _lastsaveversion_get(self):
@@ -468,7 +469,7 @@ class WizardUI(Tk):
 if __name__ == "__main__":
     #master = Tk()
     
-    database = Database('htmlparser')
+    
     of = ObjFactory(True)
-    app = WizardUI(database,of)
+    app = WizardUI('htmlparser',of,maxentrycols=10,maxentryrows=10)
     app.mainloop()

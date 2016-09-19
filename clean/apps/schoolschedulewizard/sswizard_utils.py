@@ -1,10 +1,11 @@
 from misc_utils import nxnarraycreate
 
-from database_table_util import tbl_query
+from database_table_util import tbl_query, tbl_rows_update
 from database_util import Database
 from collections import OrderedDict
 from misc_utils_log import Log, logger
 from misc_utils import thisfuncname
+from shutil import copyfile
 
 log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
 
@@ -152,6 +153,9 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     # explicit loop as OrderedDict only keeps order when items are added after initialization
     name2code = OrderedDict()
     for k,v in values:
+        if v == 'None':
+            log.log(thisfuncname(),1,msg="none value detected",tblname=tblname,key=str(k))
+ 
         name2code[k] = v
     
     # unknown/none is represented with '??'
@@ -162,7 +166,9 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     enums[tblname]['name2enum'] = dict((value,enum) for enum,value in enumerate(name2code.keys()))
     enums[tblname]['code2enum'] = dict((value,enum) for enum,value in enumerate(name2code.values()))
     enums[tblname]['name'] = enums[tblname]['name2code'].keys()
-    enums[tblname]['code'] = enums[tblname]['name2code'].values()            
+    enums[tblname]['code'] = enums[tblname]['name2code'].values()
+    
+    log.log(thisfuncname(),3,msg="created enums",tblname=tblname,names=enums[tblname]['name'])
             
 def setenums(dow,prep,dbname):
 
@@ -170,8 +176,14 @@ def setenums(dow,prep,dbname):
     
     getdbenum(enums,dbname,'name','period')
     #getdbenum(enums,dbname,'name','period')
-    getdbenum(enums,dbname,'name','student','prep',prep)
-    getdbenum(enums,dbname,'name','adult','prep',prep)
+    
+    if prep <> "-1":
+        getdbenum(enums,dbname,'name','student','prep',prep)
+        getdbenum(enums,dbname,'name','adult','prep',prep)
+    else:
+        getdbenum(enums,dbname,'name','student')
+        getdbenum(enums,dbname,'name','adult')
+        
     getdbenum(enums,dbname,'code','session')
     getdbenum(enums,dbname,'name','lessontype')
     getdbenum(enums,dbname,'name','subject')
@@ -186,3 +198,57 @@ def sessiontagtoid(tag,enums):
     lessontype_enum = enums['teacher'][lessontype_code]
     subject_enum = enums['subject'][subject_code]
     
+def session_code_gen(dbname):
+    
+    database = Database(dbname)
+    
+    exec_str =  "select s.name,lt.code || '.' || s.code"
+    exec_str += " from subject as s,lessontype as lt"
+    exec_str += " where s.lessontype = lt.name"
+    
+    with database:
+        colnames,rows = tbl_query(database,exec_str)
+    
+    subject_lookup = dict((row[0],row[1]) for row in rows)
+    
+    exec_str = "select teacher,subject,__id,code from session"
+    
+    with database:
+        colnames,rows = tbl_query(database,exec_str)
+    
+    enums = setenums('All','-1',dbname)
+    
+    for row in rows:
+        teacher = row[0]
+        subject = row[1]
+        __id = row[2]
+        oldcode = row[3]
+        
+        try:
+            if teacher == None:
+                teacher_code = "??"
+                
+            if subject == None:
+                subject_code = "??.??"  
+            elif subject_lookup.has_key(subject) == False:
+                subject_code = "??.??"
+            else:
+                subject_code =subject_lookup[subject]
+                
+            teacher_code = enums['adult']['name2code'][teacher]
+            session_code = ".".join([teacher_code,subject_code,])
+            
+            with database:
+                exec_str,_ = tbl_rows_update(database,'session',
+                                  ['code',"\""+session_code+"\"",'__id',"\""+__id+"\""],
+                                  dryrun=False),
+                log.log(thisfuncname(),4,msg="session code updated",execstr=exec_str,oldcode=oldcode)
+        
+        except Exception, e:
+            print row,"failed", e
+    
+
+    
+if __name__ == "__main__":
+    
+    session_code_gen('quadref')
