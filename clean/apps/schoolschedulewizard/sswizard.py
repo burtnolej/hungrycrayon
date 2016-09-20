@@ -14,6 +14,7 @@ from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 from misc_utils_objectfactory import ObjFactory
 
 import sswizard_utils
+from sswizard_query_utils import *
 
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
@@ -28,20 +29,6 @@ import unittest
 
 
 controlpanelconfig = dict(height=300,width=200,x=100,y=100)
-
-def _execfunc(database,value):
-    exec_str = "select code from session where period = {0} and subject <> \"None\"".format(value)
-    return(tbl_query(database,exec_str))
-
-def _rowheaderexecfunc(database):
-    exec_str = "select name from period"
-    return(tbl_query(database,exec_str))
-
-def _columnheaderexecfunc(database,pred=None,predvalue=None):
-    exec_str = "select name from student"
-    if pred <> None:
-        exec_str = exec_str + " where {0} = {1}".format(pred,predval)
-    return(tbl_query(database,exec_str))
 
 class schoolschedgeneric(dbtblgeneric):
 
@@ -94,6 +81,7 @@ class WizardUI(Tk):
         self.of = of
 
         self.refdatabase = Database('quadref')
+        font = tkFont.Font(family="monospace", size=12) 
         
         self.lastsaveversion=0
 
@@ -166,7 +154,10 @@ class WizardUI(Tk):
 
         #dbsetmember = DBSetMember('quadref','classes','
         setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['student'])
-        widget_args=dict(background='white',width=7,values=self.enums['student'])
+        widget_args=dict(background='white',
+                         width=9,
+                         font=font,
+                         values=self.enums['student'])
         
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,
                                    widget_args)
@@ -174,8 +165,9 @@ class WizardUI(Tk):
         widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,
                                                   widgetcfg,
                                                   _execfunc,
-                                                  _rowheaderexecfunc,
-                                                  _columnheaderexecfunc)
+                                                  5,
+                                                  _columnheaderexecfunc,
+                                                  _rowheaderexecfunc)
 
         '''# column headers are teacher
         setmemberp = SetMemberPartial(name='x{mylist}',set=teacher_enum)
@@ -194,12 +186,12 @@ class WizardUI(Tk):
         self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,
                                           wmwidth,wmheight,    
                                           0,0,self.maxrows,self.maxcols,
-                                          {},widgetcfg)
+                                          False,{},widgetcfg)
 
         self.entrygrid.grid(row=1,column=0,sticky=NSEW)
         
         controlpanel = Frame(self)
-        controlpanel.grid(row=2,sticky=NSEW)
+        controlpanel.grid(row=2,sticky=NSEW,columnspan=2)
         
         self.save_button = Button(controlpanel,command=self.save,text="save",name="svb")
         self.save_button.grid(row=2,column=0)
@@ -240,6 +232,9 @@ class WizardUI(Tk):
         self.dbname_entry.focus_get()
         self.dbname_entry_sv.set('htmlparser')
         
+        self.pagedown_button = Button(controlpanel,command=self.pagedown,text="pgdwn",name="pgdwn")
+        self.pagedown_button.grid(row=2,column=9)
+        self.pagedown_button.focus_get()
 
         self.bgmaxrows=len(self.enums['period']['name'])+1
         self.bgmaxcols=len(self.enums['student']['name'])+1 
@@ -263,6 +258,9 @@ class WizardUI(Tk):
         self.grid_columnconfigure(0, weight=1, uniform="foo")
          
          
+    def pagedown(self):
+        self.ui.canvas.yview()
+        
     def update_callback(self,widget,new_value):
         sswizard_utils.update_callback(self,widget,new_value)
 
@@ -294,10 +292,10 @@ class WizardUI(Tk):
         #    saveversion=str(self.lastsaveversion)
             
         for x in range(1,self.maxrows):
-            ylabel=self.entrygrid.widgets[x][0].sv.get()
+            student=self.entrygrid.widgets[x][0].sv.get()
             
             for y in range(1,self.maxcols):
-                xlabel=self.entrygrid.widgets[0][y].sv.get()
+                period=self.entrygrid.widgets[0][y].sv.get()
                 
                 session =  self.entrygrid.widgets[x][y].sv.get()
                 
@@ -312,8 +310,8 @@ class WizardUI(Tk):
                     teacher_code,lessontype_code,subject_code = session.split(".")
                     
                     # get the column and row headers associated with this cell
-                    student = self.entrygrid.widgets[0][y].sv.get()
-                    student = self.entrygrid.widgets[x][0].sv.get()
+                    #student = self.entrygrid.widgets[0][y].sv.get()
+                    #period = self.entrygrid.widgets[x][0].sv.get()
 
                     teacher = self.enums['adult']['code2enum'][teacher_code]
                     lessontype = self.enums['lessontype']['code2enum'][lessontype_code]
@@ -325,8 +323,8 @@ class WizardUI(Tk):
                                        lessontype=lessontype,
                                        objtype='lesson',
                                        userobjid=obj_id, # unique key to store obj in of
-                                       period=ylabel,
-                                       student=xlabel,
+                                       period=period,
+                                       student=student,
                                        teacher=teacher,
                                        saveversion=saveversion,
                                        session=session)
@@ -341,13 +339,13 @@ class WizardUI(Tk):
                                 dm=datamembers)
 
                     current_value = self.balancegrid.widgets[x][y].cget("text")
-                    if current_value == xlabel:
+                    if current_value == period:
                         pass
                     elif current_value == "":
                         self.balancegrid.widgets[x][y].config(background='lightgreen')
-                        self.balancegrid.widgets[x][y].sv.set(xlabel)
+                        self.balancegrid.widgets[x][y].sv.set(period)
                     else:
-                        self.balancegrid.widgets[x][y].sv.set(current_value+","+xlabel)
+                        self.balancegrid.widgets[x][y].sv.set(current_value+","+period)
                         self.balancegrid.widgets[x][y].config(background='red')
                     
         self.student_totals_calc()        
@@ -433,12 +431,14 @@ class WizardUI(Tk):
                 period =  row[cols.index('period')]
                 student =  row[cols.index('student')]
                 
-                x = self.enums['period']['name2enum'][str(period)]
-                y = self.enums['student']['name2enum'][student]
+                x = self.enums['student']['name2enum'][student]
+                y = self.enums['period']['name2enum'][str(period)]
 
                 self.entrygrid.widgets[x+1][y+1].sv.set(session)
-                self.entrygrid.widgets[0][y+1].sv.set(student)
-                self.entrygrid.widgets[x+1][0].sv.set(period)
+                self.entrygrid.widgets[0][y+1].sv.set(period)
+                self.entrygrid.widgets[x+1][0].sv.set(student)
+                
+                log.log(thisfuncname(),3,msg="loading row",period=period,student=str(student),x=x,y=y,value=z)
         else:
                 
             for x in range(len(values)):
@@ -471,5 +471,5 @@ if __name__ == "__main__":
     
     
     of = ObjFactory(True)
-    app = WizardUI('htmlparser',of,maxentrycols=10,maxentryrows=10)
+    app = WizardUI('htmlparser',of,maxentrycols=12,maxentryrows=12)
     app.mainloop()

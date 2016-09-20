@@ -4,7 +4,8 @@ from misc_utils_log import Log, logger
 log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
           pidlogname=True,proclogname=False)
 
-from type_utils import SetMemberPartial, DBSetMember, TextAlphaNum
+from type_utils import SetMemberPartial, DBSetMember, TextAlphaNum, \
+     TextAlphaNumRO
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 from misc_utils import nxnarraycreate, thisfuncname
 
@@ -58,25 +59,49 @@ class DBTableUI(Tk):
         self.bind("<Prior>",self.focus_next_widget)
         self.grid()
 
-        font = tkFont.Font(family="monospace", size=18)  
+        font = tkFont.Font(family="monospace", size=8)  
+
+        # entry grid y label
+        ylbl_widget_args=dict(width=10,font=font)
+        ylbl_widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,ylbl_widget_args)
         
+        mytextalphanumro = TextAlphaNum(name='textalphanum')
+        self.entrygridylabel = TkImageLabelGrid(self,'entrygridylbl',mytextalphanumro,2,wmheight,
+                                                0,0,1,self.maxcols,False,{},ylbl_widgetcfg)
+        self.entrygridylabel.grid(row=0,column=1,sticky=EW)
+        
+        for i in range(self.maxcols):
+            self.entrygridylabel.widgets[0][i].sv.set(i+1)
+            self.entrygridylabel.widgets[0][i]['style'] = 'InFocus.Label.TEntry'
+         
+
+        # entry grid x label
+        xlbl_widget_args=dict(width=10,font=font)
+        xlbl_widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,xlbl_widget_args)
+        
+        mytextalphanumro = TextAlphaNum(name='textalphanum')
+        self.entrygridxlabel = TkImageLabelGrid(self,'entrygridxlbl',mytextalphanumro,2,wmheight,
+                                                0,0,self.maxrows,1,False,{},xlbl_widgetcfg)
+        self.entrygridxlabel.grid(row=0,column=0,rowspan=4,sticky=NS)
+        
+        for i in range(self.maxrows):
+            if i <> 0:
+                self.entrygridxlabel.widgets[i][0].sv.set(i+1)
+                self.entrygridxlabel.widgets[i][0]['style'] = 'InFocus.Label.TEntry'
+         
+   
+        # entry grid
         widget_args=dict(background='white',width=10,font=font)
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-        
-        #rowcfg = dict(height=2,width=2,text="x")
-        #colcfg = dict(height=2,width=2,text="y")
 
         mytextalphanum = TextAlphaNum(name='textalphanum')
-
-        #self.entrygrid = TkImageLabelGrid(self.master,mytextalphanum,wmwidth,wmheight,
         self.entrygrid = TkImageLabelGrid(self,'entrygrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxrows,self.maxcols,
-                             {},widgetcfg)
-                             #{},widgetcfg,1,1,rowcfg,colcfg)
-        self.entrygrid.grid(row=0,sticky=NSEW)
-
+                             True,{},widgetcfg)
+        self.entrygrid.grid(row=1,column=1,rowspan=2,sticky=NSEW)
+        
         controlpanel = Frame(self)
-        controlpanel.grid(row=1,sticky=NSEW)
+        controlpanel.grid(row=2,column=2,sticky=NSEW)
                 
         self.dbname_label = Label(controlpanel,text="database")
         self.dbname_label.grid(column=0,row=0,sticky=NSEW)
@@ -118,11 +143,20 @@ class DBTableUI(Tk):
         self.pk_entry.focus_get()
         self.pk_entry_sv.set("__id")
   
+        self.scrolldelta_label = Label(controlpanel,text="pk")
+        self.scrolldelta_label.grid(column=7,row=0,sticky=NSEW)
+        self.scrolldelta_label.focus_get()
+        
+        self.scrolldelta_label_entry_sv = StringVar()
+        self.scrolldelta_label_entry = Entry(controlpanel,textvariable=self.pk_entry_sv)
+        self.scrolldelta_label_entry.grid(column=8,row=0,sticky=NSEW)
+        self.scrolldelta_label_entry.focus_get()
+        self.scrolldelta_label_entry_sv.set(10)
 
         self.dbload_button = Button(controlpanel,command=self.load,text="dbload",name="dbl")
         self.dbload_button.grid(column=0,row=1,columnspan=1,sticky=NSEW)
         self.dbload_button.focus_get()
-
+        
         self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
         self.clear_button.grid(column=2,row=1,columnspan=1,sticky=NSEW)
         self.clear_button.focus_get()
@@ -138,21 +172,77 @@ class DBTableUI(Tk):
         self.clone_button = Button(controlpanel,command=self.clone,text="clone",name="cln")
         self.clone_button.grid(column=5,row=1,columnspan=1,sticky=NSEW)
         self.clone_button.focus_get()
+
+        self.pagedown_button = Button(controlpanel,
+                                      command=lambda: self.pagescroll('down'),
+                                      text="D",name="pgd")
+        self.pagedown_button.grid(row=2,column=0)
+        self.pagedown_button.focus_get()
+        
+        self.pageup_button = Button(controlpanel,
+                                      command=lambda: self.pagescroll('up'),
+                                      text="U",name="pgu")
+        
+        self.pageup_button.grid(row=2,column=1)
+        self.pageup_button.focus_get()
+        
+        self.pageleft_button = Button(controlpanel,
+                                      width=2,
+                                      command=lambda: self.pagescroll('left'),
+                                      text="L",name="pgl")
+        self.pageleft_button.grid(row=2,column=2)
+        self.pageleft_button.focus_get()
+        
+        self.pageright_button = Button(controlpanel,
+                                      width=2,
+                                      command=lambda: self.pagescroll('right'),
+                                      text="R",name="pgr")
+        self.pageright_button.grid(row=2,column=3)
+        self.pageright_button.focus_get()
         
         self.maxnewrows=maxnewrowrows
         self.newrowgrid = TkImageLabelGrid(self,'newrowgrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxnewrows,self.maxcols,
-                             {},widgetcfg)
+                             True,{},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)
         #self.newrowgrid.grid(row=2,sticky=NSEW)
-        self.newrowgrid.grid(row=0,column=1,sticky=NSEW)
+        self.newrowgrid.grid(row=1,column=2,sticky=NSEW)
                 
         self.grid_columnconfigure(0, weight=1, uniform="foo")
+        self.grid_columnconfigure(1, weight=15, uniform="foo")
+        self.grid_columnconfigure(2, weight=15, uniform="foo")
+        
         self.grid_rowconfigure(0, weight=1, uniform="foo")
-        self.grid_columnconfigure(1, weight=1, uniform="foo2")
+        self.grid_rowconfigure(1, weight=15, uniform="foo")
+        self.grid_rowconfigure(2, weight=15, uniform="foo")
+        
         #self.grid_rowconfigure(2, weight=1, uniform="foo")
           
+    def pagescroll(self,direction):
+        delta = int(self.scrolldelta_label_entry_sv.get())
+        invdelta = int(delta*-1)
+        
+        if direction == "down":
+            self.entrygrid.canvas.yview("scroll",delta,"units")
+            self.entrygridxlabel.canvas.yview("scroll",delta,"units")
+        elif direction == "up":
+            self.entrygrid.canvas.yview("scroll",invdelta,"units")
+            self.entrygridxlabel.canvas.yview("scroll",invdelta,"units")
+        elif direction == "left":
+            self.entrygrid.canvas.xview("scroll",invdelta,"units")
+            self.entrygridylabel.canvas.xview("scroll",invdelta,"units")
+        elif direction == "right":
+            self.entrygrid.canvas.xview("scroll",delta,"units")
+            self.entrygridylabel.canvas.xview("scroll",delta,"units")
+            
+        #self.entrygridxlabel.canvas.yview("scroll",10,"units")
+        #self.entrygridxlabel.canvas.xview("scroll",10,"units")
 
+        
+    def pagedown(self):
+        self.entrygrid.canvas.yview("scroll",10,"units")
+
+        
     @logger(log)            
     def widget_current_values_get(self,gridname,rownum):
         return sswizard_utils.widget_current_values_get(self,gridname,rownum)
@@ -410,5 +500,5 @@ class DBTableUI(Tk):
     
 if __name__ == "__main__":
         
-    app = DBTableUI(maxentryrows=260, maxnewrowrows=10)
+    app = DBTableUI(maxentryrows=400, maxnewrowrows=20)
     app.mainloop()

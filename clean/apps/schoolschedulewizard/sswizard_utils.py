@@ -91,6 +91,7 @@ def widget_current_values_get(ui,gridname,rownum,minversion=1):
 def dropdown_build(database,
                    widgetargs,
                    exec_func,
+                   prep,
                    rowheaderexecfunc=None,
                    columnheaderexecfunc=None,
                    ui=None):
@@ -103,12 +104,15 @@ def dropdown_build(database,
 
     output = []
     with database:
-        for x in range(xoffset,len(widgetargs)):
-            colndefn,values = exec_func(database,x)
+        for y in range(yoffset,len(widgetargs[0])):
+        #for x in range(xoffset,len(widgetargs)):
+            colndefn,values = exec_func(database,y,prep)
             
             values = [value[0] for value in values]
-    
-            for y in range(yoffset,len(widgetargs[x])):
+            
+            values = list(set(values))
+            for x in range(xoffset,len(widgetargs)):
+            #for y in range(yoffset,len(widgetargs[x])):
                 widgetargs[x][y]['values'] = values
                 
         if rowheaderexecfunc <> None:
@@ -215,7 +219,7 @@ def session_code_gen(dbname,dryrun=False):
     
     subject_lookup = dict((row[0],row[1]) for row in rows)
     
-    exec_str = "select teacher,subject,__id,code from session"
+    exec_str = "select teacher,subject,__id,code,type from session"
     
     with database:
         colnames,rows = tbl_query(database,exec_str)
@@ -227,15 +231,20 @@ def session_code_gen(dbname,dryrun=False):
         subject = row[1]
         __id = row[2]
         oldcode = row[3]
+        lessontype = row[4]
         
         #try:
         if teacher == None:
             teacher_code = "??"
-            
+        
+        lessontype_code = "??"
+        if lessontype == "WP":
+            lessontype_code = "WP"
+        
         if subject == None:
-            subject_code = "??.??"  
+            subject_code = lessontype_code + ".??"  
         elif subject_lookup.has_key(subject) == False:
-            subject_code = "??.??"
+            subject_code = lessontype_code + ".??"
         else:
             subject_code =subject_lookup[subject]
             

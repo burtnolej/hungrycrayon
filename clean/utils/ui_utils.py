@@ -172,28 +172,35 @@ class TkImageLabelGrid(Frame):
         
     @logger(log)
     def _createwidget(self,master,gridname,var,width,height,x,y,maxrows,maxcols,
-                 gridcfg=None,widgetcfg=None,
-                 gridcolstart=0,gridrowstart=0,
-                 rowhdrcfg={},colhdrcfg={}):
+                      scrollbar=True,
+                      gridcfg=None,widgetcfg=None,
+                      gridcolstart=0,gridrowstart=0,
+                      rowhdrcfg={},colhdrcfg={}):
     
         self.master = master # reference to ui root
-        Frame.__init__(self,master)
-        self.grid(row=0,column=0,sticky=NSEW)
+        Frame.__init__(self,master,width=100,height=100)
+        self.grid(row=0,column=0)
         
-        canvas = Canvas(self)
-        frame = Frame(canvas)
+        self.canvas = Canvas(self)
+        frame = Frame(self.canvas)
         frame.grid(row=0,column=0,sticky=NSEW)
-    
-        vscrollbar = Scrollbar(self,orient="vertical",command=canvas.yview)
-        vscrollbar.pack(side='right',fill='y')       
-        canvas.configure(yscrollcommand=vscrollbar.set)
-    
-        hscrollbar = Scrollbar(self,orient="horizontal",command=canvas.xview)
-        hscrollbar.pack(side='bottom',fill='x')        
-        canvas.configure(yscrollcommand=hscrollbar.set,xscrollcommand=hscrollbar.set)
-    
-        canvas.pack(side="left",fill="both",expand=True)
-        canvas.create_window((2,2),window=frame,anchor="nw",tags="frame")
+
+        vscrollbar = Scrollbar(self,orient="vertical",command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=vscrollbar.set)
+        hscrollbar = Scrollbar(self,orient="horizontal",command=self.canvas.xview)
+        self.canvas.configure(yscrollcommand=hscrollbar.set,xscrollcommand=hscrollbar.set)
+        
+        if scrollbar == True:
+            #vscrollbar = Scrollbar(self,orient="vertical",command=self.canvas.yview)
+            vscrollbar.pack(side='right',fill='y')       
+            #self.canvas.configure(yscrollcommand=vscrollbar.set)
+        
+            #hscrollbar = Scrollbar(self,orient="horizontal",command=self.canvas.xview)
+            hscrollbar.pack(side='bottom',fill='x')        
+            #self.canvas.configure(yscrollcommand=hscrollbar.set,xscrollcommand=hscrollbar.set)
+        
+        self.canvas.pack(side="left",fill="both",expand=True)
+        self.canvas.create_window((2,2),window=frame,anchor="nw",tags="frame")
     
         self.gridname = gridname
         
@@ -400,6 +407,15 @@ class TKBase(object):
         self.widget.s.configure(".".join(['OutOfFocus','Changed',self.widget.winfo_class()]),
                          fieldbackground='white',
                          foreground='red')
+        
+        self.widget.s.configure(".".join(['InFocus','Label',self.widget.winfo_class()]),
+                         fieldbackground='grey',
+                         foreground='black')
+        
+        self.widget.s.configure(".".join(['OutOfFocus','Label',self.widget.winfo_class()]),
+                         fieldbackground='grey',
+                         foreground='black')
+
         
         #self.init_value= self.current_value = ""
 
