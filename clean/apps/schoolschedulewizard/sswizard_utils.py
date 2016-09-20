@@ -1,3 +1,7 @@
+import sys
+import os
+from os import path as ospath
+sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import nxnarraycreate
 
 from database_table_util import tbl_query, tbl_rows_update
@@ -198,7 +202,7 @@ def sessiontagtoid(tag,enums):
     lessontype_enum = enums['teacher'][lessontype_code]
     subject_enum = enums['subject'][subject_code]
     
-def session_code_gen(dbname):
+def session_code_gen(dbname,dryrun=False):
     
     database = Database(dbname)
     
@@ -224,31 +228,34 @@ def session_code_gen(dbname):
         __id = row[2]
         oldcode = row[3]
         
-        try:
-            if teacher == None:
-                teacher_code = "??"
-                
-            if subject == None:
-                subject_code = "??.??"  
-            elif subject_lookup.has_key(subject) == False:
-                subject_code = "??.??"
-            else:
-                subject_code =subject_lookup[subject]
-                
-            teacher_code = enums['adult']['name2code'][teacher]
-            session_code = ".".join([teacher_code,subject_code,])
+        #try:
+        if teacher == None:
+            teacher_code = "??"
             
-            with database:
-                exec_str,_ = tbl_rows_update(database,'session',
-                                  ['code',"\""+session_code+"\"",'__id',"\""+__id+"\""],
-                                  dryrun=False),
-                log.log(thisfuncname(),4,msg="session code updated",execstr=exec_str,oldcode=oldcode)
+        if subject == None:
+            subject_code = "??.??"  
+        elif subject_lookup.has_key(subject) == False:
+            subject_code = "??.??"
+        else:
+            subject_code =subject_lookup[subject]
+            
+        teacher_code = enums['adult']['name2code'][teacher]
+        session_code = ".".join([teacher_code,subject_code,])
         
-        except Exception, e:
-            print row,"failed", e
+        with database:
+            exec_str,_ = tbl_rows_update(database,'session',
+                              ['code',"\""+session_code+"\"",'__id',"\""+__id+"\""],
+                              dryrun=dryrun)
+            if dryrun == True:
+                print exec_str,oldcode
+            else:
+                log.log(thisfuncname(),4,msg="session code updated",execstr=exec_str,oldcode=oldcode)
+    
+        #except Exception, e:
+        #    print row,"failed", e
     
 
     
 if __name__ == "__main__":
     
-    session_code_gen('quadref')
+    session_code_gen('quadref',False)
