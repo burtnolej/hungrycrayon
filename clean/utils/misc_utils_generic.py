@@ -1,10 +1,11 @@
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
+sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import IDGenerator
 
 class GenericBase(object):
     
     def _setattr(self,attr,suffix=''):
+        
         for key,value in attr.iteritems():
             setattr(self,suffix+key,value)
             
@@ -79,6 +80,6 @@ class GenericBase(object):
         cls1 = cls(**kwarg)
         
         #cls1._setattr(_datamembers,'_dm_')
-        cls1._setattr(_datamembers)
+        #cls1._setattr(_datamembers)
         
         return(cls1)

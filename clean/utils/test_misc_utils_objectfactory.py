@@ -203,19 +203,139 @@ class Test_ObjFramework_Database_Derived(unittest.TestCase):
     def test_num_obj_created(self):
         self.assertEquals(len(self.of.query('DBLesson')),1)
             
-            
+     
+class schoolschedgeneric(dbtblgeneric):
+
+    def __init__(self,of,database,recursion=True,**kwargs):
+        self.recursion = recursion
+        super(schoolschedgeneric,self).__init__(database=database,
+                                                **kwargs)
+        
+        self.of = of
+        self.database = database
+        
+        for k,v in kwargs['dm'].iteritems():
+            if v <> 'None':
+                if recursion == True:
+                    # create objects for all member attributes
+                    self.attr_set(v,k)
+                                   
+    def attr_set(self,name,clsname):        
+        datamembers = dict(objtype=clsname,
+                           userobjid=name,
+                           name=name)
+        
+        setattr(self,clsname,self.of.new(schoolschedgeneric,
+                                         clsname,
+                                         objid=name, # unique key to store obj in of
+                                         constructor='datamembers',
+                                         database=self.database,
+                                         of=self.of,
+                                         modname=__name__,
+                                         recursion=False,
+                                         dm=datamembers))
+
+        return(getattr(self,clsname))
+        
+class Test_ObjFramework_Database_Derived_Nested(unittest.TestCase):
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        
+        datamembers = dict(period='830',
+                           student='Booker',
+                           teacher='Amelia',
+                           saveversion=0,
+                           session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,
+                                 'DBLesson',
+                                 objid='dblesson0',
+                                 constructor='datamembers',
+                                 database=self.database,
+                                 of=self.of,
+                                 modname=__name__,
+                                 dm=datamembers)
+        
+    def test_student_objid(self):
+        
+        obj = self.of.store['student']['Booker']
+        
+        attr = obj.attr_get_keyval(include_callable=False, 
+                                    include_baseattr=True,
+                                    include_nondataattr=True)
+    
+        d = dict(attr)
+        self.assertTrue(d.has_key('objid'))
+        self.assertEqual(d['objid'],'Booker')
+
+    def test_student_name(self):
+        
+        obj = self.of.store['student']['Booker']
+        
+        attr = obj.attr_get_keyval(include_callable=False, 
+                                    include_baseattr=True,
+                                    include_nondataattr=True)
+    
+        d = dict(attr)
+        self.assertTrue(d.has_key('name'))
+        self.assertEqual(d['name'],'Booker')
+        
+        
+class Test_ObjFramework_Database_Derived_Nested_DupeKey(unittest.TestCase):
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        
+        self.datamembers = dict(period='830',
+                           student='Booker',
+                           teacher='Amelia',
+                           saveversion=0,
+                           session='AM.AC.SC')
+
+
+        
+        
+    def test_student_objid(self):
+        
+        obj1 = self.of.new(schoolschedgeneric,
+                                 'DBLesson',
+                                 objid='dblesson0',
+                                 constructor='datamembers',
+                                 database=self.database,
+                                 of=self.of,
+                                 modname=__name__,
+                                 dm=self.datamembers)
+        
+        obj2 = self.of.new(schoolschedgeneric,
+                                 'DBLesson',
+                                 objid='dblesson0',
+                                 constructor='datamembers',
+                                 database=self.database,
+                                 of=self.of,
+                                 modname=__name__,
+                                 dm=self.datamembers)
+        
+        print self.of.store['student']
+        print obj1.student,obj2.student
+        
+
+        
+
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDupeID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_records_same_cls))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_class))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkIter))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived))'''
     
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested_DupeKey))
     
     
     

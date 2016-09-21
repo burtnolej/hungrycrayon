@@ -15,6 +15,7 @@ from misc_utils_objectfactory import ObjFactory
 
 import sswizard_utils
 from sswizard_query_utils import *
+from sswizard_config_utils import *
 
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
@@ -33,6 +34,7 @@ controlpanelconfig = dict(height=300,width=200,x=100,y=100)
 class schoolschedgeneric(dbtblgeneric):
 
     def __init__(self,of,database,recursion=True,**kwargs):
+        self.recursion = recursion
         super(schoolschedgeneric,self).__init__(database=database,
                                                 **kwargs)
         
@@ -63,8 +65,10 @@ class schoolschedgeneric(dbtblgeneric):
             
         return(getattr(self,clsname))
     
-    def __repr__(self):
-        return(self.objid)
+    #def __repr__(self):
+    #    
+    #    print "r=",self.recursion,"objid",self.objid,type(self.objid)
+    #    return(self.objid)
 
 class WizardUI(Tk):
     #def __init__(self,database,of):
@@ -81,10 +85,13 @@ class WizardUI(Tk):
         self.of = of
 
         self.refdatabase = Database('quadref')
-        font = tkFont.Font(family="monospace", size=12) 
+        font = tkFont.Font(family="monospace", size=24) 
         
         self.lastsaveversion=0
 
+        style = Style()
+        
+        set_configs(style)
         # any children that change update this 
         # key is the name and value is the new val
         # the name is likely to be the tkwidgetid.x,y
@@ -98,9 +105,9 @@ class WizardUI(Tk):
         wmheight=wheight*self.maxrows # master height
         wmwidth=wwidth*self.maxcols # master width 
 
-        geom = geometry_get(wmheight,wmwidth,0,0)
-        
+        geom = geometry_get(1000,1000,0,0)
         self.geometry(geom)
+        
 
         self.bind("<Prior>",self.focus_next_widget)
 
@@ -127,9 +134,13 @@ class WizardUI(Tk):
                              0,0,self.maxrows,self.maxcols,
                              {},widgetcfg)
         '''
+
+
+        configpanel = Frame(self,style='ConfigPanel.TFrame')
+        #configpanel = Frame(self)
         
-        configpanel = Frame(self)
-        configpanel.grid(row=0,sticky=NSEW)
+        #configpanel.configure(background='blue')
+        configpanel.grid(row=0,column=0,sticky=EW)
         
         self.prep_label = Label(configpanel,text="prep")
         self.prep_label.grid(row=0,column=0)
@@ -186,85 +197,118 @@ class WizardUI(Tk):
         self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,
                                           wmwidth,wmheight,    
                                           0,0,self.maxrows,self.maxcols,
-                                          False,{},widgetcfg)
+                                          True,{},widgetcfg)
 
+        self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.entrygrid.grid(row=1,column=0,sticky=NSEW)
         
-        controlpanel = Frame(self)
-        controlpanel.grid(row=2,sticky=NSEW,columnspan=2)
+        controlpanel = Frame(self,style='ControlPanel.TFrame')
+        controlpanel.grid(row=2,column=0,sticky=NSEW,columnspan=2)
         
         self.save_button = Button(controlpanel,command=self.save,text="save",name="svb")
-        self.save_button.grid(row=2,column=0)
+        self.save_button.grid(row=0,column=0)
         self.save_button.focus_get()
         
         self.persist_button = Button(controlpanel,command=self.persist,text="persist",name="pb")
-        self.persist_button.grid(row=2,column=1)
+        self.persist_button.grid(row=0,column=1)
         self.persist_button.focus_get()
         
         self.spacer_label = Label(controlpanel,text="                      ")
-        self.spacer_label.grid(row=2,column=2)
+        self.spacer_label.grid(row=0,column=2)
         
         self.dbload_entry_label = Label(controlpanel,text="version")
-        self.dbload_entry_label.grid(row=2,column=3)
+        self.dbload_entry_label.grid(row=0,column=3)
         self.dbload_entry_label.focus_get()
         self.dbload_entry_sv = StringVar()
         self.dbload_entry = Entry(controlpanel,textvariable=self.dbload_entry_sv)
-        self.dbload_entry.grid(row=2,column=4)
+        self.dbload_entry.grid(row=0,column=4)
         self.dbload_entry.focus_get()
         
         self.dbload_button = Button(controlpanel,
                                     command=lambda: self.load(self.dbload_entry_sv.get()),
                                     text="dbload",name="dbl")
         
-        self.dbload_button.grid(row=2,column=5)
+        self.dbload_button.grid(row=0,column=5)
         self.dbload_button.focus_get()
         
         self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
-        self.clear_button.grid(row=2,column=6)
+        self.clear_button.grid(row=0,column=6)
         self.clear_button.focus_get()
         
         self.dbname_entry_label = Label(controlpanel,text="dbname")
-        self.dbname_entry_label.grid(row=2,column=7)
+        self.dbname_entry_label.grid(row=0,column=7)
         self.dbname_entry_label.focus_get()
         self.dbname_entry_sv = StringVar()
         self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv)
-        self.dbname_entry.grid(row=2,column=8)
+        self.dbname_entry.grid(row=0,column=8)
         self.dbname_entry.focus_get()
         self.dbname_entry_sv.set('htmlparser')
         
         self.pagedown_button = Button(controlpanel,command=self.pagedown,text="pgdwn",name="pgdwn")
-        self.pagedown_button.grid(row=2,column=9)
+        self.pagedown_button.grid(row=0,column=9)
         self.pagedown_button.focus_get()
-
+        
+        self.teacher_entry_sv = StringVar()
+        self.teacher_entry = Entry(controlpanel,textvariable=self.teacher_entry_sv)
+        self.teacher_entry.grid(row=0,column=10)
+        self.teacher_entry.focus_get()
+        self.teacher_entry_sv.set('patti')
+        
+        self.teacher_button = Button(controlpanel,command=self.teacher_schedule_calc,text="sched",name="pgdwn")
+        self.teacher_button.grid(row=0,column=11)
+        self.teacher_button.focus_get()
+        
         self.bgmaxrows=len(self.enums['period']['name'])+1
         self.bgmaxcols=len(self.enums['student']['name'])+1 
         
         widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,
                                    widget_args)
         
+        self.balancepanel = Frame(self)
+        self.balancepanel.grid(row=3,column=0,sticky=NSEW)
+        
+        
         mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
-        self.balancegrid = TkImageLabelGrid(self,'balancegrid',
+        self.studentschedgrid = TkImageLabelGrid(self.balancepanel,'studentschedgrid',
                                             mytextalphanum,wmwidth,wmheight,
                                             0,0,self.bgmaxrows,self.bgmaxcols,
                                             {},widgetcfg)
         
         
-        self.balancegrid.grid(row=3,column=0,sticky=S)
-        self._draw_balancegrid_labels()
+        self.studentschedgrid.grid(row=0,column=0,sticky=NSEW)
+        
+        mytextalphanum = TextAlphaNumRO(name='textalphanum')
+        
+        self.teacherschedgrid = TkImageLabelGrid(self.balancepanel,'teacherschedgrid',
+                                            mytextalphanum,wmwidth,wmheight,
+                                            0,0,self.bgmaxrows,self.bgmaxcols,
+                                            {},widgetcfg)
+        
+        
+        self.teacherschedgrid.grid(row=0,column=1,sticky=NSEW)
+        #self._draw_balancegrid_labels()
+        
+        self.balancepanel.grid_columnconfigure(0, weight=1, uniform="foo")
+        self.balancepanel.grid_columnconfigure(1, weight=1, uniform="foo")
+        
         
         #self.grid_rowconfigure(0, weight=1, uniform="foo")
-        self.grid_rowconfigure(1, weight=1, uniform="foo")
+        self.grid_rowconfigure(1, weight=10, uniform="foo")
+        self.grid_rowconfigure(2, weight=1, uniform="foo")
+        self.grid_rowconfigure(3, weight=10, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
-         
-         
+        
+
+    def printme(self,event):
+        print "print me",event.widget.sv.get()
+        
     def pagedown(self):
         self.ui.canvas.yview()
         
     def update_callback(self,widget,new_value):
         sswizard_utils.update_callback(self,widget,new_value)
 
-            
     def _draw_balancegrid_labels(self):
         for name,enum in self.enums['period']['name2enum'].iteritems():
             self.balancegrid.widgets[enum][0].sv.set(str(name))
@@ -276,7 +320,8 @@ class WizardUI(Tk):
     def save(self,saveversion=None):
 
         self.of.reset()
-        self.clear(1,1,'balancegrid')
+        self.clear(1,1,'studentschedgrid')
+        self.clear(1,1,'teacherschedgrid')
         
         if self.dbname <> self.dbname_entry_sv.get():
             log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
@@ -292,11 +337,9 @@ class WizardUI(Tk):
         #    saveversion=str(self.lastsaveversion)
             
         for x in range(1,self.maxrows):
-            student=self.entrygrid.widgets[x][0].sv.get()
-            
             for y in range(1,self.maxcols):
                 period=self.entrygrid.widgets[0][y].sv.get()
-                
+                student=self.entrygrid.widgets[x][0].sv.get()
                 session =  self.entrygrid.widgets[x][y].sv.get()
                 
                 if session <> "":
@@ -306,6 +349,8 @@ class WizardUI(Tk):
                     session_enum = self.enums['session']['name2enum'][session]
 
                     obj_id = ",".join(map(str,[period_enum,student_enum,session_enum]))
+                    
+                    #obj_id = session
 
                     teacher_code,lessontype_code,subject_code = session.split(".")
                     
@@ -313,9 +358,14 @@ class WizardUI(Tk):
                     #student = self.entrygrid.widgets[0][y].sv.get()
                     #period = self.entrygrid.widgets[x][0].sv.get()
 
-                    teacher = self.enums['adult']['code2enum'][teacher_code]
+                    '''teacher = self.enums['adult']['code2enum'][teacher_code]
                     lessontype = self.enums['lessontype']['code2enum'][lessontype_code]
-                    subject = self.enums['subject']['code2enum'][subject_code]
+                    subject = self.enums['subject']['code2enum'][subject_code]'''
+                    
+
+                    teacher = self.enums['adult']['code2name'][teacher_code]
+                    lessontype = self.enums['lessontype']['code2name'][lessontype_code]
+                    subject = self.enums['subject']['code2name'][subject_code]
                                                                
                     datamembers = dict(schedule = '1',
                                        dow='Tuesday', 
@@ -329,46 +379,143 @@ class WizardUI(Tk):
                                        saveversion=saveversion,
                                        session=session)
                     
-                    self.of.new(schoolschedgeneric,
-                                'lesson',
-                                objid=obj_id,
-                                constructor='datamembers',
-                                database=self.database,
-                                of=self.of,
-                                modname=__name__,
-                                dm=datamembers)
-
-                    current_value = self.balancegrid.widgets[x][y].cget("text")
-                    if current_value == period:
-                        pass
-                    elif current_value == "":
-                        self.balancegrid.widgets[x][y].config(background='lightgreen')
-                        self.balancegrid.widgets[x][y].sv.set(period)
-                    else:
-                        self.balancegrid.widgets[x][y].sv.set(current_value+","+period)
-                        self.balancegrid.widgets[x][y].config(background='red')
+                    lesson = self.of.new(schoolschedgeneric,
+                                         'lesson',
+                                         objid=obj_id,
+                                         constructor='datamembers',
+                                         database=self.database,
+                                         of=self.of,
+                                         modname=__name__,
+                                         dm=datamembers)
                     
-        self.student_totals_calc()        
+                    setattr(self.entrygrid.widgets[x][y],"lesson",lesson)
+                
+                    self.lesson_change(lesson)
+        
+        self.teacher_schedule_calc() 
+        self.student_schedule_calc()
             
         self.dbload_entry_sv.set(self.lastsaveversion)
             
         self.lastsaveversion+=1
 
-    def student_totals_calc(self):
+    def _lesson_change_event(self,event):
         
+        olesson = event.widget.lesson
+        #olesson = self.of.store['lesson'][lessonobjid]
         
-        for sname,y in self.enums['student']['name2enum'].iteritems():
-            student_full = True
-            for pname,x in self.enums['period']['name2enum'].iteritems():
-                current_value = self.balancegrid.widgets[x][y].cget("text")
-                if current_value == "":
-                    student_full=False
-                    
-                self.balancegrid.widgets[x][y].config(foreground='black')
-                
-            if student_full == True:
-                self.balancegrid.widgets[0][y].config(background='green')
+        self.lesson_change(olesson)
+        self.student_schedule_calc()
+        self.teacher_schedule_calc()
+        
+    def lesson_change(self,lesson):
 
+        period = lesson.period.objid
+        student = lesson.student.objid
+        
+        # add the lesson to the teacher object
+        teacher = lesson.teacher
+        if hasattr(teacher,'lessons') == False:
+            setattr(teacher,'lessons',{})
+            
+        if teacher.lessons.has_key(period) == False:
+            teacher.lessons[period] = []
+            
+        teacher.lessons[period].append(lesson)
+        log.log(thisfuncname(),9,msg="lesson added to teacher",lesson=lesson)
+        # add the lesson to the student object
+        student = lesson.student
+        if hasattr(student,'lessons') == False:
+            setattr(student,'lessons',{})
+            
+        if student.lessons.has_key(period) == False:
+            student.lessons[period] = []
+            
+        student.lessons[period].append(lesson)
+        log.log(thisfuncname(),9,msg="lesson added to student",lesson=lesson)
+            
+
+    def student_schedule_calc(self):
+        
+        students = self.enums['student']['name']
+        periods = self.enums['period']['name']
+        
+        gridx=1
+        gridy=1
+        
+        for p in range(len(periods)):
+            self.studentschedgrid.widgets[gridx][0].sv.set(periods[p])
+            gridy+=1
+
+            for s in range(len(students)):
+                
+                try:
+                    ostudent = self.of.object_get('student',students[s])
+                except KeyError:
+                    print "student",students[s],"does not exist"
+                    continue
+    
+                if ostudent.lessons.has_key(periods[p]):
+                    self.studentschedgrid.widgets[0][gridy].sv.set(students[s])
+    
+                    lessons = ostudent.lessons[periods[p]]
+                    for lesson in lessons:
+                        try:
+                            subject = lesson.subject.objid
+                            self.studentschedgrid.widgets[gridx][gridy].sv.set(subject)
+                        except KeyError:
+                            print "lesson",lesson,"does not exist"
+                    print
+                    
+                gridy+=1
+
+            gridy=1
+            gridx+=1
+            
+    def teacher_schedule_calc(self,event=None):
+        
+        teachers = self.enums['adult']['name']
+        periods = self.enums['period']['name']
+        
+        gridx=1
+        gridy=1
+        
+        
+        for p in range(len(periods)):
+            self.teacherschedgrid.widgets[gridx][0].sv.set(periods[p])
+            gridy+=1
+
+            for t in range(len(teachers)):
+                
+                try:
+                    oteacher = self.of.object_get('teacher',teachers[t])
+                except KeyError:
+                    print "teacher",teachers[t],"does not exist"
+                    continue
+            
+                '''for p in range(len(periods)):
+                    self.teacherschedgrid.widgets[gridx][0].sv.set(periods[p])
+                    gridy+=1'''
+    
+                if oteacher.lessons.has_key(periods[p]):
+                    self.teacherschedgrid.widgets[0][gridy].sv.set(teachers[t])
+                    
+                        
+                    lessons = oteacher.lessons[periods[p]]
+                    for lesson in lessons:
+                        try:
+                            subject = lesson.subject.objid
+                            #subject = self.of.object_get('lesson',str(lesson)).subject
+                            self.teacherschedgrid.widgets[gridx][gridy].sv.set(subject)
+                        except KeyError:
+                            print "lesson",lesson,"does not exist"
+                    print
+                    
+                gridy+=1
+                    
+                
+            gridy=1
+            gridx+=1
     
     @logger(log)   
     def focus_next_widget(self,event):
@@ -453,7 +600,7 @@ class WizardUI(Tk):
     def persist(self):
         with self.database:
             for obj in self.of.object_iter():
-                log.log(thisfuncname(),9,msg="persisting of obj",objid=obj.userobjid)
+                log.log(thisfuncname(),9,msg="persisting of obj",objid=str(obj))
                 obj.persist()
                 
     def _lastsaveversion_get(self):

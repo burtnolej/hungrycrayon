@@ -170,7 +170,7 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     name2code['??'] = '??'
         
     enums[tblname]['name2code'] = name2code
-    enums[tblname]['code2name'] = zip(name2code.values(),name2code.keys())
+    enums[tblname]['code2name'] = dict(zip(name2code.values(),name2code.keys()))
     enums[tblname]['name2enum'] = dict((value,enum) for enum,value in enumerate(name2code.keys()))
     enums[tblname]['code2enum'] = dict((value,enum) for enum,value in enumerate(name2code.values()))
     enums[tblname]['name'] = enums[tblname]['name2code'].keys()
@@ -251,14 +251,15 @@ def session_code_gen(dbname,dryrun=False):
         teacher_code = enums['adult']['name2code'][teacher]
         session_code = ".".join([teacher_code,subject_code,])
         
-        with database:
-            exec_str,_ = tbl_rows_update(database,'session',
-                              ['code',"\""+session_code+"\"",'__id',"\""+__id+"\""],
-                              dryrun=dryrun)
-            if dryrun == True:
-                print exec_str,oldcode
-            else:
-                log.log(thisfuncname(),4,msg="session code updated",execstr=exec_str,oldcode=oldcode)
+        if oldcode <> session_code:
+            with database:
+                exec_str,_ = tbl_rows_update(database,'session',
+                                  ['code',"\""+session_code+"\"",'__id',"\""+__id+"\""],
+                                  dryrun=dryrun)
+                if dryrun == True:
+                    print exec_str,oldcode
+                else:
+                    log.log(thisfuncname(),4,msg="session code updated",execstr=exec_str,oldcode=oldcode)
     
         #except Exception, e:
         #    print row,"failed", e

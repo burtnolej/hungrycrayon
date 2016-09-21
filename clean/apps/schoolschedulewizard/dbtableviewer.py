@@ -59,7 +59,7 @@ class DBTableUI(Tk):
         self.bind("<Prior>",self.focus_next_widget)
         self.grid()
 
-        font = tkFont.Font(family="monospace", size=8)  
+        font = tkFont.Font(family="monospace", size=18)  
 
         # entry grid y label
         ylbl_widget_args=dict(width=10,font=font)
@@ -500,5 +500,5 @@ class DBTableUI(Tk):
     
 if __name__ == "__main__":
         
-    app = DBTableUI(maxentryrows=400, maxnewrowrows=20)
+    app = DBTableUI(maxentryrows=100, maxnewrowrows=20)
     app.mainloop()
