@@ -253,7 +253,7 @@ class Test_Load_Insert_Save(unittest.TestCase):
         
         
 
-    def test_last_widget_values(self):
+    '''def test_last_widget_values(self):
         # checking the .current_value status
         
         expected_results = [('','Tuesday'),('','wp'),('','lesson'),('','8:30-9:10'),('',0),('',1),('','COBY'),('','MATH'),('','Amelia'),('','1,5,4')]
@@ -280,7 +280,7 @@ class Test_Load_Insert_Save(unittest.TestCase):
         with self.database:
             colndefn,rows = tbl_rows_get(self.database,'lesson',cols)
         
-        self.assertListEqual(expected_result,rows)
+        self.assertListEqual(expected_result,rows)'''
         
     def tearDown(self):
         #os.remove(self.tmpdbname+".sqlite")
@@ -863,28 +863,20 @@ class Test_Add_Column_of_Loaded_Rows_With_Values(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Entry))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Entry))
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Clear_Load))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Clear_Load))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save))
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Save))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save_Insert_Save))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save_Insert_Save))
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Change_Column_of_Loaded_Rows))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Column_of_Loaded_Rows))
-    
-    '''
-    these may be defunc
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Column_of_Loaded_Rows_With_Values))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Insert_Multiple_Rows_onto_Loaded_Rows))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Update))        
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Update_Insert))'''
-     
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Change_Column_of_Loaded_Rows))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Column_of_Loaded_Rows))
+         
     
 
     

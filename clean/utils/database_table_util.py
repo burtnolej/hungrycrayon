@@ -185,7 +185,7 @@ def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
     exec_str = "select {fields} from {table}".format(fields=fieldstr,
                                                      table=tbl_name)
     
-    if whereclause <> None:
+    if whereclause <> None and whereclause <> []:
 	exec_str = exec_str + " where {0} = {1}".format(whereclause[0],
 	                                               whereclause[1])
     

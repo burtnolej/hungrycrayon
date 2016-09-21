@@ -7,8 +7,11 @@ log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 
-__all__ = ['_execfunc','_rowheaderexecfunc',\
-           '_columnheaderexecfunc']
+__all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfunc']
+
+def _dowexecfunc(database,value,prep):
+    exec_str = "select code from dow "
+    return(tbl_query(database,exec_str))
 
 def _execfunc(database,value,prep):
     exec_str = "select s.code "

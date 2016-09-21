@@ -219,7 +219,7 @@ def session_code_gen(dbname,dryrun=False):
     
     subject_lookup = dict((row[0],row[1]) for row in rows)
     
-    exec_str = "select teacher,subject,__id,code,type from session"
+    exec_str = "select teacher,subject,__id,code,type,day from session"
     
     with database:
         colnames,rows = tbl_query(database,exec_str)
@@ -232,8 +232,11 @@ def session_code_gen(dbname,dryrun=False):
         __id = row[2]
         oldcode = row[3]
         lessontype = row[4]
-        
-        #try:
+        dow_code = row[5]
+
+        if dow_code == None:
+            dow_code = "WK"
+            
         if teacher == None:
             teacher_code = "??"
         
@@ -249,7 +252,8 @@ def session_code_gen(dbname,dryrun=False):
             subject_code =subject_lookup[subject]
             
         teacher_code = enums['adult']['name2code'][teacher]
-        session_code = ".".join([teacher_code,subject_code,])
+        #session_code = ".".join([teacher_code,subject_code,])
+        session_code = ".".join([teacher_code,subject_code,dow_code])
         
         if oldcode <> session_code:
             with database:

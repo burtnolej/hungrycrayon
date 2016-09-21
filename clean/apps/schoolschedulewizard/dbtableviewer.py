@@ -200,6 +200,26 @@ class DBTableUI(Tk):
         self.pageright_button.grid(row=2,column=3)
         self.pageright_button.focus_get()
         
+        # query predicate 1
+        self.pred1_label = Label(controlpanel,text="pred1")
+        self.pred1_label.grid(column=0,row=4,sticky=NSEW)
+        self.pred1_label.focus_get()
+        
+        self.pred1_entry_sv = StringVar()
+        self.pred1_entry = Entry(controlpanel,textvariable=self.pred1_entry_sv)
+        self.pred1_entry.grid(column=1,row=4,sticky=NSEW)
+        self.pred1_entry.focus_get()
+        
+        # query predicate value 1
+        self.predval1_label = Label(controlpanel,text="val1")
+        self.predval1_label.grid(column=2,row=4,sticky=NSEW)
+        self.predval1_label.focus_get()
+        
+        self.predval1_entry_sv = StringVar()
+        self.predval1_entry = Entry(controlpanel,textvariable=self.predval1_entry_sv)
+        self.predval1_entry.grid(column=3,row=4,sticky=NSEW)
+        self.predval1_entry.focus_get()
+        
         self.maxnewrows=maxnewrowrows
         self.newrowgrid = TkImageLabelGrid(self,'newrowgrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxnewrows,self.maxcols,
@@ -446,10 +466,17 @@ class DBTableUI(Tk):
             self.clear(1)
 
         database = Database(self.dbname_entry_sv.get())
+        whereclause = []
         
+        if self.pred1_entry_sv.get() <> "":
+            
+            whereclause = [self.pred1_entry_sv.get(),
+                           self.predval1_entry_sv.get()]
+
+            log.log(thisfuncname(),9,msg="where clause specified",whereclause=whereclause)
+            
         with database:
-            colndefn,rows = tbl_rows_get(database,self.tblname_entry_sv.get())
-                                    #saveversion',str(self.dbload_entry_sv.get())))
+            colndefn,rows = tbl_rows_get(database,self.tblname_entry_sv.get(),"*",whereclause)
             
             log.log(thisfuncname(),3,func=tbl_rows_get,msg=str(len(rows))+"rows loaded",table=self.tblname_entry_sv.get())
                                     
@@ -483,10 +510,6 @@ class DBTableUI(Tk):
                         self.entrygrid.widgets[x+1][y].sv.set(new_value)
                         self.entrygrid.widgets[x+1][y].current_value = new_value
                         
-                        # reset init_value after we have loaded
-                        #self.entrygrid.widgets[0][y].init_value = new_value
-                        #self.entrygrid.widgets[x+1][y].init_value = new_value
-                        
                         # and set the style back to not updated
                         self.entrygrid.widgets[x+1][y]['style'] = 'OutOfFocus.Notchanged.TEntry'
                         
@@ -500,5 +523,5 @@ class DBTableUI(Tk):
     
 if __name__ == "__main__":
         
-    app = DBTableUI(maxentryrows=100, maxnewrowrows=20)
+    app = DBTableUI(maxentryrows=50, maxnewrowrows=20)
     app.mainloop()

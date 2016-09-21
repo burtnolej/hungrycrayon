@@ -6,8 +6,12 @@ class GenericBase(object):
     
     def _setattr(self,attr,suffix=''):
         
+        # this is a hack. in the recursion case the values are already set
+        # and can get overwritten with garbage. this prevents that from 
+        # happening (until we find the bug)
         for key,value in attr.iteritems():
-            setattr(self,suffix+key,value)
+            if hasattr(self,suffix+key) == False:
+                setattr(self,suffix+key,value)
             
     def __init__(self,**kwarg):
         self._setattr(kwarg)
@@ -80,6 +84,6 @@ class GenericBase(object):
         cls1 = cls(**kwarg)
         
         #cls1._setattr(_datamembers,'_dm_')
-        #cls1._setattr(_datamembers)
+        cls1._setattr(_datamembers)
         
         return(cls1)

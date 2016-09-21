@@ -85,7 +85,7 @@ class WizardUI(Tk):
         self.of = of
 
         self.refdatabase = Database('quadref')
-        font = tkFont.Font(family="monospace", size=24) 
+        font = tkFont.Font(family="monospace", size=14) 
         
         self.lastsaveversion=0
 
@@ -108,38 +108,9 @@ class WizardUI(Tk):
         geom = geometry_get(1000,1000,0,0)
         self.geometry(geom)
         
-
         self.bind("<Prior>",self.focus_next_widget)
 
-        '''
-        # default combolist values is student
-        setmemberp = SetMemberPartial(name='x{mylist}',set=student_enum)
-        widget_args=dict(background='white',var=setmemberp)
-        
-        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-        
-        # column headers are teacher
-        setmemberp = SetMemberPartial(name='x{mylist}',set=teacher_enum)
-        _widget_args=dict(background='white',var=setmemberp)      
-        for y in range(1,self.maxcols):
-            widgetcfg[0][y] = _widget_args  
-
-        # row headers are teacher
-        setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
-        _widget_args=dict(background='white',values=setmemberp)    
-        for x in range(1,self.maxrows):
-            widgetcfg[x][0] = _widget_args
-
-        self.entrygrid = TkImageLabelGrid(self,wmwidth,wmheight,    
-                             0,0,self.maxrows,self.maxcols,
-                             {},widgetcfg)
-        '''
-
-
-        configpanel = Frame(self,style='ConfigPanel.TFrame')
-        #configpanel = Frame(self)
-        
-        #configpanel.configure(background='blue')
+        '''configpanel = Frame(self,style='ConfigPanel.TFrame')
         configpanel.grid(row=0,column=0,sticky=EW)
         
         self.prep_label = Label(configpanel,text="prep")
@@ -158,49 +129,41 @@ class WizardUI(Tk):
         self.dow_label_sv = StringVar()
         self.dow_label = Entry(configpanel,textvariable=self.dow_label_sv)
         self.dow_label.grid(row=0,column=3)
-        self.dow_label.focus_get()
+        self.dow_label.focus_get()'''
         
-        
-        # default combolist values is student
+        # daygrids
+        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['dow'])
+        widget_args=dict(background='white',width=9,font=font,values=self.enums['dow'])
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,_dowexecfunc,5)
+        #setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])   
 
-        #dbsetmember = DBSetMember('quadref','classes','
+        # daygrid 1
+        self.dowentrygrid = TkImageLabelGrid(self,'dowentrygrid',setmemberp,wmwidth,wmheight,0,0,1,self.maxcols,False,{},widgetcfg)
+        #self.entrygrid['style'] = 'EntryGrid.TFrame'
+        self.dowentrygrid.grid(row=0,column=0,sticky=EW)
+        
+        # daygrid 2
+        self.dowentrygrid = TkImageLabelGrid(self,'dowentrygrid',setmemberp,wmwidth,wmheight,0,0,1,self.maxcols,False,{},widgetcfg)
+        #self.entrygrid['style'] = 'EntryGrid.TFrame'
+        self.dowentrygrid.grid(row=0,column=1,sticky=EW)
+
+        # entrygrids
         setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['student'])
-        widget_args=dict(background='white',
-                         width=9,
-                         font=font,
-                         values=self.enums['student'])
+        widget_args=dict(background='white',width=9,font=font,values=self.enums['student'])
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,_execfunc,5,_columnheaderexecfunc,_rowheaderexecfunc)
+        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])   
         
-        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,
-                                   widget_args)
-        
-        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,
-                                                  widgetcfg,
-                                                  _execfunc,
-                                                  5,
-                                                  _columnheaderexecfunc,
-                                                  _rowheaderexecfunc)
-
-        '''# column headers are teacher
-        setmemberp = SetMemberPartial(name='x{mylist}',set=teacher_enum)
-        _widget_args=dict(background='white',values=teacher_enum)     
-        for y in range(1,self.maxcols):
-            widgetcfg[0][y] = _widget_args  
-
-        # row headers are teacher
-        setmemberp = SetMemberPartial(name='x{mylist}',set=period_enum)
-        _widget_args=dict(background='white',values=period_enum)     
-        for x in range(1,self.maxrows):
-            widgetcfg[x][0] = _widget_args'''
-
-        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])
-
-        self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,
-                                          wmwidth,wmheight,    
-                                          0,0,self.maxrows,self.maxcols,
-                                          True,{},widgetcfg)
-
+        # entrygrid 1
+        self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,False,{},widgetcfg)
         self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.entrygrid.grid(row=1,column=0,sticky=NSEW)
+
+        # entrygrid 2
+        self.entrygrid2 = TkImageLabelGrid(self,'entrygrid2',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,False,{},widgetcfg)
+        self.entrygrid2['style'] = 'EntryGrid.TFrame'
+        self.entrygrid2.grid(row=1,column=1,sticky=NSEW)
         
         controlpanel = Frame(self,style='ControlPanel.TFrame')
         controlpanel.grid(row=2,column=0,sticky=NSEW,columnspan=2)
@@ -224,8 +187,7 @@ class WizardUI(Tk):
         self.dbload_entry.grid(row=0,column=4)
         self.dbload_entry.focus_get()
         
-        self.dbload_button = Button(controlpanel,
-                                    command=lambda: self.load(self.dbload_entry_sv.get()),
+        self.dbload_button = Button(controlpanel,command=lambda: self.load(self.dbload_entry_sv.get()),
                                     text="dbload",name="dbl")
         
         self.dbload_button.grid(row=0,column=5)
@@ -261,12 +223,10 @@ class WizardUI(Tk):
         self.bgmaxrows=len(self.enums['period']['name'])+1
         self.bgmaxcols=len(self.enums['student']['name'])+1 
         
-        widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,
-                                   widget_args)
+        widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
         
         self.balancepanel = Frame(self)
         self.balancepanel.grid(row=3,column=0,sticky=NSEW)
-        
         
         mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
@@ -274,7 +234,6 @@ class WizardUI(Tk):
                                             mytextalphanum,wmwidth,wmheight,
                                             0,0,self.bgmaxrows,self.bgmaxcols,
                                             {},widgetcfg)
-        
         
         self.studentschedgrid.grid(row=0,column=0,sticky=NSEW)
         
@@ -285,19 +244,17 @@ class WizardUI(Tk):
                                             0,0,self.bgmaxrows,self.bgmaxcols,
                                             {},widgetcfg)
         
-        
         self.teacherschedgrid.grid(row=0,column=1,sticky=NSEW)
-        #self._draw_balancegrid_labels()
         
         self.balancepanel.grid_columnconfigure(0, weight=1, uniform="foo")
         self.balancepanel.grid_columnconfigure(1, weight=1, uniform="foo")
-        
-        
-        #self.grid_rowconfigure(0, weight=1, uniform="foo")
+
+        self.grid_rowconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(1, weight=10, uniform="foo")
         self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_rowconfigure(3, weight=10, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
+        self.grid_columnconfigure(1, weight=1, uniform="foo")
         
 
     def printme(self,event):
