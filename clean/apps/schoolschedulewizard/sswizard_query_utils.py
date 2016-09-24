@@ -21,8 +21,6 @@ def _execfunc(database,value,prep,dow):
     exec_str += "s.period = {0} and ".format(value)
     exec_str += "s.day = \"{0}\"".format(dow)
     
-    print exec_str
-    #exec_str = "select code from session where period = {0} and subject <> \"None\"".format(value)
     return(tbl_query(database,exec_str))
 
 def _rowheaderexecfunc(database):

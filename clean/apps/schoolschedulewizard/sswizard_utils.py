@@ -4,7 +4,7 @@ from os import path as ospath
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import nxnarraycreate
 
-from database_table_util import tbl_query, tbl_rows_update
+from database_table_util import tbl_query, tbl_rows_update, DBException
 from database_util import Database
 from collections import OrderedDict
 from misc_utils_log import Log, logger
@@ -140,7 +140,7 @@ def dropdown_build(database,
 
     return(widgetargs)
 
-
+@logger(log)
 def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     '''
     every table has a code column which is a 2 digit unique mnemonic
@@ -155,8 +155,14 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     if pred1 <> None:
         exec_str = exec_str + " where {0} = {1}".format(pred1,predval1)
 
+
+    import sqlite3
+    
     with database:
-        coldefn,values = tbl_query(database,exec_str)
+        try:
+            coldefn,values = tbl_query(database,exec_str)
+        except DBException, e:
+            log.log(thisfuncname(),0,exception=e,msg=e.message)
     
     enums[tblname] = {}
     #name2code = dict((row[0],row[1]) for row in values)
@@ -165,7 +171,7 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     name2code = OrderedDict()
     for k,v in values:
         if v == 'None':
-            log.log(thisfuncname(),1,msg="none value detected",tblname=tblname,key=str(k))
+            log.log(thisfuncname(),0,msg="none value detected",tblname=tblname,key=str(k))
  
         name2code[k] = v
     
@@ -181,6 +187,7 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     
     log.log(thisfuncname(),3,msg="created enums",tblname=tblname,names=enums[tblname]['name'])
             
+
 def setenums(dow,prep,dbname):
 
     enums = {'maps':{},'enums':{},'codes':{}}

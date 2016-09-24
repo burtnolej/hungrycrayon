@@ -75,6 +75,8 @@ class WizardUI(Tk):
     def __init__(self,dbname,of,refdbname,maxentrycols=3,maxentryrows=4,
                  maxnewrowcols=3,maxnewrowrows=3):
         
+        log.log(thisfuncname(),3,msg="initialize",dbname=dbname,refdbname=refdbname)
+        
         Tk.__init__(self)
         
         self.enums = sswizard_utils.setenums('All','5',refdbname)
@@ -501,9 +503,7 @@ class WizardUI(Tk):
         for x in range(1,self.maxrows):
             for y in range(1,self.maxcols):
                 
-                print self.entrygrid.widgets[x][y]['values']
                 self.entrygrid.widgets[x][y].config(**widgetcfg[x][y])   
-                print self.entrygrid.widgets[x][y]['values']
 
         
     @logger(log)   
@@ -612,8 +612,10 @@ class WizardUI(Tk):
     def persist(self):
         with self.database:
             for obj in self.of.object_iter():
-                log.log(thisfuncname(),9,msg="persisting of obj",objid=str(obj))
-                obj.persist()
+                
+                exec_str, result = obj.persist()
+                log.log(thisfuncname(),9,msg="persisting of obj",objid=str(obj),exec_str=exec_str,
+                        result=result)
                 
     def _lastsaveversion_get(self):
         
