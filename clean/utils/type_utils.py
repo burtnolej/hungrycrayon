@@ -126,8 +126,11 @@ class BaseBoolean(BaseType):
 
         super(BaseBoolean,self).__init__()
         
-        from ui_utils import TkButton
-        self.widgettype = TkButton
+        #from ui_utils import TkButton
+        #self.widgettype = TkButton
+        
+        from ui_utils import TkEntryBool
+        self.widgettype = TkEntryBool
     
 class TrueFalse(BaseBoolean):
     def __init__(self,**kwargs):

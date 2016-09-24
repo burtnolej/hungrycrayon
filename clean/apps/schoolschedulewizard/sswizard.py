@@ -72,12 +72,12 @@ class schoolschedgeneric(dbtblgeneric):
 
 class WizardUI(Tk):
     #def __init__(self,database,of):
-    def __init__(self,dbname,of,maxentrycols=3,maxentryrows=4,
+    def __init__(self,dbname,of,refdbname,maxentrycols=3,maxentryrows=4,
                  maxnewrowcols=3,maxnewrowrows=3):
         
         Tk.__init__(self)
         
-        self.enums = sswizard_utils.setenums('All','5','quadref')
+        self.enums = sswizard_utils.setenums('All','5',refdbname)
         
         self.dbname = dbname
         
@@ -91,6 +91,9 @@ class WizardUI(Tk):
 
         style = Style()
         
+        bigfont = tkFont.Font(family="Helvetica",size=50)
+        self.option_add("*TCombobox*Listbox*Font", bigfont)
+      
         set_configs(style)
         # any children that change update this 
         # key is the name and value is the new val
@@ -139,31 +142,31 @@ class WizardUI(Tk):
         #setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])   
 
         # daygrid 1
-        self.dowentrygrid = TkImageLabelGrid(self,'dowentrygrid',setmemberp,wmwidth,wmheight,0,0,1,self.maxcols,False,{},widgetcfg)
+        self.dowentrygrid = TkImageLabelGrid(self,'dowentrygrid',setmemberp,wmwidth,wmheight,0,0,1,self.maxcols,True,{},widgetcfg)
         #self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.dowentrygrid.grid(row=0,column=0,sticky=EW)
         
         # daygrid 2
-        self.dowentrygrid = TkImageLabelGrid(self,'dowentrygrid',setmemberp,wmwidth,wmheight,0,0,1,self.maxcols,False,{},widgetcfg)
+        #self.dowentrygrid = TkImageLabelGrid(self,'dowentrygrid',setmemberp,wmwidth,wmheight,0,0,1,self.maxcols,False,{},widgetcfg)
         #self.entrygrid['style'] = 'EntryGrid.TFrame'
-        self.dowentrygrid.grid(row=0,column=1,sticky=EW)
+        #self.dowentrygrid.grid(row=0,column=1,sticky=EW)
 
         # entrygrids
         setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['student'])
         widget_args=dict(background='white',width=9,font=font,values=self.enums['student'])
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,_execfunc,5,_columnheaderexecfunc,_rowheaderexecfunc)
+        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,_execfunc,5,"Monday",_columnheaderexecfunc,_rowheaderexecfunc)
         setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])   
         
         # entrygrid 1
-        self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,False,{},widgetcfg)
+        self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,True,{},widgetcfg)
         self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.entrygrid.grid(row=1,column=0,sticky=NSEW)
 
         # entrygrid 2
-        self.entrygrid2 = TkImageLabelGrid(self,'entrygrid2',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,False,{},widgetcfg)
-        self.entrygrid2['style'] = 'EntryGrid.TFrame'
-        self.entrygrid2.grid(row=1,column=1,sticky=NSEW)
+        #self.entrygrid2 = TkImageLabelGrid(self,'entrygrid2',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,True,{},widgetcfg)
+        #self.entrygrid2['style'] = 'EntryGrid.TFrame'
+        #self.entrygrid2.grid(row=1,column=1,sticky=NSEW)
         
         controlpanel = Frame(self,style='ControlPanel.TFrame')
         controlpanel.grid(row=2,column=0,sticky=NSEW,columnspan=2)
@@ -210,19 +213,24 @@ class WizardUI(Tk):
         self.pagedown_button.grid(row=0,column=9)
         self.pagedown_button.focus_get()
         
-        self.teacher_entry_sv = StringVar()
-        self.teacher_entry = Entry(controlpanel,textvariable=self.teacher_entry_sv)
-        self.teacher_entry.grid(row=0,column=10)
-        self.teacher_entry.focus_get()
-        self.teacher_entry_sv.set('patti')
+        self.dow_entry_label = Label(controlpanel,text="dow")
+        self.dow_entry_label.grid(row=0,column=10)
+        self.dow_entry_label.focus_get()
         
-        self.teacher_button = Button(controlpanel,command=self.teacher_schedule_calc,text="sched",name="pgdwn")
-        self.teacher_button.grid(row=0,column=11)
-        self.teacher_button.focus_get()
+        self.dow_entry_sv = StringVar()
+        self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv)
+        self.dow_entry.grid(row=0,column=11)
+        self.dow_entry.focus_get()
+        self.dow_entry_sv.set('Monday')
+        
+        self.rebuilddropdown_button = Button(controlpanel,command=self.dropdowns_set,text="ddown",name="ddown")
+        self.rebuilddropdown_button.grid(row=0,column=12)
+        self.rebuilddropdown_button.focus_get()
         
         self.bgmaxrows=len(self.enums['period']['name'])+1
         self.bgmaxcols=len(self.enums['student']['name'])+1 
         
+        widget_args=dict(background='white',width=2,font=font,values=self.enums['dow'])
         widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
         
         self.balancepanel = Frame(self)
@@ -233,7 +241,7 @@ class WizardUI(Tk):
         self.studentschedgrid = TkImageLabelGrid(self.balancepanel,'studentschedgrid',
                                             mytextalphanum,wmwidth,wmheight,
                                             0,0,self.bgmaxrows,self.bgmaxcols,
-                                            {},widgetcfg)
+                                            True,{},widgetcfg)
         
         self.studentschedgrid.grid(row=0,column=0,sticky=NSEW)
         
@@ -242,19 +250,20 @@ class WizardUI(Tk):
         self.teacherschedgrid = TkImageLabelGrid(self.balancepanel,'teacherschedgrid',
                                             mytextalphanum,wmwidth,wmheight,
                                             0,0,self.bgmaxrows,self.bgmaxcols,
-                                            {},widgetcfg)
+                                            True,{},widgetcfg)
         
         self.teacherschedgrid.grid(row=0,column=1,sticky=NSEW)
         
         self.balancepanel.grid_columnconfigure(0, weight=1, uniform="foo")
         self.balancepanel.grid_columnconfigure(1, weight=1, uniform="foo")
+        self.balancepanel.grid_rowconfigure(0, weight=1, uniform="foo")
 
         self.grid_rowconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(1, weight=10, uniform="foo")
         self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_rowconfigure(3, weight=10, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
-        self.grid_columnconfigure(1, weight=1, uniform="foo")
+        #self.grid_columnconfigure(1, weight=1, uniform="foo")
         
 
     def printme(self,event):
@@ -285,10 +294,16 @@ class WizardUI(Tk):
             self.database = Database(self.dbname_entry_sv.get())
             self.dbname = self.dbname_entry_sv.get()
         
-        if saveversion==None:
-            saveversion = str(self._lastsaveversion_get()+1)
-            #log.log(self,3,"saving save version=",str(saveversion))
-            log.log(thisfuncname(),3,msg="saving save version=",saveversion=str(saveversion))
+        if saveversion==None or saveversion == "":
+            
+            if self.dbload_entry_sv.get()==None or self.dbload_entry_sv.get() == "":
+                log.log(thisfuncname(),1,msg="no saveversion set for save; exception")
+                raise Exception("attempting to save without a saveversion set")  
+                
+            else:
+                saveversion = self.dbload_entry_sv.get()
+        
+        log.log(thisfuncname(),3,msg="saving save version=",saveversion=str(saveversion))
             
         #if saveversion == None:
         #    saveversion=str(self.lastsaveversion)
@@ -309,7 +324,7 @@ class WizardUI(Tk):
                     
                     #obj_id = session
 
-                    teacher_code,lessontype_code,subject_code = session.split(".")
+                    teacher_code,lessontype_code,subject_code,dow = session.split(".")
                     
                     # get the column and row headers associated with this cell
                     #student = self.entrygrid.widgets[0][y].sv.get()
@@ -325,7 +340,7 @@ class WizardUI(Tk):
                     subject = self.enums['subject']['code2name'][subject_code]
                                                                
                     datamembers = dict(schedule = '1',
-                                       dow='Tuesday', 
+                                       dow=dow, 
                                        subject=subject,
                                        lessontype=lessontype,
                                        objtype='lesson',
@@ -352,9 +367,9 @@ class WizardUI(Tk):
         self.teacher_schedule_calc() 
         self.student_schedule_calc()
             
-        self.dbload_entry_sv.set(self.lastsaveversion)
+        #self.dbload_entry_sv.set(self.lastsaveversion)
             
-        self.lastsaveversion+=1
+        #self.lastsaveversion+=1
 
     def _lesson_change_event(self,event):
         
@@ -409,7 +424,7 @@ class WizardUI(Tk):
                 try:
                     ostudent = self.of.object_get('student',students[s])
                 except KeyError:
-                    print "student",students[s],"does not exist"
+                    #print "student",students[s],"does not exist"
                     continue
     
                 if ostudent.lessons.has_key(periods[p]):
@@ -421,8 +436,9 @@ class WizardUI(Tk):
                             subject = lesson.subject.objid
                             self.studentschedgrid.widgets[gridx][gridy].sv.set(subject)
                         except KeyError:
-                            print "lesson",lesson,"does not exist"
-                    print
+                            pass
+                            #print "lesson",lesson,"does not exist"
+                    #print
                     
                 gridy+=1
 
@@ -447,7 +463,7 @@ class WizardUI(Tk):
                 try:
                     oteacher = self.of.object_get('teacher',teachers[t])
                 except KeyError:
-                    print "teacher",teachers[t],"does not exist"
+                    #print "teacher",teachers[t],"does not exist"
                     continue
             
                 '''for p in range(len(periods)):
@@ -465,8 +481,9 @@ class WizardUI(Tk):
                             #subject = self.of.object_get('lesson',str(lesson)).subject
                             self.teacherschedgrid.widgets[gridx][gridy].sv.set(subject)
                         except KeyError:
-                            print "lesson",lesson,"does not exist"
-                    print
+                            #print "lesson",lesson,"does not exist"
+                            pass
+                    #print
                     
                 gridy+=1
                     
@@ -474,6 +491,21 @@ class WizardUI(Tk):
             gridy=1
             gridx+=1
     
+    def dropdowns_set(self):
+        
+        widget_args=dict(background='red',width=9,values=self.enums['student'])
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,
+                                                  _execfunc,5,
+                                                  self.dow_entry_sv.get())        
+        for x in range(1,self.maxrows):
+            for y in range(1,self.maxcols):
+                
+                print self.entrygrid.widgets[x][y]['values']
+                self.entrygrid.widgets[x][y].config(**widgetcfg[x][y])   
+                print self.entrygrid.widgets[x][y]['values']
+
+        
     @logger(log)   
     def focus_next_widget(self,event):
         if str(event.widget)[-3:] == "svb":
@@ -489,11 +521,13 @@ class WizardUI(Tk):
         for x in range(firstrow,grid.maxrows):
             for y in range(firstcol,grid.maxcols):
                 grid.widgets[x][y].sv.set("")
+
                 grid.widgets[x][y].config(background='white')
                 grid.widgets[x][y].config(foreground='black')
                 grid.widgets[x][y].init_value = ""
                 grid.widgets[x][y].current_value = ""
                 grid.widgets[x][y].version = 0
+        self.dropdowns_set()
                     
     @logger(log)     
     def clear(self,firstrow=0,firstcol=0,gridname=None):
@@ -511,24 +545,44 @@ class WizardUI(Tk):
         self.save()
         
     @logger(log)       
-    def load(self,saveversion=None,values=None):
+    def load(self,saveversion=None,values=None, dow=None):
         
         if self.dbname <> self.dbname_entry_sv.get():
             log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
             self.database = Database(self.dbname_entry_sv.get())
             self.dbname = self.dbname_entry_sv.get()
         
-        if saveversion==None:
-            saveversion = self._lastsaveversion_get()
-            log.log(thisfuncname(),3,msg="loading last save version",saveversion=str(saveversion))
+        whereclause = []
+        
+        if saveversion==None or saveversion== "":
+            if self.dbload_entry_sv.get() <> None and self.dbload_entry_sv.get() <> "":
+                saveversion = self.dbload_entry_sv.get()
+            else:
+                log.log(thisfuncname(),1,msg="no saveversion set for load; exception")
+                raise Exception("attempting to load without a saveversion set")
+        
+        whereclause.append(['saveversion',"=",saveversion])
+        log.log(thisfuncname(),3,msg="loading",saveversion=str(saveversion))
+            
+        if dow==None:
+            if self.dow_entry_sv.get() == None:
+                raise Exception("dow must be specified")
+            else:
+                dow = self.dow_entry_sv.get()
+                dow = self.enums['dow']['name2code'][dow]
+                
+                whereclause.append( ['dow',"=","\""+dow+"\""])
+        
+                log.log(thisfuncname(),3,msg="loading",dow=str(dow))
         
         cols = ['period','student','session','dow']
         
         if values==None:
             with self.database:
-                colndefn,rows = tbl_rows_get(self.database,'lesson',cols,
-                                    ('saveversion',saveversion))
-            
+                colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
+                
+                log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
+                
             for row in rows:
                 
                 z = session =  row[cols.index('session')]
@@ -542,7 +596,8 @@ class WizardUI(Tk):
                 self.entrygrid.widgets[0][y+1].sv.set(period)
                 self.entrygrid.widgets[x+1][0].sv.set(student)
                 
-                log.log(thisfuncname(),3,msg="loading row",period=period,student=str(student),x=x,y=y,value=z)
+                log.log(thisfuncname(),3,msg="loading row",period=period,student=str(student),sv=saveversion,
+                        x=x,y=y,value=z)
         else:
                 
             for x in range(len(values)):
@@ -575,5 +630,5 @@ if __name__ == "__main__":
     
     
     of = ObjFactory(True)
-    app = WizardUI('htmlparser',of,maxentrycols=12,maxentryrows=12)
+    app = WizardUI('htmlparser',of,'quadref',maxentrycols=12,maxentryrows=20)
     app.mainloop()

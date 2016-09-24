@@ -2,6 +2,8 @@ from Tkinter import *
 from Tkinter import Button as _tkbutton
 from Tkinter import Label as _tklabel
 from Tkinter import Entry as _tkentry
+from Tkinter import Frame as _tkframe
+from Tkinter import Canvas as _tkcanvas
 
 from ttk import *
 import tkFont
@@ -177,32 +179,36 @@ class TkImageLabelGrid(Frame):
                       gridcolstart=0,gridrowstart=0,
                       rowhdrcfg={},colhdrcfg={}):
     
+        # toplevel
         self.master = master # reference to ui root
-        Frame.__init__(self,master,width=100,height=100)
-        self.grid(row=0,column=0)
+        Frame.__init__(self,master)    
+        self.grid(row=0,column=0,sticky=NSEW)
         
-        self.canvas = Canvas(self)
-        frame = Frame(self.canvas)
-        frame.grid(row=0,column=0,sticky=NSEW)
+        #self.master.grid_rowconfigure(0,weight=1,uniform='foo')
+        #self.master.grid_columnconfigure(0,weight=1,uniform='foo')
+        
+        # canvas
+        self.canvas = _tkcanvas(self)
+        self.canvas.pack(side=RIGHT,fill=BOTH,expand=True,anchor=N)
+        
+        # canvasframe
+        self.canvasframe = Frame(self.canvas)
+        self.canvasframe.pack(side = LEFT, fill = BOTH, expand = True,anchor=N)
+
+        self.canvas_window = self.canvas.create_window((0,0),window=self.canvasframe,anchor=N)
 
         vscrollbar = Scrollbar(self,orient="vertical",command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=vscrollbar.set)
-        hscrollbar = Scrollbar(self,orient="horizontal",command=self.canvas.xview)
-        self.canvas.configure(yscrollcommand=hscrollbar.set,xscrollcommand=hscrollbar.set)
         
         if scrollbar == True:
-            #vscrollbar = Scrollbar(self,orient="vertical",command=self.canvas.yview)
-            vscrollbar.pack(side='right',fill='y')       
-            #self.canvas.configure(yscrollcommand=vscrollbar.set)
+            vscrollbar.pack(side=RIGHT,fill=Y)         
         
-            #hscrollbar = Scrollbar(self,orient="horizontal",command=self.canvas.xview)
-            hscrollbar.pack(side='bottom',fill='x')        
-            #self.canvas.configure(yscrollcommand=hscrollbar.set,xscrollcommand=hscrollbar.set)
-        
-        self.canvas.pack(side="left",fill="both",expand=True)
-        self.canvas.create_window((2,2),window=frame,anchor="nw",tags="frame")
-    
+        self.canvas.config(yscrollcommand=vscrollbar.set)        
+
+        self.canvas.config(background='green')
         self.gridname = gridname
+    
+        self.canvasframe.bind("<Configure>",self.resize_canvasframe)  
+        self.canvas.bind("<Configure>",self.reset_framewidth)
         
         self.current_yfocus=0
         self.current_xfocus=0
@@ -231,30 +237,42 @@ class TkImageLabelGrid(Frame):
         self.label='foobar'
     
         self.widgets=[]
+
+        self.canvasframe.grid_rowconfigure(0,weight=1,uniform='foo')
+        self.canvasframe.grid_columnconfigure(0,weight=1,uniform='foo')  
+        
         for x in range(self.maxrows):
             ylbls=[]
             for y in range(self.maxcols):
                 
-                lbl = tkwidgetfactory(self,var,frame,master,
+                lbl = tkwidgetfactory(self,var,self.canvasframe,master,
                                       name=",".join([gridname,str(x),str(y)]),
-                                      **widgetcfg[x][y])
+                                      **widgetcfg[x][y])        
+                
     
                 lbl.grid(row=x,column=y,sticky=NSEW)
                    
                 ylbls.append(lbl)
             self.widgets.append(ylbls)
-         
+
         for i in range(self.gridcolstart,self.maxcols):
-            self.grid_columnconfigure(i, weight=1, uniform="foo")
+            self.canvasframe.grid_columnconfigure(i, weight=1, uniform="foo")
             
         for i in range(self.gridrowstart,self.maxrows):        
-            self.grid_rowconfigure(i, weight=1, uniform="foo")
+            self.canvasframe.grid_rowconfigure(i, weight=1, uniform="foo")
     
         if rowhdrcfg <> None: self.header_set(1,**rowhdrcfg)
         if colhdrcfg <> None: self.header_set(2,**colhdrcfg)   
     
         self.focus(0,0)
         self.ic = ImageCreate()
+        
+    def reset_framewidth(self,event):
+        self.canvas.itemconfig(self.canvas_window,width=event.width)
+        
+    def resize_canvasframe(self,event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
         
     def refocus(self,event):
         
@@ -448,7 +466,8 @@ class TKBase(object):
 
     def highlight(self,event):
         _,state,_ = self['style'].split(".")
-           
+        
+        print "highlight",event.widget
         if event.type == '9':
             self['style']=".".join(['InFocus',state,self.winfo_class()])
         elif event.type == '10':
@@ -465,6 +484,35 @@ class TKBase(object):
         self.app.refocus(event)
         return "break"
 
+class TkEntryBool(Entry,TKBase):
+    def __init__(self,master,var,**kwargs):
+        
+        if not isadatatype(var):
+            raise Exception('arg datatype must be a valid type')
+
+        self.sv=StringVar()    
+        Entry.__init__(self,master,
+                          textvariable=self.sv,
+                          **kwargs)
+        
+        TKBase.__init__(self,self,**kwargs)
+        
+        #self.widget.config(relief=FLAT,borderwidth=1,highlightthickness=0)
+        self.style_on = ".".join(['On','Notchanged',self.widget.winfo_class()])
+        self.widget.s.configure(self.style_on,fieldbackground='green',foreground='black',
+                                relief=FLAT,borderwidth=1,highlightthickness=0)
+        
+        log.log(thisfuncname(),10,func=self.__init__)
+        
+    def highlight(self,event):
+        
+        if event.type == '9':
+            if self.widget['style'] <> self.style_on:
+                self.orig_style = self.widget['style']
+                self.widget['style'] = self.style_on
+            else:
+                self.widget['style'] = self.orig_style
+        
 class TkEntry(Entry,TKBase):
     def __init__(self,master,var,**kwargs):
         

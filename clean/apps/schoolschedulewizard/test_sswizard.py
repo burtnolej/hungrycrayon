@@ -79,13 +79,13 @@ class Test_Grid_Behaviour_Update_Combobox(unittest.TestCase):
         self.ui.destroy()
         
 class Test_Base(unittest.TestCase):
-    def setUp(self,dbname):
+    def setUp(self,dbname,refdbname):
         dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
         self.dbname = dbname
         self.dbfilename = path.join(dbpath,self.dbname)
         self.database = Database(self.dbfilename)
         self.of = ObjFactory(True)
-        self.ui = WizardUI(self.dbname, self.of)       
+        self.ui = WizardUI(self.dbname, self.of,refdbname)       
         self.ui.dbname_entry_sv.set(dbname)
         
     def tearDown(self):
@@ -143,47 +143,48 @@ class Test_Input_New_Save_Persist(Test_Base):
 
 class Test_Input_New_Save_Change_Save_Persist(Test_Base):
     def setUp(self):
-        Test_Base.setUp(self,'tmp')
+        Test_Base.setUp(self,'tmp','quadref.092216')
         
         self.ui.dbname_entry_sv.set(self.dbname)
         
-        self.ui.entrygrid.widgets[1][0].sv.set('8:30-9:10')
-        self.ui.entrygrid.widgets[0][1].sv.set('Stan')
-        self.ui.entrygrid.widgets[1][1].sv.set('NATHANIEL')
+        self.ui.entrygrid.widgets[1][0].sv.set('830')
+        self.ui.entrygrid.widgets[0][1].sv.set('A')
+        self.ui.entrygrid.widgets[1][1].sv.set('DA.AC.HU.WK')
         
         self.ui.save()
         
         self.ui.entrygrid.widgets[1][1].sv.set('TRISTAN')
         
         self.ui.persist()
-    
-    def test_balancegrid_contents(self):
+
+    def test_dbwrite_teacher(self):
         
-        expected_results = [['2:30-3:00', 'NATHANIEL', 'TRISTAN', 'SIMON A.', 'ORIG', 'COBY', 'BOOKER', 'ASHLEY', 'YOSEF', 'LUCY', 'JAKE', 'ASHER', 'DONOVAN', 'LIAM', 'SIMON B', 'NICK'], 
-                            ['8:30-9:10', 'Stan'], 
-                            ['9:11-9:51'], 
-                            ['9:52-10:32'], 
-                            ['10:33-11:13'], 
-                            ['11:13-11:45'], 
-                            ['11:45-12:25'], 
-                            ['12:26-1:06'], 
-                            ['1:07-1:47'], 
-                            ['1:48-2:28'], 
-                            ['2:30-3:00']]
-                
-        self.assertListEqual(self.ui.balancegrid.dump_grid(), expected_results)    
+        expected_result = [['Danielle']]
         
-    def test_dbwrite(self):
+        cols = ['name']
+
+        with self.database:
+            colndefn,rows = tbl_rows_get(self.database,'teacher',cols)
+            
+        print expected_result,rows
         
-        expected_result = [[u'8:30-9:10', u'NATHANIEL', u'Stan', u'Tuesday', 0],
-                           [u'8:30-9:10', u'TRISTAN', u'Stan', u'Tuesday', 1]]
         
-        cols = ['period','student','teacher','dow','saveversion']
+    def test_dbwrite_lesson(self):
+        
+        expected_result = [[830, u'A', 'DA.AC.HU', u'Tuesday', 1]]
+        
+        cols = ['period','student','session','dow','saveversion']
+        
+        
+        with self.database:
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols)
+            
+        print expected_result,rows
         
     def test_grid_contents(self):
         
-        expected_results =[['Stan'],
-                        ['8:30-9:10', 'TRISTAN']]
+        expected_results =[['830'],
+                        ['A', 'DA.AC.HU.WK']]
                 
         self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)
 
@@ -494,27 +495,28 @@ class Test_Load_Save(Test_Base):
 class Test_Load_Change_Save_Single_Value(Test_Base):
     
     def setUp(self):
-        Test_Base.setUp(self,'test_sswizard')
+        Test_Base.setUp(self,'test_sswizard','quadref.092216')
         
         self.ui.load()
     
-        self.ui.entrygrid.widgets[1][1].sv.set('DA.AC.HU')
+        self.ui.entrygrid.widgets[1][1].sv.set('DA.AC.HU.WK')
     
         self.ui.save()
         
         self.ui.persist()
-        
+       
+  
     def test_dbwrite(self):
         
-        expected_result = [[830, u'A', 'DA.AC.HU', u'Tuesday', 1], 
-                           [830, u'B', 'DA.AC.HU', u'Tuesday', 1]]
+        expected_result = [[830, u'A', 'DA.AC.HU.WK', u'WK', 1], 
+                           [830, u'B', 'DA.AC.HU.WK', u'WK', 1]]
         
         cols = ['period','student','session','dow','saveversion']
         
         
         with self.database:
-            colndefn,rows = tbl_rows_get(self.database,'lesson',cols,['saveversion','1'])
-
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols,[['saveversion',"=",'1']])
+        
         self.assertListEqual(expected_result,rows)
         
         
@@ -758,22 +760,22 @@ class Test_Load_Save_Change_Save_New_Row(Test_Base):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Combobox))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Combobox))
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Persist))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save))   
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Persist))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save))   
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save_Single_Value))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_New_Row))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_Change_Save_Single_Value))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_New_Row))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_Change_Save_Single_Value))
 
         
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_Single_Value))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Fill_Student))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Fill_Student_Unfill))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist_Overbook_Teacher_Period))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Fix_Overbooking))
     

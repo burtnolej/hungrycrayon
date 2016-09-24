@@ -5,7 +5,7 @@ log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
           pidlogname=True,proclogname=False)
 
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNum, \
-     TextAlphaNumRO
+     TextAlphaNumRO, TrueFalse
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 from misc_utils import nxnarraycreate, thisfuncname
 
@@ -14,7 +14,7 @@ import sswizard_utils
 
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, \
-     tbl_rows_update, dbtblfactory, tbl_col_update, tbl_col_add
+     tbl_rows_update, dbtblfactory, tbl_col_update, tbl_col_add,tbl_row_delete
 
 from collections import OrderedDict
 from Tkinter import *
@@ -52,6 +52,8 @@ class DBTableUI(Tk):
         wmheight=wheight*20 # master height
         wmwidth=wwidth*20 # master width 
 
+
+
         geom = geometry_get(wmheight,wmwidth,0,0)
         self.geometry(geom)
                
@@ -79,14 +81,16 @@ class DBTableUI(Tk):
         xlbl_widget_args=dict(width=10,font=font)
         xlbl_widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,xlbl_widget_args)
         
-        mytextalphanumro = TextAlphaNum(name='textalphanum')
-        self.entrygridxlabel = TkImageLabelGrid(self,'entrygridxlbl',mytextalphanumro,2,wmheight,
+        mytruefalse = TrueFalse(name='truefalse')
+        #mytextalphanumro = TextAlphaNum(name='textalphanum')
+        self.entrygridxlabel = TkImageLabelGrid(self,'entrygridxlbl',mytruefalse,2,wmheight,
                                                 0,0,self.maxrows,1,False,{},xlbl_widgetcfg)
-        self.entrygridxlabel.grid(row=0,column=0,rowspan=4,sticky=NS)
+        self.entrygridxlabel.grid(row=0,column=0,rowspan=2,sticky=NS)
         
         for i in range(self.maxrows):
             if i <> 0:
                 self.entrygridxlabel.widgets[i][0].sv.set(i+1)
+                #self.entrygridxlabel.widgets[i][0].config(text=i+1)
                 self.entrygridxlabel.widgets[i][0]['style'] = 'InFocus.Label.TEntry'
          
    
@@ -97,81 +101,85 @@ class DBTableUI(Tk):
         mytextalphanum = TextAlphaNum(name='textalphanum')
         self.entrygrid = TkImageLabelGrid(self,'entrygrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxrows,self.maxcols,
-                             True,{},widgetcfg)
-        self.entrygrid.grid(row=1,column=1,rowspan=2,sticky=NSEW)
+                             False,{},widgetcfg)
+        self.entrygrid.grid(row=1,column=1,sticky=NSEW)
         
         controlpanel = Frame(self)
-        controlpanel.grid(row=2,column=2,sticky=NSEW)
+        controlpanel.grid(row=2,column=1,sticky=NSEW)
                 
         self.dbname_label = Label(controlpanel,text="database")
-        self.dbname_label.grid(column=0,row=0,sticky=NSEW)
+        self.dbname_label.grid(column=8,row=0,sticky=NSEW)
         self.dbname_label.focus_get()
         
         self.dbname_entry_sv = StringVar()
         self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv)
-        self.dbname_entry.grid(column=1,row=0,sticky=NSEW)
+        self.dbname_entry.grid(column=9,row=0,sticky=NSEW)
         self.dbname_entry.focus_get()
         self.dbname_entry_sv.set("htmlparser")
 
         self.tblname_label = Label(controlpanel,text="table")
-        self.tblname_label.grid(column=2,row=0,sticky=NSEW)
+        self.tblname_label.grid(column=8,row=1,sticky=NSEW)
         self.tblname_label.focus_get()
         
         self.tblname_entry_sv = StringVar()
         self.tblname_entry = Entry(controlpanel,textvariable=self.tblname_entry_sv)
-        self.tblname_entry.grid(column=3,row=0,sticky=NSEW)
+        self.tblname_entry.grid(column=9,row=1,sticky=NSEW)
         self.tblname_entry.focus_get()
         self.tblname_entry_sv.set("lesson")
         
         self.clone_label = Label(controlpanel,text="clone id")
-        self.clone_label.grid(column=4,row=0,sticky=NSEW)
+        self.clone_label.grid(column=10,row=2,sticky=NSEW)
         self.clone_label.focus_get()
         
         self.clone_entry_sv = StringVar()
         self.clone_entry = Entry(controlpanel,textvariable=self.clone_entry_sv)
-        self.clone_entry.grid(column=5,row=0,sticky=NSEW)
+        self.clone_entry.grid(column=11,row=2,sticky=NSEW)
         self.clone_entry.focus_get()
         self.clone_entry_sv.set(1)
         
         self.pkentry_label = Label(controlpanel,text="pk")
-        self.pkentry_label.grid(column=6,row=0,sticky=NSEW)
+        self.pkentry_label.grid(column=10,row=1,sticky=NSEW)
         self.pkentry_label.focus_get()
         
         self.pk_entry_sv = StringVar()
         self.pk_entry = Entry(controlpanel,textvariable=self.pk_entry_sv)
-        self.pk_entry.grid(column=7,row=0,sticky=NSEW)
+        self.pk_entry.grid(column=11,row=1,sticky=NSEW)
         self.pk_entry.focus_get()
         self.pk_entry_sv.set("__id")
   
-        self.scrolldelta_label = Label(controlpanel,text="pk")
-        self.scrolldelta_label.grid(column=7,row=0,sticky=NSEW)
+        self.scrolldelta_label = Label(controlpanel,text="sdelta")
+        self.scrolldelta_label.grid(column=10,row=0,sticky=NSEW)
         self.scrolldelta_label.focus_get()
         
         self.scrolldelta_label_entry_sv = StringVar()
-        self.scrolldelta_label_entry = Entry(controlpanel,textvariable=self.pk_entry_sv)
-        self.scrolldelta_label_entry.grid(column=8,row=0,sticky=NSEW)
+        self.scrolldelta_label_entry = Entry(controlpanel,textvariable=self.scrolldelta_label_entry_sv)
+        self.scrolldelta_label_entry.grid(column=11,row=0,sticky=NSEW)
         self.scrolldelta_label_entry.focus_get()
         self.scrolldelta_label_entry_sv.set(10)
 
         self.dbload_button = Button(controlpanel,command=self.load,text="dbload",name="dbl")
-        self.dbload_button.grid(column=0,row=1,columnspan=1,sticky=NSEW)
+        self.dbload_button.grid(column=0,row=1,sticky=NSEW)
         self.dbload_button.focus_get()
         
         self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
-        self.clear_button.grid(column=2,row=1,columnspan=1,sticky=NSEW)
+        self.clear_button.grid(column=1,row=1,sticky=NSEW)
         self.clear_button.focus_get()
         
         self.dbinsert_button = Button(controlpanel,command=self.insert,text="dbinsert",name="dbi")
-        self.dbinsert_button.grid(column=3,row=1,columnspan=1,sticky=NSEW)
+        self.dbinsert_button.grid(column=2,row=1,sticky=NSEW)
         self.dbinsert_button.focus_get()
         
         self.dbsavechanges_button = Button(controlpanel,command=self.process_updates,text="dbsavechgs",name="dbc")
-        self.dbsavechanges_button.grid(column=4,row=1,columnspan=1,sticky=NSEW)
+        self.dbsavechanges_button.grid(column=3,row=1,sticky=NSEW)
         self.dbsavechanges_button.focus_get()
 
         self.clone_button = Button(controlpanel,command=self.clone,text="clone",name="cln")
-        self.clone_button.grid(column=5,row=1,columnspan=1,sticky=NSEW)
+        self.clone_button.grid(column=4,row=1,sticky=NSEW)
         self.clone_button.focus_get()
+        
+        self.delrow_button = Button(controlpanel,command=self.delrow,text="delrow",name="drw")
+        self.delrow_button.grid(column=5,row=1,sticky=NSEW)
+        self.delrow_button.focus_get()
 
         self.pagedown_button = Button(controlpanel,
                                       command=lambda: self.pagescroll('down'),
@@ -211,33 +219,139 @@ class DBTableUI(Tk):
         self.pred1_entry.focus_get()
         
         # query predicate value 1
-        self.predval1_label = Label(controlpanel,text="val1")
-        self.predval1_label.grid(column=2,row=4,sticky=NSEW)
-        self.predval1_label.focus_get()
+        self.pred1_op_entry_sv = StringVar()
+        self.pred1_op_entry = Entry(controlpanel,textvariable=self.pred1_op_entry_sv)
+        self.pred1_op_entry.grid(column=2,row=4,sticky=NSEW)
+        self.pred1_op_entry.focus_get()
+        self.pred1_op_entry_sv.set("=")
         
         self.predval1_entry_sv = StringVar()
         self.predval1_entry = Entry(controlpanel,textvariable=self.predval1_entry_sv)
         self.predval1_entry.grid(column=3,row=4,sticky=NSEW)
         self.predval1_entry.focus_get()
         
+        # query predicate 2
+        self.pred2_label = Label(controlpanel,text="pred2")
+        self.pred2_label.grid(column=0,row=5,sticky=NSEW)
+        self.pred2_label.focus_get()
+        
+        self.pred2_entry_sv = StringVar()
+        self.pred2_entry = Entry(controlpanel,textvariable=self.pred2_entry_sv)
+        self.pred2_entry.grid(column=1,row=5,sticky=NSEW)
+        self.pred2_entry.focus_get()
+        
+        # query predicate value 2
+        self.pred2_op_entry_sv = StringVar()
+        self.pred2_op_entry = Entry(controlpanel,textvariable=self.pred2_op_entry_sv)
+        self.pred2_op_entry.grid(column=2,row=5,sticky=NSEW)
+        self.pred2_op_entry.focus_get()
+        self.pred2_op_entry_sv.set("=")
+        
+        self.predval2_entry_sv = StringVar()
+        self.predval2_entry = Entry(controlpanel,textvariable=self.predval2_entry_sv)
+        self.predval2_entry.grid(column=3,row=5,sticky=NSEW)
+        self.predval2_entry.focus_get()
+        
+        # query details
+        self.lastquery_label = Label(controlpanel,text="last query")
+        self.lastquery_label.grid(column=8,row=4,sticky=NSEW)
+        self.lastquery_label.focus_get()
+        
+        self.lastquery_text_sv = StringVar()
+        self.lastquery_text = Entry(controlpanel,textvariable=self.lastquery_text_sv)
+        self.lastquery_text.grid(column=9,row=4,sticky=NSEW,columnspan=3)
+        self.lastquery_text.focus_get()
+        
+        self.lastquery_rowcount_label = Label(controlpanel,text="last query rowcount")
+        self.lastquery_rowcount_label.grid(column=8,row=5,sticky=NSEW)
+        self.lastquery_rowcount_label.focus_get()
+        
+        self.lastquery_rowcount_text_sv = StringVar()
+        self.lastquery_rowcount_text = Entry(controlpanel,text=self.lastquery_rowcount_text_sv)
+        self.lastquery_rowcount_text.grid(column=9,row=5,sticky=NSEW)
+        self.lastquery_rowcount_text.focus_get()
+        
+        self.hlightpk_label = Label(controlpanel,text="hlight pk")
+        self.hlightpk_label.grid(column=8,row=6,sticky=NSEW)
+        self.hlightpk_label.focus_get()
+        
+        self.hlightpk_text_sv = StringVar()
+        self.hlightpk_text = Entry(controlpanel,text=self.hlightpk_text_sv)
+        self.hlightpk_text.grid(column=9,row=6,sticky=NSEW)
+        self.hlightpk_text.focus_get()
+        
+        
+        self.hlightpk_button = Button(controlpanel,width=1,command=self.delrow_show,
+                                      text="PK",name="hlpk")
+        self.hlightpk_button.grid(row=6,column=10)
+        self.hlightpk_button.focus_get()
+        
+        
+        # new row grid
         self.maxnewrows=maxnewrowrows
         self.newrowgrid = TkImageLabelGrid(self,'newrowgrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxnewrows,self.maxcols,
                              True,{},widgetcfg)
                              #{},widgetcfg,1,1,rowcfg,colcfg)
         #self.newrowgrid.grid(row=2,sticky=NSEW)
-        self.newrowgrid.grid(row=1,column=2,sticky=NSEW)
+        self.newrowgrid.grid(row=3,column=1,sticky=NSEW)
                 
         self.grid_columnconfigure(0, weight=1, uniform="foo")
         self.grid_columnconfigure(1, weight=15, uniform="foo")
-        self.grid_columnconfigure(2, weight=15, uniform="foo")
+        #self.grid_columnconfigure(2, weight=15, uniform="foo")
         
         self.grid_rowconfigure(0, weight=1, uniform="foo")
-        self.grid_rowconfigure(1, weight=15, uniform="foo")
-        self.grid_rowconfigure(2, weight=15, uniform="foo")
+        self.grid_rowconfigure(1, weight=15,uniform="foo")
+        self.grid_rowconfigure(2, weight=3, uniform="foo")
+        self.grid_rowconfigure(3, weight=5, uniform="foo")
         
         #self.grid_rowconfigure(2, weight=1, uniform="foo")
           
+          
+    def delrow_show(self):
+        
+        l=[]
+        for i in range(self.maxrows):
+            if i <> 0:
+                widget = self.entrygridxlabel.widgets[i][0]
+                
+                if widget['style'] == widget.style_on:
+                    pk_id = self.pk_entry_sv.get()
+                    pk_id_index = self.colnames.index(pk_id)
+                    pkval = self.entrygrid.widgets[i-1][pk_id_index].sv.get()
+                    l.append(pkval)
+                
+          
+        self.hlightpk_text_sv.set(",".join(l))
+        return(l)
+                    
+    
+    def delrow(self):
+        database = Database(self.dbname_entry_sv.get())
+        
+        for i in range(self.maxrows):
+            if i <> 0:
+                widget = self.entrygridxlabel.widgets[i][0]
+                
+                if widget['style'] == widget.style_on:
+                    pk_id = self.pk_entry_sv.get()
+                    pk_id_index = self.colnames.index(pk_id)
+                    pkval = self.entrygrid.widgets[i-1][pk_id_index].sv.get()
+                    
+                    with database:
+                        exec_str = tbl_row_delete(database,self.tblname_entry_sv.get(),
+                                                                [[pk_id,"=","\""+pkval+"\""]])
+    
+                        self.lastquery_text_sv.set(exec_str)
+                        
+        self.clear()
+        self.load()
+        
+    
+    def deleteflagset(self,event=None):
+        print self.focus_get()
+        #print event.widget
+        
     def pagescroll(self,direction):
         delta = int(self.scrolldelta_label_entry_sv.get())
         invdelta = int(delta*-1)
@@ -268,6 +382,7 @@ class DBTableUI(Tk):
         return sswizard_utils.widget_current_values_get(self,gridname,rownum)
                  
     def update_callback(self,widget,new_value):
+        
         sswizard_utils.update_callback(self,widget,new_value)
         
     @logger(log)        
@@ -466,21 +581,34 @@ class DBTableUI(Tk):
             self.clear(1)
 
         database = Database(self.dbname_entry_sv.get())
-        whereclause = []
+        whereclauses = []
         
         if self.pred1_entry_sv.get() <> "":
             
-            whereclause = [self.pred1_entry_sv.get(),
-                           self.predval1_entry_sv.get()]
+            whereclauses.append([self.pred1_entry_sv.get(),
+                                 self.pred1_op_entry_sv.get(),
+                                 self.predval1_entry_sv.get()])
 
-            log.log(thisfuncname(),9,msg="where clause specified",whereclause=whereclause)
+            log.log(thisfuncname(),9,msg="where clause specified",whereclauses=whereclauses)
+            
+        if self.pred2_entry_sv.get() <> "":
+            
+            whereclauses.append([self.pred2_entry_sv.get(),
+                                 self.pred2_op_entry_sv.get(),
+                                 self.predval2_entry_sv.get()])
+
+            log.log(thisfuncname(),9,msg="where clause specified",whereclauses=whereclauses)
+
             
         with database:
-            colndefn,rows = tbl_rows_get(database,self.tblname_entry_sv.get(),"*",whereclause)
+            colndefn,rows,exec_str = tbl_rows_get(database,self.tblname_entry_sv.get(),"*",whereclauses)
+            
+            self.lastquery_text_sv.set(exec_str)
+            self.lastquery_rowcount_text_sv.set(str(len(rows)))
             
             log.log(thisfuncname(),3,func=tbl_rows_get,msg=str(len(rows))+"rows loaded",table=self.tblname_entry_sv.get())
                                     
-            for y in range(len(rows[0])):
+            for y in range(len(colndefn)):
         
                 self.dbcol_defn.append(colndefn[y])
                 
@@ -515,6 +643,11 @@ class DBTableUI(Tk):
                         
                     except:
                         pass
+                    
+        # after load store the column headers for easy lookup later
+        self.colnames = colndefn
+                    
+    
 
     @logger(log)        
     def updates_get(self,gridname,ignoreaxes=False):

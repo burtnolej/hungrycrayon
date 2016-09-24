@@ -859,7 +859,116 @@ class Test_Add_Column_of_Loaded_Rows_With_Values(unittest.TestCase):
 
         #os.remove(self.tmpdbname+".sqlite")
         self.ui.destroy()
+    
+class Test_New_DBTable_Insert(unittest.TestCase):
+    def setUp(self):
+        dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'        
+        self.dbname = 'test_dbtableviewer_tmp'
+        self.dbfilename = path.join(dbpath,self.dbname)
+        self.ui = DBTableUI()
+        self.ui.dbname_entry_sv.set(self.dbfilename)
+        #self.ui.load()
+
+        self.database = Database(self.dbfilename)
+
+        self.ui.newrowgrid.widgets[0][0].sv.set('A')
+        self.ui.newrowgrid.widgets[0][1].sv.set('B')
+        self.ui.newrowgrid.widgets[0][2].sv.set('C')
+    
+        self.ui.newrowgrid.widgets[1][0].sv.set('1')
+        self.ui.newrowgrid.widgets[1][1].sv.set('2')
+        self.ui.newrowgrid.widgets[1][2].sv.set('3')
+
+    def test_(self):
+      
+        #self.ui.mainloop()
+        self.ui.insert(self.database)  
+
+        expected_results = [[1,2,3]]
      
+        cols = ['A','B','C']
+
+        with self.database:
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols)
+
+        self.assertListEqual(expected_results,rows)
+        
+    def tearDown(self):
+        #copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")
+        os.remove(self.dbname+".sqlite")
+        self.ui.destroy()
+        
+class Test_New_DBTable_Insert_Change_Save(unittest.TestCase):
+    def setUp(self):
+        dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'        
+        self.dbname = 'test_dbtableviewer_tmp'
+        self.dbfilename = path.join(dbpath,self.dbname)
+        self.ui = DBTableUI()
+        self.ui.dbname_entry_sv.set(self.dbfilename)
+        #self.ui.load()
+
+        self.database = Database(self.dbfilename)
+
+        self.ui.newrowgrid.widgets[0][0].sv.set('A')
+        self.ui.newrowgrid.widgets[0][1].sv.set('B')
+        self.ui.newrowgrid.widgets[0][2].sv.set('C')
+    
+        self.ui.newrowgrid.widgets[1][0].sv.set('1')
+        self.ui.newrowgrid.widgets[1][1].sv.set('2')
+        self.ui.newrowgrid.widgets[1][2].sv.set('3')
+        
+        self.ui.insert(self.database)
+        
+        self.ui.entrygrid.widgets[1][1].sv.set('foobar')
+
+    '''def test_update_queue(self):
+        
+        # until save reload column name is actually in 2 places
+        expected_results = [[('A',1),('B',1),('C',1)],
+                            [('1',1),('foobar',2),('3',1)]]
+                            
+                
+        values,bgcolor = self.ui.updates_get('entrygrid',ignoreaxes=False)
+
+        self.assertListEqual(values[0][:-2], expected_results[0])
+        self.assertListEqual(values[1][:-2], expected_results[1])
+
+
+    def test_last_widget_values(self):
+        
+        # ('','') not on the end as blank, blanks get suppressed by current_value_get
+        #expected_results =  [('dow','dow'),('','lessontype'),  ('','objtype'), ('','period'), ('','saveversion'), ('','schedule'), ('','student'),('','subject'), ('','teacher'),('','userobjid'),('','__timestamp'),('','__id')]
+        expected_results_row0 =  [('A','A'),('B','B'),  ('C','C')]
+        expected_results_row1 =  [('',1),('',2),  ('',3)]
+        
+        values = self.ui.widget_current_values_get('entrygrid',0)
+
+        self.assertListEqual(values[:-2], expected_results_row0)
+        
+        values = self.ui.widget_current_values_get('entrygrid',1)
+
+        self.assertListEqual(values[:-2], expected_results_row1)'''
+        
+    def test_dbwrite(self):
+      
+        #self.ui.mainloop()
+
+        self.ui.process_updates(self.database)
+        
+        expected_results = [[1,'foobar',3]]
+     
+        cols = ['A','B','C']
+
+        with self.database:
+            colndefn,rows = tbl_rows_get(self.database,'lesson',cols)
+
+        self.assertListEqual(expected_results,rows)
+        
+    def tearDown(self):
+        #copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")
+        os.remove(self.dbname+".sqlite")
+        self.ui.destroy()
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
@@ -870,15 +979,19 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Clear_Load))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save))
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Save))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Save))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Insert_Change_Save_Insert_Save))
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Change_Column_of_Loaded_Rows))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Column_of_Loaded_Rows))
          
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New_DBTable_Insert))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New_DBTable_Insert_Change_Save))
+    
     
 
+    
     
     
     

@@ -9,18 +9,19 @@ from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 
 __all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfunc']
 
-def _dowexecfunc(database,value,prep):
+def _dowexecfunc(database,value,prep,*args):
     exec_str = "select code from dow "
     return(tbl_query(database,exec_str))
 
-def _execfunc(database,value,prep):
+def _execfunc(database,value,prep,dow):
     exec_str = "select s.code "
     exec_str += "from session as s,adult as a "
     exec_str += "where a.prep = {0} and ".format(prep)
     exec_str += "a.name = s.teacher and "
     exec_str += "s.period = {0} and ".format(value)
-    exec_str += "a.subject <> \"None\""
+    exec_str += "s.day = \"{0}\"".format(dow)
     
+    print exec_str
     #exec_str = "select code from session where period = {0} and subject <> \"None\"".format(value)
     return(tbl_query(database,exec_str))
 

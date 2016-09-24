@@ -92,12 +92,15 @@ def dropdown_build(database,
                    widgetargs,
                    exec_func,
                    prep,
+                   dow="Monday",
                    rowheaderexecfunc=None,
                    columnheaderexecfunc=None,
                    ui=None):
     
     xoffset=0
     yoffset=0
+    
+    log.log(thisfuncname(),3,msg="creating dropdowns lists",dow=dow,prep=prep)
     
     if rowheaderexecfunc <> None: yoffset=1    
     if columnheaderexecfunc <> None: xoffset=1
@@ -106,7 +109,7 @@ def dropdown_build(database,
     with database:
         for y in range(yoffset,len(widgetargs[0])):
         #for x in range(xoffset,len(widgetargs)):
-            colndefn,values = exec_func(database,y,prep)
+            colndefn,values = exec_func(database,y,prep,dow)
             
             values = [value[0] for value in values]
             
@@ -232,10 +235,10 @@ def session_code_gen(dbname,dryrun=False):
         __id = row[2]
         oldcode = row[3]
         lessontype = row[4]
-        dow_code = row[5]
+        dow = row[5]
 
-        if dow_code == None:
-            dow_code = "WK"
+        if dow == None:
+            dow = "??"
             
         if teacher == None:
             teacher_code = "??"
@@ -253,7 +256,9 @@ def session_code_gen(dbname,dryrun=False):
             
         teacher_code = enums['adult']['name2code'][teacher]
         #session_code = ".".join([teacher_code,subject_code,])
+        dow_code = enums['dow']['name2code'][dow]
         session_code = ".".join([teacher_code,subject_code,dow_code])
+        
         
         if oldcode <> session_code:
             with database:

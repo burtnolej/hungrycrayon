@@ -10,7 +10,7 @@ from database_util import schema_data_get, db_enum, Database, \
      tbl_create, tbl_exists, tbl_remove, tbl_rename
 from misc_utils_generic import GenericBase
 from datetime import datetime
-from types import StringType,IntType
+from types import StringType,IntType, UnicodeType
 
 test_db = enum(name="db_name_test",
                tbl_name="tbl_name_test",
@@ -80,14 +80,16 @@ class dbtblgeneric(GenericBase):
 	t=[]
 	for _key,_val in self.attr_get_keyval(include_callable=False,
 	                                                include_nondataattr=False):
-	    if isinstance(_val,StringType):
+	    if isinstance(_val,StringType) or isinstance(_val,UnicodeType):
 		t.append("\""+_val+"\"")
+		
 	    elif not isinstance(_val,IntType):
-		if not hasattr(_val,"__repr__"):
-		    raise Exception("objects to be written to db need a __repr__ defined")
-		t.append("\""+str(_val)+"\"")
+		if not hasattr(_val,"objid"):
+		    raise Exception("objects to be written to db need a objid attribute")
+		t.append("\""+str(_val.objid)+"\"")
 	    else:
-		t.append(_val)
+		raise Exception("dont know how to persist this type",_val,type(_val))
+		
 		
 	# also include useful system info 
 	if include_internal == True:
@@ -174,9 +176,27 @@ def tbl_query(database,exec_str):
     keys = [description[0] for description in database.description()]
     return(keys,results)    
 
+
+@logger(log)
+def tbl_row_delete(database,tbl_name,whereclause=None):
+    
+    exec_str = "delete from {table}".format(table=tbl_name)
+    
+    if whereclause <> None and whereclause <> []:
+	
+	if isinstance(whereclause[0],list) <> True:
+	    raise Exception("list of list needs to be provide; changed 9/22")
+	
+	exec_str = exec_str + " where {0} {1} {2}".format(whereclause[0][0],
+	                                                  whereclause[0][1],
+	                                                  whereclause[0][2])
+    results = database.execute(exec_str)
+    
+    return(exec_str)
+
+
 @logger(log)
 def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
-    
     
     fieldstr="*"
     if fields<>None:
@@ -186,13 +206,25 @@ def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
                                                      table=tbl_name)
     
     if whereclause <> None and whereclause <> []:
-	exec_str = exec_str + " where {0} = {1}".format(whereclause[0],
-	                                               whereclause[1])
-    
+	
+	if isinstance(whereclause[0],list) <> True:
+	    raise Exception("list of list needs to be provide; changed 9/22")
+	
+	
+	exec_str = exec_str + " where {0} {1} {2}".format(whereclause[0][0],
+	                                                  whereclause[0][1],
+	                                                  whereclause[0][2])
+	
+	for i in range(1,len(whereclause)):
+	    
+	    exec_str = exec_str + " and {0} {1} {2}".format(whereclause[i][0],
+		                                              whereclause[i][1],
+		                                              whereclause[i][2])
+
     results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]
-    return(keys,results)
+    return(keys,results,exec_str)
 
 def tbl_rows_insert_from_schema(database,schema_file,tbl_name):
     

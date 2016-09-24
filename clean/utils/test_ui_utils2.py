@@ -673,7 +673,7 @@ class TestUIGridCustom(TestWidget):
         
         self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanumro,self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols,
-                                      gridcfg,widgetcfg,1,1,rowcfg,colcfg)
+                                      gridcfg,widgetcfg)
         
         self.tkilg.cell_set(0,0,**dict(background='white',width=2,height=2))
         self.tkilg.cell_set(1,1,**dict(background='pink',width=2,height=2))
@@ -1297,12 +1297,35 @@ class TestTkcomboDBSetMember(unittest.TestCase):
     def tearDown(self):
         self.master.destroy()
         
+class Test_Grid_Scrollbars(unittest.TestCase):
+    
+    def setUp(self):
+            self.master = Tk()
+            
+            setmemberp = SetMemberPartial(name='x{mylist}',set=['foo','bar'])
+            widget_args=dict(background='white',values=['foo','bar'])
+            widgetcfg = nxnarraycreate(60,10,widget_args)
+            
+            self.entrygrid = TkImageLabelGrid(self.master,'entrygrid',setmemberp,500,
+                                              500,0,0,30,5,
+                                              True,{},widgetcfg)
+            self.entrygrid.grid(row=0,column=0,sticky=NSEW)
+            
+
+            
+      
+            
+    def test_(self):
+        self.master.mainloop()
+        
+        
+        
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridFocusAppObject))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridFocusAppObject))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUILabelImageGridCustom))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Scrollbars))
     unittest.TextTestRunner(verbosity=2).run(suite)
     exit()
     
