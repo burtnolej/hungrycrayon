@@ -2,7 +2,7 @@
 import sys
 
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
-from misc_utils import Singleton
+from misc_utils import Singleton, thisfuncname
 from misc_utils_process import process_instances_get, process_kill, process_start, process_get_stdout, \
      process_stdin
 from time import time, sleep
@@ -16,15 +16,17 @@ import os.path
 from types import *
 
 def logger(log):
+    
     def decorator(func):
         def wrapper(*args, **kw):
             stime = time()
+            funcname = ".".join(([func.__module__,func.__name__]))
             
             # explicitly pass in func args with fargs/fkw keywords
-            log.log(func.__name__,100,fargs=args,fkw=kw)
+            log.log(funcname,100,fargs=args,fkw=kw)
             result = func(*args, **kw)
             etime = round(time()-stime,4)
-            log.log(func.__name__,101,etime=etime,result=result)
+            log.log(funcname,101,etime=etime,result=result)
             return result
         return wrapper
     return decorator
@@ -157,7 +159,7 @@ class Log():
             logitem = []
             
             logmesg['funcname'] = funcname
-            logmesg['module'] = basename(stack()[2][1])
+            logmesg['module'] = basename(stack()[1][1])
 
             # setup stats for this given function if not called before
             if _stats.has_key(logmesg['funcname']) == False:
@@ -204,8 +206,11 @@ class Log():
                     logmesg['type'] ="INFO"
                 elif priority in [7,8,9]:
                     logmesg['type'] ="DEBUG"
-                elif priority in [0,1]:
+                elif priority in [1]:
                     logmesg['type'] = "ERROR"
+                elif priority in [0]:
+                    logmesg['type'] = "FATALERROR"
+                    
                 elif priority in [2]:
                     logmesg['type'] = "FAILURE"
                 else:
@@ -247,6 +252,11 @@ class Log():
 
             self.logfile.write("|".join(output)+"\n")
             self.logfile.flush()
+            
+            if logmesg['type'] == "FATALERROR":
+                print "FATAL ERROR, exiting; check logs"
+                exit()
+                
             
     def shrink(self,s,size):
         ''' pull out middle chars to fit into desired width of log field '''

@@ -9,7 +9,8 @@ from misc_utils_enum import enum
 from misc_utils import nxnarraycreate, thisfuncname
 
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
-from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
+from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get, TkGridCombobox, \
+     TkCombobox
 
 from misc_utils_objectfactory import ObjFactory
 
@@ -77,7 +78,10 @@ class WizardUI(Tk):
         
         log.log(thisfuncname(),3,msg="initialize",dbname=dbname,refdbname=refdbname)
         
+        self.clipboard=[]
+        self.clipboard_selection=-1
         Tk.__init__(self)
+        self.geometry("2000x1000+0+0")
         
         self.enums = sswizard_utils.setenums('All','5',refdbname)
         
@@ -95,7 +99,9 @@ class WizardUI(Tk):
         
         bigfont = tkFont.Font(family="Helvetica",size=50)
         self.option_add("*TCombobox*Listbox*Font", bigfont)
-      
+        
+        self.current_inputmode = "Normal"
+        
         set_configs(style)
         # any children that change update this 
         # key is the name and value is the new val
@@ -110,31 +116,11 @@ class WizardUI(Tk):
         wmheight=wheight*self.maxrows # master height
         wmwidth=wwidth*self.maxcols # master width 
 
-        geom = geometry_get(1000,1000,0,0)
-        self.geometry(geom)
+        #geom = geometry_get(1000,1000,0,0)
+        #self.geometry(geom)
         
         self.bind("<Prior>",self.focus_next_widget)
-
-        '''configpanel = Frame(self,style='ConfigPanel.TFrame')
-        configpanel.grid(row=0,column=0,sticky=EW)
-        
-        self.prep_label = Label(configpanel,text="prep")
-        self.prep_label.grid(row=0,column=0)
-        self.prep_label.focus_get()
-        
-        self.prep_entry_sv = StringVar()
-        self.prep_entry = Entry(configpanel,textvariable=self.prep_entry_sv)
-        self.prep_entry.grid(row=0,column=1)
-        self.prep_entry.focus_get()
-        
-        self.dow_label = Label(configpanel,text="dow")
-        self.dow_label.grid(row=0,column=2)
-        self.dow_label.focus_get()
-        
-        self.dow_label_sv = StringVar()
-        self.dow_label = Entry(configpanel,textvariable=self.dow_label_sv)
-        self.dow_label.grid(row=0,column=3)
-        self.dow_label.focus_get()'''
+        self.bind_all("<Control-Key>",self.modeset)
         
         # daygrids
         setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['dow'])
@@ -148,11 +134,6 @@ class WizardUI(Tk):
         #self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.dowentrygrid.grid(row=0,column=0,sticky=EW)
         
-        # daygrid 2
-        #self.dowentrygrid = TkImageLabelGrid(self,'dowentrygrid',setmemberp,wmwidth,wmheight,0,0,1,self.maxcols,False,{},widgetcfg)
-        #self.entrygrid['style'] = 'EntryGrid.TFrame'
-        #self.dowentrygrid.grid(row=0,column=1,sticky=EW)
-
         # entrygrids
         setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['student'])
         widget_args=dict(background='white',width=9,font=font,values=self.enums['student'])
@@ -161,15 +142,11 @@ class WizardUI(Tk):
         setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])   
         
         # entrygrid 1
+        setmemberp.widgettype = TkGridCombobox
         self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,True,{},widgetcfg)
         self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.entrygrid.grid(row=1,column=0,sticky=NSEW)
 
-        # entrygrid 2
-        #self.entrygrid2 = TkImageLabelGrid(self,'entrygrid2',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,True,{},widgetcfg)
-        #self.entrygrid2['style'] = 'EntryGrid.TFrame'
-        #self.entrygrid2.grid(row=1,column=1,sticky=NSEW)
-        
         controlpanel = Frame(self,style='ControlPanel.TFrame')
         controlpanel.grid(row=2,column=0,sticky=NSEW,columnspan=2)
         
@@ -228,6 +205,24 @@ class WizardUI(Tk):
         self.rebuilddropdown_button = Button(controlpanel,command=self.dropdowns_set,text="ddown",name="ddown")
         self.rebuilddropdown_button.grid(row=0,column=12)
         self.rebuilddropdown_button.focus_get()
+
+        self.inputmode_label_sv = StringVar()        
+        self.inputmode_label = Label(controlpanel,textvariable=self.inputmode_label_sv)
+        self.inputmode_label.grid(row=0,column=13)
+        self.inputmode_label.focus_get()
+        self.inputmode_label_sv.set("NORMAL")
+        
+        self.clipboard_size_label_sv = StringVar()        
+        self.clipboard_size_label = Label(controlpanel,textvariable=self.clipboard_size_label_sv)
+        self.clipboard_size_label.grid(row=0,column=14)
+        self.inputmode_label.focus_get()
+        self.clipboard_size_label_sv.set(0)
+        
+        self.clipboard_selected_label_sv = StringVar()        
+        self.clipboard_selected_label = Label(controlpanel,textvariable=self.clipboard_selected_label_sv)
+        self.clipboard_selected_label.grid(row=0,column=15)
+        self.clipboard_selected_label.focus_get()        
+        self.clipboard_selected_label_sv.set(self.clipboard_selection)
         
         self.bgmaxrows=len(self.enums['period']['name'])+1
         self.bgmaxcols=len(self.enums['student']['name'])+1 
@@ -266,11 +261,89 @@ class WizardUI(Tk):
         self.grid_rowconfigure(3, weight=10, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
         #self.grid_columnconfigure(1, weight=1, uniform="foo")
-        
 
-    def printme(self,event):
-        print "print me",event.widget.sv.get()
+    def clipboard_paste(self):
         
+        _clipboard = self.clipboard[self.clipboard_selection-1]
+        
+        _,tx,ty = self.entrygrid.focus_get().winfo_name().split(",")
+        
+        tx = int(tx)
+        ty = int(ty)
+        
+        # workout offset from the first cell saved in the selection
+        ox,oy = _clipboard[0]
+        dx = tx-ox
+        dy = ty-oy
+        for x,y in _clipboard:
+            
+            newx = x+dx
+            newy = y+dy
+            self.entrygrid.widgets[newx][newy].sv.set(self.entrygrid.widgets[x][y].sv.get())
+
+    def clipboard_add_selection(self):
+        _clipboard = []
+        
+        if self.current_inputmode == "Normal": # single cell copy
+            _,tx,ty = self.focus_get().winfo_name().split(",")
+            _clipboard.append((int(tx),int(ty)))
+        else:
+            
+            for x in range(1,self.maxrows):
+                for y in range(1,self.maxcols):
+                    if self.entrygrid.widgets[x][y].copy_state == True:
+                        widget = self.entrygrid.widgets[x][y]
+                        _,tx,ty = widget.winfo_name().split(",")
+                        _clipboard.append((int(tx),int(ty)))
+                        widget.copy_state=False
+                        widget.unhighlight()
+                
+        self.clipboard.append(_clipboard)
+        self.clipboard_size_label_sv.set(len(self.clipboard))
+        
+        # set the current clipboard selection to the latest
+        self.clipboard_selection = len(self.clipboard)
+        self.clipboard_selected_label_sv.set(self.clipboard_selection)
+        
+    def selection_clear(self):
+        for x in range(1,self.maxrows):
+            for y in range(1,self.maxcols):
+                if self.entrygrid.widgets[x][y].copy_state == True:
+                    self.entrygrid.widgets[x][y].unhighlight()
+                    self.entrygrid.widgets[x][y].copy_state == False
+                    
+        self.current_inputmode = "Normal"
+        self.inputmode_label_sv.set(self.current_inputmode)
+        
+    
+                    
+    def modeset(self,event):
+        if event.keysym == "s":
+            self.current_inputmode = "Select"
+        elif event.keysym == "r":
+            self.selection_clear()
+        elif event.keysym == "c":
+            self.clipboard_add_selection()
+        elif event.keysym == "x":
+            self.current_inputmode =  "Delete"
+        elif event.keysym == "n":
+            if self.clipboard_selection == len(self.clipboard):
+                self.clipboard_selection = 1
+            else:
+                self.clipboard_selection+=1
+            self.clipboard_selected_label_sv.set(self.clipboard_selection)
+        elif event.keysym == "v":
+            self.current_inputmode =  "Paste"
+            self.clipboard_paste()
+            
+        elif event.keysym == "d":
+            print self.clipboard
+            
+        else:
+            pass
+        
+        self.inputmode_label_sv.set(self.current_inputmode)
+       
     def pagedown(self):
         self.ui.canvas.yview()
         
@@ -591,7 +664,7 @@ class WizardUI(Tk):
                 
                 x = self.enums['student']['name2enum'][student]
                 y = self.enums['period']['name2enum'][str(period)]
-
+                
                 self.entrygrid.widgets[x+1][y+1].sv.set(session)
                 self.entrygrid.widgets[0][y+1].sv.set(period)
                 self.entrygrid.widgets[x+1][0].sv.set(student)

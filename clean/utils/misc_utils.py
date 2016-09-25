@@ -5,17 +5,18 @@ import sys
 from types import *
 from inspect import stack
 sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
+from os.path import basename
 
-
-def thisfuncname(cls=None):
+def thisfuncname(cls=None,stackdelta=0):
     
-    funcname = stack()[1][3]
+    funcname = stack()[1 + stackdelta][3]
+    module = basename(stack()[1 + stackdelta][1])
     
     if cls <> None:
         clsname = cls.__class__.__name__
         funcname = clsname + "." + funcname
     
-    return(funcname)
+    return("^".join([module,funcname]))
 
 def nxnarraycreate(maxrows,maxcols,args={}):
     ''' creates a n x n array containing args; args can be none, args can be dict, list, string'''

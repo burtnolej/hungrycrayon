@@ -1,4 +1,6 @@
 import sqlite3
+from sqlite3 import OperationalError as DBException
+
 import sys
 sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_log import Log, logger
@@ -82,7 +84,8 @@ class dbtblgeneric(GenericBase):
 	                                                include_nondataattr=False):
 	    if isinstance(_val,StringType) or isinstance(_val,UnicodeType):
 		t.append("\""+_val+"\"")
-		
+	    elif isinstance(_val,IntType):
+		t.append(_val)
 	    elif not isinstance(_val,IntType):
 		if not hasattr(_val,"objid"):
 		    raise Exception("objects to be written to db need a objid attribute")
@@ -168,9 +171,7 @@ def tbl_rows_update(database,tbl_name,row,dryrun=False):
 
 @logger(log)
 def tbl_query(database,exec_str):
-    
-    #print exec_str
-    
+
     results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]

@@ -137,7 +137,7 @@ def tkwidgetfactory(app,var,master,toplevel,**kwargs):
             widgettype.__init__(self,master,var,**d)
             
             # not every widget type accepts every option   
-            if var.widgettype <> TkCombobox:
+            if issubclass(var.widgettype,TkCombobox) == False:
                 try:
                     kwargs.pop('values')
                 except:
@@ -433,7 +433,7 @@ class TKBase(object):
         self.widget.s.configure(".".join(['OutOfFocus','Label',self.widget.winfo_class()]),
                          fieldbackground='grey',
                          foreground='black')
-
+    
         
         #self.init_value= self.current_value = ""
 
@@ -456,6 +456,7 @@ class TKBase(object):
         
         widget_class = str(self.widget.winfo_class())
 
+        
         try:
             self.sv.trace("w",lambda name,index,mode,sv=self.sv:
                           self.toplevel.update_callback(self.widget,self.sv.get()))
@@ -467,12 +468,12 @@ class TKBase(object):
     def highlight(self,event):
         _,state,_ = self['style'].split(".")
         
-        print "highlight",event.widget
         if event.type == '9':
-            self['style']=".".join(['InFocus',state,self.winfo_class()])
+            self['style']=".".join(['InFocus',state,self.winfo_class()])    
+            
         elif event.type == '10':
             self['style']=".".join(['OutOfFocus',state,self.winfo_class()])
-
+          
         self.selectall()
         
     def selectall(self,event=None):
@@ -637,13 +638,14 @@ class TkCombobox(Combobox,TKBase):
         self.bind('<FocusOut>',self.highlight)
 
         self.bind("<Control-Down>",self.postdropdown)
-        self.bind("<Control-Up>",self.unpostdropdown)   
+        self.bind("<Control-Up>",self.unpostdropdown) 
         
+
     def postdropdown(self,event):
-        self.post
+        self.post()
         
     def unpostdropdown(self,event):
-        self.unpost
+        self.unpost()
         
     def propogate(self,event):
         parent = self.winfo_parent()
@@ -651,13 +653,14 @@ class TkCombobox(Combobox,TKBase):
         return "break"
             
     def complete(self):
-       
+
+        current_focus_state,_,_ = self['style'].split(".")
         valid_state = 'Invalid'
-        focus_state = 'InFocus'
+        #focus_state = 'InFocus'
         
         # check if function is because of a system load (ignore focus) or by a user selection
         if self.master.focus_get() == None:
-            focus_state = 'OutOfFocus'
+            current_focus_state = 'OutOfFocus'
 
         # always use the chars up to the most recent char only to start the complete
         # otherwise we create a dupe char if the input continues to be correct after a match is created
@@ -679,7 +682,7 @@ class TkCombobox(Combobox,TKBase):
         else:
             self.update_values(self.orig_values)
             
-        self['style']=".".join([focus_state,valid_state,'TCombobox'])   
+        self['style']=".".join([current_focus_state,valid_state,'TCombobox'])   
             
                 
     def update_values(self,newvalues):
@@ -699,6 +702,70 @@ class TkCombobox(Combobox,TKBase):
         match.sort()
         return(match)
 
+
+class TkGridCombobox(TkCombobox):
+    
+    
+    def __init__(self,*args,**kwargs):
+        super(TkGridCombobox,self).__init__(*args,**kwargs)
+        self.bind("<Alt_L>",self.copypaste)
+        self.copy_state=False
+        
+        self.s.configure(".".join(['Select','Invalid',self.winfo_class()]),
+                         fieldbackground='LightPink',background='white')
+        self.s.configure(".".join(['Copy','Invalid',self.winfo_class()]),
+                         fieldbackground='LightCyan',background='white')
+    
+        self.s.configure(".".join(['OutOfFocus','Invalid',self.winfo_class()]),
+                         fieldbackground='white',background='white')
+
+        
+    def copypaste(self,event):
+        if self.copy_state==False: 
+            self.copy_state=True
+        else:
+            self.copy_state=False
+        
+    def unhighlight(self):
+        _,state,cls = self['style'].split(".")
+        self['style'] = ".".join(['OutOfFocus',state,cls])
+        
+    def highlight(self,event):
+               
+        _,state,_ = self['style'].split(".")
+
+        # cannot set this earlier as cell widget could be created before its put into the widgets array
+        # used by highlighter so you can see the col/row hdr associated with cell in focus
+        _,x,y = self.winfo_name().split(",")
+        
+        if hasattr(self,'xhdrwidget') == False:            
+            self.xhdrwidget = self.app.widgets[0][int(y)]
+            self.yhdrwidget = self.app.widgets[int(x)][0]
+            
+        if event.type == '9':
+            
+            if self.toplevel.current_inputmode == "Select":
+                self['style']=".".join(['Select',state,self.winfo_class()])
+                self.copy_state=True
+            else:
+                self['style']=".".join(['InFocus',state,self.winfo_class()])    
+                self.xhdrwidget['style']=".".join(['InFocus',state,self.winfo_class()])
+                self.yhdrwidget['style']=".".join(['InFocus',state,self.winfo_class()])
+                self.copy_state=False
+            
+        elif event.type == '10':
+            if self.toplevel.inputmode_label_sv.get() <> "Select":
+                self['style']=".".join(['OutOfFocus',state,self.winfo_class()])
+                self.xhdrwidget['style']=".".join(['OutOfFocus',state,self.winfo_class()])
+                self.yhdrwidget['style']=".".join(['OutOfFocus',state,self.winfo_class()])
+                self.copy_state=False
+            elif self.toplevel.inputmode_label_sv.get() == "Select":
+                self['style']=".".join(['Select',state,self.winfo_class()])
+                self.copy_state=True
+        
+        self.selectall()
+        
+    
 if __name__ == '__main__':
     master = Tk()
     wgt = GridTableWidget(master,5,8)

@@ -26,6 +26,10 @@ class Test_Base(unittest.TestCase):
         self.of = ObjFactory(True)
         self.ui = WizardUI(self.dbname, self.of,refdbname)       
         self.ui.dbname_entry_sv.set(dbname)
+        
+        parent_name = self.ui.entrygrid.widgets[0][0].winfo_parent()
+        self.parent_widget = self.ui.entrygrid.widgets[0][0]._nametowidget(parent_name)
+        self.parent_widget.update()
 
     def tearDown(self):
         self.ui.destroy()
@@ -36,10 +40,6 @@ class Test_Grid_Behaviour_Focus(Test_Base):
     def setUp(self):
         Test_Base.setUp(self,'test_sswizard','test_quadref')
         
-        parent_name = self.ui.entrygrid.widgets[0][0].winfo_parent()
-        self.parent_widget = self.ui.entrygrid.widgets[0][0]._nametowidget(parent_name)
-        self.parent_widget.update()
-    
     def test_rightarrow_moveright(self):
         
         self.ui.entrygrid.widgets[0][0].event_generate("<Right>")
@@ -66,28 +66,90 @@ class Test_Grid_Behaviour_Update_Combobox(Test_Base):
     def setUp(self):
         
         Test_Base.setUp(self,'test_sswizard','test_quadref')
-        
-        parent_name = self.ui.entrygrid.widgets[0][0].winfo_parent()
-        self.parent_widget = self.ui.entrygrid.widgets[0][0]._nametowidget(parent_name)
-        self.parent_widget.update()
 
         self.widget = self.ui.entrygrid.widgets[0][0]
     
     def test_rightarrow_moveright(self):
 
         self.widget.focus_set()
-        # need to input char by char for the complete to fire
         
         self.widget.insert(0,'8')
-        self.widget.update_idletasks()
+        self.ui.update()
         
         self.assertEqual(self.widget.sv.get(),'830-910')
 
-        #self.assertEqual(self.widget['style'],'InFocus.Valid.TCombobox')
+        self.assertEqual(self.widget['style'],'InFocus.Valid.TCombobox')
         
     def tearDown(self):
         self.ui.destroy()
 
+class Test_Grid_Behaviour_After_Load(Test_Base):
+    def setUp(self):
+        
+        Test_Base.setUp(self,'test_sswizard','test_quadref')
+
+        self.colhdrwidget = self.ui.entrygrid.widgets[1][1]
+        self.rowhdrwidget = self.ui.entrygrid.widgets[0][1]
+        self.valuewidget = self.ui.entrygrid.widgets[1][0]
+        
+        self.ui.load(1)
+    
+    def test_(self):
+        
+        self.assertEqual(self.colhdrwidget['style'],'OutOfFocus.Invalid.TCombobox')
+        self.assertEqual(self.rowhdrwidget['style'],'OutOfFocus.Invalid.TCombobox')
+        self.assertEqual(self.valuewidget['style'],'OutOfFocus.Invalid.TCombobox')
+                
+    def tearDown(self):
+        self.ui.destroy()
+        
+class Test_Grid_Behaviour_Headers_Highlight(Test_Base):
+    def setUp(self):
+        
+        Test_Base.setUp(self,'test_sswizard','test_quadref')
+        
+        self.valuewidget = self.ui.entrygrid.widgets[2][2]
+        
+        self.valuewidget.focus_set()
+
+    def test_(self):
+        
+        self.ui.update()
+        self.assertEqual(self.valuewidget['style'],'InFocus.Invalid.TCombobox')
+        self.assertEqual(self.valuewidget.xhdrwidget['style'],'InFocus.Invalid.TCombobox')
+        self.assertEqual(self.valuewidget.yhdrwidget['style'],'InFocus.Invalid.TCombobox')
+                
+    def tearDown(self):
+        self.ui.destroy()
+        
+        
+class Test_Grid_Behaviour_Single_Cell_Copy_Paste(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,'test_sswizard','test_quadref')
+        
+        self.ui.load(1)
+    
+        self.ui.entrygrid.widgets[2][0].sv.set('Tristan')
+    
+        self.ui.entrygrid.widgets[1][1].focus_set()
+    
+        self.ui.event_generate("<Control-c>")
+        
+        self.ui.update()
+        
+    def test_copy(self):
+        
+        self.assertListEqual(self.ui.clipboard,[[(1,1)]])
+        
+    def test_paste(self):
+        
+        self.ui.entrygrid.widgets[2][1].focus_set()
+        
+        self.ui.event_generate("<Control-v>")
+        
+        self.assertEquals(self.ui.entrygrid.widgets[2][1].sv.get(),"STAN.BK.DRA.MO")
+        
+        
 class Test_Input_New_Save_Persist(Test_Base):
     
     def setUp(self):
@@ -465,9 +527,22 @@ class Test_Load_Save_Change_Save_New_Row(Test_Base):
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Single_Cell_Copy_Paste))
+    
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    exit()    
+    
 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_After_Load))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Headers_Highlight))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Focus))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Behaviour_Update_Combobox))
+    
+
+    
+    
+    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Change_Save_Single_Value))
