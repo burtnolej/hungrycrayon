@@ -78,8 +78,8 @@ class WizardUI(Tk):
         
         log.log(thisfuncname(),3,msg="initialize",dbname=dbname,refdbname=refdbname)
         
-        self.clipboard=[]
-        self.clipboard_selection=-1
+        #self.clipboard=[]
+        #self.clipboard_selection=-1
         Tk.__init__(self)
         self.geometry("2000x1000+0+0")
         
@@ -120,7 +120,7 @@ class WizardUI(Tk):
         #self.geometry(geom)
         
         self.bind("<Prior>",self.focus_next_widget)
-        self.bind_all("<Control-Key>",self.modeset)
+        
         
         # daygrids
         setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['dow'])
@@ -147,6 +147,9 @@ class WizardUI(Tk):
         self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.entrygrid.grid(row=1,column=0,sticky=NSEW)
 
+        # at the moment just enable 1 grid for copy paste
+        #self.bind_all("<Control-Key>",self.entrygrid.modeset)
+        
         controlpanel = Frame(self,style='ControlPanel.TFrame')
         controlpanel.grid(row=2,column=0,sticky=NSEW,columnspan=2)
         
@@ -206,7 +209,7 @@ class WizardUI(Tk):
         self.rebuilddropdown_button.grid(row=0,column=12)
         self.rebuilddropdown_button.focus_get()
 
-        self.inputmode_label_sv = StringVar()        
+        '''self.inputmode_label_sv = StringVar()        
         self.inputmode_label = Label(controlpanel,textvariable=self.inputmode_label_sv)
         self.inputmode_label.grid(row=0,column=13)
         self.inputmode_label.focus_get()
@@ -222,46 +225,83 @@ class WizardUI(Tk):
         self.clipboard_selected_label = Label(controlpanel,textvariable=self.clipboard_selected_label_sv)
         self.clipboard_selected_label.grid(row=0,column=15)
         self.clipboard_selected_label.focus_get()        
-        self.clipboard_selected_label_sv.set(self.clipboard_selection)
+        self.clipboard_selected_label_sv.set(self.clipboard_selection)'''
         
-        self.bgmaxrows=len(self.enums['period']['name'])+1
-        self.bgmaxcols=len(self.enums['student']['name'])+1 
+        self.viewer_button = Button(controlpanel,command=self.viewer,text="viewer",name="view")
+        self.viewer_button.grid(row=0,column=16)
+        self.viewer_button.focus_get()
         
-        widget_args=dict(background='white',width=2,font=font,values=self.enums['dow'])
-        widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
-        
-        self.balancepanel = Frame(self)
-        self.balancepanel.grid(row=3,column=0,sticky=NSEW)
-        
-        mytextalphanum = TextAlphaNumRO(name='textalphanum')
-        
-        self.studentschedgrid = TkImageLabelGrid(self.balancepanel,'studentschedgrid',
-                                            mytextalphanum,wmwidth,wmheight,
-                                            0,0,self.bgmaxrows,self.bgmaxcols,
-                                            True,{},widgetcfg)
-        
-        self.studentschedgrid.grid(row=0,column=0,sticky=NSEW)
-        
-        mytextalphanum = TextAlphaNumRO(name='textalphanum')
-        
-        self.teacherschedgrid = TkImageLabelGrid(self.balancepanel,'teacherschedgrid',
-                                            mytextalphanum,wmwidth,wmheight,
-                                            0,0,self.bgmaxrows,self.bgmaxcols,
-                                            True,{},widgetcfg)
-        
-        self.teacherschedgrid.grid(row=0,column=1,sticky=NSEW)
-        
-        self.balancepanel.grid_columnconfigure(0, weight=1, uniform="foo")
-        self.balancepanel.grid_columnconfigure(1, weight=1, uniform="foo")
-        self.balancepanel.grid_rowconfigure(0, weight=1, uniform="foo")
-
         self.grid_rowconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(1, weight=10, uniform="foo")
         self.grid_rowconfigure(2, weight=1, uniform="foo")
-        self.grid_rowconfigure(3, weight=10, uniform="foo")
+        #self.grid_rowconfigure(3, weight=10, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
         #self.grid_columnconfigure(1, weight=1, uniform="foo")
 
+    
+    def viewer(self):
+        
+        font = tkFont.Font(family="monospace", size=24) 
+        
+        self.viewerui = Toplevel(self.master)
+        self.viewerui.transient(self.master)
+        self.viewerui.geometry("2000x1000+0+0")
+        
+        #self.bgmaxrows=len(self.enums['period']['name'])+1
+        #self.bgmaxcols=len(self.enums['student']['name'])+1
+        
+        self.bgmaxrows=len(self.enums['period']['name'])+1
+        self.bgmaxcols=len(self.of.query('student'))+1
+
+        widget_args=dict(background='white',width=2,height=3,wraplength=180,
+                         highlightbackground='black',highlightthickness=4,
+                         font=font,values=self.enums['dow'])
+        widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
+
+        mytextalphanum = TextAlphaNumRO(name='textalphanum')
+
+        self.viewergrid = TkImageLabelGrid(self.viewerui,'viewergrid',
+                                                 mytextalphanum,10,10,
+                                                 0,0,self.bgmaxrows,self.bgmaxcols,
+                                                 True,{},widgetcfg)
+
+        self.viewergrid.grid(row=0,column=0,sticky=NSEW)
+        self.viewerui.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.viewerui.grid_columnconfigure(0, weight=1, uniform="foo")
+        
+        self.viewer_calc()
+
+    def viewer_calc(self):
+        
+        students = self.enums['student']['name']
+        periods = self.enums['period']['name']
+        
+        gridx=1
+        gridy=1
+        
+        for p in range(len(periods)):
+            self.viewergrid.widgets[gridx][0].sv.set(periods[p])
+            #gridy+=1
+
+            for ostudent in self.of.query('student'):
+                if ostudent.lessons.has_key(periods[p]):
+                    self.viewergrid.widgets[0][gridy].sv.set(ostudent.name)
+    
+                    lessons = ostudent.lessons[periods[p]]
+                    for lesson in lessons:
+                        try:
+                            subject = lesson.subject.objid
+                            self.viewergrid.widgets[gridx][gridy].sv.set(subject)
+                        except KeyError:
+                            pass
+                    
+                gridy+=1
+
+            gridy=1
+            gridx+=1
+        
+        
+    '''@logger(log)
     def clipboard_paste(self):
         
         _clipboard = self.clipboard[self.clipboard_selection-1]
@@ -275,18 +315,23 @@ class WizardUI(Tk):
         ox,oy = _clipboard[0]
         dx = tx-ox
         dy = ty-oy
+        log.log(thisfuncname(),9,msg="paste clipboard",clipboard= _clipboard,tag="clipboard")
         for x,y in _clipboard:
             
             newx = x+dx
             newy = y+dy
             self.entrygrid.widgets[newx][newy].sv.set(self.entrygrid.widgets[x][y].sv.get())
-
-    def clipboard_add_selection(self):
+        
+    @logger(log)
+    def clipboard_add_selection(self,cut=False):
         _clipboard = []
         
         if self.current_inputmode == "Normal": # single cell copy
             _,tx,ty = self.focus_get().winfo_name().split(",")
+            widget = self.entrygrid.widgets[int(tx)][int(ty)]
             _clipboard.append((int(tx),int(ty)))
+            widget.copy_state=False
+            widget.unhighlight()
         else:
             
             for x in range(1,self.maxrows):
@@ -297,7 +342,15 @@ class WizardUI(Tk):
                         _clipboard.append((int(tx),int(ty)))
                         widget.copy_state=False
                         widget.unhighlight()
+                        
+                        if cut==True: # delete source cell content
+                            self.entrygrid.widgets[x][y].set("")
+                            
+            self.current_inputmode = "Normal"
+            self.inputmode_label_sv.set(self.current_inputmode)            
                 
+        log.log(thisfuncname(),9,msg="added to clipboard",clipboard= _clipboard,tag="clipboard")
+         
         self.clipboard.append(_clipboard)
         self.clipboard_size_label_sv.set(len(self.clipboard))
         
@@ -305,6 +358,9 @@ class WizardUI(Tk):
         self.clipboard_selection = len(self.clipboard)
         self.clipboard_selected_label_sv.set(self.clipboard_selection)
         
+        log.log(thisfuncname(),9,msg="input mode set",currentmode= self.current_inputmode,tag="clipboard")
+        
+    @logger(log)
     def selection_clear(self):
         for x in range(1,self.maxrows):
             for y in range(1,self.maxcols):
@@ -312,38 +368,46 @@ class WizardUI(Tk):
                     self.entrygrid.widgets[x][y].unhighlight()
                     self.entrygrid.widgets[x][y].copy_state == False
                     
+
+        log.log(thisfuncname(),9,msg="input mode set",currentmode= self.current_inputmode,
+                newmode="Normal",tag="clipboard")
+
         self.current_inputmode = "Normal"
         self.inputmode_label_sv.set(self.current_inputmode)
-        
     
-                    
+    @logger(log)               
     def modeset(self,event):
+        
+        log.log(thisfuncname(),9,msg="input mode",currentmode= self.current_inputmode,tag="clipboard")
+        new_inputmode = None
         if event.keysym == "s":
-            self.current_inputmode = "Select"
+            new_inputmode = "Select"
         elif event.keysym == "r":
             self.selection_clear()
         elif event.keysym == "c":
             self.clipboard_add_selection()
         elif event.keysym == "x":
-            self.current_inputmode =  "Delete"
+            self.clipboard_add_selection(cut=True)
         elif event.keysym == "n":
             if self.clipboard_selection == len(self.clipboard):
                 self.clipboard_selection = 1
             else:
                 self.clipboard_selection+=1
             self.clipboard_selected_label_sv.set(self.clipboard_selection)
+            log.log(thisfuncname(),9,msg="clipboard selection set",selection=self.clipboard_selection,tag="clipboard")
         elif event.keysym == "v":
-            self.current_inputmode =  "Paste"
             self.clipboard_paste()
-            
         elif event.keysym == "d":
             print self.clipboard
-            
         else:
             pass
         
-        self.inputmode_label_sv.set(self.current_inputmode)
-       
+        if new_inputmode <> None:
+            self.inputmode_label_sv.set(new_inputmode)
+        
+            log.log(thisfuncname(),9,msg="input mode set",newmode=new_inputmode,tag="clipboard")
+            self.current_inputmode = new_inputmode'''
+        
     def pagedown(self):
         self.ui.canvas.yview()
         
@@ -361,8 +425,8 @@ class WizardUI(Tk):
     def save(self,saveversion=None):
 
         self.of.reset()
-        self.clear(1,1,'studentschedgrid')
-        self.clear(1,1,'teacherschedgrid')
+        #self.clear(1,1,'studentschedgrid')
+        #self.clear(1,1,'teacherschedgrid')
         
         if self.dbname <> self.dbname_entry_sv.get():
             log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
@@ -439,8 +503,8 @@ class WizardUI(Tk):
                 
                     self.lesson_change(lesson)
         
-        self.teacher_schedule_calc() 
-        self.student_schedule_calc()
+        #$self.teacher_schedule_calc() 
+        #self.student_schedule_calc()
             
         #self.dbload_entry_sv.set(self.lastsaveversion)
             
@@ -482,43 +546,7 @@ class WizardUI(Tk):
         log.log(thisfuncname(),9,msg="lesson added to student",lesson=lesson)
             
 
-    def student_schedule_calc(self):
-        
-        students = self.enums['student']['name']
-        periods = self.enums['period']['name']
-        
-        gridx=1
-        gridy=1
-        
-        for p in range(len(periods)):
-            self.studentschedgrid.widgets[gridx][0].sv.set(periods[p])
-            gridy+=1
 
-            for s in range(len(students)):
-                
-                try:
-                    ostudent = self.of.object_get('student',students[s])
-                except KeyError:
-                    #print "student",students[s],"does not exist"
-                    continue
-    
-                if ostudent.lessons.has_key(periods[p]):
-                    self.studentschedgrid.widgets[0][gridy].sv.set(students[s])
-    
-                    lessons = ostudent.lessons[periods[p]]
-                    for lesson in lessons:
-                        try:
-                            subject = lesson.subject.objid
-                            self.studentschedgrid.widgets[gridx][gridy].sv.set(subject)
-                        except KeyError:
-                            pass
-                            #print "lesson",lesson,"does not exist"
-                    #print
-                    
-                gridy+=1
-
-            gridy=1
-            gridx+=1
             
     def teacher_schedule_calc(self,event=None):
         

@@ -209,6 +209,12 @@ def setenums(dow,prep,dbname):
   
     return enums
 
+def setconfig():
+    
+    config = {'student':{}}
+    _studentcolor = _colorexecfunc('student')
+    
+
 def sessiontagtoid(tag,enums):
     
     teacher_code,lessontype_code,subject_code = value.split(".")

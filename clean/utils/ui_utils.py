@@ -187,6 +187,11 @@ class TkImageLabelGrid(Frame):
         #self.master.grid_rowconfigure(0,weight=1,uniform='foo')
         #self.master.grid_columnconfigure(0,weight=1,uniform='foo')
         
+        #self.current_inputmode = self.master.current_inputmode
+        self.clipboard=[]
+        self.clipboard_selection=-1
+        self.current_inputmode = "Normal"
+        
         # canvas
         self.canvas = _tkcanvas(self)
         self.canvas.pack(side=RIGHT,fill=BOTH,expand=True,anchor=N)
@@ -209,6 +214,8 @@ class TkImageLabelGrid(Frame):
     
         self.canvasframe.bind("<Configure>",self.resize_canvasframe)  
         self.canvas.bind("<Configure>",self.reset_framewidth)
+        
+        
         
         self.current_yfocus=0
         self.current_xfocus=0
@@ -264,9 +271,115 @@ class TkImageLabelGrid(Frame):
         if rowhdrcfg <> None: self.header_set(1,**rowhdrcfg)
         if colhdrcfg <> None: self.header_set(2,**colhdrcfg)   
     
-        self.focus(0,0)
+        #self.focus(0,0)
         self.ic = ImageCreate()
         
+        
+        self.bind_all("<Control-Key>",self.modeset)
+        
+    def clipboard_paste(self):
+        
+        _clipboard = self.clipboard[self.clipboard_selection-1]
+        
+        _,tx,ty = self.focus_get().winfo_name().split(",")
+        
+        tx = int(tx)
+        ty = int(ty)
+        
+        # workout offset from the first cell saved in the selection
+        ox,oy = _clipboard[0]
+        dx = tx-ox
+        dy = ty-oy
+        log.log(thisfuncname(),9,msg="paste clipboard",clipboard= _clipboard,tag="clipboard")
+        for x,y in _clipboard:
+            
+            newx = x+dx
+            newy = y+dy
+            self.widgets[newx][newy].sv.set(self.widgets[x][y].sv.get())
+        
+    def clipboard_add_selection(self,cut=False):
+        _clipboard = []
+        
+        if self.current_inputmode == "Normal": # single cell copy
+            _,tx,ty = self.focus_get().winfo_name().split(",")
+            widget = self.widgets[int(tx)][int(ty)]
+            _clipboard.append((int(tx),int(ty)))
+            widget.copy_state=False
+            widget.unhighlight()
+        else:
+            
+            for x in range(1,self.maxrows):
+                for y in range(1,self.maxcols):
+                    if self.widgets[x][y].copy_state == True:
+                        widget = self.widgets[x][y]
+                        _,tx,ty = widget.winfo_name().split(",")
+                        _clipboard.append((int(tx),int(ty)))
+                        widget.copy_state=False
+                        widget.unhighlight()
+                        
+                        if cut==True: # delete source cell content
+                            self.widgets[x][y].set("")
+                            
+            self.current_inputmode = "Normal"
+            #self.inputmode_label_sv.set(self.current_inputmode)            
+                
+        log.log(thisfuncname(),9,msg="added to clipboard",clipboard= _clipboard,tag="clipboard")
+         
+        self.clipboard.append(_clipboard)
+        #self.clipboard_size_label_sv.set(len(self.clipboard))
+        
+        # set the current clipboard selection to the latest
+        self.clipboard_selection = len(self.clipboard)
+        #self.clipboard_selected_label_sv.set(self.clipboard_selection)
+        
+        log.log(thisfuncname(),9,msg="input mode set",currentmode= self.current_inputmode,tag="clipboard")
+        
+    def selection_clear(self):
+        for x in range(1,self.maxrows):
+            for y in range(1,self.maxcols):
+                if self.widgets[x][y].copy_state == True:
+                    self.widgets[x][y].unhighlight()
+                    self.widgets[x][y].copy_state == False
+                    
+
+        log.log(thisfuncname(),9,msg="input mode set",currentmode= self.current_inputmode,
+                newmode="Normal",tag="clipboard")
+
+        self.current_inputmode = "Normal"
+        self.inputmode_label_sv.set(self.current_inputmode)
+                
+    def modeset(self,event):
+        
+        log.log(thisfuncname(),9,msg="input mode",currentmode= self.current_inputmode,tag="clipboard")
+        new_inputmode = None
+        if event.keysym == "s":
+            new_inputmode = "Select"
+        elif event.keysym == "r":
+            self.selection_clear()
+        elif event.keysym == "c":
+            self.clipboard_add_selection()
+        elif event.keysym == "x":
+            self.clipboard_add_selection(cut=True)
+        elif event.keysym == "n":
+            if self.clipboard_selection == len(self.clipboard):
+                self.clipboard_selection = 1
+            else:
+                self.clipboard_selection+=1
+            self.clipboard_selected_label_sv.set(self.clipboard_selection)
+            log.log(thisfuncname(),9,msg="clipboard selection set",selection=self.clipboard_selection,tag="clipboard")
+        elif event.keysym == "v":
+            self.clipboard_paste()
+        elif event.keysym == "d":
+            print self.clipboard
+        else:
+            pass
+        
+        if new_inputmode <> None:
+            #self.inputmode_label_sv.set(new_inputmode)
+        
+            log.log(thisfuncname(),9,msg="input mode set",newmode=new_inputmode,tag="clipboard")
+            self.current_inputmode = new_inputmode
+            
     def reset_framewidth(self,event):
         self.canvas.itemconfig(self.canvas_window,width=event.width)
         
@@ -551,6 +664,68 @@ class TkEntry(Entry,TKBase):
             self['style']=".".join([focus_state,'Notchanged',self.winfo_class()])
                                       #'InFocus.Notchanged.TEntry'
 
+
+class TkGridEntry(TkEntry):
+    
+    
+    def __init__(self,*args,**kwargs):
+        super(TkGridEntry,self).__init__(*args,**kwargs)
+        self.copy_state=False
+        
+        self.s.configure(".".join(['Select','Invalid',self.winfo_class()]),
+                         fieldbackground='LightPink',background='white')
+        self.s.configure(".".join(['Copy','Invalid',self.winfo_class()]),
+                         fieldbackground='LightCyan',background='white')
+    
+        self.s.configure(".".join(['OutOfFocus','Invalid',self.winfo_class()]),
+                         fieldbackground='white',background='white')
+        
+        
+    def highlight(self,event):
+        
+       
+        log.log(thisfuncname(),9,style=self['style'],inputmode=self.app.current_inputmode,tag="clipboard")
+        
+        _,state,_ = self['style'].split(".")
+
+        # cannot set this earlier as cell widget could be created before its put into the widgets array
+        # used by highlighter so you can see the col/row hdr associated with cell in focus
+        _,x,y = self.winfo_name().split(",")
+
+        if hasattr(self,'xhdrwidget') == False:            
+            self.xhdrwidget = self.app.widgets[0][int(y)]
+            self.yhdrwidget = self.app.widgets[int(x)][0]
+
+        if event.type == '9':
+
+            #if self.toplevel.current_inputmode == "Select":
+            if self.app.current_inputmode == "Select":
+                self['style']=".".join(['Select',state,self.winfo_class()])
+                self.copy_state=True
+            else:
+                self['style']=".".join(['InFocus',state,self.winfo_class()])    
+                self.xhdrwidget['style']=".".join(['InFocus',state,self.winfo_class()])
+                self.yhdrwidget['style']=".".join(['InFocus',state,self.winfo_class()])
+                self.copy_state=False
+
+        elif event.type == '10':
+            #if self.toplevel.inputmode_label_sv.get() <> "Select":
+            if self.app.current_inputmode <> "Select":
+                
+                self['style']=".".join(['OutOfFocus',state,self.winfo_class()])
+                self.xhdrwidget['style']=".".join(['OutOfFocus',state,self.winfo_class()])
+                self.yhdrwidget['style']=".".join(['OutOfFocus',state,self.winfo_class()])
+                self.copy_state=False
+            #elif self.toplevel.inputmode_label_sv.get() == "Select":
+            elif self.app.current_inputmode == "Select":
+                self['style']=".".join(['Select',state,self.winfo_class()])
+                self.copy_state=True
+
+        self.selectall()
+        
+        
+
+
 class TkLabel(_tklabel,TKBase):
     def __init__(self,master,var,**kwargs):
         if not isadatatype(var):
@@ -732,6 +907,8 @@ class TkGridCombobox(TkCombobox):
         
     def highlight(self,event):
                
+        print "highlight"
+                
         _,state,_ = self['style'].split(".")
 
         # cannot set this earlier as cell widget could be created before its put into the widgets array
@@ -744,7 +921,9 @@ class TkGridCombobox(TkCombobox):
             
         if event.type == '9':
             
-            if self.toplevel.current_inputmode == "Select":
+            #if self.toplevel.current_inputmode == "Select":
+            if self.app.current_inputmode == "Select":
+                    
                 self['style']=".".join(['Select',state,self.winfo_class()])
                 self.copy_state=True
             else:
@@ -754,12 +933,14 @@ class TkGridCombobox(TkCombobox):
                 self.copy_state=False
             
         elif event.type == '10':
-            if self.toplevel.inputmode_label_sv.get() <> "Select":
+            #if self.toplevel.inputmode_label_sv.get() <> "Select":
+            if self.app.current_inputmode <> "Select":
                 self['style']=".".join(['OutOfFocus',state,self.winfo_class()])
                 self.xhdrwidget['style']=".".join(['OutOfFocus',state,self.winfo_class()])
                 self.yhdrwidget['style']=".".join(['OutOfFocus',state,self.winfo_class()])
                 self.copy_state=False
-            elif self.toplevel.inputmode_label_sv.get() == "Select":
+            #elif self.toplevel.inputmode_label_sv.get() == "Select":
+            elif self.app.current_inputmode == "Select":
                 self['style']=".".join(['Select',state,self.winfo_class()])
                 self.copy_state=True
         
