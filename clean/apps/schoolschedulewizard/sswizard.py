@@ -241,17 +241,75 @@ class WizardUI(Tk):
     
     def viewer(self):
         
-        font = tkFont.Font(family="monospace", size=24) 
+        font = tkFont.Font(family="monospace", size=18) 
         
         self.viewerui = Toplevel(self.master)
         self.viewerui.transient(self.master)
         self.viewerui.geometry("2000x1000+0+0")
+
         
+        controlpanel = Frame(self.viewerui)
+        controlpanel.grid(row=0,column=0,sticky=NSEW)
+        
+    
+        self.viewerui.xaxis_label = Label(controlpanel,text="xaxis",font=font)
+        self.viewerui.xaxis_label.grid(row=0,column=0)
+        self.viewerui.xaxis_label.focus_get()
+        self.viewerui.xaxis_label_sv = StringVar()
+        self.viewerui.xaxis_label = Entry(controlpanel,textvariable=self.viewerui.xaxis_label_sv,font=font)
+        self.viewerui.xaxis_label.grid(row=0,column=1)
+        self.viewerui.xaxis_label.focus_get()
+        self.viewerui.xaxis_label_sv.set("period")
+        
+        self.viewerui.yaxis_label = Label(controlpanel,text="yaxis",font=font)
+        self.viewerui.yaxis_label.grid(row=0,column=2)
+        self.viewerui.yaxis_label.focus_get()
+        self.viewerui.yaxis_label_sv = StringVar()
+        self.viewerui.yaxis_label = Entry(controlpanel,textvariable=self.viewerui.yaxis_label_sv,font=font)
+        self.viewerui.yaxis_label.grid(row=0,column=3)
+        self.viewerui.yaxis_label.focus_get()
+        self.viewerui.yaxis_label_sv.set("dow")
+        
+        self.viewerui.prep_label = Label(controlpanel,text="prep",font=font)
+        self.viewerui.prep_label.grid(row=0,column=4)
+        self.viewerui.prep_label.focus_get()
+        self.viewerui.prep_label_sv = StringVar()
+        self.viewerui.prep_label = Entry(controlpanel,textvariable=self.viewerui.prep_label_sv,font=font)
+        self.viewerui.prep_label.grid(row=0,column=5)
+        self.viewerui.prep_label.focus_get()
+        
+        self.viewerui.student_label = Label(controlpanel,text="student",font=font)
+        self.viewerui.student_label.grid(row=0,column=6)
+        self.viewerui.student_label.focus_get()
+        self.viewerui.student_label_sv = StringVar()
+        self.viewerui.student_label = Entry(controlpanel,textvariable=self.viewerui.student_label_sv,font=font)
+        self.viewerui.student_label.grid(row=0,column=7)
+        self.viewerui.student_label.focus_get()
+        self.viewerui.student_label_sv.set("Nathaniel")
+        
+        self.viewerui.teacher_label = Label(controlpanel,text="dow",font=font)
+        self.viewerui.teacher_label.grid(row=0,column=8)
+        self.viewerui.teacher_label.focus_get()
+        self.viewerui.teacher_label_sv = StringVar()
+        self.viewerui.teacher_label = Entry(controlpanel,textvariable=self.viewerui.teacher_label_sv,font=font)
+        self.viewerui.teacher_label.grid(row=0,column=9)
+        self.viewerui.teacher_label.focus_get()
+
+        self.recalc_button = Button(controlpanel,command=self.viewer_calc,text="calc",
+                                    name="vc")
+        self.recalc_button.grid(row=0,column=0)
+        self.recalc_button.focus_get()
+        
+        
+        values = self.viewer_calc()
+        
+
         #self.bgmaxrows=len(self.enums['period']['name'])+1
-        #self.bgmaxcols=len(self.enums['student']['name'])+1
+        #self.bgmaxcols=len(self.of.query('student'))+1
         
-        self.bgmaxrows=len(self.enums['period']['name'])+1
-        self.bgmaxcols=len(self.of.query('student'))+1
+        
+        self.bgmaxrows=len(values)
+        self.bgmaxcols=len(values[0])
 
         widget_args=dict(background='white',width=2,height=3,wraplength=180,
                          highlightbackground='black',highlightthickness=4,
@@ -260,45 +318,59 @@ class WizardUI(Tk):
 
         mytextalphanum = TextAlphaNumRO(name='textalphanum')
 
+        try:
+            self.viewergrid.destroy()
+        except:
+            pass
+        
         self.viewergrid = TkImageLabelGrid(self.viewerui,'viewergrid',
                                                  mytextalphanum,10,10,
                                                  0,0,self.bgmaxrows,self.bgmaxcols,
-                                                 True,{},widgetcfg)
+                                                 True,False,{},widgetcfg)
 
-        self.viewergrid.grid(row=0,column=0,sticky=NSEW)
-        self.viewerui.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.viewergrid.grid(row=1,column=0,sticky=NSEW)
+        self.viewerui.grid_rowconfigure(1, weight=1, uniform="foo")
         self.viewerui.grid_columnconfigure(0, weight=1, uniform="foo")
         
-        self.viewer_calc()
-
+        for x in range(len(values)):
+            for y in range(len(values[x])):
+                self.viewergrid.widgets[x][y].sv.set(values[x][y])
+                
     def viewer_calc(self):
         
-        students = self.enums['student']['name']
-        periods = self.enums['period']['name']
-        
-        gridx=1
-        gridy=1
-        
-        for p in range(len(periods)):
-            self.viewergrid.widgets[gridx][0].sv.set(periods[p])
-            #gridy+=1
-
-            for ostudent in self.of.query('student'):
-                if ostudent.lessons.has_key(periods[p]):
-                    self.viewergrid.widgets[0][gridy].sv.set(ostudent.name)
+        values = []
     
-                    lessons = ostudent.lessons[periods[p]]
-                    for lesson in lessons:
-                        try:
-                            subject = lesson.subject.objid
-                            self.viewergrid.widgets[gridx][gridy].sv.set(subject)
-                        except KeyError:
-                            pass
-                    
-                gridy+=1
+        xaxis_type = self.viewerui.xaxis_label_sv.get() # period
+        yaxis_type = self.viewerui.yaxis_label_sv.get() # dow
+        
+        source = "student"
+        ztype = "teacher"
+        
+        source_obj = self.of.object_get(source,self.viewerui.student_label_sv.get())
+        
+        xaxis_obj = self.of.query(xaxis_type)
+        yaxis_obj = self.of.query(yaxis_type)
+        
+        # get yaxis value
+        row=['']
+        for y in range(1,len(yaxis_obj)+1):
+            row.append(yaxis_obj[y-1].name)
+        values.append(row)
+            
+        # get xaxis value
+        for x in range(len(xaxis_obj)):
+            row = [xaxis_obj[x].name]
+            values.append(row)
+        
+        for y in range(1,len(values[0])):
 
-            gridy=1
-            gridx+=1
+            for x in range(1,len(values)):
+                
+                xval = xaxis_obj[x-1].name     
+                zval = getattr(source_obj.lessons[xval][y-1],ztype)
+                values[x].append(zval.name)
+
+        return(values)
         
         
     '''@logger(log)
