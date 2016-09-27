@@ -64,7 +64,7 @@ class DBTableUI(Tk):
         self.bind("<Prior>",self.focus_next_widget)
         self.grid()
 
-        font = tkFont.Font(family="monospace", size=18)  
+        font = tkFont.Font(family="monospace", size=14)  
 
         # entry grid origin label
         xlbl_widget_args=dict(width=10,font=font)
@@ -81,7 +81,7 @@ class DBTableUI(Tk):
         
         mytextalphanumro = TextAlphaNum(name='textalphanum')
         self.entrygridylabel = TkImageLabelGrid(self,'entrygridylbl',mytextalphanumro,2,wmheight,
-                                                0,0,1,self.maxcols,False,{},ylbl_widgetcfg)
+                                                0,0,1,self.maxcols,False,False,{},ylbl_widgetcfg)
         self.entrygridylabel.grid(row=0,column=1,sticky=EW)
         
         for i in range(self.maxcols):
@@ -94,7 +94,7 @@ class DBTableUI(Tk):
         
         mytruefalse = TrueFalse(name='truefalse')
         self.entrygridxlabel = TkImageLabelGrid(self,'entrygridxlbl',mytruefalse,2,wmheight,
-                                                0,0,self.maxrows,1,False,{},xlbl_widgetcfg)
+                                                0,0,self.maxrows,1,False,False,{},xlbl_widgetcfg)
         self.entrygridxlabel.grid(row=1,column=0,rowspan=1,sticky=NS)
         
         for i in range(self.maxrows):
@@ -112,7 +112,7 @@ class DBTableUI(Tk):
         
         self.entrygrid = TkImageLabelGrid(self,'entrygrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxrows,self.maxcols,
-                             False,{},widgetcfg)
+                             False,True,{},widgetcfg)
         self.entrygrid.grid(row=1,column=1,sticky=NSEW)
         
         
@@ -334,7 +334,7 @@ class DBTableUI(Tk):
         
         mytruefalse = TrueFalse(name='truefalse')
         self.newrowgridxlabel = TkImageLabelGrid(self,'entrygridxlbl',mytruefalse,2,wmheight,
-                                                0,0,self.maxrows,1,False,{},xlbl_widgetcfg)
+                                                0,0,self.maxrows,1,False,False,{},xlbl_widgetcfg)
         self.newrowgridxlabel.grid(row=5,column=0,rowspan=1,sticky=NS)
         
         for i in range(self.maxrows):
@@ -345,7 +345,7 @@ class DBTableUI(Tk):
         self.maxnewrows=maxnewrowrows
         self.newrowgrid = TkImageLabelGrid(self,'newrowgrid',mytextalphanum,wmwidth,wmheight,
                              0,0,self.maxnewrows,self.maxcols,
-                             False,{},widgetcfg)
+                             False,False,{},widgetcfg)
         self.newrowgrid.grid(row=5,column=1,sticky=NSEW)
                 
         self.grid_columnconfigure(0, weight=1, uniform="foo")
@@ -532,7 +532,7 @@ class DBTableUI(Tk):
                 
                 # ignore any updates that are initial version (version=1)
                 if int(x)==0:
-                    init_vgrid_columnconfigurealue = getattr(self,gridname).widgets[0][int(y)].init_value
+                    init_value = getattr(self,gridname).widgets[0][int(y)].init_value
                     current_value = getattr(self,gridname).widgets[0][int(y)].current_value
                     #new_value = getattr(self,gridname).widgets[0][int(y)].sv.get()
     
@@ -724,5 +724,5 @@ class DBTableUI(Tk):
     
 if __name__ == "__main__":
 
-    app = DBTableUI(maxentryrows=50, maxnewrowrows=20)
+    app = DBTableUI(maxentryrows=50, maxnewrowrows=40)
     app.mainloop()

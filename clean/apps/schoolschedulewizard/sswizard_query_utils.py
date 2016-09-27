@@ -20,7 +20,8 @@ def _colorexecfunc(database,value):
 def _execfunc(database,value,prep,dow):
     exec_str = "select s.code "
     exec_str += "from session as s,adult as a "
-    exec_str += "where a.prep = {0} and ".format(prep)
+    #exec_str += "where a.prep = {0} and ".format(prep)
+    exec_str += "where s.prep = {0} and ".format(prep)
     exec_str += "a.name = s.teacher and "
     exec_str += "s.period = {0} and ".format(value)
     exec_str += "s.day = \"{0}\"".format(dow)
@@ -34,7 +35,7 @@ def _rowheaderexecfunc(database):
 def _columnheaderexecfunc(database,pred=None,predvalue=None):
     exec_str = "select name from student"
     if pred <> None:
-        exec_str = exec_str + " where {0} = {1}".format(pred,predval)
+        exec_str = exec_str + " where {0} = {1}".format(pred,predvalue)
     return(tbl_query(database,exec_str))
 
 if __name__ == "__main__":

@@ -108,18 +108,16 @@ def dropdown_build(database,
     output = []
     with database:
         for y in range(yoffset,len(widgetargs[0])):
-        #for x in range(xoffset,len(widgetargs)):
             colndefn,values = exec_func(database,y,prep,dow)
             
             values = [value[0] for value in values]
             
             values = list(set(values))
             for x in range(xoffset,len(widgetargs)):
-            #for y in range(yoffset,len(widgetargs[x])):
                 widgetargs[x][y]['values'] = values
                 
         if rowheaderexecfunc <> None:
-            colndefn,values = rowheaderexecfunc(database)
+            colndefn,values = rowheaderexecfunc(database,"prep",prep)
             
             values = [value[0] for value in values]
             
@@ -127,6 +125,8 @@ def dropdown_build(database,
                 widgetargs[x][0]['values'] = values
                 if ui <> None:
                     ui.widgets[x][0].sv.set(values[x])
+                    
+                print values
 
         if columnheaderexecfunc <> None:
             colndefn,values = columnheaderexecfunc(database)
@@ -137,11 +137,13 @@ def dropdown_build(database,
                 widgetargs[0][y]['values'] = values
                 if ui <> None:
                     ui.widgets[0][y].sv.set(values[y])
+                    
+                print values
 
     return(widgetargs)
 
 @logger(log)
-def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
+def getdbenum(enums,database,fldname,tblname,pred1=None,predval1=None):
     '''
     every table has a code column which is a 2 digit unique mnemonic
     
@@ -150,7 +152,7 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     given a code/name get an enumeration
     get names, codes
     '''
-    database = Database(dbname)
+    #database = Database(dbname)
     exec_str = "select {1},code from {0}".format(tblname,fldname)
     if pred1 <> None:
         exec_str = exec_str + " where {0} = {1}".format(pred1,predval1)
@@ -188,24 +190,24 @@ def getdbenum(enums,dbname,fldname,tblname,pred1=None,predval1=None):
     log.log(thisfuncname(),3,msg="created enums",tblname=tblname,names=enums[tblname]['name'])
             
 
-def setenums(dow,prep,dbname):
+def setenums(dow,prep,database):
 
     enums = {'maps':{},'enums':{},'codes':{}}
     
-    getdbenum(enums,dbname,'name','period')
+    getdbenum(enums,database,'name','period')
     #getdbenum(enums,dbname,'name','period')
     
     if prep <> "-1":
-        getdbenum(enums,dbname,'name','student','prep',prep)
-        getdbenum(enums,dbname,'name','adult','prep',prep)
+        getdbenum(enums,database,'name','student','prep',prep)
+        getdbenum(enums,database,'name','adult','prep',prep)
     else:
-        getdbenum(enums,dbname,'name','student')
-        getdbenum(enums,dbname,'name','adult')
+        getdbenum(enums,database,'name','student')
+        getdbenum(enums,database,'name','adult')
         
-    getdbenum(enums,dbname,'code','session')
-    getdbenum(enums,dbname,'name','lessontype')
-    getdbenum(enums,dbname,'name','subject')
-    getdbenum(enums,dbname,'name','dow')
+    getdbenum(enums,database,'code','session')
+    getdbenum(enums,database,'name','lessontype')
+    getdbenum(enums,database,'name','subject')
+    getdbenum(enums,database,'name','dow')
   
     return enums
 
@@ -249,7 +251,9 @@ def session_code_gen(dbname,dryrun=False):
         oldcode = row[3]
         lessontype = row[4]
         dow = row[5]
-
+        
+        print row
+        
         if dow == None:
             dow = "??"
             

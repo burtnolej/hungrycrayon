@@ -297,7 +297,7 @@ def tbl_col_update(database,tbl_name,old_col_name,new_col_name):
                new_col_defn)
     
     
-    colnames,rows = tbl_rows_get(database,tbl_name)
+    colnames,rows,exec_str = tbl_rows_get(database,tbl_name)
     colindex = colnames.index(old_col_name)
     
     colnames.remove(old_col_name)

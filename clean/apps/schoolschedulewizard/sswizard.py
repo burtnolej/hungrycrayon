@@ -81,17 +81,19 @@ class WizardUI(Tk):
         #self.clipboard=[]
         #self.clipboard_selection=-1
         Tk.__init__(self)
-        self.geometry("2000x1000+0+0")
+        self.geometry("2000x500+0+0")
         
-        self.enums = sswizard_utils.setenums('All','5',refdbname)
+        self.refdatabase = Database('quadref')
+        
+        self.enums = sswizard_utils.setenums('All','5',self.refdatabase)
         
         self.dbname = dbname
         
         self.database = Database(self.dbname)
         self.of = of
 
-        self.refdatabase = Database('quadref')
-        font = tkFont.Font(family="monospace", size=14) 
+        
+        font = tkFont.Font(family="monospace", size=24) 
         
         self.lastsaveversion=0
 
@@ -121,121 +123,119 @@ class WizardUI(Tk):
         
         self.bind("<Prior>",self.focus_next_widget)
         
-        
         # daygrids
-        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['dow'])
+        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['dow']['name'])
         widget_args=dict(background='white',width=9,font=font,values=self.enums['dow'])
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,_dowexecfunc,5)
-        #setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])   
 
         # daygrid 1
         self.dowentrygrid = TkImageLabelGrid(self,'dowentrygrid',setmemberp,wmwidth,wmheight,0,0,1,self.maxcols,True,{},widgetcfg)
-        #self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.dowentrygrid.grid(row=0,column=0,sticky=EW)
         
         # entrygrids
-        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['student'])
-        widget_args=dict(background='white',width=9,font=font,values=self.enums['student'])
+        setmemberp = SetMemberPartial(name='x{mylist}',set=[])
+        widget_args=dict(background='white',width=9,font=font,values=[])
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
-        widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,_execfunc,5,"Monday",_columnheaderexecfunc,_rowheaderexecfunc)
-        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['period'])   
         
         # entrygrid 1
         setmemberp.widgettype = TkGridCombobox
-        self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,True,{},widgetcfg)
+        self.entrygrid = TkImageLabelGrid(self,'entrygrid',setmemberp,wmwidth,wmheight,0,0,self.maxrows,self.maxcols,True,True,{},widgetcfg)
         self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.entrygrid.grid(row=1,column=0,sticky=NSEW)
 
         # at the moment just enable 1 grid for copy paste
         #self.bind_all("<Control-Key>",self.entrygrid.modeset)
         
-        controlpanel = Frame(self,style='ControlPanel.TFrame')
-        controlpanel.grid(row=2,column=0,sticky=NSEW,columnspan=2)
         
-        self.save_button = Button(controlpanel,command=self.save,text="save",name="svb")
+        
+        buttonpanel = Frame(self,style='ControlPanel.TFrame')
+        buttonpanel.grid(row=2,column=0,sticky=NSEW,columnspan=2)
+        
+        self.save_button = Button(buttonpanel,command=self.save,text="save",name="svb")
         self.save_button.grid(row=0,column=0)
         self.save_button.focus_get()
-        
-        self.persist_button = Button(controlpanel,command=self.persist,text="persist",name="pb")
+    
+        self.persist_button = Button(buttonpanel,command=self.persist,text="persist",name="pb")
         self.persist_button.grid(row=0,column=1)
         self.persist_button.focus_get()
         
-        self.spacer_label = Label(controlpanel,text="                      ")
-        self.spacer_label.grid(row=0,column=2)
+        
+        self.dbload_button = Button(buttonpanel,command=lambda: self.load(self.dbload_entry_sv.get()),
+                                    text="dbload",name="dbl")
+    
+        self.dbload_button.grid(row=0,column=2)
+        self.dbload_button.focus_get()
+    
+        self.clear_button = Button(buttonpanel,command=self.clear,text="clear",name="clr")
+        self.clear_button.grid(row=0,column=3)
+        self.clear_button.focus_get()
+
+        self.viewer_button = Button(buttonpanel,command=self.viewer,text="viewer",name="view")
+        self.viewer_button.grid(row=0,column=4)
+        self.viewer_button.focus_get()
+
+        self.rebuilddropdown_button = Button(buttonpanel,command=self.dropdowns_set,text="ddown",name="ddown")
+        self.rebuilddropdown_button.grid(row=0,column=5)
+        self.rebuilddropdown_button.focus_get()
+
+        controlpanel = Frame(self,style='ControlPanel.TFrame')
+        controlpanel.grid(row=3,column=0,sticky=NSEW,columnspan=2)
+
         
         self.dbload_entry_label = Label(controlpanel,text="version")
-        self.dbload_entry_label.grid(row=0,column=3)
+        self.dbload_entry_label.grid(row=0,column=0)
         self.dbload_entry_label.focus_get()
         self.dbload_entry_sv = StringVar()
         self.dbload_entry = Entry(controlpanel,textvariable=self.dbload_entry_sv)
-        self.dbload_entry.grid(row=0,column=4)
+        self.dbload_entry.grid(row=0,column=1)
         self.dbload_entry.focus_get()
         
-        self.dbload_button = Button(controlpanel,command=lambda: self.load(self.dbload_entry_sv.get()),
-                                    text="dbload",name="dbl")
-        
-        self.dbload_button.grid(row=0,column=5)
-        self.dbload_button.focus_get()
-        
-        self.clear_button = Button(controlpanel,command=self.clear,text="clear",name="clr")
-        self.clear_button.grid(row=0,column=6)
-        self.clear_button.focus_get()
-        
         self.dbname_entry_label = Label(controlpanel,text="dbname")
-        self.dbname_entry_label.grid(row=0,column=7)
+        self.dbname_entry_label.grid(row=0,column=2)
         self.dbname_entry_label.focus_get()
         self.dbname_entry_sv = StringVar()
         self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv)
-        self.dbname_entry.grid(row=0,column=8)
+        self.dbname_entry.grid(row=0,column=3)
         self.dbname_entry.focus_get()
         self.dbname_entry_sv.set('htmlparser')
         
-        self.pagedown_button = Button(controlpanel,command=self.pagedown,text="pgdwn",name="pgdwn")
-        self.pagedown_button.grid(row=0,column=9)
-        self.pagedown_button.focus_get()
+        #self.pagedown_button = Button(controlpanel,command=self.pagedown,text="pgdwn",name="pgdwn")
+        #self.pagedown_button.grid(row=0,column=9)
+        #self.pagedown_button.focus_get()
         
-        self.dow_entry_label = Label(controlpanel,text="dow")
-        self.dow_entry_label.grid(row=0,column=10)
+        self.dow_entry_label = Label(controlpanel,text="dow",width=10)
+        self.dow_entry_label.grid(row=0,column=4)
         self.dow_entry_label.focus_get()
         
         self.dow_entry_sv = StringVar()
-        self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv)
-        self.dow_entry.grid(row=0,column=11)
+        self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv,width=10)
+        self.dow_entry.grid(row=0,column=5)
         self.dow_entry.focus_get()
         self.dow_entry_sv.set('Monday')
         
-        self.rebuilddropdown_button = Button(controlpanel,command=self.dropdowns_set,text="ddown",name="ddown")
-        self.rebuilddropdown_button.grid(row=0,column=12)
-        self.rebuilddropdown_button.focus_get()
-
-        '''self.inputmode_label_sv = StringVar()        
-        self.inputmode_label = Label(controlpanel,textvariable=self.inputmode_label_sv)
-        self.inputmode_label.grid(row=0,column=13)
-        self.inputmode_label.focus_get()
-        self.inputmode_label_sv.set("NORMAL")
+        self.prep_label = Label(controlpanel,text="prep",width=10)
+        self.prep_label.grid(row=0,column=6)
+        self.prep_label.focus_get()
         
-        self.clipboard_size_label_sv = StringVar()        
-        self.clipboard_size_label = Label(controlpanel,textvariable=self.clipboard_size_label_sv)
-        self.clipboard_size_label.grid(row=0,column=14)
-        self.inputmode_label.focus_get()
-        self.clipboard_size_label_sv.set(0)
+        self.prep_entry_sv = StringVar()        
+        self.prep_entry = Entry(controlpanel,textvariable=self.prep_entry_sv,width=10)
+        self.prep_entry.grid(row=0,column=7)
+        self.prep_entry.focus_get()
+        self.prep_entry_sv.set(5)
         
-        self.clipboard_selected_label_sv = StringVar()        
+        '''self.clipboard_selected_label_sv = StringVar()        
         self.clipboard_selected_label = Label(controlpanel,textvariable=self.clipboard_selected_label_sv)
         self.clipboard_selected_label.grid(row=0,column=15)
         self.clipboard_selected_label.focus_get()        
         self.clipboard_selected_label_sv.set(self.clipboard_selection)'''
-        
-        self.viewer_button = Button(controlpanel,command=self.viewer,text="viewer",name="view")
-        self.viewer_button.grid(row=0,column=16)
-        self.viewer_button.focus_get()
-        
+                
         self.grid_rowconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(1, weight=10, uniform="foo")
         self.grid_rowconfigure(2, weight=1, uniform="foo")
-        #self.grid_rowconfigure(3, weight=10, uniform="foo")
+        self.grid_rowconfigure(3, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
+        
+        
         #self.grid_columnconfigure(1, weight=1, uniform="foo")
 
     
@@ -599,10 +599,12 @@ class WizardUI(Tk):
         widget_args=dict(background='red',width=9,values=self.enums['student'])
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
         widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,
-                                                  _execfunc,5,
-                                                  self.dow_entry_sv.get())        
-        for x in range(1,self.maxrows):
-            for y in range(1,self.maxcols):
+                                                  _execfunc,self.prep_entry_sv.get(),
+                                                  self.dow_entry_sv.get(),
+                                                  _columnheaderexecfunc,_rowheaderexecfunc)    
+
+        for x in range(self.maxrows):
+            for y in range(self.maxcols):
                 
                 self.entrygrid.widgets[x][y].config(**widgetcfg[x][y])   
 
@@ -646,8 +648,17 @@ class WizardUI(Tk):
         self.save()
         
     @logger(log)       
-    def load(self,saveversion=None,values=None, dow=None):
+    def load(self,saveversion=None,values=None, dow=None, prep=None):
         
+        if prep==None:
+            if self.prep_entry_sv.get() <> None and self.prep_entry_sv.get() <> "":
+                prep = self.prep_entry_sv.get()
+            else:
+                log.log(thisfuncname(),1,msg="no prep set for load; exception")
+                raise Exception("attempting to load without a prep set")
+            
+        self.enums = sswizard_utils.setenums('All',prep,self.refdatabase)
+
         if self.dbname <> self.dbname_entry_sv.get():
             log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
             self.database = Database(self.dbname_entry_sv.get())
@@ -734,4 +745,5 @@ if __name__ == "__main__":
     
     of = ObjFactory(True)
     app = WizardUI('htmlparser',of,'quadref',maxentrycols=12,maxentryrows=20)
+    
     app.mainloop()

@@ -174,7 +174,7 @@ class TkImageLabelGrid(Frame):
         
     @logger(log)
     def _createwidget(self,master,gridname,var,width,height,x,y,maxrows,maxcols,
-                      scrollbar=True,
+                      scrollbar=True,clipboard=False,
                       gridcfg=None,widgetcfg=None,
                       gridcolstart=0,gridrowstart=0,
                       rowhdrcfg={},colhdrcfg={}):
@@ -214,8 +214,6 @@ class TkImageLabelGrid(Frame):
     
         self.canvasframe.bind("<Configure>",self.resize_canvasframe)  
         self.canvas.bind("<Configure>",self.reset_framewidth)
-        
-        
         
         self.current_yfocus=0
         self.current_xfocus=0
@@ -270,12 +268,11 @@ class TkImageLabelGrid(Frame):
     
         if rowhdrcfg <> None: self.header_set(1,**rowhdrcfg)
         if colhdrcfg <> None: self.header_set(2,**colhdrcfg)   
-    
-        #self.focus(0,0)
+
         self.ic = ImageCreate()
         
-        
-        self.bind_all("<Control-Key>",self.modeset)
+        if clipboard == True:
+            self.bind_all("<Control-Key>",self.modeset)
         
     def clipboard_paste(self):
         
@@ -350,6 +347,8 @@ class TkImageLabelGrid(Frame):
                 
     def modeset(self,event):
         
+        print self
+        
         log.log(thisfuncname(),9,msg="input mode",currentmode= self.current_inputmode,tag="clipboard")
         new_inputmode = None
         if event.keysym == "s":
@@ -379,6 +378,8 @@ class TkImageLabelGrid(Frame):
         
             log.log(thisfuncname(),9,msg="input mode set",newmode=new_inputmode,tag="clipboard")
             self.current_inputmode = new_inputmode
+            
+            self.widgets[0][0].sv.set(new_inputmode)
             
     def reset_framewidth(self,event):
         self.canvas.itemconfig(self.canvas_window,width=event.width)
@@ -672,14 +673,13 @@ class TkGridEntry(TkEntry):
         super(TkGridEntry,self).__init__(*args,**kwargs)
         self.copy_state=False
         
-        self.s.configure(".".join(['Select','Invalid',self.winfo_class()]),
-                         fieldbackground='LightPink',background='white')
-        self.s.configure(".".join(['Copy','Invalid',self.winfo_class()]),
-                         fieldbackground='LightCyan',background='white')
-    
-        self.s.configure(".".join(['OutOfFocus','Invalid',self.winfo_class()]),
-                         fieldbackground='white',background='white')
         
+        self.s.configure(".".join(['Select','Notchanged',self.winfo_class()]),
+                         fieldbackground='LightPink',background='white')
+        
+    def unhighlight(self):
+        _,state,cls = self['style'].split(".")
+        self['style'] = ".".join(['OutOfFocus',state,cls])
         
     def highlight(self,event):
         
@@ -702,6 +702,8 @@ class TkGridEntry(TkEntry):
             if self.app.current_inputmode == "Select":
                 self['style']=".".join(['Select',state,self.winfo_class()])
                 self.copy_state=True
+                
+                log.log(thisfuncname(),9,msg="combo in select mode",style=self['style'],tag="clipboard")
             else:
                 self['style']=".".join(['InFocus',state,self.winfo_class()])    
                 self.xhdrwidget['style']=".".join(['InFocus',state,self.winfo_class()])
@@ -888,6 +890,7 @@ class TkGridCombobox(TkCombobox):
         
         self.s.configure(".".join(['Select','Invalid',self.winfo_class()]),
                          fieldbackground='LightPink',background='white')
+        
         self.s.configure(".".join(['Copy','Invalid',self.winfo_class()]),
                          fieldbackground='LightCyan',background='white')
     
