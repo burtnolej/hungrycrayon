@@ -1,7 +1,6 @@
 from subprocess import Popen, STDOUT, PIPE
 from time import sleep
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
 from misc_utils_enum import enum
 from os import remove, kill
 import signal

@@ -1,7 +1,6 @@
 from subprocess import Popen, STDOUT, PIPE
 from time import sleep
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
 from misc_utils_process import process_instances_get, process_kill, \
      process_start
 

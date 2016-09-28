@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from xml_utils import element_find_by_attrib_value, element_move, element_fuse, \
      element_parent_get, element_find_tags,element_find_children, xmltree
 

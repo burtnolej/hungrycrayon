@@ -2,7 +2,6 @@ import sqlite3
 from sqlite3 import OperationalError as DBException
 
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_log import Log, logger
 log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
           pidlogname=True,proclogname=False)

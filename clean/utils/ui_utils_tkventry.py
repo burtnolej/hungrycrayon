@@ -5,7 +5,6 @@ from Tkinter import Label as Tklabel
 from ttk import *
 import tkFont
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from ui_utils import  geometry_get, tkwidgetfactory, geometry_get_dict
 from type_utils import isadatatype
     

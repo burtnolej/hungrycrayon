@@ -1,7 +1,6 @@
 import sys
 import os
 from os import path as ospath
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from misc_utils_generic import GenericBase
 
 import unittest

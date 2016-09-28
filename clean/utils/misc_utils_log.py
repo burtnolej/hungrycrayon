@@ -1,7 +1,6 @@
 
 import sys
 
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from misc_utils import Singleton, thisfuncname
 from misc_utils_process import process_instances_get, process_kill, process_start, process_get_stdout, \
      process_stdin

@@ -1,6 +1,5 @@
 import unittest
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from misc_utils_enum import enum
 
 class Test_Enum(unittest.TestCase):

@@ -10,7 +10,6 @@ from misc_utils_process import *
 import tkFont
 import unittest
 
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from format_utils import *
 
 from ui_utils import tk_create_config, tkfrm_cfg, \

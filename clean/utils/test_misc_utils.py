@@ -2,7 +2,6 @@ import sys
 
 import os
 from os import path as ospath
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from misc_utils import IDGenerator, os_file_get_wildcard, os_file_to_string, read_pickle, \
      write_pickle, Singleton
 from misc_utils_enum import enum

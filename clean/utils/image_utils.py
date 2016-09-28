@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_generic import GenericBase
 from misc_utils_process import *
 from misc_utils import os_file_exists

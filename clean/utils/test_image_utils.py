@@ -4,7 +4,6 @@ import magic
 import Image
 from subprocess import call, check_output
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_process import *
 from time import sleep
 from datetime import datetime

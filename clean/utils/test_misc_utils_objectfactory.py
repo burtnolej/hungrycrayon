@@ -2,7 +2,6 @@
 import sys
 import os
 from os import path as ospath
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from misc_utils_objectfactory import GenericBase, ObjFactory
 from database_table_util import dbtblgeneric, dbtblfactory
 from database_util import Database

@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from database_table_util import tbl_rows_get
 from database_util import Database
 import re

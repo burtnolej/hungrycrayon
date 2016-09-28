@@ -18,7 +18,6 @@ from ui_utils import TkImageWidget, TkImageLabelGrid, geometry_get, font_scale, 
 import tkFont
 import unittest
 
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from format_utils import *
 from type_utils import TextAlphaNum, TextAlphaNumRO, SetMemberPartial, DBSetMember
 from ui_utils import tk_create_config, tkfrm_cfg, \

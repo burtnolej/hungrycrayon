@@ -1,7 +1,6 @@
 import sys
 import os
 from os import path as ospath
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from shutil import copyfile
 
 from Tkinter import *

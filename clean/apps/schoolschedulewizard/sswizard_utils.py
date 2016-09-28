@@ -1,7 +1,6 @@
 import sys
 import os
 from os import path as ospath
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import nxnarraycreate
 
 from database_table_util import tbl_query, tbl_rows_update, DBException

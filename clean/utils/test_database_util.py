@@ -9,7 +9,6 @@ from database_util import Database, tbl_create, tbl_index_count, \
 
 from database_table_util import tbl_rows_insert, tbl_rows_get
 
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_enum import enum
 from misc_utils_generic import GenericBase
 from os import remove

@@ -4,7 +4,6 @@ from collections import OrderedDict
 import sys
 from types import *
 from inspect import stack
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from os.path import basename
 
 def thisfuncname(cls=None,stackdelta=0):

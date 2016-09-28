@@ -1,7 +1,6 @@
 
 import unittest
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from type_utils import RealInt, BoundRealInt, SetMember, \
      DBSetMember, TextAlphaNum, SetMemberPartial, isadatatype
 

@@ -1,6 +1,5 @@
 import unittest
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from http_utils import urlpost
 
 class TestUrlPost(unittest.TestCase):

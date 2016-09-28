@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_log import Log, logger, Singleton
 from misc_utils import thisfuncname, os_file_to_list
 from time import sleep

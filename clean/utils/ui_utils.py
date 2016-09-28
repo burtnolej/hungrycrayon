@@ -9,7 +9,6 @@ from ttk import *
 import tkFont
 from math import ceil,floor
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils import nxnarraycreate, thisfuncname
 from misc_utils_log import Log, logger
 from misc_utils_enum import enum

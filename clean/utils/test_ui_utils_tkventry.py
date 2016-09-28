@@ -7,7 +7,6 @@ from ttk import *
 import tkFont
 import unittest
 
-sys.path.append("/home/burtnolej/Development/pythonapps/clean/utils")
 from ui_utils_tkventry import TkValidEntry, BaseTkValidEntry
 
 from ui_utils import geometry_get,  tkwidgetfactory, geometry_get_dict, TkCombobox, TkEntry

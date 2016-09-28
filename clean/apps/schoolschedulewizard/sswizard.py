@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/home/burtnolej/Development/pythonapps3/clean/utils")
 from misc_utils_log import Log, logger
 log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
           pidlogname=True,proclogname=False)
@@ -371,114 +370,7 @@ class WizardUI(Tk):
                 values[x].append(zval.name)
 
         return(values)
-        
-        
-    '''@logger(log)
-    def clipboard_paste(self):
-        
-        _clipboard = self.clipboard[self.clipboard_selection-1]
-        
-        _,tx,ty = self.entrygrid.focus_get().winfo_name().split(",")
-        
-        tx = int(tx)
-        ty = int(ty)
-        
-        # workout offset from the first cell saved in the selection
-        ox,oy = _clipboard[0]
-        dx = tx-ox
-        dy = ty-oy
-        log.log(thisfuncname(),9,msg="paste clipboard",clipboard= _clipboard,tag="clipboard")
-        for x,y in _clipboard:
-            
-            newx = x+dx
-            newy = y+dy
-            self.entrygrid.widgets[newx][newy].sv.set(self.entrygrid.widgets[x][y].sv.get())
-        
-    @logger(log)
-    def clipboard_add_selection(self,cut=False):
-        _clipboard = []
-        
-        if self.current_inputmode == "Normal": # single cell copy
-            _,tx,ty = self.focus_get().winfo_name().split(",")
-            widget = self.entrygrid.widgets[int(tx)][int(ty)]
-            _clipboard.append((int(tx),int(ty)))
-            widget.copy_state=False
-            widget.unhighlight()
-        else:
-            
-            for x in range(1,self.maxrows):
-                for y in range(1,self.maxcols):
-                    if self.entrygrid.widgets[x][y].copy_state == True:
-                        widget = self.entrygrid.widgets[x][y]
-                        _,tx,ty = widget.winfo_name().split(",")
-                        _clipboard.append((int(tx),int(ty)))
-                        widget.copy_state=False
-                        widget.unhighlight()
-                        
-                        if cut==True: # delete source cell content
-                            self.entrygrid.widgets[x][y].set("")
-                            
-            self.current_inputmode = "Normal"
-            self.inputmode_label_sv.set(self.current_inputmode)            
-                
-        log.log(thisfuncname(),9,msg="added to clipboard",clipboard= _clipboard,tag="clipboard")
-         
-        self.clipboard.append(_clipboard)
-        self.clipboard_size_label_sv.set(len(self.clipboard))
-        
-        # set the current clipboard selection to the latest
-        self.clipboard_selection = len(self.clipboard)
-        self.clipboard_selected_label_sv.set(self.clipboard_selection)
-        
-        log.log(thisfuncname(),9,msg="input mode set",currentmode= self.current_inputmode,tag="clipboard")
-        
-    @logger(log)
-    def selection_clear(self):
-        for x in range(1,self.maxrows):
-            for y in range(1,self.maxcols):
-                if self.entrygrid.widgets[x][y].copy_state == True:
-                    self.entrygrid.widgets[x][y].unhighlight()
-                    self.entrygrid.widgets[x][y].copy_state == False
-                    
-
-        log.log(thisfuncname(),9,msg="input mode set",currentmode= self.current_inputmode,
-                newmode="Normal",tag="clipboard")
-
-        self.current_inputmode = "Normal"
-        self.inputmode_label_sv.set(self.current_inputmode)
-    
-    @logger(log)               
-    def modeset(self,event):
-        
-        log.log(thisfuncname(),9,msg="input mode",currentmode= self.current_inputmode,tag="clipboard")
-        new_inputmode = None
-        if event.keysym == "s":
-            new_inputmode = "Select"
-        elif event.keysym == "r":
-            self.selection_clear()
-        elif event.keysym == "c":
-            self.clipboard_add_selection()
-        elif event.keysym == "x":
-            self.clipboard_add_selection(cut=True)
-        elif event.keysym == "n":
-            if self.clipboard_selection == len(self.clipboard):
-                self.clipboard_selection = 1
-            else:
-                self.clipboard_selection+=1
-            self.clipboard_selected_label_sv.set(self.clipboard_selection)
-            log.log(thisfuncname(),9,msg="clipboard selection set",selection=self.clipboard_selection,tag="clipboard")
-        elif event.keysym == "v":
-            self.clipboard_paste()
-        elif event.keysym == "d":
-            print self.clipboard
-        else:
-            pass
-        
-        if new_inputmode <> None:
-            self.inputmode_label_sv.set(new_inputmode)
-        
-            log.log(thisfuncname(),9,msg="input mode set",newmode=new_inputmode,tag="clipboard")
-            self.current_inputmode = new_inputmode'''
+   
         
     def pagedown(self):
         self.ui.canvas.yview()
@@ -537,18 +429,27 @@ class WizardUI(Tk):
 
                     teacher_code,lessontype_code,subject_code,dow = session.split(".")
                     
-                    # get the column and row headers associated with this cell
-                    #student = self.entrygrid.widgets[0][y].sv.get()
-                    #period = self.entrygrid.widgets[x][0].sv.get()
-
-                    '''teacher = self.enums['adult']['code2enum'][teacher_code]
-                    lessontype = self.enums['lessontype']['code2enum'][lessontype_code]
-                    subject = self.enums['subject']['code2enum'][subject_code]'''
-                    
-
-                    teacher = self.enums['adult']['code2name'][teacher_code]
-                    lessontype = self.enums['lessontype']['code2name'][lessontype_code]
-                    subject = self.enums['subject']['code2name'][subject_code]
+                    try:
+                        teacher = self.enums['adult']['code2name'][teacher_code]
+                    except KeyError:
+                        log.log(thisfuncname(),5,msg="could not find in enum; using **",teacher_code=teacher_code)
+                        teacher = "**"
+                        
+                    try:
+                        lessontype = self.enums['lessontype']['code2name'][lessontype_code]
+                    except KeyError:
+                        log.log(thisfuncname(),5,msg="could not find in enum; using **",lessontype_code=lessontype_code)
+            
+                        lessontype = "**"
+                        
+                    try:    
+                        subject = self.enums['subject']['code2name'][subject_code]
+                    except KeyError:
+                        log.log(thisfuncname(),5,msg="could not find in enum; using **",subject_code=subject_code)
+                             
+                        subject = "**"
+                        
+                        
                                                                
                     datamembers = dict(schedule = '1',
                                        dow=dow, 
