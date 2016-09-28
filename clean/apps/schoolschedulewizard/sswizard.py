@@ -623,6 +623,8 @@ class WizardUI(Tk):
     @logger(log)       
     def load(self,saveversion=None,values=None, dow=None, prep=None):
         
+        whereclause = []
+        
         if prep==None:
             if self.prep_entry_sv.get() <> None and self.prep_entry_sv.get() <> "":
                 prep = self.prep_entry_sv.get()
@@ -630,6 +632,8 @@ class WizardUI(Tk):
                 log.log(thisfuncname(),1,msg="no prep set for load; exception")
                 raise Exception("attempting to load without a prep set")
             
+        whereclause.append(['prep',"=",prep])
+        
         self.enums = sswizard_utils.setenums('All',prep,self.refdatabase)
 
         if self.dbname <> self.dbname_entry_sv.get():
@@ -637,7 +641,7 @@ class WizardUI(Tk):
             self.database = Database(self.dbname_entry_sv.get())
             self.dbname = self.dbname_entry_sv.get()
         
-        whereclause = []
+        
         
         if saveversion==None or saveversion== "":
             if self.dbload_entry_sv.get() <> None and self.dbload_entry_sv.get() <> "":

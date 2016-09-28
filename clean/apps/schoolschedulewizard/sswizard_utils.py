@@ -152,10 +152,12 @@ def getdbenum(enums,database,fldname,tblname,pred1=None,predval1=None):
     get names, codes
     '''
     #database = Database(dbname)
-    exec_str = "select {1},code from {0}".format(tblname,fldname)
+    exec_str = "select {1},code,enum from {0}".format(tblname,fldname)
     if pred1 <> None:
         exec_str = exec_str + " where {0} = {1}".format(pred1,predval1)
-
+        
+    exec_str = exec_str + " order by enum".format(pred1,predval1)
+    
 
     import sqlite3
     
@@ -170,19 +172,29 @@ def getdbenum(enums,database,fldname,tblname,pred1=None,predval1=None):
     
     # explicit loop as OrderedDict only keeps order when items are added after initialization
     name2code = OrderedDict()
-    for k,v in values:
+    name2enum = OrderedDict()
+    code2enum = OrderedDict()
+    
+    print tblname
+    for k,v,e in values:
         if v == 'None':
             log.log(thisfuncname(),0,msg="none value detected",tblname=tblname,key=str(k))
  
         name2code[k] = v
+        name2enum[k] = int(e)
+        code2enum[v] = int(e)
     
     # unknown/none is represented with '??'
     name2code['??'] = '??'
         
     enums[tblname]['name2code'] = name2code
     enums[tblname]['code2name'] = dict(zip(name2code.values(),name2code.keys()))
-    enums[tblname]['name2enum'] = dict((value,enum) for enum,value in enumerate(name2code.keys()))
-    enums[tblname]['code2enum'] = dict((value,enum) for enum,value in enumerate(name2code.values()))
+    #enums[tblname]['name2enum'] = dict((value,enum) for enum,value in enumerate(name2code.keys()))
+    #enums[tblname]['code2enum'] = dict((value,enum) for enum,value in enumerate(name2code.values()))
+    
+    enums[tblname]['name2enum'] =name2enum
+    enums[tblname]['code2enum'] = code2enum
+    
     enums[tblname]['name'] = enums[tblname]['name2code'].keys()
     enums[tblname]['code'] = enums[tblname]['name2code'].values()
     
@@ -241,7 +253,7 @@ def session_code_gen(dbname,dryrun=False):
     with database:
         colnames,rows = tbl_query(database,exec_str)
     
-    enums = setenums('All','-1',dbname)
+    enums = setenums('All','-1',database)
     
     for row in rows:
         teacher = row[0]
@@ -250,8 +262,6 @@ def session_code_gen(dbname,dryrun=False):
         oldcode = row[3]
         lessontype = row[4]
         dow = row[5]
-        
-        print row
         
         if dow == None:
             dow = "??"
@@ -281,10 +291,9 @@ def session_code_gen(dbname,dryrun=False):
                 exec_str,_ = tbl_rows_update(database,'session',
                                   ['code',"\""+session_code+"\"",'__id',"\""+__id+"\""],
                                   dryrun=dryrun)
-                if dryrun == True:
-                    print exec_str,oldcode
-                else:
-                    log.log(thisfuncname(),4,msg="session code updated",execstr=exec_str,oldcode=oldcode)
+
+                print exec_str,oldcode
+                log.log(thisfuncname(),4,msg="session code updated",execstr=exec_str,oldcode=oldcode)
     
         #except Exception, e:
         #    print row,"failed", e

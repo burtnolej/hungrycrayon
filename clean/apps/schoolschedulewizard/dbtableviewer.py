@@ -20,11 +20,9 @@ from Tkinter import *
 from ttk import *
 import tkFont
 
-
-
 class DBTableUI(Tk):
-    def __init__(self,maxentrycols=13,maxentryrows=12,
-                 maxnewrowcols=13,maxnewrowrows=3):
+    def __init__(self,maxentrycols=16,maxentryrows=12,
+                 maxnewrowcols=16,maxnewrowrows=3):
         
         Tk.__init__(self)
 
@@ -182,6 +180,28 @@ class DBTableUI(Tk):
         self.predval2_entry = Entry(dbcontrolpanel,textvariable=self.predval2_entry_sv)
         self.predval2_entry.grid(column=10,row=2,sticky=NSEW)
         self.predval2_entry.focus_get()
+        
+        # query predicate 3
+        self.pred3_label = Label(dbcontrolpanel,text="pred3",width=10)
+        self.pred3_label.grid(column=7,row=3,sticky=NSEW)
+        self.pred3_label.focus_get()
+    
+        self.pred3_entry_sv = StringVar()
+        self.pred3_entry = Entry(dbcontrolpanel,textvariable=self.pred3_entry_sv)
+        self.pred3_entry.grid(column=8,row=3,sticky=NSEW)
+        self.pred3_entry.focus_get()
+    
+        # query predicate value 3
+        self.pred3_op_entry_sv = StringVar()
+        self.pred3_op_entry = Entry(dbcontrolpanel,textvariable=self.pred3_op_entry_sv)
+        self.pred3_op_entry.grid(column=9,row=3,sticky=NSEW)
+        self.pred3_op_entry.focus_get()
+        self.pred3_op_entry_sv.set("=")
+    
+        self.predval3_entry_sv = StringVar()
+        self.predval3_entry = Entry(dbcontrolpanel,textvariable=self.predval3_entry_sv)
+        self.predval3_entry.grid(column=10,row=3,sticky=NSEW)
+        self.predval3_entry.focus_get()
         
         # primary key specifier
         self.pkentry_label = Label(dbcontrolpanel,text="pk",width=10)
@@ -654,6 +674,14 @@ class DBTableUI(Tk):
                                  self.predval2_entry_sv.get()])
 
             log.log(thisfuncname(),9,msg="where clause specified",whereclauses=whereclauses)
+            
+        if self.pred3_entry_sv.get() <> "":
+            
+            whereclauses.append([self.pred3_entry_sv.get(),
+                                 self.pred3_op_entry_sv.get(),
+                                 self.predval3_entry_sv.get()])
+
+            log.log(thisfuncname(),9,msg="where clause specified",whereclauses=whereclauses)
 
             
         with database:
@@ -670,6 +698,8 @@ class DBTableUI(Tk):
                 
                 new_value = colndefn[y]
                 
+                print y
+                
                 self.entrygrid.widgets[0][y].sv.set(new_value)
                 self.entrygrid.widgets[0][y].current_value = new_value
                 
@@ -681,6 +711,7 @@ class DBTableUI(Tk):
                 self.entrygrid.widgets[0][y].init_value = new_value
                 self.newrowgrid.widgets[0][y].init_value = new_value
                 
+            print rows
             #for x in range(len(rows)):
             for x in range(self.maxrows-1): # 1 taken up for header
                 for y in range(len(rows[x])):
