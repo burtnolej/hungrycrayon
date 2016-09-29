@@ -163,7 +163,6 @@ def getdbenum(enums,database,fldname,tblname,**kwargs):
             where_str = where_str + " and {0} = {1}".format(key,value)
 
     exec_str = exec_str + where_str
-    print exec_str
     
     import sqlite3
     
@@ -181,7 +180,6 @@ def getdbenum(enums,database,fldname,tblname,**kwargs):
     name2enum = OrderedDict()
     code2enum = OrderedDict()
     
-    print tblname
     for k,v,e in values:
         if v == 'None':
             log.log(thisfuncname(),0,msg="none value detected",tblname=tblname,key=str(k))
@@ -207,6 +205,15 @@ def getdbenum(enums,database,fldname,tblname,**kwargs):
     log.log(thisfuncname(),3,msg="created enums",tblname=tblname,names=enums[tblname]['name'])
             
 
+def lookupenum(enums,converttype,fieldtype,code):
+    try:
+        name = enums[fieldtype][converttype][code]
+    except KeyError, e:
+        msg = "lookup failed: type={0},field ={1},code={2} [{3}]".format(converttype,fieldtype,code,e.message,enums[fieldtype])
+        log.log(thisfuncname(),2,msg=msg)
+        raise Exception(msg)
+    return(name)
+    
 def setenums(dow,prep,database):
 
     enums = {'maps':{},'enums':{},'codes':{}}
@@ -221,7 +228,7 @@ def setenums(dow,prep,database):
     
     arg = {}
     if dow <> "all": 
-        dow_name = enums['dow']['code2name'][dow]
+        dow_name = lookupenum(enums,'code2name','dow',dow)
         arg = dict(day="\""+dow_name+"\"")
         
     getdbenum(enums,database,'code','session',**arg)

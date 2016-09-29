@@ -334,23 +334,6 @@ class Test_Load_Save_Change_Save_Single_Value(Test_Base):
                 
         self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)        
         
-    def test_studentschedgrid_contents(self):
-        
-        expected_results = [['Nathaniel'], 
-                            ['830-910', u'ELA'], 
-                            ['910-950', u'ELA'],
-                            ['950-1030'], 
-                            ['1030-1110'], 
-                            ['1110-1210'], 
-                            ['1210-100'], 
-                            ['100-140'], 
-                            ['140-220'], 
-                            ['220-300'],
-                            ['300-330'],
-                            ['??']]
-                
-        self.assertListEqual(self.ui.studentschedgrid.dump_grid(), expected_results)
-        
 class Test_Load_Save_Change_Save_New_Row(Test_Base):
     
     def setUp(self):
@@ -389,23 +372,6 @@ class Test_Load_Save_Change_Save_New_Row(Test_Base):
                 
         self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)           
         
-    def test_studentschedgrid_contents(self):
-        
-        expected_results = [['Nathaniel','Orig'], 
-                            ['830-910', u'Drama',u'Drama'], 
-                            ['910-950', u'ELA',u'ELA'],
-                            ['950-1030'], 
-                            ['1030-1110'], 
-                            ['1110-1210'], 
-                            ['1210-100'], 
-                            ['100-140'], 
-                            ['140-220'], 
-                            ['220-300'],
-                            ['300-330'],
-                            ['??']]
-                
-        self.assertListEqual(self.ui.studentschedgrid.dump_grid(), expected_results)
-        
 
         
 if __name__ == "__main__":
@@ -418,7 +384,7 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_New_Row))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_Change_Save_Single_Value))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Persist))    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Persist))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

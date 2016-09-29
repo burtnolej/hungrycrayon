@@ -199,7 +199,7 @@ class WizardUI(Tk):
         self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv,width=10)
         self.dow_entry.grid(row=0,column=5)
         self.dow_entry.focus_get()
-        self.dow_entry_sv.set('Monday')
+        self.dow_entry_sv.set('MO')
         
         self.prep_label = Label(controlpanel,text="prep",width=10)
         self.prep_label.grid(row=0,column=6)
@@ -368,8 +368,6 @@ class WizardUI(Tk):
     def save(self,saveversion=None):
 
         self.of.reset()
-        #self.clear(1,1,'studentschedgrid')
-        #self.clear(1,1,'teacherschedgrid')
         
         if self.dbname <> self.dbname_entry_sv.get():
             log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
@@ -384,12 +382,19 @@ class WizardUI(Tk):
                 
             else:
                 saveversion = self.dbload_entry_sv.get()
+        # prep
+        prep=self.prep_entry_sv.get()
+        if  prep == "":prep = -1
         
-        log.log(thisfuncname(),3,msg="saving save version=",saveversion=str(saveversion))
-            
-        #if saveversion == None:
-        #    saveversion=str(self.lastsaveversion)
-            
+        # dow
+        dow = self.dow_entry_sv.get()
+        if dow == "": dow = "all"
+
+        log.log(thisfuncname(),3,msg="saving save version=",saveversion=str(saveversion),prep=prep,dow=dow)
+
+        # get enums
+        self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
+
         for x in range(1,self.maxrows):
             for y in range(1,self.maxcols):
                 period=self.entrygrid.widgets[0][y].sv.get()
@@ -427,9 +432,7 @@ class WizardUI(Tk):
                         log.log(thisfuncname(),5,msg="could not find in enum; using **",subject_code=subject_code)
                              
                         subject = "**"
-                        
-                        
-                                                               
+                    
                     datamembers = dict(schedule = '1',
                                        dow=dow, 
                                        subject=subject,
