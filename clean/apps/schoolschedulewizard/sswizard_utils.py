@@ -142,7 +142,8 @@ def dropdown_build(database,
     return(widgetargs)
 
 @logger(log)
-def getdbenum(enums,database,fldname,tblname,pred1=None,predval1=None):
+#def getdbenum(enums,database,fldname,tblname,pred1=None,predval1=None):
+def getdbenum(enums,database,fldname,tblname,**kwargs):
     '''
     every table has a code column which is a 2 digit unique mnemonic
     
@@ -153,12 +154,17 @@ def getdbenum(enums,database,fldname,tblname,pred1=None,predval1=None):
     '''
     #database = Database(dbname)
     exec_str = "select {1},code,enum from {0}".format(tblname,fldname)
-    if pred1 <> None:
-        exec_str = exec_str + " where {0} = {1}".format(pred1,predval1)
-        
-    exec_str = exec_str + " order by enum".format(pred1,predval1)
-    
 
+    where_str = ""
+    for key,value in kwargs.iteritems():
+        if where_str == "":
+            where_str = " where {0} = {1}".format(key,value)
+        else:
+            where_str = where_str + " and {0} = {1}".format(key,value)
+
+    exec_str = exec_str + where_str
+    print exec_str
+    
     import sqlite3
     
     with database:
@@ -204,21 +210,24 @@ def getdbenum(enums,database,fldname,tblname,pred1=None,predval1=None):
 def setenums(dow,prep,database):
 
     enums = {'maps':{},'enums':{},'codes':{}}
-    
+    getdbenum(enums,database,'name','dow')
     getdbenum(enums,database,'name','period')
-    #getdbenum(enums,dbname,'name','period')
     
-    if prep <> "-1":
-        getdbenum(enums,database,'name','student','prep',prep)
-        getdbenum(enums,database,'name','adult','prep',prep)
-    else:
-        getdbenum(enums,database,'name','student')
-        getdbenum(enums,database,'name','adult')
+    arg = {}
+    if prep <> -1: arg = dict(prep=prep)
         
-    getdbenum(enums,database,'code','session')
+    getdbenum(enums,database,'name','student',**arg)
+    getdbenum(enums,database,'name','adult',**arg)
+    
+    arg = {}
+    if dow <> "all": 
+        dow_name = enums['dow']['code2name'][dow]
+        arg = dict(day="\""+dow_name+"\"")
+        
+    getdbenum(enums,database,'code','session',**arg)
     getdbenum(enums,database,'name','lessontype')
     getdbenum(enums,database,'name','subject')
-    getdbenum(enums,database,'name','dow')
+    
   
     return enums
 

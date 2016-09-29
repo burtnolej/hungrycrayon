@@ -84,7 +84,7 @@ class WizardUI(Tk):
         
         self.refdatabase = Database('quadref')
         
-        self.enums = sswizard_utils.setenums('All','5',self.refdatabase)
+        #self.enums = sswizard_utils.setenums('All','5',self.refdatabase)
         
         self.dbname = dbname
         
@@ -123,8 +123,8 @@ class WizardUI(Tk):
         self.bind("<Prior>",self.focus_next_widget)
         
         # daygrids
-        setmemberp = SetMemberPartial(name='x{mylist}',set=self.enums['dow']['name'])
-        widget_args=dict(background='white',width=9,font=font,values=self.enums['dow'])
+        setmemberp = SetMemberPartial(name='x{mylist}',set=['Monday'])
+        widget_args=dict(background='white',width=9,font=font,values=['Monday'])
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
 
         # daygrid 1
@@ -142,11 +142,6 @@ class WizardUI(Tk):
         self.entrygrid['style'] = 'EntryGrid.TFrame'
         self.entrygrid.grid(row=1,column=0,sticky=NSEW)
 
-        # at the moment just enable 1 grid for copy paste
-        #self.bind_all("<Control-Key>",self.entrygrid.modeset)
-        
-        
-        
         buttonpanel = Frame(self,style='ControlPanel.TFrame')
         buttonpanel.grid(row=2,column=0,sticky=NSEW,columnspan=2)
         
@@ -159,8 +154,7 @@ class WizardUI(Tk):
         self.persist_button.focus_get()
         
         
-        self.dbload_button = Button(buttonpanel,command=lambda: self.load(self.dbload_entry_sv.get()),
-                                    text="dbload",name="dbl")
+        self.dbload_button = Button(buttonpanel,command=self.load,text="dbload",name="dbl")
     
         self.dbload_button.grid(row=0,column=2)
         self.dbload_button.focus_get()
@@ -180,7 +174,6 @@ class WizardUI(Tk):
         controlpanel = Frame(self,style='ControlPanel.TFrame')
         controlpanel.grid(row=3,column=0,sticky=NSEW,columnspan=2)
 
-        
         self.dbload_entry_label = Label(controlpanel,text="version")
         self.dbload_entry_label.grid(row=0,column=0)
         self.dbload_entry_label.focus_get()
@@ -197,10 +190,6 @@ class WizardUI(Tk):
         self.dbname_entry.grid(row=0,column=3)
         self.dbname_entry.focus_get()
         self.dbname_entry_sv.set('htmlparser')
-        
-        #self.pagedown_button = Button(controlpanel,command=self.pagedown,text="pgdwn",name="pgdwn")
-        #self.pagedown_button.grid(row=0,column=9)
-        #self.pagedown_button.focus_get()
         
         self.dow_entry_label = Label(controlpanel,text="dow",width=10)
         self.dow_entry_label.grid(row=0,column=4)
@@ -221,22 +210,12 @@ class WizardUI(Tk):
         self.prep_entry.grid(row=0,column=7)
         self.prep_entry.focus_get()
         self.prep_entry_sv.set(5)
-        
-        '''self.clipboard_selected_label_sv = StringVar()        
-        self.clipboard_selected_label = Label(controlpanel,textvariable=self.clipboard_selected_label_sv)
-        self.clipboard_selected_label.grid(row=0,column=15)
-        self.clipboard_selected_label.focus_get()        
-        self.clipboard_selected_label_sv.set(self.clipboard_selection)'''
                 
         self.grid_rowconfigure(0, weight=1, uniform="foo")
         self.grid_rowconfigure(1, weight=10, uniform="foo")
         self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_rowconfigure(3, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
-        
-        
-        #self.grid_columnconfigure(1, weight=1, uniform="foo")
-
     
     def viewer(self):
         
@@ -518,54 +497,6 @@ class WizardUI(Tk):
         student.lessons[period].append(lesson)
         log.log(thisfuncname(),9,msg="lesson added to student",lesson=lesson)
             
-
-
-            
-    def teacher_schedule_calc(self,event=None):
-        
-        teachers = self.enums['adult']['name']
-        periods = self.enums['period']['name']
-        
-        gridx=1
-        gridy=1
-        
-        
-        for p in range(len(periods)):
-            self.teacherschedgrid.widgets[gridx][0].sv.set(periods[p])
-            gridy+=1
-
-            for t in range(len(teachers)):
-                
-                try:
-                    oteacher = self.of.object_get('teacher',teachers[t])
-                except KeyError:
-                    #print "teacher",teachers[t],"does not exist"
-                    continue
-            
-                '''for p in range(len(periods)):
-                    self.teacherschedgrid.widgets[gridx][0].sv.set(periods[p])
-                    gridy+=1'''
-    
-                if oteacher.lessons.has_key(periods[p]):
-                    self.teacherschedgrid.widgets[0][gridy].sv.set(teachers[t])
-                    
-                        
-                    lessons = oteacher.lessons[periods[p]]
-                    for lesson in lessons:
-                        try:
-                            subject = lesson.subject.objid
-                            #subject = self.of.object_get('lesson',str(lesson)).subject
-                            self.teacherschedgrid.widgets[gridx][gridy].sv.set(subject)
-                        except KeyError:
-                            #print "lesson",lesson,"does not exist"
-                            pass
-                    #print
-                    
-                gridy+=1
-                    
-                
-            gridy=1
-            gridx+=1
     
     def dropdowns_set(self):
         
@@ -625,44 +556,43 @@ class WizardUI(Tk):
         
         whereclause = []
         
-        if prep==None:
-            if self.prep_entry_sv.get() <> None and self.prep_entry_sv.get() <> "":
-                prep = self.prep_entry_sv.get()
-            else:
-                log.log(thisfuncname(),1,msg="no prep set for load; exception")
-                raise Exception("attempting to load without a prep set")
-            
-        whereclause.append(['prep',"=",prep])
-        
-        self.enums = sswizard_utils.setenums('All',prep,self.refdatabase)
-
+        # dbname
         if self.dbname <> self.dbname_entry_sv.get():
             log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
             self.database = Database(self.dbname_entry_sv.get())
             self.dbname = self.dbname_entry_sv.get()
         
-        
-        
+        # saveversion
         if saveversion==None or saveversion== "":
-            if self.dbload_entry_sv.get() <> None and self.dbload_entry_sv.get() <> "":
-                saveversion = self.dbload_entry_sv.get()
-            else:
-                log.log(thisfuncname(),1,msg="no saveversion set for load; exception")
-                raise Exception("attempting to load without a saveversion set")
+            saveversion = self.dbload_entry_sv.get()
+        if saveversion == "":
+            log.log(thisfuncname(),1,msg="no saveversion set for load; exception")
+            raise Exception("attempting to load without a saveversion set")
+        else:
+            log.log(thisfuncname(),3,msg="loading",saveversion=str(saveversion))
+            whereclause.append(['saveversion',"=",saveversion])
+            
+        # prep
+        if prep==None: prep=self.prep_entry_sv.get()
+        if  prep == "":
+            prep = -1
+        else:
+            whereclause.append(['prep',"=",prep])
+        log.log(thisfuncname(),3,msg="loading",prep=str(prep))
+        
+        # dow
+        if dow==None: dow = self.dow_entry_sv.get()
+        if dow == "":
+            dow = "all"
+        else:
+            whereclause.append( ['dow',"=","\""+dow+"\""])
+        log.log(thisfuncname(),3,msg="loading",dow=str(dow))
+        
+        # get enums
+        self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
         
         whereclause.append(['saveversion',"=",saveversion])
         log.log(thisfuncname(),3,msg="loading",saveversion=str(saveversion))
-            
-        if dow==None:
-            if self.dow_entry_sv.get() == None:
-                raise Exception("dow must be specified")
-            else:
-                dow = self.dow_entry_sv.get()
-                dow = self.enums['dow']['name2code'][dow]
-                
-                whereclause.append( ['dow',"=","\""+dow+"\""])
-        
-                log.log(thisfuncname(),3,msg="loading",dow=str(dow))
         
         cols = ['period','student','session','dow']
         
@@ -680,10 +610,6 @@ class WizardUI(Tk):
                 
                 x = self.enums['student']['name2enum'][student]
                 y = self.enums['period']['name2enum'][str(period)]
-                
-                #self.entrygrid.widgets[x+1][y+1].sv.set(session)
-                #self.entrygrid.widgets[0][y+1].sv.set(period)
-                #self.entrygrid.widgets[x+1][0].sv.set(student)
                 
                 self.entrygrid.widgets[x][y].sv.set(session)
                 self.entrygrid.widgets[0][y].sv.set(period)

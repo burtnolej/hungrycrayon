@@ -77,9 +77,7 @@ class ObjFactory(GenericBase):
                 log.log(thisfuncname(),2,msg="could not create an instance")
             else:
                 self.store[clsname][kwargs['objid']] = newobj
-                log.log(thisfuncname(),3,newobj=newobj,kwargs=kwargs)
-        else:
-            log.log(thisfuncname(),3,msg="object exists",objid=kwargs['objid'])
+                log.log(thisfuncname(),20,msg="created",newobj=newobj,kwargs=kwargs)
 
         return(self.store[clsname][kwargs['objid']])
         

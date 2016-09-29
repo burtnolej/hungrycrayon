@@ -84,7 +84,7 @@ class WizardUI(Tk):
         
         self.refdatabase = Database('quadref')
         
-        self.enums = sswizard_utils.setenums('All','5',self.refdatabase)
+        #self.enums = sswizard_utils.setenums('All','5',self.refdatabase)
         
         self.dbname = dbname
         
@@ -174,6 +174,16 @@ class WizardUI(Tk):
         self.prep_entry.focus_get()
         self.prep_entry_sv.set(5)
         
+        self.period_label = Label(controlpanel,text="period",width=10,font=font)
+        self.period_label.grid(row=0,column=8)
+        self.period_label.focus_get()
+        
+        self.period_entry_sv = StringVar()        
+        self.period_entry = Entry(controlpanel,textvariable=self.period_entry_sv,width=10,font=font)
+        self.period_entry.grid(row=0,column=9)
+        self.period_entry.focus_get()
+        self.period_entry_sv.set('830-910')
+        
         self.viewcontrolpanel = Frame(self.master)
         self.viewcontrolpanel.grid(row=2,column=0,sticky=NSEW)
         
@@ -243,8 +253,7 @@ class WizardUI(Tk):
 
         xaxis_type = self.viewxaxis_label_sv.get() # period
         yaxis_type = self.viewyaxis_label_sv.get() # dow
-        
-        #source = "student"
+
         source_type,source_value = self.viewfocus_label_sv.get().split("=")
         ztypes = self.viewdata_label_sv.get().split(",")
         
@@ -253,33 +262,36 @@ class WizardUI(Tk):
         xaxis_obj = self.of.query(xaxis_type)
         yaxis_obj = self.of.query(yaxis_type)
         
-        values = []
-        # get yaxis value
-        row=['']
-        for y in range(1,len(yaxis_obj)+1):
-            row.append(yaxis_obj[y-1].name)
-        values.append(row)
-            
-        # get xaxis value
-        for x in range(len(xaxis_obj)):
-            row = [xaxis_obj[x].name]
-            values.append(row)
+        xaxis_enum = self.enums[xaxis_type]['name2enum']
+        yaxis_enum = self.enums[yaxis_type]['code2enum']
         
-        for y in range(1,len(values[0])):
+        values = []
+        row=['']
 
-            for x in range(1,len(values)):
+        values = [['']]    
+        for yval in yaxis_enum.keys():
+            values[0].append(yval)
+            
+        for xval in xaxis_enum.keys():
+            values.append([xval])
+
+        ymax = len(values[0])
+        xmax = len(values)-1
+
+        for yval,y in yaxis_enum.iteritems():
+
+            for xval,x in xaxis_enum.iteritems():
                 celltext=[]
-                xval = xaxis_obj[x-1].name
                 
                 for ztype in ztypes:
                     try:
-                        zval = getattr(source_obj.lessons[xval][y-1],ztype)
+                        zval = getattr(source_obj.lessons[yval][xval][0],ztype)
                         celltext.append(zval.name)
-                    except:
-                        log.log(thisfuncname(),2,msg="attr not found on object",
-                                attr=ztype,xval=xval)
+                    except Exception, e:
+                        log.log(thisfuncname(),2,msg="attr not found on object",error=e,
+                                attr=ztype,xval=str(xval),yval=str(yval))
                         celltext.append("**")
-                    
+                print celltext
                 values[x].append(",".join(celltext))
                 
 
@@ -409,27 +421,37 @@ class WizardUI(Tk):
 
         period = lesson.period.objid
         student = lesson.student.objid
+        dow = lesson.dow.objid
         
         # add the lesson to the teacher object
         teacher = lesson.teacher
         if hasattr(teacher,'lessons') == False:
             setattr(teacher,'lessons',{})
+          
+        if teacher.lessons.has_key(dow) == False:
+            teacher.lessons[dow] = {} 
+
+        if teacher.lessons[dow].has_key(period) == False:
+            teacher.lessons[dow][period] = []
             
-        if teacher.lessons.has_key(period) == False:
-            teacher.lessons[period] = []
-            
-        teacher.lessons[period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to teacher",lesson=lesson)
+        teacher.lessons[dow][period].append(lesson)
+        log.log(thisfuncname(),9,msg="lesson added to teacher",dow=str(dow),period=str(period),
+                 session=str(lesson.session.name),teacher=str(lesson.teacher.name))
+        
         # add the lesson to the student object
         student = lesson.student
         if hasattr(student,'lessons') == False:
             setattr(student,'lessons',{})
             
-        if student.lessons.has_key(period) == False:
-            student.lessons[period] = []
+        if student.lessons.has_key(dow) == False:
+            student.lessons[dow] = {}
             
-        student.lessons[period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to student",lesson=lesson)
+        if student.lessons[dow].has_key(period) == False:
+            student.lessons[dow][period] = []
+            
+        student.lessons[dow][period].append(lesson)
+        log.log(thisfuncname(),9,msg="lesson added to student",dow=str(dow),period=str(period),
+                session=str(lesson.session.name),student=str(lesson.student.name))
             
     @logger(log)
     def _clear_grid(self,gridname,firstrow,firstcol):
@@ -454,70 +476,85 @@ class WizardUI(Tk):
         else:
             self._clear_grid(gridname,firstrow,firstcol)
         
-        self.updates={}
+        self.of.store={}
 
     @logger(log)       
-    def load(self,saveversion=None,values=None, dow=None, prep=None):
+    def load(self,saveversion=None,values=None, dow=None, prep=None, period=None):
         
+        # database name
         if self.dbname_entry_sv.get() <> self.dbname:
             newdb = self.dbname_entry_sv.get()
             log.log(thisfuncname(),3,msg="switching databases",olddb=self.dbname,newdb=newdb)
             self.database = Database(newdb)
             self.dbname = newdb
-        
-        cols = ['period','student','session','dow','teacher','subject','userobjid']
+            
         whereclause = []
+    
+        # saveversion
+        if saveversion==None or saveversion== "":
+            saveversion = self.dbload_entry_sv.get()
+        if saveversion == "":
+            log.log(thisfuncname(),1,msg="no saveversion set for load; exception")
+            raise Exception("attempting to load without a saveversion set")
+        else:
+            log.log(thisfuncname(),3,msg="loading",saveversion=str(saveversion))
+            whereclause.append(['saveversion',"=",saveversion])
         
-        whereclause.append(['saveversion',"=",self.dbload_entry_sv.get()])
+        # prep
+        if prep==None: prep=self.prep_entry_sv.get()
+        if  prep == "":
+            prep = -1
+        else:
+            whereclause.append(['prep',"=",prep])
+        log.log(thisfuncname(),3,msg="loading",prep=str(prep))
         
+        # period
+        if period==None: period=self.period_entry_sv.get()
+        if period == "":
+            prep = -1
+        else:
+            whereclause.append(['period',"=","\""+period+"\""])            
+        log.log(thisfuncname(),3,msg="loading",prep=str(prep))
+
+        # dow
+        if dow==None: dow = self.dow_entry_sv.get()
+        if dow == "":
+            dow = "all"
+        else:
+            whereclause.append( ['dow',"=","\""+dow+"\""])
+        log.log(thisfuncname(),3,msg="loading",dow=str(dow))
+
+        # get enums
+        self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
+
+        # load from database
+        cols = ['period','student','session','dow','teacher','subject','userobjid']        
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
-            
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
-            
+        
+        # parse rows
         for row in rows:
+            datamembers = {}
+            for i in range(len(cols)):
+                datamembers[cols[i]] = row[i]
             
-            session_code =  row[cols.index('session')]
-            period =  row[cols.index('period')]
-            student =  row[cols.index('student')]
-            teacher = row[cols.index('teacher')]
-            subject = row[cols.index('subject')]
-            userobjid = row[cols.index('userobjid')]
-            dow = row[cols.index('dow')]
+            _,lessontype_code,_,_ = datamembers['session'].split(".")
+            lessontype = self.enums['lessontype']['code2name'][lessontype_code]      
+            datamembers['objtype'] = 'lesson'                               
             
-            _,lessontype_code,_,_ = session_code.split(".")
-            
-            lessontype = self.enums['lessontype']['code2name'][lessontype_code]
-                                                       
-            datamembers = dict(schedule = '1',
-                               dow=dow, 
-                               subject=subject,
-                               lessontype=lessontype,
-                               objtype='lesson',
-                               userobjid=userobjid, # unique key to store obj in of
-                               period=period,
-                               student=student,
-                               teacher=teacher,
-                               saveversion=saveversion,
-                               session=session_code)
-            
-            lesson = self.of.new(schoolschedgeneric,
-                                 'lesson',
-                                 objid=userobjid,
-                                 constructor='datamembers',
-                                 database=self.database,
-                                 of=self.of,
-                                 modname=__name__,
-                                 dm=datamembers)
-            
+            lesson = self.of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
+                                 constructor='datamembers',database=self.database,
+                                 of=self.of,modname=__name__,dm=datamembers)
             
             self.lesson_change(lesson)
                             
-            log.log(thisfuncname(),3,msg="loading row",period=period,student=str(student),sv=saveversion,teacher=teacher,subject=subject)
+            log.log(thisfuncname(),3,msg="loading row",dm=datamembers)
 
-        log.log(thisfuncname(),3,msg="db rows loaded",num=len(rows))
-        log.log(thisfuncname(),3,msg="lesson obj created",num=len(self.of.store['lesson']))
-
+        # post log with results
+        log.log(thisfuncname(),3,msg="db rows loaded",num=len(rows))        
+        for i in range(len(cols)):
+            log.log(thisfuncname(),3,msg="lesson obj created",num=len(self.of.store[cols[i]]))
 
     def updates_get(self,gridname,ignoreaxes=False):
         

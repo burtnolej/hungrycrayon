@@ -221,6 +221,8 @@ def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
 		                                              whereclause[i][1],
 		                                              whereclause[i][2])
 
+    print exec_str
+    
     results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]
