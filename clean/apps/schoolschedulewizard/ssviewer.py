@@ -92,14 +92,14 @@ class WizardUI(Tk):
         self.of = of
 
         
-        font = tkFont.Font(family="monospace", size=14) 
+        font = tkFont.Font(family="monospace", size=10) 
         
         self.lastsaveversion=0
 
         style = Style()
         
-        bigfont = tkFont.Font(family="Helvetica",size=50)
-        self.option_add("*TCombobox*Listbox*Font", bigfont)
+        #bigfont = tkFont.Font(family="Helvetica",size=50)
+        #self.option_add("*TCombobox*Listbox*Font", bigfont)
         
         self.current_inputmode = "Normal"
         
@@ -282,8 +282,6 @@ class WizardUI(Tk):
                     
                 values[x].append(",".join(celltext))
                 
-                print xval,zval,x,y
-
 
         self.bgmaxrows=len(values)
         self.bgmaxcols=len(values[0])

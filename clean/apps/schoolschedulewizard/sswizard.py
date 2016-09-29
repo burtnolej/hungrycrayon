@@ -92,7 +92,7 @@ class WizardUI(Tk):
         self.of = of
 
         
-        font = tkFont.Font(family="monospace", size=24) 
+        font = tkFont.Font(family="monospace", size=12) 
         
         self.lastsaveversion=0
 
@@ -681,9 +681,13 @@ class WizardUI(Tk):
                 x = self.enums['student']['name2enum'][student]
                 y = self.enums['period']['name2enum'][str(period)]
                 
-                self.entrygrid.widgets[x+1][y+1].sv.set(session)
-                self.entrygrid.widgets[0][y+1].sv.set(period)
-                self.entrygrid.widgets[x+1][0].sv.set(student)
+                #self.entrygrid.widgets[x+1][y+1].sv.set(session)
+                #self.entrygrid.widgets[0][y+1].sv.set(period)
+                #self.entrygrid.widgets[x+1][0].sv.set(student)
+                
+                self.entrygrid.widgets[x][y].sv.set(session)
+                self.entrygrid.widgets[0][y].sv.set(period)
+                self.entrygrid.widgets[x][0].sv.set(student)
                 
                 log.log(thisfuncname(),3,msg="loading row",period=period,student=str(student),sv=saveversion,
                         x=x,y=y,value=z)
