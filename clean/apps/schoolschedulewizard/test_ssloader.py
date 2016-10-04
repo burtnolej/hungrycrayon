@@ -5,7 +5,7 @@ from os import path as ospath
 from ssloader import SSLoader, SSLoaderRuleException, SSLoaderRecordEndException, SSLoaderNoMatchException
 
 from database_table_util import tbl_rows_get
-from database_util import Database
+from database_util import Database, tbl_remove
 
 from Tkinter import *
 from ttk import *
@@ -13,13 +13,15 @@ from shutil import copyfile
 
 import unittest
 
-
-# "ELA: Nathaniel (Amelia)$$Math: CLayton, (Stan)$$Engineering: Orig, Stephen, Oscar (Paraic)"
-
-class Test_String2Records(unittest.TestCase):
+class Test_Base(unittest.TestCase):
+    def setUp(self):
+        self.databasename = "test_ssloader"
+        self.ssloader = SSLoader(self.databasename)    
+    
+class Test_String2Records(Test_Base):
     
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_single_dollar(self):
         
@@ -51,9 +53,9 @@ class Test_String2Records(unittest.TestCase):
         
         self.assertListEqual(records,['foo','foo','foo','foo','^','bar'])
         
-class Test_ApplyRules(unittest.TestCase):
+class Test_ApplyRules(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_teachertype(self):
         self.rules = [(":",1),("(",1),(")",1)]
@@ -86,9 +88,9 @@ class Test_ApplyRules(unittest.TestCase):
         self.assertTrue(self.ssloader.appyrules(self.inputstr,self.rules))
         
         
-class Test_ApplyRules_Fails(unittest.TestCase):
+class Test_ApplyRules_Fails(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_no_colon(self):
         
@@ -115,9 +117,9 @@ class Test_ApplyRules_Fails(unittest.TestCase):
         self.rules = [(":",1),("(",1),(")",1)]
         self.assertFalse(self.ssloader.appyrules(self.inputstr,self.rules))
     
-class Test_teachertype_1student(unittest.TestCase):
+class Test_teachertype_1student(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.inputstr = "ELA: Nathaniel (Amelia)"
 
     def test_subject(self):
@@ -157,9 +159,9 @@ class Test_teachertype_1student(unittest.TestCase):
         
         self.assertListEqual(students,['Nathaniel'])
         
-class Test_teachertype_edgecasestudent(unittest.TestCase):
+class Test_teachertype_edgecasestudent(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.inputstr = "Science: Oscar, Peter, (Paraic)"
 
     def test_subject(self):
@@ -171,9 +173,9 @@ class Test_teachertype_edgecasestudent(unittest.TestCase):
         
         self.assertListEqual(students,["Oscar","Peter"])
         
-class Test_teachertype_edgecase_quotes(unittest.TestCase):
+class Test_teachertype_edgecase_quotes(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.inputstr = "Science: Jake (Paraic) \""
 
     def test_subject(self):
@@ -192,9 +194,9 @@ class Test_teachertype_edgecase_quotes(unittest.TestCase):
         
         self.assertListEqual(teacher,Paraic)  
         
-class Test_teachertype_multi_student(unittest.TestCase):
+class Test_teachertype_multi_student(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.inputstr = "Science: Oscar, Peter (Paraic)"
 
     def test_subject(self):
@@ -234,9 +236,9 @@ class Test_teachertype_multi_student(unittest.TestCase):
         
         self.assertListEqual(students,["Oscar","Peter"])
 
-class Test_periodtype(unittest.TestCase):
+class Test_periodtype(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.inputstr = "8:30 \n-9:10"
         
     def test_(self):
@@ -244,9 +246,9 @@ class Test_periodtype(unittest.TestCase):
         period = self.ssloader.extract_period(self.inputstr)
         self.assertEqual(period,"830-910")
 
-class Test_extract_staff(unittest.TestCase):
+class Test_extract_staff(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.inputstr = "Moira++"
 
     def test_subject(self):
@@ -255,9 +257,9 @@ class Test_extract_staff(unittest.TestCase):
         
         self.assertEqual(subject,"Moira")
         
-class Test_nonacademic_1_student(unittest.TestCase):
+class Test_nonacademic_1_student(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.inputstr = "History: Oscar"
 
     def test_subject(self):
@@ -274,9 +276,9 @@ class Test_nonacademic_1_student(unittest.TestCase):
         
         self.assertListEqual(students,['Oscar'])
         
-class Test_nonacademic_multi_student(unittest.TestCase):
+class Test_nonacademic_multi_student(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.inputstr = "Student News: Peter, Jack "
 
     def test_subject(self):
@@ -293,9 +295,9 @@ class Test_nonacademic_multi_student(unittest.TestCase):
         
         self.assertListEqual(students,['Peter','Jack'])
         
-class Test_extractteacher_Fails(unittest.TestCase):
+class Test_extractteacher_Fails(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         self.rules = [(":",1),("(",1),(")",1)]
         self.ruletype = "teacher"
 
@@ -306,9 +308,9 @@ class Test_extractteacher_Fails(unittest.TestCase):
         with self.assertRaises(SSLoaderRecordEndException):
             teacher,_ = self.ssloader.extract_teacher(self.inputstr)
         
-class Test_LoadRefObjects(unittest.TestCase):
+class Test_LoadRefObjects(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_(self):
         
@@ -324,31 +326,32 @@ class Test_LoadRefObjects(unittest.TestCase):
         
         rows = self.ssloader.loadrefobjects("quadref","subject",True)
         
-        expected_results = [u'WP', u'Work P', u'AP', u'APeriod', u'SN', u'SNews', u'Activity P', u'Student N', 'Independent Art',u'Movement / Chess', u'Movement/chess', u'Debate Elective','Math Activity Period',u'ELA', 'Psychology','Psychology Reading','Biology','Spanish','Italian','Debate',u'Drama', 'Reading',u'Engineering', u'Math', u'Student News', u'Counseling', u'Science', u'Movement', u'Activity Period', u'Speech', u'History', u'OT', u'Core', u'Chess', u'Lunch Computer Time', u'Music', u'??', u'Independent Reading', u'Piano', u'Art', u'STEM', u'Humanities', u'Work Period']
+        expected_results = [u'WP', 'W Period', u'Work P', u'AP', u'APeriod', u'SN', u'SNews', u'Activity P', u'Student N', 'Independent Art',u'Movement / Chess', u'Movement/chess', u'Debate Elective','Math Activity Period',u'ELA', 'Psychology','Psychology Reading','Biology','Spanish','Italian','Debate',u'Drama', 'Reading',u'Engineering', u'Math', u'Student News', u'Counseling', u'Science', u'Movement', u'Activity Period', u'Speech', u'History', u'OT', u'Core', u'Chess', u'Lunch Computer Time', u'Music', u'??', u'Independent Reading', u'Piano', u'Art', u'STEM', u'Humanities', u'Work Period']
 
         expected_results.sort()
         
         self.assertListEqual(expected_results,rows)
         
-class Test_LoadSynonyms(unittest.TestCase):
+class Test_LoadSynonyms(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_(self):
         
         rows = self.ssloader.addsynonyms("quadref","subject")
         rows.sort()
         
-        expected_results = [u'WP', u'Work P', u'AP', u'APeriod', u'SN', u'SNews', u'Activity P', u'Student N', u'Movement / Chess', u'Movement/chess', u'Debate Elective']
+        expected_results = [u'WP', 'W Period', u'Work P', u'AP', u'APeriod', u'SN', u'SNews', u'Activity P', u'Student N', u'Movement / Chess', u'Movement/chess', u'Debate Elective']
         
         expected_results.sort()
 
         self.assertListEqual(expected_results,rows)
         
         
-class Test_ValidateTokens_Subject(unittest.TestCase):
+class Test_ValidateTokens_Subject(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
+        self.ssloader.inputfile = "test_ssloader.py"
         
         self.valid_subjects = self.ssloader.loadrefobjects('quadref','subject')
         
@@ -404,9 +407,9 @@ class Test_ValidateTokens_Subject(unittest.TestCase):
         with self.assertRaises(SSLoaderNoMatchException):
             validated_token = self.ssloader.validate_token2('Fsxh',self.valid_subjects)
         
-class Test_ValidateTokens_Student(unittest.TestCase):
+class Test_ValidateTokens_Student(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
         self.valid_students = self.ssloader.loadrefobjects('quadref','student')
         
@@ -420,11 +423,11 @@ class Test_ValidateTokens_Student(unittest.TestCase):
         
         validated_token = self.ssloader.validate_token2('Simon A',self.valid_students)
         
-        self.assertEqual(validated_token,'SimonA')
+        self.assertEqual(validated_token,'Simon A')
   
-class Test_RelSize(unittest.TestCase):
+class Test_RelSize(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_same(self):
         
@@ -475,9 +478,9 @@ class Test_RelSize(unittest.TestCase):
         self.assertEquals(result,False)
         self.assertEquals(value,1)
 
-class Test_NumCharsSamelLocation(unittest.TestCase):
+class Test_NumCharsSamelLocation(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_all(self):
         
@@ -534,9 +537,9 @@ class Test_NumCharsSamelLocation(unittest.TestCase):
         result,value = self.ssloader._match_num_chars_same_location("zblahfoobar","foobar")
         self.assertEquals(result,True)
         
-class Test_NumCharsSame(unittest.TestCase):
+class Test_NumCharsSame(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_identical(self):
         
@@ -588,9 +591,9 @@ class Test_NumCharsSame(unittest.TestCase):
 
         self.assertEquals(result,False)
 
-class Test_NumCharsLocationSame(unittest.TestCase):
+class Test_NumCharsLocationSame(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_identical(self):
         
@@ -598,9 +601,9 @@ class Test_NumCharsLocationSame(unittest.TestCase):
         self.assertEquals(result,True)
         self.assertEquals(value,1)
         
-class Test_RecordIdentifcation(unittest.TestCase):
+class Test_RecordIdentifcation(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         fileasstring = self.ssloader.file2string("prep5data_test.csv")
         self.records = self.ssloader.string2records(fileasstring)
    
@@ -638,9 +641,9 @@ class Test_RecordIdentifcation(unittest.TestCase):
         
         self.assertEquals(recordtype, 'teacher')        
      
-class Test_RecordIdentifcation_realsample(unittest.TestCase):
+class Test_RecordIdentifcation_realsample(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         fileasstring = self.ssloader.file2string("prep5data_test.csv")
         self.records = self.ssloader.string2records(fileasstring)
 
@@ -663,9 +666,9 @@ class Test_RecordIdentifcation_realsample(unittest.TestCase):
         self.assertEquals(results['SSLoaderNoRulesMatchException'],6)
         self.assertEquals(results['period'],1)
         
-class Test_RecordIdentifcation_realsample2(unittest.TestCase):
+class Test_RecordIdentifcation_realsample2(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         fileasstring = self.ssloader.file2string("prep5data_miss-day-terminator.csv")
         self.records = self.ssloader.string2records(fileasstring)
 
@@ -684,9 +687,9 @@ class Test_RecordIdentifcation_realsample2(unittest.TestCase):
         print results
            
         
-class Test_PreProcessRecords(unittest.TestCase):
+class Test_PreProcessRecords(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_(self):
         
@@ -726,9 +729,9 @@ class Test_PreProcessRecords(unittest.TestCase):
             
         self.assertListEqual(clean_records,expected_results)
 
-class Test_PreProcessRecordsStaff(unittest.TestCase):
+class Test_PreProcessRecordsStaff(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_(self):
     
@@ -758,9 +761,9 @@ class Test_PreProcessRecordsStaff(unittest.TestCase):
         
         self.assertListEqual(clean_records,expected_results)
         
-class Test_PreProcessRecordsNewPeriod(unittest.TestCase):
+class Test_PreProcessRecordsNewPeriod(Test_Base):
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_(self):
         
@@ -790,11 +793,11 @@ class Test_PreProcessRecordsNewPeriod(unittest.TestCase):
         self.assertListEqual(clean_records,expected_results)
         
         
-class Test_ValidateTokens(unittest.TestCase):
+class Test_ValidateTokens(Test_Base):
 
 
     def setUp(self):
-        self.ssloader = SSLoader()
+        Test_Base.setUp(self)
         
     def test_(self):
         
@@ -805,16 +808,22 @@ class Test_ValidateTokens(unittest.TestCase):
         
         self.assertListEqual(results,expected_results)
         
-class Test_DBLoader(unittest.TestCase):
+class Test_DBLoader(Test_Base):
 
     def setUp(self):
+        Test_Base.setUp(self)
         
-        self.databasename = "test_ssloader"
-        self.ssloader = SSLoader(self.databasename)
+        database = Database(self.databasename)
+        try:
+            with database:
+                tbl_remove(database,'lesson')
+                tbl_remove(database,'session')
+        except:
+            pass
         
     def test_session(self):
         
-        records = [['100-140', 'Tuesday', 'STEM', 'Thea', [u'SimonA']], 
+        records = [['100-140', 'Tuesday', 'STEM', 'Thea', [u'Simon A']], 
                   ['1210-100', 'Wednesday', 'Humanities', 'Jess', ['Liam']]]
             
         
@@ -832,12 +841,12 @@ class Test_DBLoader(unittest.TestCase):
         
     def test_lesson(self):
         
-        records = [['100-140', 'Tuesday', 'STEM', 'Thea', [u'SimonA']], 
+        records = [['100-140', 'Tuesday', 'STEM', 'Thea', [u'Simon A']], 
                   ['1210-100', 'Wednesday', 'Humanities', 'Jess', ['Liam']]]
             
         
-        expected_results =  [['SimonA', 'Tuesday',7,'Thea', 'STEM','Thea.STEM.Tuesday'], 
-                             ['Liam', 'Wednesday',6, 'Jess','Humanities','Jess.Humanities.Wednesday']]
+        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday'], 
+                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday']]
             
             
         self.ssloader.dbloader(records)
@@ -846,26 +855,24 @@ class Test_DBLoader(unittest.TestCase):
         with database:
             _,rows,_ = tbl_rows_get(database,'lesson',['student','dow','period','teacher','subject','session'])
         
-        self.assertListEqual(expdatabasenameected_results,rows)
+        self.assertListEqual(expected_results,rows)
         
     def tearDown(self):
         copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
     
-class Test_DBLoader_RealFile(unittest.TestCase):
+class Test_DBLoader_RealFile(Test_Base):
     def setUp(self):
-        
-        self.databasename = "test_ssloader"
-        self.ssloader = SSLoader(self.databasename)
+        Test_Base.setUp(self)
         
     def test_prep4(self):
         
-        self.ssloader.ssloader(['prep4data.csv'],self.databasename)
+        self.ssloader.ssloader(['prep5data.csv'],self.databasename)
     
     
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ApplyRules))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ApplyRules_Fails))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_teachertype_1student)) 
@@ -888,13 +895,10 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_NumCharsSamelLocation))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RelSize))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsStaff))
-    suite.addTeTest_DBLoader_RealFilest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadSynonyms))'''
-    
-    
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_RealFile))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadSynonyms))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_RealFile))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
