@@ -1,5 +1,5 @@
 from misc_utils_log import Log, logger
-log = Log(cacheflag=True,logdir="/tmp/log",verbosity=5,pidlogname=True,proclogname=False)
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,pidlogname=True,proclogname=False)
 
 from misc_utils import os_file_to_string, thisfuncname
 from database_table_util import tbl_rows_get

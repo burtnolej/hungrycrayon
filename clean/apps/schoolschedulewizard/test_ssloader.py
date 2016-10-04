@@ -2,6 +2,8 @@ import sys
 import os
 from os import path as ospath
 
+from ssloader import SSLoader, SSLoaderRuleException, SSLoaderRecordEndException, SSLoaderNoMatchException
+
 from database_table_util import tbl_rows_get
 from database_util import Database
 
@@ -10,7 +12,7 @@ from ttk import *
 from shutil import copyfile
 
 import unittest
-from ssloader import SSLoader, SSLoaderRuleException, SSLoaderRecordEndException, SSLoaderNoMatchException
+
 
 # "ELA: Nathaniel (Amelia)$$Math: CLayton, (Stan)$$Engineering: Orig, Stephen, Oscar (Paraic)"
 
@@ -870,8 +872,6 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_teachertype_multi_student))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_extractteacher_Fails))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_extract_staff))
-    
-      
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nonacademic_1_student))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nonacademic_multi_student))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Subject))
