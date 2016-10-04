@@ -74,6 +74,10 @@ class Log():
         self.log(self.__init__,3,logdir=self.logdir,verbosity=verbosity,pidlogname=str(pidlogname),
                  proclogname=str(proclogname))
 
+    def verbosity_set(self,new_value):
+        self.log(thisfuncname(),3,msg="updating verbosity",old_value = self.verbosity,new_value = new_value)
+        self.verbosity = new_value
+        
     def _getpid(self):
         thread = currentThread().name
         if thread == 'MainThread':
@@ -222,7 +226,7 @@ class Log():
             # add into logmesg any other info passed into the log function as kwargs
             kwargs = self._args_readable(kwargs)
             logmesg['logmesg'] = str(zip(map(str,kwargs.keys()),map(str,kwargs.values())))
-            logmesg['logmesg'] =  logmesg['logmesg'].replace(" ","")
+            #logmesg['logmesg'] =  logmesg['logmesg'].replace(" ","")
             
             # build log mesg as specified in config
             output = []

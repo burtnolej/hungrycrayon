@@ -5,16 +5,17 @@ from Tkinter import *
 from Tkinter import Label as tklabel
 from Tkinter import Entry as tkentry
 from Tkinter import Frame as tkframe
+from Tkinter import Button as tkbutton
 from ttk import *
 import tkFont
 
 class FontPickerFrame(Frame):
     
-    def __init__(self,master,error_sv,example_label,example_label_sv,text,family="Helvetica",pointsize="12",weight="normal"):
+    def __init__(self,master,error_sv,text,family="Helvetica",pointsize="12",weight="normal"):
         Frame.__init__(self,master)
         
         self.error_sv = error_sv
-
+        
         rgb_label = Label(self,text=text,anchor=CENTER)
         rgb_label.grid(row=0,column=0,columnspan=2,pady=2)
     
@@ -62,7 +63,7 @@ class FontPickerFrame(Frame):
             font = tkFont.Font(family=self.family_entry_sv.get(),
                                size=self.pointsize_entry_sv.get(),
                                weight=self.weight_entry_sv.get()) 
-            self.error_sv,example_label.config(font=font)
+            self.pick_widget.config(font=font)
             
             log.log(thisfuncname(),3,msg="updating font",font=font)
             return 0
@@ -70,12 +71,10 @@ class FontPickerFrame(Frame):
             self.error_sv.set(e)    
             
 class RGBPickerFrame(Frame):
-    def __init__(self,master,config,error_sv,example_label,example_label_sv,text,r=0,g=0,b=0,labels=True):
+    def __init__(self,master,config,error_sv,text,r=0,g=0,b=0,labels=True):
         Frame.__init__(self,master)     
 
         self.error_sv = error_sv
-        self.example_label_sv = example_label_sv
-        self.example_label = example_label
         self.config = config
         
         rgb_label = Label(self,text=text,anchor=CENTER)
@@ -133,109 +132,78 @@ class RGBPickerFrame(Frame):
     @logger(log)
     def onchange(self):
         
-        try:
-            self.msg_label_sv.set("")
-        except:
-            pass
-        
-        try:
-            hexcode = self.gethexcode(self.red_entry_sv.get(), self.green_entry_sv.get(), self.blue_entry_sv.get())
-            config =  {self.config:hexcode}
-            self.example_label.config(**config)
-            log.log(thisfuncname(),3,msg="updating config",config=config)
-            return 0
-        except Exception,e:
-            self.error_sv.set(e)
+        if hasattr(self,'pick_widget') == False:
+            log.log(thisfuncname(),3,msg="no pick label/button defined to display selection")
+        else:
+            try:
+                self.msg_label_sv.set("")
+            except:
+                pass
+            
+            try:
+                hexcode = self.gethexcode(self.red_entry_sv.get(), self.green_entry_sv.get(), self.blue_entry_sv.get())
+                config =  {self.config:hexcode}
+                self.pick_widget.config(**config)
+                log.log(thisfuncname(),3,msg="updating config",config=config)
+                return 0
+            except Exception,e:
+                self.error_sv.set(e)
             
         return -1
     
-class RGBPaletteFrame(Frame):
-    def __init__(self,master,num_slots=8):
-        Frame.__init__(self,master)     
-
-        self.s = Style()
-        
-        self.s.configure(".".join(['InFocus','Unset','TEntry']),fieldbackground='yellow',foreground='black')
-        self.s.configure(".".join(['OutOfFocus','Set','TEntry']),fieldbackground='white',foreground='black')
-
-        self.widgets = []
-
-        for i in range(num_slots):
-            _entry_sv = StringVar()
-            _entry = Entry(master,)
-            _entry.grid(row=i,column=0)        
-            self.grid_rowconfigure(i,weight=1,uniform="foo",name=i)
-            self.widgets.append(_entry)
-            
-            self.widget.bind('<FocusIn>',self.highlight)
-            self.widget.bind('<FocusOut>',self.highlight)
-            
-        self.grid_columnconfigure(i,weight=1,uniform="foo")
     
-        self.widgets[0].set_focus()
+class ConfigPicker(Tk):
+    
+    def __init__(self):
+        Tk.__init__(self)
+    
+        self.style = Style()
+    
+        #('clam', 'alt', 'default', 'classic')
+        self.style.theme_use("default")
         
-    def highlight(self,event):
-        _,state,_ = self['style'].split(".")
+        self.style.configure('TCombobox',fieldbackground='lightgreen')
+        self.style.configure('TEntry',fieldbackground='lightgreen')
+        self.style.configure('TFrame',background='lightgrey', bd=1, relief=RAISED)
+        self.style.configure('TLabel',fieldbackground='lightgreen')
+
+        self.frame = Frame(self)
+        self.frame.grid(row=0,column=0,sticky=NSEW)
+    
+        msg_label_sv = StringVar()
+        msg_label = tklabel(self.frame,text="",textvariable=msg_label_sv, bd=3)
+        msg_label.grid(row=4,column=0,columnspan=2,sticky=NSEW)
+    
+        self.num_picks=0
+
+        self.bgrgbframe = RGBPickerFrame(self.frame,"background",msg_label_sv,"Background",255,0,0)
+        self.bgrgbframe.grid(row=0,column=0,sticky=NSEW)
         
-        if event.type == '9':
-            self['style']=".".join(['InFocus',state,'TEntry'])    
-            
-        elif event.type == '10':
-            self['style']=".".join(['OutOfFocus',state,'TEntry'])
-            
-        self.infocuswidget = event.widget
-         
-    def set(self,bgcolor,fgcolor,family,weight,pointsize):
+        self.fgrgbframe = RGBPickerFrame(self.frame,"foreground",msg_label_sv,"Foreground",0,255,0)
+        self.fgrgbframe.grid(row=0,column=1,sticky=NSEW)
         
-        _,widgetindex = self.infocuswidget.winfo_name().split(".")
+        self.fontpkrframe = FontPickerFrame(self.frame,msg_label_sv,"Font","Helvetica")
+        self.fontpkrframe.grid(row=1,column=0,columnspan=2,sticky=NSEW)
+    
+        self.frame.grid_columnconfigure(0,weight=1,uniform="foo")
+        self.frame.grid_columnconfigure(1,weight=1,uniform="foo")
+    
+        self.frame.grid_rowconfigure(0,weight=1,uniform="foo")
         
-        _style = ".".join([str(self.infocuswidget),'Set','TEntry'])
-        self.s.configure(_style,fieldbackground=bgcolor,foreground=fgcolor,
-                         font=family)
+        self.set_pick()
+
+    def set_pick(self):
+        pick = tkbutton(self.frame,text="Aa Bb Cc Dd Ee 123 %^&*#@", bd=3,command=self.set_pick)
+        pick.grid(row=3+self.num_picks,column=0,columnspan=2,sticky=NSEW,pady=2)
+        self.num_picks = self.num_picks + 1
         
-        self.infocuswidget.config(text=bgcolor)
-        self.infocuswidget['style'] = _style
+        self.bgrgbframe.pick_widget = pick
+        self.fgrgbframe.pick_widget = pick
+        self.fontpkrframe.pick_widget = pick
+                        
+    
         
 if __name__ == "__main__":
-    master = Tk()
     
-    master.style = Style()
-    #('clam', 'alt', 'default', 'classic')
-    master.style.theme_use("default")
-
-    master.style.configure('TCombobox',fieldbackground='lightgreen')
-    master.style.configure('TEntry',fieldbackground='lightgreen')
-    master.style.configure('TFrame',background='lightgrey', bd=1, relief=RAISED)
-    master.style.configure('TLabel',fieldbackground='lightgreen')
-
-    frame = Frame(master)
-    frame.grid(row=0,column=0,sticky=NSEW)
-    
-    msg_label_sv = StringVar()
-    msg_label = tklabel(frame,text="",textvariable=msg_label_sv, bd=3)
-    msg_label.grid(row=4,column=0,columnspan=2,sticky=NSEW)
-    
-    example_label_sv = StringVar()
-    example_label = tklabel(frame,textvariable=example_label_sv, bd=3)
-    example_label.grid(row=3,column=0,columnspan=2,sticky=NSEW,pady=2)
-    example_label_sv.set("Aa Bb Cc Dd Ee 123 %^&*#@")
-
-    bgrgbframe = RGBPickerFrame(frame,"background",msg_label_sv,example_label,example_label_sv,"Background",255,0,0)
-    bgrgbframe.grid(row=0,column=0,sticky=NSEW)
-    fgrgbframe = RGBPickerFrame(frame,"foreground",msg_label_sv,example_label,example_label_sv,"Foreground",0,255,0)
-    fgrgbframe.grid(row=0,column=1,sticky=NSEW)
-    fontpkrframe = FontPickerFrame(frame,msg_label_sv,example_label,example_label_sv,"Font","Helvetica")
-    fontpkrframe.grid(row=1,column=0,columnspan=2,sticky=NSEW)
-
-    rgbpalette = RGBPaletteFrame(8)
-    rgbpalette.grid(row=6,column=0,columnspan=2,sticky=NSEW)
-    
-    set_button = Button(frame,text="set",command=rgbpalette.set)
-    set_button.grid(row=5,column=0,columnspan=2,sticky=NSEW)
-
-    frame.grid_columnconfigure(0,weight=1,uniform="foo")
-    frame.grid_columnconfigure(1,weight=1,uniform="foo")
-
-    frame.grid_rowconfigure(0,weight=1,uniform="foo")
-    
-    master.mainloop()
+    app = ConfigPicker()
+    app.mainloop()

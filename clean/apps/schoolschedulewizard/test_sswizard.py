@@ -370,10 +370,28 @@ class Test_Load_Save_Change_Save_New_Row(Test_Base):
                            ['Nathaniel', 'STAN.BK.DRA.MO', 'AMEL.AC.ELA.MO'],
                            ['Orig', 'STAN.BK.DRA.MO', 'AMEL.AC.ELA.MO']]
                 
-        self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)           
+        self.assertListEqual(self.ui.entrygrid.dump_grid(), expected_results)
         
+        
+class Test_Dropdowns(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,'test_sswizard','test_quadref')
+        
+        self.ui.dropdowns_set()
+        
+        self.periods = [u'830-910', u'910-950', u'950-1030', u'1030-1110', u'1110-1210', u'1210-100', u'100-140', u'140-220', u'220-300', u'300-330']
+        self.students = [u'Nathaniel', u'Clayton', u'Bruno', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Stephen A', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'SimonA', u'Booker', u'OmerC', u'JackB']
 
+    def test_(self):
         
+        for y in range(1,3): # test grid only 3 wide
+            self.ui.entrygrid.widgets[0][y]['values'] = self.periods
+            
+        for x in range(1,3): # test grid only 3 high
+            self.ui.entrygrid.widgets[x][0]['values'] = self.students
+            
+            
+                
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
@@ -385,6 +403,9 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load_Save_Change_Save_Change_Save_Single_Value))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Change_Save_Persist))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Input_New_Save_Persist))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dropdowns))
+    
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

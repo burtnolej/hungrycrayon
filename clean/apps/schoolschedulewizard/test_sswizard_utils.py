@@ -7,18 +7,20 @@ from Tkinter import *
 from ttk import *
 
 import unittest
+from shutil import copyfile
 
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get
 
 from misc_utils import nxnarraycreate
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
+from sswizard_query_utils import *
 
 from database_util import Database
 from database_table_util import tbl_rows_get, tbl_query
 
-from sswizard_utils import dropdown_build, setenums, session_code_gen
+from sswizard_utils import dropdown_build, setenums, session_code_gen, dbinsert
             
-def _execfunc(database,value,prep):
+'''def _execfunc(database,value,prep):
     
     exec_str = "select s.code "
     exec_str += "from session as s,adult as a "
@@ -36,7 +38,7 @@ def _rowheaderexecfunc(database):
 
 def _columnheaderexecfunc(database):
     exec_str = "select nickname from student"
-    return(tbl_query(database,exec_str))
+    return(tbl_query(database,exec_str))'''
 
 class UI(Tk):
     def __init__(self,database):       
@@ -125,8 +127,7 @@ class Test_Dropdown(unittest.TestCase):
         self.maxy = 10
 
     def test_col1(self):
-        testx=0
-        prep=3
+        prep=5
         widget_args=dict(background='white')
         
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
@@ -135,37 +136,42 @@ class Test_Dropdown(unittest.TestCase):
         expected_results =[u'DA.AC.HU', u'BR.AC.ST', u'JA.CO.MV', u'TH.AC.ST', u'JE.AC.HU']
         expected_results.sort()
         
-        results = widgetcfg[0][testx+1]['values']
+        results = widgetcfg[1][1]['values']
         results.sort()
         
-        print results,expected_results
-        
-        #self.assertListEqual(results,expected_results)
+        self.assertListEqual(results,expected_results)
 
-    '''def test_col2(self):
-        testx=1
+    def test_col2(self):
+        prep =5
         widget_args=dict(background='white')
          
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc,prep)
         
-        expected_results = [u'DA.AC.HU', u'BR.AC.ST']
-
+        expected_results = [u'DA.AC.HU', u'BR.AC.ST',u'JA.??.WP']
+        expected_results.sort()
         
-        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
+        results = widgetcfg[1][2]['values']
+        results.sort()
+        
+        self.assertListEqual(results,expected_results)
          
     def test_col3(self):
-        testx=2
+        prep=5
         widget_args=dict(background='white')
          
         widgetcfg = nxnarraycreate(self.maxx,self.maxy,widget_args)
-        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc)
+        widgetcfg = dropdown_build(self.database,widgetcfg,_execfunc,prep)
         
         expected_results = [u'DA.AC.HU', u'BR.AC.ST', u'JA.??.SP', u'TH.AC.ST', u'JE.AC.HU']
+        expected_results.sort()
+        
+        results = widgetcfg[1][3]['values']
+        results.sort()
+        
+        self.assertEqual(results,expected_results)
 
-        self.assertEqual(widgetcfg[testx+1][0]['values'],expected_results)
-
-    def test_col4(self):
+    '''def test_col4(self):
         testx=3
         widget_args=dict(background='white')
          
@@ -211,7 +217,7 @@ class Test_GetEnums(unittest.TestCase):
     def setUp(self):
         
         self.database = Database('test_sswizard_utils')
-        self.enums =  setenums('All','3','test_sswizard_utils')
+        self.enums =  setenums('all','3',self.database)
         
     def test_prep3_students_name(self):
 
@@ -221,9 +227,9 @@ class Test_GetEnums(unittest.TestCase):
 
     def test_prep3_students_name2enum(self):
         
-        expected_results = {'A':0,'B':1,'C':2,'D':3, \
-                            'E':4,'F':5,'G':6,'H':7, \
-                            'I':8,'J':9,'??':10}
+        expected_results = {'A':1,'B':2,'C':3,'D':4, \
+                            'E':5,'F':6,'G':7,'H':8, \
+                            'I':9,'J':10}
         
         self.assertEqual(expected_results,self.enums['student']['name2enum'])
 
@@ -234,38 +240,39 @@ class Test_GetEnums(unittest.TestCase):
                             'I':'IA','J':'JA','??':'??'}
         
         self.assertEqual(expected_results,self.enums['student']['name2code'])
-
-class Test_GetSessionCodes(unittest.TestCase):
+        
+        
+class Test_DBLoader(unittest.TestCase):
+    
     def setUp(self):
-        self.dbfilename = 'test_sswizard_utils'
-        self.database = Database(self.dbfilename)
+        
+        self.database = Database('test_sswizard_utils')
+        
+        self.cols = ['col1','col2']
+        self.rows = [['val1','val2']]
         
     def test_(self):
-        session_code_gen(self.dbfilename)
         
-        exec_str = "select distinct code from session "
-        exec_str += " where subject = \"Humanities\""
-        exec_str += " and teacher = \"Danielle\""
+        dbinsert(self.database,'session2',self.rows,self.cols)
         
         with self.database:
-            colnames,rows = tbl_query(self.database,exec_str)
-
-        print rows
+            
+            _,rows,_ = tbl_rows_get(self.database,'session2',self.cols)
         
-        self.assertEqual(rows,[['DA.AC.HU']])
+            print rows
         
     def tearDown(self):
-        copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")
-        pass
+        copyfile("test_sswizard_utils.sqlite.backup","test_sswizard_utils.sqlite")
+
         
+    
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dropdown))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetEnums))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetSessionCodes))
-
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dropdown))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetEnums))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
     
     
     

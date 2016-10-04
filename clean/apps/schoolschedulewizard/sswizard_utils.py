@@ -3,11 +3,12 @@ import os
 from os import path as ospath
 from misc_utils import nxnarraycreate
 
-from database_table_util import tbl_query, tbl_rows_update, DBException
+from database_table_util import tbl_query, tbl_rows_update, DBException, dbtblfactory
 from database_util import Database
 from collections import OrderedDict
 from misc_utils_log import Log, logger
 from misc_utils import thisfuncname
+
 from shutil import copyfile
 
 log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
@@ -100,18 +101,21 @@ def dropdown_build(database,
     yoffset=0
     
     log.log(thisfuncname(),3,msg="creating dropdowns lists",dow=dow,prep=prep)
-    
-    if rowheaderexecfunc <> None: yoffset=1    
-    if columnheaderexecfunc <> None: xoffset=1
 
+    # if not creating dropdowns for the headers increment the count
+    if rowheaderexecfunc == None: yoffset=1
+    if columnheaderexecfunc == None: xoffset=1
+    
     output = []
     with database:
         for y in range(yoffset,len(widgetargs[0])):
             colndefn,values = exec_func(database,y,prep,dow)
             
+            # pull out distinct and make a single list
             values = [value[0] for value in values]
-            
             values = list(set(values))
+            
+            # add a 'values' attr for each widget
             for x in range(xoffset,len(widgetargs)):
                 widgetargs[x][y]['values'] = values
                 
@@ -125,8 +129,6 @@ def dropdown_build(database,
                 if ui <> None:
                     ui.widgets[x][0].sv.set(values[x])
                     
-                print values
-
         if columnheaderexecfunc <> None:
             colndefn,values = columnheaderexecfunc(database)
             
@@ -136,8 +138,7 @@ def dropdown_build(database,
                 widgetargs[0][y]['values'] = values
                 if ui <> None:
                     ui.widgets[0][y].sv.set(values[y])
-                    
-                print values
+
 
     return(widgetargs)
 
@@ -170,7 +171,7 @@ def getdbenum(enums,database,fldname,tblname,**kwargs):
         try:
             coldefn,values = tbl_query(database,exec_str)
         except DBException, e:
-            log.log(thisfuncname(),0,exception=e,msg=e.message)
+            log.log(thisfuncname(),0,exception=e,msg=e.message,tblname=tblname,fldname=fldname)
     
     enums[tblname] = {}
     #name2code = dict((row[0],row[1]) for row in values)
@@ -181,8 +182,9 @@ def getdbenum(enums,database,fldname,tblname,**kwargs):
     code2enum = OrderedDict()
     
     for k,v,e in values:
-        if v == 'None':
-            log.log(thisfuncname(),0,msg="none value detected",tblname=tblname,key=str(k))
+        if v == 'None' or e == None:
+            log.log(thisfuncname(),1,msg="none value detected",tblname=tblname,key=str(k))
+            continue
  
         name2code[k] = v
         name2enum[k] = int(e)
@@ -314,6 +316,30 @@ def session_code_gen(dbname,dryrun=False):
         #except Exception, e:
         #    print row,"failed", e
     
+def dbinsert(database,dbclassname,rows,colnames):
+    
+    dbclass = dbtblfactory(dbclassname)
+
+    for x in range(len(rows)):
+        dm={}
+        emptyrow=True
+        for y in range(len(colnames)): 
+            colname = colnames[y]
+            value = rows[x][y]
+            if colname <> "" and colname.startswith("_") == False:
+                if value <> "":
+                    dm[colname] = value
+                    emptyrow=False
+                
+        if emptyrow == False:
+            dbobj = dbclass.datamembers(database=database,dm=dm)
+
+            with database:
+                try:
+                    exec_str,result = dbobj.persist()
+                    log.log(thisfuncname(),4,func=dbobj.persist,exec_str=exec_str,result=result)
+                except Exception, e:
+                    log.log(thisfuncname(),1,func=dbobj.persist,error=str(e))
 
     
 if __name__ == "__main__":

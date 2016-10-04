@@ -503,6 +503,7 @@ class WizardUI(Tk):
     
     def dropdowns_set(self):
         
+        #widget_args=dict(background='red',width=9,values=self.enums['student'])
         widget_args=dict(background='red',width=9,values=self.enums['student'])
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
         widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,
@@ -605,7 +606,12 @@ class WizardUI(Tk):
                 
                 log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
                 
+            if len(rows) == 0:
+                log.log(thisfuncname(),2,msg="no rows detected",whereclause=whereclause)
+                
             for row in rows:
+                
+                print row
                 
                 z = session =  row[cols.index('session')]
                 period =  row[cols.index('period')]

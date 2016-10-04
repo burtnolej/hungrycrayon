@@ -968,6 +968,9 @@ class Test_New_DBTable_Insert_Change_Save(unittest.TestCase):
         os.remove(self.dbname+".sqlite")
         self.ui.destroy()
         
+        
+
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
