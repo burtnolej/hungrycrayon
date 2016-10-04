@@ -174,7 +174,7 @@ def tbl_query(database,exec_str):
     results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]
-    return(keys,results)    
+    return(keys,results,exec_str)    
 
 
 @logger(log)
