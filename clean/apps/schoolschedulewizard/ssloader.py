@@ -144,10 +144,12 @@ class SSLoader(object):
             _,rows,_ = tbl_rows_get(database,objtype,cols)
         
         rows = [row[0] for row in rows]
+        log.log(thisfuncname(),10,msg="loading refdata",objtype=objtype,rows=rows)
         
         if synonyms == True:
-            rows = rows + self.addsynonyms(databasename,objtype)
-            log.log(thisfuncname(),10,msg="adding synonyms",objtype=objtype,rows=rows)
+            synonyms = self.addsynonyms(databasename,objtype)
+            rows = rows + synonyms
+            log.log(thisfuncname(),10,msg="adding synonyms",objtype=objtype,synonyms=synonyms)
             
         rows.sort()
         return rows
@@ -443,6 +445,7 @@ class SSLoader(object):
         cols = ['period','dow','subject','teacher','students']
         
         session_count=0
+        lesson_count=0
         for record in records:
             
             d = dict(zip(cols,record))
@@ -472,11 +475,10 @@ class SSLoader(object):
             _students = d.pop('students')
             
             # insert session record
+            d['enum'] = int(session_count)
             dbinsert(self.database,'session',[d.values()],d.keys())
             log.log(thisfuncname(),10,msg="loaded row to session",row=d.values())
             
-            # get session enum
-            d['enum'] = int(session_count)
         
             # change col name for session code
             d['session'] = d['code']
@@ -498,6 +500,9 @@ class SSLoader(object):
                 d['student'] = student
                 student_enum = enums['student']['name2enum'][student]
                 
+                # lesson enum
+                d['enum'] = int(lesson_count)
+                
                 # create userobjid
                 d['userobjid'] = ",".join(map(str,[d['period'],student_enum,session_count]))   
                 
@@ -508,6 +513,8 @@ class SSLoader(object):
                 dbinsert(self.database,'lesson',[d.values()],d.keys())
                 log.log(thisfuncname(),10,msg="loaded row to lesson",row=d.values())
 
+                lesson_count += 1
+                
             session_count+=1
         
     def ssloader(self,files,databasename):

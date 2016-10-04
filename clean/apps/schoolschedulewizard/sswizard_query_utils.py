@@ -23,7 +23,8 @@ def _execfunc(database,value,prep,dow):
     exec_str += "where s.prep = {0} and ".format(prep)
     exec_str += "a.name = s.teacher and "
     exec_str += "s.period = {0} and ".format(value)
-    exec_str += "s.day = \"{0}\"".format(dow)
+    #exec_str += "s.day = \"{0}\"".format(dow)
+    exec_str += "s.dow = \"{0}\"".format(dow)
     
     return(tbl_query(database,exec_str))
 

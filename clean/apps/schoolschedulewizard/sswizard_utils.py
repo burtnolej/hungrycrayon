@@ -106,10 +106,11 @@ def dropdown_build(database,
     if rowheaderexecfunc == None: yoffset=1
     if columnheaderexecfunc == None: xoffset=1
     
+
     output = []
     with database:
         for y in range(yoffset,len(widgetargs[0])):
-            colndefn,values = exec_func(database,y,prep,dow)
+            colndefn,values,exec_str = exec_func(database,y,prep,dow)
             
             # pull out distinct and make a single list
             values = [value[0] for value in values]
@@ -119,8 +120,10 @@ def dropdown_build(database,
             for x in range(xoffset,len(widgetargs)):
                 widgetargs[x][y]['values'] = values
                 
+            log.log(thisfuncname(),10,msg="generated data dropdowns",num=len(values),query=exec_str)
+                
         if rowheaderexecfunc <> None:
-            colndefn,values = rowheaderexecfunc(database,"prep",prep)
+            colndefn,values,exec_str = rowheaderexecfunc(database,"prep",prep)
             
             values = [value[0] for value in values]
             
@@ -129,8 +132,10 @@ def dropdown_build(database,
                 if ui <> None:
                     ui.widgets[x][0].sv.set(values[x])
                     
+            log.log(thisfuncname(),10,msg="generated row hdr dropdowns",num=len(values),query=exec_str)
+                    
         if columnheaderexecfunc <> None:
-            colndefn,values = columnheaderexecfunc(database)
+            colndefn,values,exec_str = columnheaderexecfunc(database)
             
             values = [value[0] for value in values]
             
@@ -138,6 +143,8 @@ def dropdown_build(database,
                 widgetargs[0][y]['values'] = values
                 if ui <> None:
                     ui.widgets[0][y].sv.set(values[y])
+                    
+            log.log(thisfuncname(),10,msg="generated col hdr dropdowns",num=len(values),query=exec_str)
 
 
     return(widgetargs)
@@ -169,7 +176,7 @@ def getdbenum(enums,database,fldname,tblname,**kwargs):
     
     with database:
         try:
-            coldefn,values = tbl_query(database,exec_str)
+            coldefn,values,_ = tbl_query(database,exec_str)
         except DBException, e:
             log.log(thisfuncname(),0,exception=e,msg=e.message,tblname=tblname,fldname=fldname)
     
@@ -231,7 +238,7 @@ def setenums(dow,prep,database):
     arg = {}
     if dow <> "all": 
         dow_name = lookupenum(enums,'code2name','dow',dow)
-        arg = dict(day="\""+dow_name+"\"")
+        arg = dict(dow="\""+dow_name+"\"")
         
     getdbenum(enums,database,'code','session',**arg)
     getdbenum(enums,database,'name','lessontype')

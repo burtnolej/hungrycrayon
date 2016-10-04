@@ -1,6 +1,6 @@
 import sys
 from misc_utils_log import Log, logger
-log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
           pidlogname=True,proclogname=False)
 
 from misc_utils_process import *
@@ -82,7 +82,7 @@ class WizardUI(Tk):
         Tk.__init__(self)
         self.geometry("2000x500+0+0")
         
-        self.refdatabase = Database('quadref')
+        self.refdatabase = Database(refdbname)
         
         #self.enums = sswizard_utils.setenums('All','5',self.refdatabase)
         
@@ -97,6 +97,7 @@ class WizardUI(Tk):
         self.lastsaveversion=0
 
         style = Style()
+        style.theme_use("default")
         
         bigfont = tkFont.Font(family="Helvetica",size=50)
         self.option_add("*TCombobox*Listbox*Font", bigfont)
@@ -189,7 +190,7 @@ class WizardUI(Tk):
         self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv)
         self.dbname_entry.grid(row=0,column=3)
         self.dbname_entry.focus_get()
-        self.dbname_entry_sv.set('htmlparser')
+        self.dbname_entry_sv.set(self.dbname)
         
         self.dow_entry_label = Label(controlpanel,text="dow",width=10)
         self.dow_entry_label.grid(row=0,column=4)
@@ -504,7 +505,7 @@ class WizardUI(Tk):
     def dropdowns_set(self):
         
         #widget_args=dict(background='red',width=9,values=self.enums['student'])
-        widget_args=dict(background='red',width=9,values=self.enums['student'])
+        widget_args=dict(background='red',width=9,values=[])
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
         widgetcfg = sswizard_utils.dropdown_build(self.refdatabase,widgetcfg,
                                                   _execfunc,self.prep_entry_sv.get(),
@@ -660,6 +661,6 @@ if __name__ == "__main__":
     
     
     of = ObjFactory(True)
-    app = WizardUI('htmlparser',of,'quadref',maxentrycols=12,maxentryrows=20)
-    
+    #app = WizardUI('htmlparser',of,'quadref',maxentrycols=12,maxentryrows=20)
+    app = WizardUI('test_ssloader',of,'test_ssloader',maxentrycols=12,maxentryrows=20)
     app.mainloop()
