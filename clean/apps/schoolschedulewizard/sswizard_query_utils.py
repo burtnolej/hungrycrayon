@@ -38,6 +38,47 @@ def _columnheaderexecfunc(database,pred=None,predvalue=None):
         exec_str = exec_str + " where {0} = {1}".format(pred,predvalue)
     return(tbl_query(database,exec_str))
 
+def _pivotexecfunc(database,ycoltype,xcoltype,tblname,prep):
+    
+    headers = {}
+    with database:
+        for hdrtype in [ycoltype,xcoltype]:        
+            _,headers[hdrtype],_ =  tbl_query(database,"select distinct({0}) from {1}".format(hdrtype,tblname))
+            headers[hdrtype] = [_hdrtype[0] for _hdrtype in headers[hdrtype]]
+
+    resulttable = []
+    resulttable.append([""] + headers[ycoltype])
+    with database:
+        for xaxishdr in headers[xcoltype]:
+            row=[]
+            row.append(xaxishdr)
+            for yaxishdr in headers[ycoltype]:
+                exec_str = "select count(*) from {0} ".format(tblname)
+                exec_str += "where {1} = {0} ".format("\""+str(yaxishdr)+"\"",ycoltype)
+                exec_str += " and {1} = {0} ".format("\""+str(xaxishdr)+"\"",xcoltype)                
+                
+                _,results,_ = tbl_query(database,exec_str)
+                try:
+                    row.append(results[0][0])
+                except:
+                    row.append(0)
+            resulttable.append(row)
+            
+    row=[""]      
+    with database:
+        for yaxishdr in headers[ycoltype]:
+            exec_str = "select count(*) from {0} ".format(tblname)
+            exec_str += "where {1} = {0} ".format("\""+str(yaxishdr)+"\"",ycoltype)                
+            
+            _,results,_ = tbl_query(database,exec_str)
+            try:
+                row.append(results[0][0])
+            except:
+                row.append(0)
+    resulttable.append(row)
+    
+    return resulttable
+
 if __name__ == "__main__":
     
     from pprint import pprint

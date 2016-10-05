@@ -603,6 +603,11 @@ class WizardUI(Tk):
         
         if values==None:
             with self.database:
+                
+                #whereclause.append(['teacher',"<>","\"" + "??" + "\""])
+                
+                #query twice - once where teacher is not ?? and once where they are ??
+                # then in below iterator twice but for 2nd/withot teacher only put into UI if not set
                 colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
                 
                 log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
@@ -662,5 +667,5 @@ if __name__ == "__main__":
     
     of = ObjFactory(True)
     #app = WizardUI('htmlparser',of,'quadref',maxentrycols=12,maxentryrows=20)
-    app = WizardUI('test_ssloader',of,'test_ssloader',maxentrycols=12,maxentryrows=20)
+    app = WizardUI('test_ssloader1',of,'test_ssloader1',maxentrycols=12,maxentryrows=20)
     app.mainloop()
