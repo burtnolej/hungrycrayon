@@ -2,7 +2,8 @@ from misc_utils_log import Log, logger
 log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,pidlogname=True,proclogname=False)
 
 from misc_utils import os_file_to_string, thisfuncname
-from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _gencoldefn, tbl_exists, tbl_create
+from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _gencoldefn, tbl_exists, \
+     tbl_create, tbl_remove
 from database_util import Database 
 from sswizard_utils import getdbenum, session_code_gen, dbinsert
 
@@ -41,7 +42,7 @@ class SSLoaderFatal(Exception):
 
 class SSLoader(object):
     
-    def __init__(self,databasename,prep):
+    def __init__(self,databasename,prep=-1):
         
         self.database = Database(databasename)
         self.prep = prep
@@ -57,6 +58,7 @@ class SSLoader(object):
                       '_CRETURN_' :[("&",1)],
                       'staffname':[('+',2)]}
         
+        self.synonyms = {}
         self.valid_values = {}
         self.valid_values['students'] = self.loadrefobjects(databasename,'student',True)
         self.valid_values['period'] = self.loadrefobjects(databasename,'period',True)
@@ -65,7 +67,8 @@ class SSLoader(object):
         self.valid_values['subject'] = self.loadrefobjects(databasename,'subject',True)
     
         self.fields = ['period','dow','subject','teacher','students']
-            
+
+	
         self.prepmap = self.loadprepmapper()
         
     def pre_process_records(self,records):
@@ -170,13 +173,19 @@ class SSLoader(object):
         return rows
     
     def addsynonyms(self,databasename,objtype):
-        cols = ['synonym']
+        cols = ['name','synonym']
         database = Database(databasename)
         
         with database:
             _,rows,_ = tbl_rows_get(database,'synonyms',cols,[['objtype','=',"\""+objtype+"\""]])
         
-        rows = [row[0] for row in rows]
+        for name,syno in rows:
+	    self.synonyms[syno]=name
+	    log.log(thisfuncname(),3,msg="adding synonym to lookup",name=name,syno=syno)
+	
+	rows = [row[1] for row in rows]
+
+	
         return rows
     
     def loadprepmapper(self):
@@ -415,6 +424,11 @@ class SSLoader(object):
                         new_value.append(self.validate_token2(_value,self.valid_values[self.fields[i]]))
                 else:
                     new_value = self.validate_token2(orig_value,self.valid_values[self.fields[i]])
+		    
+		    if self.synonyms.has_key(new_value):
+			log.log(thisfuncname(),3,msg="synonym, swapping",new_value=self.synonyms[new_value],old_value=new_value)
+			new_value = self.synonyms[new_value]
+		    
             except SSLoaderNoMatchException:
                 log.log(thisfuncname(),2,msg="failed to validate record",record=record,file=self.inputfile)
 
@@ -423,7 +437,7 @@ class SSLoader(object):
                 record.insert(i,new_value)
         return record
     
-    def validate_token2(self,token,valid_values,tolerance=0.8):
+    def validate_token2(self,token,valid_values,tolerance=0.7):
         
         for value in valid_values:
             if value == token:
@@ -447,6 +461,11 @@ class SSLoader(object):
                 if result == True:
                     log.log(thisfuncname(),3,msg="fuzzy match",token=token,validvalue=str(value),similarity=similarity)                        
                     return value
+		else:
+		    log.log(thisfuncname(),10,msg="failed to fuzzy match",token=token,validvalue=str(value),similarity=similarity)          
+		    
+	    else:
+		log.log(thisfuncname(),2,msg="size difference too big to fuzzy match",result=result)
                     
         log.log(thisfuncname(),2,msg="failed to validate token",token=token,file=self.inputfile)
         raise SSLoaderNoMatchException
@@ -585,11 +604,12 @@ class SSLoader(object):
 	    log.log(thisfuncname(),10,msg="loaded row to session",numrows=len(dbsessionrows))
 
         
-    def ssloader(self,files,databasename):
+    def ssloader(self,files,databasename="htmlparser"):
         
-        for file in files:
+        for file,prep in files:
             
             self.inputfile = file
+	    self.prep = prep
             fileasstring = self.file2string(file)
     
             records = self.string2records(fileasstring)
@@ -600,14 +620,23 @@ class SSLoader(object):
             for clean_record in clean_records:
                 validated_clean_records.append(self.validate_tokens(clean_record))
                 
-            
-        self.dbloader(validated_clean_records)
+	    self.dbloader(validated_clean_records)
  
 if __name__ == "__main__":
-    ssloader = SSLoader(databasename,prep)
- 
-    files = ["prep4data.csv"]
-    #files = ["prep4data.csv","prep5data.csv","prep6data.csv","staffdata.csv"]
+    databasename = "test_ssloader"
     
-    ssloader.ssloader(files)
+    database = Database(databasename)
+    
+    try:
+	with database:
+	    tbl_remove(database,'lesson')
+	    tbl_remove(database,'session')
+    except:
+	pass
+    
+    ssloader = SSLoader(databasename)
+ 
+    files = [("prep6data.csv",6),("prep5data.csv",5),("staffdata.csv",-1)]
+    
+    ssloader.ssloader(files,databasename)
     

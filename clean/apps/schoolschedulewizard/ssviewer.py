@@ -82,7 +82,7 @@ class WizardUI(Tk):
         Tk.__init__(self)
         self.geometry("2000x500+0+0")
         
-        self.refdatabase = Database('quadref')
+        self.refdatabase = Database(refdbname)
         
         #self.enums = sswizard_utils.setenums('All','5',self.refdatabase)
         
@@ -143,6 +143,7 @@ class WizardUI(Tk):
         self.dbload_entry_sv = StringVar()
         self.dbload_entry = Entry(controlpanel,textvariable=self.dbload_entry_sv,font=font)
         self.dbload_entry.grid(row=0,column=2)
+        self.dbload_entry_sv.set('1')
         self.dbload_entry.focus_get()
         
         self.dbname_entry_label = Label(controlpanel,text="dbname",font=font)
@@ -152,7 +153,7 @@ class WizardUI(Tk):
         self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv,font=font)
         self.dbname_entry.grid(row=0,column=4)
         self.dbname_entry.focus_get()
-        self.dbname_entry_sv.set('htmlparser')
+        self.dbname_entry_sv.set(self.dbname)
         
         self.dow_entry_label = Label(controlpanel,text="dow",width=10,font=font)
         self.dow_entry_label.grid(row=0,column=5)
@@ -162,7 +163,7 @@ class WizardUI(Tk):
         self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv,width=10,font=font)
         self.dow_entry.grid(row=0,column=6)
         self.dow_entry.focus_get()
-        self.dow_entry_sv.set('Monday')
+        self.dow_entry_sv.set('MO')
         
         self.prep_label = Label(controlpanel,text="prep",width=10,font=font)
         self.prep_label.grid(row=0,column=7)
@@ -175,12 +176,12 @@ class WizardUI(Tk):
         self.prep_entry_sv.set(5)
         
         self.period_label = Label(controlpanel,text="period",width=10,font=font)
-        self.period_label.grid(row=0,column=8)
+        self.period_label.grid(row=0,column=9)
         self.period_label.focus_get()
         
         self.period_entry_sv = StringVar()        
         self.period_entry = Entry(controlpanel,textvariable=self.period_entry_sv,width=10,font=font)
-        self.period_entry.grid(row=0,column=9)
+        self.period_entry.grid(row=0,column=10)
         self.period_entry.focus_get()
         self.period_entry_sv.set('830-910')
         
@@ -539,8 +540,8 @@ class WizardUI(Tk):
             for i in range(len(cols)):
                 datamembers[cols[i]] = row[i]
             
-            _,lessontype_code,_,_ = datamembers['session'].split(".")
-            lessontype = self.enums['lessontype']['code2name'][lessontype_code]      
+            _,lessontype_code,_ = datamembers['session'].split(".")
+            #lessontype = self.enums['lessontype']['code2name'][lessontype_code]      
             datamembers['objtype'] = 'lesson'                               
             
             lesson = self.of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
@@ -575,6 +576,6 @@ if __name__ == "__main__":
     
     
     of = ObjFactory(True)
-    app = WizardUI('htmlparser',of,'quadref',maxentrycols=12,maxentryrows=20)
+    app = WizardUI('test_ssloader',of,'test_ssloader',maxentrycols=12,maxentryrows=20)
     
     app.mainloop()

@@ -474,6 +474,20 @@ class Test_ValidateTokens_Subject(Test_Base):
         with self.assertRaises(SSLoaderNoMatchException):
             validated_token = self.ssloader.validate_token2('Fsxh',self.valid_subjects)
         
+class Test_ValidateTokens_Multi(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        self.ssloader.inputfile = "test"
+        self.valid_students = self.ssloader.loadrefobjects('quadref','student')
+        
+        self.record = ['830-910','Monday','WP','Amelia',['Nathaniel']]
+        
+    def test_(self):
+        new_record = self.ssloader.validate_tokens(self.record)
+        expected_results = ['830-910','Monday','Work Period','Amelia',['Nathaniel']]
+        self.assertListEqual(new_record,expected_results)
+        
+        
 class Test_ValidateTokens_Student(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -1066,7 +1080,7 @@ class Test_DBLoader_Prep5Computertime(Test_Base):
         results =  _pivotexecfunc(self.ssloader.database,'student','subject','lesson',5)
 
         self.assertListEqual(results,expected_results)
-        
+           
 class Test_DBLoader_Prep5(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -1081,45 +1095,46 @@ class Test_DBLoader_Prep5(Test_Base):
         
     def test_lesson(self):
         
-        expected_results = [['', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Booker'], 
-                            [u'ELA', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0], 
-                            [u'Math', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0], 
-                            [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Work Period', 8, 6, 8, 8, 7, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0], 
-                            [u'Movement', 2, 7, 3, 3, 4, 5, 3, 2, 5, 0, 0, 0, 0, 0, 0], 
-                            [u'Counseling', 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Student News', 2, 2, 3, 1, 4, 3, 3, 1, 3, 0, 0, 0, 0, 0, 0], 
-                            [u'Science', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0], 
-                            [u'Core', 2, 2, 2, 2, 0, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0], 
-                            [u'Humanities', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-                            [u'Music', 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], 
-                            [u'STEM', 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], 
-                            [u'Art', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], 
-                            [u'Activity Period', 3, 5, 1, 2, 3, 2, 8, 5, 3, 0, 0, 0, 0, 0, 0], 
-                            [u'Math Activity Period', 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0], 
-                            [u'History', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0], 
-                            [u'Speech', 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'??', 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'OT', 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Chess', 4, 0, 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Computer Time', 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0], 
-                            [u'Reading', 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Independent Reading', 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            ['', 45, 45, 43, 41, 45, 47, 45, 46, 44, 4, 4, 4, 4, 4, 1]]
+        expected_results = [['', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
+                            [u'ELA', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Math', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Work Period', 7, 6, 8, 8, 7, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Movement', 2, 7, 3, 3, 4, 5, 3, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Counseling', 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Student News', 2, 2, 3, 1, 4, 3, 3, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Science', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Core', 2, 2, 3, 3, 0, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Humanities', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+                            [u'Music', 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+                            [u'STEM', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+                            [u'Art', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+                            [u'Activity Period', 3, 5, 1, 2, 3, 2, 8, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Math Activity Period', 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'History', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Speech', 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'??', 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'OT', 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Chess', 4, 0, 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Computer Time', 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Reading', 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Independent Reading', 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            ['', 44, 45, 44, 43, 45, 47, 45, 46, 44, 4, 4, 4, 4, 4, 4, 4, 4]]
 
         self.ssloader.ssloader(['prep5data.csv'],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson',5)
+        
         self.assertListEqual(results,expected_results)
         
     def test_session(self):
         
         expected_results = [['', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
                             [u'Monday', 5, 5, 6, 6, 1, 4, 6, 5, 5, 1], 
-                            [u'Tuesday', 6, 8, 5, 6, 1, 5, 7, 5, 5, 1], 
+                            [u'Tuesday', 6, 8, 5, 6, 1, 5, 7, 5, 5, 1],
                             [u'Wednesday', 4, 6, 5, 5, 1, 5, 7, 5, 5, 1], 
-                            [u'Thursday', 6, 8, 4, 7, 1, 4, 6, 5, 5, 1], 
+                            [u'Thursday', 6, 8, 5, 7, 1, 4, 6, 5, 5, 1],
                             [u'Friday', 4, 5, 4, 4, 1, 0, 0, 0, 0, 0], 
-                            ['', 25, 32, 24, 28, 5, 18, 26, 20, 20, 4]]
+                            ['', 25, 32, 25, 28, 5, 18, 26, 20, 20, 4]]
 
         self.ssloader.ssloader(['prep5data.csv'],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'period','dow','session',5)
@@ -1140,32 +1155,30 @@ class Test_DBLoader_Staff(Test_Base):
         
     def test_lesson(self):
         
-        expected_results = [['', u'OmerC', u'Ashley', u'Tristan', u'Yosef', u'Coby', u'Clayton', u'Jake', u'Peter', u'Thomas', u'Simon A', u'Jack', u'Nathaniel', u'Bruno', u'Orig', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Mackenzie', u'Lucy', u'Oscar', u'Booker', u'Nick', u'Tris', u'Donovan'], 
-                            [u'Activity Period', 3, 3, 1, 6, 4, 4, 4, 2, 3, 2, 3, 2, 3, 1, 3, 1, 2, 1, 1, 0, 1, 2, 3, 2, 2, 0, 0], 
-                            [u'APeriod', 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Student News', 0, 3, 1, 1, 3, 2, 1, 2, 0, 0, 1, 0, 3, 3, 1, 0, 0, 2, 3, 2, 2, 2, 3, 1, 2, 0, 1], 
-                            [u'SNews', 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Debate Elective', 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Work Period', 4, 6, 3, 7, 7, 3, 6, 7, 5, 4, 5, 5, 6, 7, 7, 7, 5, 7, 6, 8, 4, 4, 3, 5, 3, 0, 0], 
-                            [u'WP', 1, 0, 0, 1, 1, 0, 1, 0, 2, 0, 0, 1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 1, 2], 
-                            [u'Student N', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Work P', 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Core', 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Movement / Chess', 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Movement/chess', 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Chess', 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Counseling', 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Movement', 0, 1, 0, 0, 0, 5, 1, 3, 1, 0, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 1, 2, 0, 0], 
-                            [u'Activity P', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1], 
-                            [u'SN', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 0, 0], 
-                            ['', 8, 14, 6, 17, 20, 16, 16, 15, 16, 8, 10, 13, 16, 18, 16, 12, 12, 11, 12, 11, 8, 10, 13, 9, 10, 1, 4]]
+        expected_results = [['', u'OmerC', u'Ashley', u'Tristan', u'Yosef', u'Coby', u'Nathaniel', u'Clayton', u'Jake', u'Peter', u'Thomas', u'Simon A', u'Orig', u'Jack', u'Bruno', u'Nick', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Mackenzie', u'Lucy', u'Oscar', u'Booker', u'Tris', u'Donovan'], 
+                            [u'ELA', 1, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Activity Period', 4, 5, 2, 7, 5, 3, 5, 5, 3, 5, 4, 1, 4, 3, 2, 3, 2, 3, 2, 1, 1, 1, 2, 4, 2, 0, 1], 
+                            [u'Student News', 1, 3, 1, 2, 3, 0, 3, 1, 3, 2, 0, 5, 1, 3, 3, 2, 0, 0, 2, 3, 2, 3, 4, 3, 1, 0, 2], 
+                            [u'Debate', 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Work Period', 7, 8, 4, 8, 9, 8, 5, 8, 7, 9, 7, 7, 5, 8, 6, 8, 8, 10, 7, 9, 9, 6, 7, 7, 6, 1, 6], 
+                            [u'??', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Core', 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'History', 0, 0, 2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Chess', 0, 0, 0, 1, 2, 4, 1, 3, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Counseling', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+                            [u'Movement', 0, 1, 0, 0, 0, 0, 5, 0, 3, 1, 0, 3, 1, 3, 2, 3, 3, 3, 0, 0, 0, 0, 0, 3, 1, 0, 1], 
+                            [u'Psychology Reading', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Psychology', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], 
+                            [u'Independent Art', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
+                            ['', 13, 17, 10, 20, 21, 15, 21, 20, 17, 23, 14, 20, 11, 17, 13, 16, 15, 18, 11, 13, 12, 12, 13, 17, 11, 2, 10]]
 
 
         self.ssloader.ssloader(['staffdata.csv'],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson',5)
-        self.assertListEqual(results,expected_results)
+        print results
+        #self.assertListEqual(results,expected_results)
 
-    def test_session(self):
+    '''def test_session(self):
         expected_results = [['', 2, 3, 6, 7, 8, 9, 1, 4], 
                             [u'Monday', 6, 4, 4, 7, 1, 5, 3, 6], 
                             [u'Tuesday', 6, 4, 2, 3, 5, 5, 4, 6], 
@@ -1176,44 +1189,55 @@ class Test_DBLoader_Staff(Test_Base):
 
         self.ssloader.ssloader(['staffdata.csv'],self.databasename)
         results = _pivotexecfunc(self.ssloader.database,'period','dow','session',5)
-        self.assertListEqual(results,expected_results)
+        self.assertListEqual(results,expected_results)'''
         
             
-class Test_DBLoader_Staff_withp5(Test_Base):
+class Test_DBLoader_Staff_with_Prep5(Test_Base):
     def setUp(self):
-        self.databasename1 = "test_ssloader1"
-        self.database1 = Database(self.databasename1)
+        self.databasename = "test_ssloader"
+        self.database = Database(self.databasename)
         try:
-            with self.database1:
-                tbl_remove(self.database1,'lesson')
-                tbl_remove(self.database1,'session')
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
         except:
             pass
 
     def test_(self):
 
-        self.ssloader = SSLoader("test_ssloader1",-1)        
-        self.ssloader.ssloader(['staffdata.csv'],self.databasename1)
+        self.ssloader = SSLoader("test_ssloader",-1)        
+        self.ssloader.ssloader(['staffdata.csv'],self.databasename)
+        self.ssloader = SSLoader("test_ssloader",5)
+        self.ssloader.ssloader(['prep5data.csv'],self.databasename) 
 
-        
-        
-class Test_DBLoader_Prep5_withs(Test_Base):
+class Test_DBLoader_Staff_with_Prep5_Period1(Test_Base):
     def setUp(self):
-
-        self.databasename2 = "test_ssloader2"
-        self.database2 = Database(self.databasename2)
+        self.databasename = "test_ssloader"
+        self.database = Database(self.databasename)
         try:
-            with self.database2:
-                tbl_remove(self.database2,'lesson')
-                tbl_remove(self.database2,'session')
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
         except:
             pass
+
+    def test_(self):
+
+        self.ssloader = SSLoader("test_ssloader",-1)        
+        self.ssloader.ssloader(['staffdata_1period_Issey.csv'],self.databasename)
+        self.ssloader = SSLoader("test_ssloader",5)
+        self.ssloader.ssloader(['prep5data_test1period.csv'],self.databasename) 
+
+class Test_DBLoader_Academic(unittest.TestCase):
+    def setUp(self):    
+    
+        ssloader = SSLoader("test_ssloader")
+        fileasstring = ssloader.file2string("academic.csv")
+
+        self.records = ssloader.string2records(fileasstring)
     
     def test_(self):
-
-        self.ssloader = SSLoader("test_ssloader2",5) 
-        self.ssloader.ssloader(['prep5data.csv'],self.databasename2)         
-
+        print self.records
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
@@ -1229,6 +1253,7 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nonacademic_multi_student))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Subject))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Student))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Multi))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample2))
@@ -1251,12 +1276,17 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsComputerTime))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsPrep4))'''
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff))'''
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_withp5))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5))
     
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1))
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_withs))
+    
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

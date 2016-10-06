@@ -604,21 +604,20 @@ class WizardUI(Tk):
         if values==None:
             with self.database:
                 
-                #whereclause.append(['teacher',"<>","\"" + "??" + "\""])
-                
-                #query twice - once where teacher is not ?? and once where they are ??
-                # then in below iterator twice but for 2nd/withot teacher only put into UI if not set
+                whereclause.append(['teacher',"<>","\"" + "??" + "\""])
                 colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
-                
                 log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
+
+                whereclause = whereclause[:-1]
+                whereclause.append(['teacher',"=","\"" + "??" + "\""])
+                colndefn,noteacherrows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
+                log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)                
+                
                 
             if len(rows) == 0:
                 log.log(thisfuncname(),2,msg="no rows detected",whereclause=whereclause)
                 
             for row in rows:
-                
-                print row
-                
                 z = session =  row[cols.index('session')]
                 period =  row[cols.index('period')]
                 student =  row[cols.index('student')]
@@ -632,6 +631,21 @@ class WizardUI(Tk):
                 
                 log.log(thisfuncname(),3,msg="loading row",period=period,student=str(student),sv=saveversion,
                         x=x,y=y,value=z)
+                    
+            for noteacherrow in noteacherrows:
+                z = session =  noteacherrow[cols.index('session')]
+                period =  noteacherrow[cols.index('period')]
+                student =  noteacherrow[cols.index('student')]
+                
+                x = self.enums['student']['name2enum'][student]
+                y = self.enums['period']['name2enum'][str(period)]
+                
+                if self.entrygrid.widgets[x][y].sv.get() == "":
+                    self.entrygrid.widgets[x][y].sv.set(session)
+                
+                    log.log(thisfuncname(),3,msg="loading no teacher row",period=period,student=str(student),sv=saveversion,
+                            x=x,y=y,value=z)
+
         else:
                 
             for x in range(len(values)):
@@ -667,5 +681,5 @@ if __name__ == "__main__":
     
     of = ObjFactory(True)
     #app = WizardUI('htmlparser',of,'quadref',maxentrycols=12,maxentryrows=20)
-    app = WizardUI('test_ssloader1',of,'test_ssloader1',maxentrycols=12,maxentryrows=20)
+    app = WizardUI('test_ssloader',of,'test_ssloader',maxentrycols=12,maxentryrows=20)
     app.mainloop()
