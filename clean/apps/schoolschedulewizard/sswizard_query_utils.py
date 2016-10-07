@@ -16,6 +16,16 @@ def _colorexecfunc(database,value):
     exec_str = "select rgb from {0} ".format(value)
     return(tbl_query(database,exec_str))
 
+def _sessionenum(database,code,period,prep):
+    exec_str = "select enum from session where code = {0} ".format(code)
+    exec_str += " and period = {0} ".format(period)
+    exec_str += " and prep = {0} ".format(prep)
+    return(tbl_query(database,exec_str))
+
+def _maxlessonenum(database):
+    exec_str = "select max(enum) from lesson"
+    return(tbl_query(database,exec_str))
+
 def _execfunc(database,value,prep,dow):
     exec_str = "select s.code "
     exec_str += "from session as s,adult as a "
@@ -38,7 +48,7 @@ def _columnheaderexecfunc(database,pred=None,predvalue=None):
         exec_str = exec_str + " where {0} = {1}".format(pred,predvalue)
     return(tbl_query(database,exec_str))
 
-def _pivotexecfunc(database,ycoltype,xcoltype,tblname,prep):
+def _pivotexecfunc(database,ycoltype,xcoltype,tblname,whereclause=None):
     
     headers = {}
     with database:
@@ -55,7 +65,11 @@ def _pivotexecfunc(database,ycoltype,xcoltype,tblname,prep):
             for yaxishdr in headers[ycoltype]:
                 exec_str = "select count(*) from {0} ".format(tblname)
                 exec_str += "where {1} = {0} ".format("\""+str(yaxishdr)+"\"",ycoltype)
-                exec_str += " and {1} = {0} ".format("\""+str(xaxishdr)+"\"",xcoltype)                
+                exec_str += " and {1} = {0} ".format("\""+str(xaxishdr)+"\"",xcoltype)      
+                
+                if whereclause <> None:
+                    for pred,op,predval in whereclause:
+                        exec_str += " and {0} {1} {2} ".format(pred,op,"\""+str(predval)+"\"")
                 
                 _,results,_ = tbl_query(database,exec_str)
                 try:
@@ -83,9 +97,9 @@ if __name__ == "__main__":
     
     from pprint import pprint
     
-    database = Database('quadref')
-    with database:
-        coldefn,values = _execfunc(database,6,5)
+    database = Database('test_ssloader')
+    
+    results = _pivotexecfunc(database,'period','dow','lesson',[['student','=','Booker'],['status','=','complete']])
         
-    pprint(values)
+    pprint(results)
     

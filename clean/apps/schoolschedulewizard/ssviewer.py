@@ -1,6 +1,6 @@
 import sys
 from misc_utils_log import Log, logger
-log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
           pidlogname=True,proclogname=False)
 
 from misc_utils_process import *
@@ -184,6 +184,17 @@ class WizardUI(Tk):
         self.period_entry.grid(row=0,column=10)
         self.period_entry.focus_get()
         self.period_entry_sv.set('830-910')
+        
+        self.teacher_label = Label(controlpanel,text="teacher",width=10,font=font)
+        self.teacher_label.grid(row=0,column=11)
+        self.teacher_label.focus_get()
+        
+        self.teacher_label_sv = StringVar()        
+        self.teacher_label = Entry(controlpanel,textvariable=self.teacher_label_sv,width=10,font=font)
+        self.teacher_label.grid(row=0,column=12)
+        self.teacher_label.focus_get()
+        self.teacher_label_sv.set('Stan')
+        
         
         self.viewcontrolpanel = Frame(self.master)
         self.viewcontrolpanel.grid(row=2,column=0,sticky=NSEW)
@@ -480,7 +491,7 @@ class WizardUI(Tk):
         self.of.store={}
 
     @logger(log)       
-    def load(self,saveversion=None,values=None, dow=None, prep=None, period=None):
+    def load(self,saveversion=None,values=None, dow=None, prep=None, period=None, teacher=None):
         
         # database name
         if self.dbname_entry_sv.get() <> self.dbname:
@@ -524,7 +535,20 @@ class WizardUI(Tk):
         else:
             whereclause.append( ['dow',"=","\""+dow+"\""])
         log.log(thisfuncname(),3,msg="loading",dow=str(dow))
-
+        
+        
+        # teacher
+        if teacher==None: teacher = self.teacher_label_sv.get()
+        if teacher == "":
+            teacher = "all"
+        else:
+            whereclause.append( ['teacher',"=","\""+teacher+"\""])
+        log.log(thisfuncname(),3,msg="loading",teacher=str(teacher))        
+        
+        
+        #whereclause.append( ['teacher',"<>","\""+"??"+"\""]
+        whereclause.append( ['status',"=","\"" + "complete" + "\""])
+        
         # get enums
         self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
 

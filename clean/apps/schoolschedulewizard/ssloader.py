@@ -7,6 +7,7 @@ from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _genc
 from database_util import Database 
 from sswizard_utils import getdbenum, session_code_gen, dbinsert
 
+from sswizard_query_utils import _sessionenum, _maxlessonenum
 
 class SSLoaderRuleException(Exception):
     def __repr__(self):
@@ -56,7 +57,13 @@ class SSLoader(object):
                       #'_CRETURN_' :[("_CRETURN_",1)]}
                       '_ENDCELL_' :[("^",1)],
                       '_CRETURN_' :[("&",1)],
-                      'staffname':[('+',2)]}
+                      'staffname':[('+',2)],
+	              'dow1':[('Monday',1)],
+	              'dow2':[('Tuesday',1)],
+	              'dow3':[('Wednesday',1)],
+	              'dow4':[('Thursday',1)],
+	              'dow5':[('Friday',1)],
+	              'academicname':[('-',2)]}
         
         self.synonyms = {}
         self.valid_values = {}
@@ -68,26 +75,47 @@ class SSLoader(object):
     
         self.fields = ['period','dow','subject','teacher','students']
 
-	
         self.prepmap = self.loadprepmapper()
         
     def pre_process_records(self,records):
 
         dowidx=-1
+	periodidx=-1
         _records=[]
         _errors=[]
 
         lastrecordtype = None
         staffrecordflag = False
+	academicrecordflag = False
+	
+	enums = {'maps':{},'enums':{},'codes':{}}	
+	getdbenum(enums,self.database,'name','period')
+
+	
         for record in records:
             try:
                 recordtype = self.identify_record(record)
             except Exception, e:
-                _errors.append((record,str(e)))
-                log.log(thisfuncname(),1,msg="could not match record to a rule,skipping",record=record)
-                continue
-            
-            if recordtype in ['teacher','noteacher']:
+		
+		if  academicrecordflag==True:
+		    recordtype="academicstudent"
+		else:
+		    _errors.append((record,str(e)))
+		    log.log(thisfuncname(),1,msg="could not match record to a rule,skipping",record=record)
+		    continue
+
+
+	    if  recordtype == 'academicstudent':
+		period = enums['period']['name'][periodidx]
+		#dow = self.valid_values['dow'][dowidx]
+		subject = "??"
+		teacher = academicname
+		students = [record.lstrip().strip()]
+		_record = [locals()[field] for field in self.fields]
+		_records.append(_record)
+		log.log(thisfuncname(),10,msg="record added",record=_record)
+		
+	    elif recordtype in ['teacher','noteacher']:
                 #try:
 		subject,_rest = self.extract_subject(record)
 		teacher = "??"
@@ -99,7 +127,12 @@ class SSLoader(object):
 		    
 		students = self.extract_students(_rest)
 		
-		dow = self.valid_values['dow'][dowidx]
+		if academicrecordflag==False: # edge case where academic records is matched
+		    dow = self.valid_values['dow'][dowidx]
+		else:
+		    teacher = academicname
+		    period = enums['period']['name'][periodidx]
+		    
 		_record = [locals()[field] for field in self.fields]
 		_records.append(_record)
 		log.log(thisfuncname(),10,msg="record added",record=_record)
@@ -123,7 +156,15 @@ class SSLoader(object):
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
 		else:
 		    log.log(thisfuncname(),10,msg="skipping Computer Time as Staff File",record=_record)
-                
+	    elif recordtype[:3] == 'dow':
+		periodidx=-1
+		dow = record
+		log.log(thisfuncname(),10,msg="setting dow",dow=dow)
+		
+	    elif recordtype == 'academicname':
+                academicname = self.extract_staff(record)
+                log.log(thisfuncname(),3,msg="this is an academic file",academicname=academicname)
+                academicrecordflag=True
             elif recordtype == 'date':
                 pass
             elif recordtype == '_CRETURN_':
@@ -131,20 +172,30 @@ class SSLoader(object):
             elif recordtype == 'blankrow':
                 pass
             elif recordtype == 'period':
-                period = self.extract_period(record)
-                dowidx=-1
-                log.log(thisfuncname(),10,msg="dow reset on period",dow=self.valid_values['dow'][dowidx])
+		if academicrecordflag==False:
+		    period = self.extract_period(record)
+		    dowidx=-1
+		    log.log(thisfuncname(),10,msg="dow reset on period",dow=self.valid_values['dow'][dowidx])
             elif recordtype == '_ENDCELL_':
-                old_dowidx = dowidx
-                # increment day each time we hit an end of cell marker; set to -1 at 4 so that
-                # period cell is missed on the next line.
-                if dowidx==4:dowidx=-1
-                dowidx+=1
                 
-                log.log(thisfuncname(),10,msg="dow increment",old_dowidx=old_dowidx,dowidx=dowidx,lastrecordtype=lastrecordtype)
+                if academicrecordflag==False:
+		    old_dowidx = dowidx
+		    # increment day each time we hit an end of cell marker; set to -1 at 4 so that
+		    # period cell is missed on the next line.
+		    if dowidx==4:dowidx=-1
+		    dowidx+=1
                 
+		    log.log(thisfuncname(),10,msg="dow increment",old_dowidx=old_dowidx,dowidx=dowidx,lastrecordtype=lastrecordtype)
+		else:
+		    old_periodidx =periodidx
+		    if periodidx==8:
+			periodidx=-1
+		    elif periodidx==3:
+			periodidx=4
+		    periodidx+=1
+		    log.log(thisfuncname(),10,msg="period increment",old_periodidx=old_periodidx,periodidx=periodidx,lastrecordtype=lastrecordtype)
             else:
-                log.log(thisfuncname(),0,msg="could not identify record",record=record)
+                log.log(thisfuncname(),0,msg="could not identify record",recordtype=recordtype,record=record)
                 raise SSLoaderFatal
             
             lastrecordtype = recordtype
@@ -287,7 +338,7 @@ class SSLoader(object):
         return(subject,_rest)
     
     def extract_staff(self,record):
-        if record[-2:] <> "++":
+        if record[-2:] <> "++" and record[-2:] <> "--":
             raise SSLoaderBadTokenException
 
         return(record[:-2])
@@ -471,6 +522,150 @@ class SSLoader(object):
         raise SSLoaderNoMatchException
     
     @logger(log)
+    def dbupdater(self,records):
+        
+        from misc_utils import IDGenerator
+        from datetime import datetime
+	from copy import deepcopy
+
+        enums = {'maps':{},'enums':{},'codes':{}}
+        
+        getdbenum(enums,self.database,'name','period')
+        getdbenum(enums,self.database,'name','student')
+        getdbenum(enums,self.database,'name','dow')
+        
+        cols = ['period','dow','subject','teacher','students']
+        
+        session_count=0
+        lesson_count=0
+        
+        dblessonrows = []
+        dbsessionrows = []
+        
+	dbrecords = []
+        for record in records:
+	    
+	    print record
+	    
+            whereclause = []
+            d = dict(zip(cols,record))
+
+	    if len(d['students']) == 0:
+		log.log(thisfuncname(),2,msg="0 students - check input file",record=record)
+		continue
+	    
+	    _dow = enums['dow']['name2code'][d['dow']]
+	    whereclause.append(['student',"=","\"" + d['students'][0] + "\""])
+	    whereclause.append(['period',"=","\"" + d['period'] + "\""])
+	    whereclause.append(['dow',"=","\"" + _dow + "\""])                 
+	    #whereclause.append(['teacher',"<>","\"" + d['teacher'] + "\""])   
+	    
+	    with self.database:
+		colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',['__id','teacher','session','subject'],whereclause)
+
+	    if len(rows) == 1:
+		if rows[0][1] <> d['teacher'] and rows[0][1] <> '??':
+		    _record = deepcopy(record)
+		    _record.append(rows[0][2])
+		    _record.pop(2)
+		    _record.insert(2,rows[0][3])
+		    
+		    dbrecords.append(_record)
+		    
+		    print "add",record
+		elif  rows[0][1] == '??':
+		    _record = deepcopy(record)
+		    _record.append(rows[0][2])
+		    _record.pop(2)
+		    _record.insert(2,rows[0][3])
+
+		    dbrecords.append(_record)
+		    print "add",record
+		elif rows[0][1] == d['teacher']:
+		    continue
+	    else:
+		if len(rows) <> 2:
+		    print "error <> 2",rows,record
+		    #raise Exception
+		else:
+		    print record,rows
+		    error=True
+		    for id,teacher,_,_ in rows:
+			if teacher == d['teacher']:
+			    error=False
+		    if error == True:
+			print "more than 2 rows",rows
+			#raise Exception
+
+	cols = ['period','dow','subject','teacher','students','session']
+	
+	with self.database:
+	    _,_lesson_count,_ = _maxlessonenum(self.database)		    
+    
+	lesson_count = int(_lesson_count[0][0])+1
+
+	for record in dbrecords:
+	    
+	    d = dict(zip(cols,record))
+
+	    # move students so we can insert to sessions
+	    _students = d.pop('students')  
+	    _dow = d['dow']
+	    
+	    # set who loaded the record
+	    d['souce'] = self.inputfile
+	    
+	    # set status
+	    d['status'] = "complete"
+	    if d['teacher'] == '??':
+		d['status'] = "incomplete"
+
+	    for student in _students:
+	
+		_period =  int(enums['period']['name2enum'][d['period']])
+		_prep = int(self.prepmap[student])
+		_code = "\"" + d['session'] + "\""
+		
+		with self.database:
+		    _,session_enum,exec_str = _sessionenum(self.database,_code,_period,_prep)
+		    
+		if len(session_enum) == 0:
+		    log.log(thisfuncname(),2,msg="no session exists;need to create",record=record)
+		    continue
+		
+		# student enum
+		d['student'] = student
+		student_enum = enums['student']['name2enum'][student]
+		
+		d['dow'] = enums['dow']['name2code'][_dow]
+		
+		# set prep per student as could be cross preps
+		d['prep'] = int(self.prepmap[student])
+		
+		# lesson enum
+		d['enum'] = lesson_count
+		
+		# code
+		d['session'] = ".".join([d['teacher'],d['subject'],_dow]) 
+		
+		# create userobjid
+		d['userobjid'] = ",".join(map(str,[d['period'],student_enum,session_enum[0][0],d['teacher']]))   
+		
+		# set the saveversion
+		d['saveversion'] = 1
+		
+
+
+		d['__id'] = IDGenerator().getid()
+		d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
+		
+		print d
+		dbinsert(self.database,'lesson',[d.values()],d.keys())
+		
+		lesson_count += 1
+
+	    
+    @logger(log)
     def dbloader(self,records):
         
         from misc_utils import IDGenerator
@@ -539,11 +734,19 @@ class SSLoader(object):
             d.pop('type')
             d.pop('enum')
 
+	    # set who loaded the record
+	    d['souce'] = self.inputfile
+
             # store the day code for the lesson record
             d['dow'] = enums['dow']['name2code'][d['dow']]
             
             # store the period name for the lesson record
             d['period'] = _period
+	    
+	    # set status
+	    d['status'] = "complete"
+	    if d['teacher'] == '??':
+		d['status'] = "incomplete"
             
             for student in _students:
 
@@ -558,6 +761,13 @@ class SSLoader(object):
                 d['enum'] = int(lesson_count)
                 
                 # create userobjid
+		
+		'''
+		periodenum dayenum studenenum
+		load them all into a hash using userobjid; set a complete and incomplete attribute and store the asociated id
+		then parse list setting the tags
+		'''
+		
                 d['userobjid'] = ",".join(map(str,[d['period'],student_enum,session_count]))   
                 
                 # set the saveversion
@@ -627,16 +837,19 @@ if __name__ == "__main__":
     
     database = Database(databasename)
     
-    try:
+    '''try:
 	with database:
 	    tbl_remove(database,'lesson')
 	    tbl_remove(database,'session')
     except:
-	pass
+	pass'''
     
     ssloader = SSLoader(databasename)
  
-    files = [("prep6data.csv",6),("prep5data.csv",5),("staffdata.csv",-1)]
+    #files = [("prep4data.csv",4),("prep6data.csv",6),("prep5data.csv",5),("staffdata.csv",-1)]
+    #files = [("prep4data.csv",4),("prep6data.csv",6),("prep5data.csv",5)]
+	
+    files = [("staffdata.csv",-1)]
     
     ssloader.ssloader(files,databasename)
     

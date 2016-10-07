@@ -221,6 +221,7 @@ def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
 		                                              whereclause[i][1],
 		                                              whereclause[i][2])
 
+    #print exec_str
     
     results = database.execute(exec_str)
     
@@ -271,7 +272,21 @@ def _quotestrs(rows):
 		newrow.append("'"+str(field)+"'")
 	newrows.append(newrow)
     return(newrows)
-	
+
+def _gencoldefn(row,colnames):
+    ''' take a row of values and colnames and determine best type; same algorithm as
+    used in dbtblgeneric '''
+    coldefn=[]
+    for i in range(len(colnames)):
+	_type = "text"
+	try:
+	    int(row[i])
+	    _type = "integer"
+	except Exception:
+	    pass
+	coldefn.append((colnames[i],_type))
+    return coldefn
+
 def tbl_col_update(database,tbl_name,old_col_name,new_col_name):
     ''' sqlite does not support change column name so have implemented a simple
     version; does not handle complex db features which we will not be needing currently'''

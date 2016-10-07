@@ -78,6 +78,8 @@ class ObjFactory(GenericBase):
             else:
                 self.store[clsname][kwargs['objid']] = newobj
                 log.log(thisfuncname(),20,msg="created",newobj=newobj,kwargs=kwargs)
+        else:
+            log.log(thisfuncname,15,msg="key conflict",kwargs=kwargs)
 
         return(self.store[clsname][kwargs['objid']])
         

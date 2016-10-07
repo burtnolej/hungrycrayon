@@ -982,6 +982,7 @@ class Test_DBLoader(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
         
+        self.ssloader.inputfile = "test"
         database = Database(self.databasename)
         try:
             with database:
@@ -1080,7 +1081,58 @@ class Test_DBLoader_Prep5Computertime(Test_Base):
         results =  _pivotexecfunc(self.ssloader.database,'student','subject','lesson',5)
 
         self.assertListEqual(results,expected_results)
-           
+    
+class Test_DBLoader_Prep5_1period(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+        
+    def test_lesson(self):
+        
+        expected_results = [['', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
+                            [u'ELA', 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Math', 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Work Period', 0, 0, 0, 0, 0, 4, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Movement', 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Counseling', 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Student News', 0, 0, 2, 1, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Science', 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Core', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Humanities', 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Music', 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0], 
+                            [u'STEM', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], 
+                            [u'Art', 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                            ['', 5, 5, 5, 5, 5, 5, 5, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1]]
+
+        self.ssloader.ssloader([('prep5data_test1period.csv',5)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson')
+
+        self.assertListEqual(results,expected_results)
+        
+    def test_session(self):
+        
+        expected_results = [['', 1], 
+                            [u'Monday', 5], 
+                            [u'Tuesday', 6], 
+                            [u'Wednesday', 4], 
+                            [u'Thursday', 6], 
+                            [u'Friday', 4], 
+                            ['', 25]]
+
+
+        self.ssloader.ssloader([('prep5data_test1period.csv',5)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'period','dow','session')
+
+        self.assertListEqual(results,expected_results)
+        
 class Test_DBLoader_Prep5(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -1232,60 +1284,142 @@ class Test_DBLoader_Academic(unittest.TestCase):
     def setUp(self):    
     
         ssloader = SSLoader("test_ssloader")
+        ssloader.inputfile = "academic.csv"
         fileasstring = ssloader.file2string("academic.csv")
 
-        self.records = ssloader.string2records(fileasstring)
-    
+        records = ssloader.string2records(fileasstring)
+
+        self.clean_records,_,_ = ssloader.pre_process_records(records)
+        
+        self.validated_clean_records = []
+        for clean_record in self.clean_records:
+            self.validated_clean_records.append(ssloader.validate_tokens(clean_record))
+            
+        ssloader.dbupdater(self.validated_clean_records)
+
     def test_(self):
-        print self.records
+        
+        expected_results = [[u'830-910', 'Monday', '??', u'Stan', ['Clayton']],
+        [u'910-950', 'Monday', '??', u'Stan', ['Simon A']],
+        [u'1030-1110', 'Monday', '??', u'Stan', ['Yosef']],
+        [u'1210-100', 'Monday', '??', u'Stan', ['Booker']],
+        [u'100-140', 'Monday', '??', u'Stan', ['Thomas']],
+        [u'140-220', 'Monday', '??', u'Stan', ['Ashley']],
+        [u'220-300', 'Monday', '??', u'Stan', [u'Coby']],
+        [u'830-910', 'Tuesday', '??', u'Stan', ['Nathaniel']],
+        [u'910-950', 'Tuesday', u'Activity Period', u'Stan', ['Bruno']],
+        [u'1030-1110', 'Tuesday', '??', u'Stan', ['Peter']],
+        [u'1210-100', 'Tuesday', '??', u'Stan', ['Jake']],
+        [u'100-140', 'Tuesday', '??', u'Stan', ['Orig']],
+        [u'140-220', 'Tuesday', '??', u'Stan', ['Oscar']],
+        [u'220-300', 'Tuesday', '??', u'Stan', ['Jack']],
+        [u'830-910', 'Wednesday', '??', u'Stan', ['Clayton']],
+        [u'910-950', 'Wednesday', '??', u'Stan', ['Simon A']],
+        [u'1030-1110', 'Wednesday', '??', u'Stan', ['Yosef']],
+        [u'1210-100', 'Wednesday', '??', u'Stan', ['Booker']],
+        [u'100-140', 'Wednesday', '??', u'Stan', ['Thomas']],
+        [u'140-220', 'Wednesday', '??', u'Stan', ['Ashley']],
+        [u'220-300', 'Wednesday', '??', u'Stan', ['Coby']],
+        [u'830-910', 'Thursday', '??', u'Stan', ['Nathaniel']],
+        [u'910-950', 'Thursday', u'Activity Period', u'Stan', ['Bruno']],
+        [u'1030-1110', 'Thursday', '??', u'Stan', ['Peter']],
+        [u'1210-100', 'Thursday', '??', u'Stan', ['Jake']],
+        [u'100-140', 'Thursday', '??', u'Stan', ['Orig']],
+        [u'140-220', 'Thursday', '??', u'Stan', ['Oscar']],
+        [u'220-300', 'Thursday', '??', u'Stan', ['Jack']]]
+
+        
+        self.assertListEqual(expected_results,self.clean_records)
+        
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ApplyRules))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ApplyRules_Fails))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_teachertype_1student)) 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_teachertype_multi_student))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_extractteacher_Fails))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_extract_staff))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nonacademic_1_student))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nonacademic_multi_student))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Subject))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Student))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Multi))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample2))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_periodtype))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_teachertype_edgecasestudent))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecords))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsNewPeriod))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_NumCharsSame))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_NumCharsSamelLocation))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RelSize))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsStaff))
+    '''
+    
+    # #####################################################################################################
+    # unit tests=
+    
+    # loadrefobjects
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
+    
+    # loadsynonyms
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadSynonyms))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
+    
+    # string2records
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records_Prep4100))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records_Prep41Period))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records_Prep4ComputerTime))
+        
+    # identify_record
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample2))
+    
+    # applyrules
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ApplyRules))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ApplyRules_Fails))
+    
+    # extract staff
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_extract_staff))
+    
+    # extract_period
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_periodtype))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_extractteacher_Fails))
+    
+    # extract_students
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_teachertype_edgecasestudent))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_teachertype_1student)) 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_teachertype_multi_student))
+    
+    # extract subject
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nonacademic_1_student))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nonacademic_multi_student))
+    
+    # validatetokens
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Multi))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens))
+    
+    # validatetoken2
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Subject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Student))
+    
+    # _match_num_chars_same
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_NumCharsSame))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_NumCharsSamelLocation))
+    
+    # _match_relsize
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RelSize))
+
+    # pre_process_records
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecords))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsNewPeriod))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsPrep4100))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsComputerTime))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsPrep4))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsPrep4))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsStaff))
+
+    # dbloader
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
+    
+    '''
+    
+    # ######################################################################################################
+    # functional tests
+    
+    # 1 period of 1 prep
+    Test_DBLoader_Prep5_1period
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1))
+    
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5))
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1))
-    
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_withs))
-    
-    
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
