@@ -22,10 +22,10 @@ def logger(log):
             funcname = ".".join(([func.__module__,func.__name__]))
             
             # explicitly pass in func args with fargs/fkw keywords
-            log.log(funcname,100,fargs=args,fkw=kw)
+            log.log(funcname,11,fargs=args,fkw=kw)
             result = func(*args, **kw)
             etime = round(time()-stime,4)
-            log.log(funcname,101,etime=etime,result=result)
+            log.log(funcname,12,etime=etime,result=result)
             return result
         return wrapper
     return decorator

@@ -170,8 +170,6 @@ def tbl_rows_update(database,tbl_name,row,dryrun=False):
 
 @logger(log)
 def tbl_query(database,exec_str):
-
-    print exec_str
     
     results = database.execute(exec_str)
     
