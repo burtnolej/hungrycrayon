@@ -620,6 +620,6 @@ if __name__ == "__main__":
     
     
     of = ObjFactory(True)
-    app = WizardUI('test_ssloader',of,'test_ssloader',maxentrycols=12,maxentryrows=20)
+    app = WizardUI('quad_new',of,'quad_new',maxentrycols=12,maxentryrows=20)
     
     app.mainloop()

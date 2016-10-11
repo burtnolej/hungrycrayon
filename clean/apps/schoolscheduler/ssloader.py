@@ -669,6 +669,7 @@ class SSLoader(object):
 		d['student'] = student
 		student_enum = enums['student']['name2enum'][student]
 		
+		dow_enum = enums['dow']['name2enum'][_dow]
 		d['dow'] = enums['dow']['name2code'][_dow]
 		
 		# set prep per student as could be cross preps
@@ -681,7 +682,7 @@ class SSLoader(object):
 		d['session'] = ".".join([d['teacher'],d['subject'],_dow]) 
 		
 		# create userobjid
-		d['userobjid'] = ",".join(map(str,[d['period'],student_enum,_sessionenum,d['teacher']]))
+		d['userobjid'] = ",".join(map(str,[d['period'],dow_enum,student_enum]))
 		
 		# set the saveversion
 		d['saveversion'] = 1
@@ -767,7 +768,7 @@ class SSLoader(object):
             d.pop('type')
             d.pop('enum')
 
-            # store the day code for the lesson record
+	    dow_enum = enums['dow']['name2enum'][d['dow']]
             d['dow'] = enums['dow']['name2code'][d['dow']]
             
             # store the period name for the lesson record
@@ -783,6 +784,8 @@ class SSLoader(object):
                 # student enum
                 d['student'] = student
                 student_enum = enums['student']['name2enum'][student]
+		
+
                 
                 # set prep per student as could be cross preps
                 d['prep'] = int(self.prepmap[student])
@@ -798,7 +801,7 @@ class SSLoader(object):
 		then parse list setting the tags
 		'''
 		
-                d['userobjid'] = ",".join(map(str,[d['period'],student_enum,session_count]))   
+                d['userobjid'] = ",".join(map(str,[d['period'],dow_enum,student_enum]))   
                 
                 # set the saveversion
                 d['saveversion'] = 1
