@@ -6,6 +6,8 @@ log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 
+from sqlite3 import OperationalError
+
 __all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfunc']
 
 def _dowexecfunc(database,value,prep,*args):
@@ -24,7 +26,21 @@ def _sessionenum(database,code,period,prep):
 
 def _maxlessonenum(database):
     exec_str = "select max(enum) from lesson"
-    return(tbl_query(database,exec_str))
+    try:
+        return tbl_query(database,exec_str)
+    except OperationalError:
+        return [None,[[0]],None]
+    
+def _maxsessionenum(database):
+    exec_str = "select max(enum) from session"
+    try:
+        return tbl_query(database,exec_str)
+    except OperationalError:
+        return [None,[[0]],None]
+
+def _distinct(database,value,table):
+    exec_str = "select distinct({1}) from {0}".format(table,value)
+    tbl_query(database,exec_str)
 
 def _execfunc(database,value,prep,dow):
     exec_str = "select s.code "
@@ -48,13 +64,16 @@ def _columnheaderexecfunc(database,pred=None,predvalue=None):
         exec_str = exec_str + " where {0} = {1}".format(pred,predvalue)
     return(tbl_query(database,exec_str))
 
-def _pivotexecfunc(database,ycoltype,xcoltype,tblname,whereclause=None):
+def _pivotexecfunc(database,ycoltype,xcoltype,tblname,whereclause=None,result="count(*)"):
     
     headers = {}
     with database:
         for hdrtype in [ycoltype,xcoltype]:        
-            _,headers[hdrtype],_ =  tbl_query(database,"select distinct({0}) from {1}".format(hdrtype,tblname))
+            #_,headers[hdrtype],_ =  tbl_query(database,"select distinct({0}) from {1}".format(hdrtype,tblname))
+            _,headers[hdrtype],_ =  tbl_query(database,"select name from {0}".format(hdrtype))
             headers[hdrtype] = [_hdrtype[0] for _hdrtype in headers[hdrtype]]
+
+    headers['dow'] = ['MO','TU','WE','TH','FR']
 
     resulttable = []
     resulttable.append([""] + headers[ycoltype])
@@ -63,9 +82,10 @@ def _pivotexecfunc(database,ycoltype,xcoltype,tblname,whereclause=None):
             row=[]
             row.append(xaxishdr)
             for yaxishdr in headers[ycoltype]:
-                exec_str = "select count(*) from {0} ".format(tblname)
+                exec_str = "select {1} from {0} ".format(tblname,result)
+                #exec_str = "select subject,teacher from {0} ".format(tblname)
                 exec_str += "where {1} = {0} ".format("\""+str(yaxishdr)+"\"",ycoltype)
-                exec_str += " and {1} = {0} ".format("\""+str(xaxishdr)+"\"",xcoltype)      
+                exec_str += " and {1} = {0} ".format("\""+str(xaxishdr)+"\"",xcoltype) 
                 
                 if whereclause <> None:
                     for pred,op,predval in whereclause:
@@ -73,7 +93,8 @@ def _pivotexecfunc(database,ycoltype,xcoltype,tblname,whereclause=None):
                 
                 _,results,_ = tbl_query(database,exec_str)
                 try:
-                    row.append(results[0][0])
+                    row.append(",".join(results[0]))
+                    pass
                 except:
                     row.append(0)
             resulttable.append(row)
@@ -97,9 +118,32 @@ if __name__ == "__main__":
     
     from pprint import pprint
     
-    database = Database('test_ssloader')
+    database = Database('test_ssloader_new')
     
-    results = _pivotexecfunc(database,'period','dow','lesson',[['student','=','Booker'],['status','=','complete']])
-        
-    pprint(results)
+    '''results = _pivotexecfunc(database,'period','dow','lesson',[['teacher','=','Stan'],['status','=','complete']],"distinct(student)")
+    
+    expected_results = [['','830-910','910-950','950-1030','1030-1110','1110-1210','1210-100','100-140','140-220','220-300','300-330'],
+                        ['MO','Clayton','Simon A',0,'Yosef',0,'Booker','Thomas','Ashley','Coby',0],
+                        ['TU','Nathaniel','Bruno',0,'Peter',0,'Jake','Orig','Oscar','Jack',0],
+                        ['WE','Clayton','Simon A',0,'Yosef',0,'Booker','Thomas','Ashley','Coby',0],
+                        ['TH','Nathaniel','Bruno',0,'Peter',0,'Jake','Orig','Oscar','Jack',0]]'''
+    
+    '''for i in range(len(results)-2):
+        if expected_results[i] == results[i]: 
+            print "True"
+        else:
+            print "False",results[i]'''
+            
+
+    results = _pivotexecfunc(database,'dow','period','lesson',[['student','=','Booker']],"subject,teacher")
+    
+    print results
+    
+    for i in range(len(results)-1):
+        print results[i]
+        '''if expected_results[i] == results[i]: 
+            print "True"
+        else:
+            print "False",results[i]'''
+    #pprint(results)
     

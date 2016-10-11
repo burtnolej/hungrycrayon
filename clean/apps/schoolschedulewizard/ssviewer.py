@@ -195,6 +195,16 @@ class WizardUI(Tk):
         self.teacher_label.focus_get()
         self.teacher_label_sv.set('Stan')
         
+        self.student_label = Label(controlpanel,text="student",width=10,font=font)
+        self.student_label.grid(row=0,column=13)
+        self.student_label.focus_get()
+        
+        self.student_label_sv = StringVar()        
+        self.student_label = Entry(controlpanel,textvariable=self.student_label_sv,width=10,font=font)
+        self.student_label.grid(row=0,column=14)
+        self.student_label.focus_get()
+        self.student_label_sv.set('Nathaniel')
+        
         
         self.viewcontrolpanel = Frame(self.master)
         self.viewcontrolpanel.grid(row=2,column=0,sticky=NSEW)
@@ -491,7 +501,7 @@ class WizardUI(Tk):
         self.of.store={}
 
     @logger(log)       
-    def load(self,saveversion=None,values=None, dow=None, prep=None, period=None, teacher=None):
+    def load(self,saveversion=None,values=None, dow=None, prep=None, period=None, teacher=None, student=None):
         
         # database name
         if self.dbname_entry_sv.get() <> self.dbname:
@@ -543,11 +553,21 @@ class WizardUI(Tk):
             teacher = "all"
         else:
             whereclause.append( ['teacher',"=","\""+teacher+"\""])
-        log.log(thisfuncname(),3,msg="loading",teacher=str(teacher))        
+        log.log(thisfuncname(),3,msg="loading",teacher=str(teacher))      
+        
+        
+        # student
+        if student==None: student = self.student_label_sv.get()
+        if student == "":
+            student = "all"
+        else:
+            whereclause.append( ['student',"=","\""+student+"\""])
+        log.log(thisfuncname(),3,msg="loading",student=str(student))
+        
         
         
         #whereclause.append( ['teacher',"<>","\""+"??"+"\""]
-        whereclause.append( ['status',"=","\"" + "complete" + "\""])
+        #whereclause.append( ['status',"=","\"" + "complete" + "\""])
         
         # get enums
         self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)

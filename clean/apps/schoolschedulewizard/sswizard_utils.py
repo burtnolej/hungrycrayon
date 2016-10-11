@@ -3,13 +3,16 @@ import os
 from os import path as ospath
 from misc_utils import nxnarraycreate
 
-from database_table_util import tbl_query, tbl_rows_update, DBException, dbtblfactory
+from database_table_util import tbl_query, tbl_rows_update, tbl_rows_get, tbl_exists, tbl_create, tbl_rows_insert, \
+     DBException, dbtblfactory, _gencoldefn, _quotestrs
 from database_util import Database
 from collections import OrderedDict
 from misc_utils_log import Log, logger
 from misc_utils import thisfuncname
 
 from shutil import copyfile
+
+from sswizard_query_utils import _sessionenum, _maxlessonenum, _maxsessionenum
 
 log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
 
@@ -206,6 +209,7 @@ def getdbenum(enums,database,fldname,tblname,**kwargs):
     #enums[tblname]['code2enum'] = dict((value,enum) for enum,value in enumerate(name2code.values()))
     
     enums[tblname]['name2enum'] =name2enum
+    enums[tblname]['enum2name'] = dict(zip(name2enum.values(),name2enum.keys()))
     enums[tblname]['code2enum'] = code2enum
     
     enums[tblname]['name'] = enums[tblname]['name2code'].keys()
@@ -323,6 +327,140 @@ def session_code_gen(dbname,dryrun=False):
         #except Exception, e:
         #    print row,"failed", e
     
+    
+@logger(log)
+def dbbulkloader(database,dbrecords,tblname,cols,maxsize=300):
+    with database:
+
+	dbcoldefn = _gencoldefn(dbrecords[0],cols)
+
+	if not tbl_exists(database,tblname) ==True:
+	    tbl_create(database,tblname,dbcoldefn)
+	    
+	dbrecords = _quotestrs(dbrecords)
+	
+	if len(dbrecords) > maxsize:
+	    for starti in range(0,len(dbrecords),maxsize):
+		if starti+maxsize > len(dbrecords):
+		    endi = len(dbrecords)
+		else:
+		    endi = starti + (maxsize-1)
+
+		tbl_rows_insert(database,tblname,cols,dbrecords[starti:endi])
+		log.log(thisfuncname(),10,msg="loaded rows to "+tblname,numrow=endi-starti)
+	else:
+	    tbl_rows_insert(database,tblname,cols,dbrecords)
+	    log.log(thisfuncname(),10,msg="loaded rows to "+tblname,numrow=len(dbrecords))	    
+
+def _isenum(enums,objtype,value):
+    
+    if value in enums[objtype]['enum2name'].keys(): 
+	return value
+    
+    if value in enums[objtype]['name']:
+	return enums[objtype]['name2enum'][value]
+
+def _loadprepmapper(database):
+    cols = ['name','prep']
+
+    with database:
+	_,rows,_ = tbl_rows_get(database,'student',cols)
+
+    d = dict((row[0],row[1]) for row in rows)
+    return d
+
+def _getuserobjid(enums,cols,d):
+    # take in a list of field names and convert all to enums
+    return(".".join(map(str,[_isenum(enums,col,d[col]) for col in cols])))	    
+    
+@logger(log)
+def dbinsert_direct(database,records,tblname,source):
+
+    # assumes all fields have been validated
+    
+    from misc_utils import IDGenerator
+    from datetime import datetime
+    
+    dbrows = []
+    
+    count=0
+    
+    enums = {'maps':{},'enums':{},'codes':{}}
+
+    getdbenum(enums,database,'name','period')
+    getdbenum(enums,database,'name','student')
+    getdbenum(enums,database,'name','dow')
+    getdbenum(enums,database,'name','subject')
+    getdbenum(enums,database,'name','adult')
+    
+    prepmap = _loadprepmapper(database)
+    
+    
+    if tblname == 'session':
+	with database:
+	    _,_session_count,_ = _maxsessionenum(database)	
+	    
+	tablerow_count = int(_session_count[0][0])+1
+    elif tblname == 'lesson':
+	with database:
+	    _,_lesson_count,_ = _maxlessonenum(database)		    
+    
+	tablerow_count = int(_lesson_count[0][0])+1
+
+    cols = ['period','dow','subject','adult','student','type']
+
+    for record in records:
+	    
+	# prepare fields to complete record
+	if tblname == 'session':
+	    
+	    d = dict(zip(cols,record))
+	    
+	    d['period'] = _isenum(enums,'period',d['period'])
+	    d['code'] = ".".join([d['adult'],d['subject'],d['dow']])
+	    #d['userobjid'] = _getuserobjid(enums,['period','dow','subject','adult'],d)
+	    d['prep'] = int(prepmap[d['student']])
+	    d.pop('student')
+
+	elif tblname == 'lesson':
+
+	    d = dict(zip(cols,record))
+	    _dow = d['dow']
+	    d['dow'] = enums['dow']['code2name'][d['dow']]
+	    d['session'] = ".".join([d['adult'],d['subject'],d['dow']])
+	    d['prep'] = int(prepmap[d['student']])
+	    d['userobjid'] = _getuserobjid(enums,['period','dow','student'],d)
+	    d['dow'] = _dow
+	    d['saveversion'] = 1
+	    d['status'] = 'master'
+	    d.pop('type')
+	
+	d['teacher'] = d['adult']
+	d.pop('adult')
+
+
+	d['__id'] = IDGenerator().getid()
+	d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
+
+	d['enum'] = tablerow_count
+	d['source'] = source
+    
+	dbrows.append(d.values())
+	
+	if count ==0: dbcols = d.keys()
+	
+	tablerow_count+=1
+
+    dbbulkloader(database,dbrows,tblname,dbcols)
+    
+    
+@logger(log)
+def dbinsert_lesson(self,**kwargs):
+    
+    cols = ['teacher','dow','subject','source','students']
+    
+    
+
 def dbinsert(database,dbclassname,rows,colnames):
     
     dbclass = dbtblfactory(dbclassname)

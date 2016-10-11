@@ -171,9 +171,12 @@ def tbl_rows_update(database,tbl_name,row,dryrun=False):
 @logger(log)
 def tbl_query(database,exec_str):
 
+    print exec_str
+    
     results = database.execute(exec_str)
     
     keys = [description[0] for description in database.description()]
+    
     return(keys,results,exec_str)    
 
 
@@ -196,7 +199,7 @@ def tbl_row_delete(database,tbl_name,whereclause=None):
 
 
 @logger(log)
-def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
+def tbl_rows_get(database,tbl_name,fields=None,whereclause=None,orderby=None):
     
     fieldstr="*"
     if fields<>None:
@@ -221,6 +224,9 @@ def tbl_rows_get(database,tbl_name,fields=None,whereclause=None):
 		                                              whereclause[i][1],
 		                                              whereclause[i][2])
 
+    if orderby <> None:
+	exec_str = exec_str + " order by {0}".format(orderby)
+	
     #print exec_str
     
     results = database.execute(exec_str)
