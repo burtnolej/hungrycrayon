@@ -7,7 +7,11 @@ from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _genc
 from database_util import Database 
 from sswizard_utils import getdbenum, session_code_gen, dbinsert, dbinsert_direct
 
+from collections import OrderedDict
+
 from sswizard_query_utils import _sessionenum, _maxlessonenum, _maxsessionenum
+
+import re
 
 class SSLoaderRuleException(Exception):
     def __repr__(self):
@@ -48,29 +52,39 @@ class SSLoader(object):
         self.database = Database(databasename)
         self.prep = prep
         
-        self.rules = {'computertime':[("Computer Time",1),(":",0),("with",0)],
+        #add in |; so 'Music':[("Music"|"Cello",1),(":",0)],
+	
+	# add an extra field in lesson and session; lessontype
+	
+	# add rules to pick out the WP/Work P/W Period/ to set lessontype
+	# and find subject
+	
+	#self.rules = {'wp': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0)]}
+	
+        self.rules = OrderedDict({'computertime':[("Computer Time",1),(":",0),("with",0)],
 	              'Movement':[("Movement",1),(":",0),("with",0)],
 	              'Engineering':[("Engineering",1),(":",0),("with",0)],
 	              'Art':[("Art",1),(":",0)],
 	              'Music':[("Music",1),(":",0)],
-                      'teacher':[(":",1),("(",1),(")",1)],
+                      'teacher':[(":",1),("\(",1),("\)",1)],
                       'date':[("/",2)],
-                      'noteacher': [(":",1),("(",0),(")",0)],
+                      'noteacher': [(":",1),("\(",0),("\)",0)],
+	              'wp': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0)],
                       'period' :[(":",2),("-",1)],
-	              'ignore' : [("Period",1),(":",0),("(",0),(")",0)],
-	              'ignore2' : [("Lunch",1),(":",0),("(",0),(")",0)],
+	              'ignore' : [("^Period",1),(":",0),("\(",0),("\)",0)],
+	              'ignore2' : [("Lunch",1),(":",0),("\(",0),("\)",0)],
                       #_ENDCELL_' :[("_ENDCELL_",1)],
                       #'_CRETURN_' :[("_CRETURN_",1)]}
-                      '_ENDCELL_' :[("^",1)],
-                      '_CRETURN_' :[("&",1)],
-                      'staffname':[('+',2)],
-	              'staffwith':[('with',1),(":",0),("(",0),(")",0)],
+                      '_ENDCELL_' :[("\^",1)],
+                      '_CRETURN_' :[("\&",1)],
+                      'staffname':[('\+',2)],
+	              'staffwith':[('with',1),(":",0),("\(",0),("\)",0)],
 	              'dow1':[('Monday',1)],
 	              'dow2':[('Tuesday',1)],
 	              'dow3':[('Wednesday',1)],
 	              'dow4':[('Thursday',1)],
 	              'dow5':[('Friday',1)],
-	              'academicname':[('-',2)]}
+	              'academicname':[('-',2)]})
         
         self.synonyms = {}
         self.valid_values = {}
@@ -162,14 +176,21 @@ class SSLoader(object):
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
 	    elif recordtype == "staffwith":
+		
+		try:
+		    subject,_,teacher = record.split(" ")
+		except:
+		    log.log(thisfuncname(),msg="could not parse",recordtype=recordtype,record=record)
+		
+		# if this is a staff file then use the staff member whose schedule we are reading
+		# for the primary teacher (until a teacher2 field is implemented)
 		if staffrecordflag == True:
-		    subject,_,_ = record.split(" ")
 		    teacher = staffname
-		    students = []
-		    dow = self.valid_values['dow'][dowidx]
-		    _record = [locals()[field] for field in self.fields]
-		    _records.append(_record)
-		    log.log(thisfuncname(),10,msg="record added",record=_record)
+		students = []
+		dow = self.valid_values['dow'][dowidx]
+		_record = [locals()[field] for field in self.fields]
+		_records.append(_record)
+		log.log(thisfuncname(),10,msg="record added",record=_record)
             elif recordtype == 'computertime':
                 if self.prep <> -1:
 		    students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
@@ -345,7 +366,9 @@ class SSLoader(object):
             log.log(thisfuncname(),10,msg="skipoing as blank row",record=record,matches=match)
             return('blankrow')
         elif len(match) > 1:
-            raise SSLoaderMultiRuleMatchException
+            log.log(thisfuncname(),3,msg="multiple rules matched picking on priority",mathes=match)
+	    return(match[0])
+	    #raise SSLoaderMultiRuleMatchException
         elif len(match) == 0:
             raise SSLoaderNoRulesMatchException
         else:
@@ -353,8 +376,22 @@ class SSLoader(object):
             return(match[0])
         
     def appyrules(self,record,rules):
-        for char,count in rules:    
-            if record.lower().count(char.lower()) <> count:
+	
+        for char,count in rules:
+	    p = re.compile(char.lower())
+	    if char.count("=") == 1:
+		# match any synonym
+		objtype,value = char.split("=")
+		synomatch=False
+		for syno,master_value in self.synonyms.iteritems():
+		    if master_value==value and record.count(syno) == count:
+			synomatch=True
+
+		if synomatch==False:
+		    return False
+	    
+	    #elif record.lower().count(char.lower()) <> count:
+            elif len(p.findall(record.lower())) <> count:
                 return False
         return True
     

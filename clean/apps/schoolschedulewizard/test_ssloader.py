@@ -127,12 +127,12 @@ class Test_ApplyRules(Test_Base):
         Test_Base.setUp(self)
         
     def test_teachertype(self):
-        self.rules = [(":",1),("(",1),(")",1)]
+        self.rules = [(":",1),("\(",1),("\)",1)]
         self.inputstr = "ELA: Nathaniel (Amelia)"
         self.assertTrue(self.ssloader.appyrules(self.inputstr,self.rules))
         
     def test_teachertype_multi_student(self):
-        self.rules = [(":",1),("(",1),(")",1)]
+        self.rules = [(":",1),("\(",1),("\)",1)]
         self.inputstr = "Science: Oscar, Peter (Paraic)"
         self.assertTrue(self.ssloader.appyrules(self.inputstr,self.rules))
         
@@ -147,12 +147,12 @@ class Test_ApplyRules(Test_Base):
         self.assertTrue(self.ssloader.appyrules(self.inputstr,self.rules))
         
     def test_noteachertype(self):
-        self.rules = [(":",1),("(",0),(")",0)]
+        self.rules = [(":",1),("\(",0),("\)",0)]
         self.inputstr = "ELA: Nathaniel"
         self.assertTrue(self.ssloader.appyrules(self.inputstr,self.rules))
         
     def test_staff(self):
-        self.rules = [("+",2)]
+        self.rules = [("\+",2)]
         self.inputstr = "Moira++"
         self.assertTrue(self.ssloader.appyrules(self.inputstr,self.rules))
         
@@ -164,26 +164,26 @@ class Test_ApplyRules_Fails(Test_Base):
     def test_no_colon(self):
         
         self.inputstr = "ELA Nathaniel (Amelia)"
-        self.rules = [(":",1),("(",1),(")",1)]
+        self.rules = [(":",1),("\(",1),("\)",1)]
     
         self.assertFalse(self.ssloader.appyrules(self.inputstr,self.rules))
             
     def test_more_than_one_colon(self):
         
         self.inputstr = "ELA :Nathaniel : (Amelia)"
-        self.rules = [(":",1),("(",1),(")",1)]
+        self.rules = [(":",1),("\(",1),("\)",1)]
         self.assertFalse(self.ssloader.appyrules(self.inputstr,self.rules))
             
     def test_no_open_bracket(self):
         
         self.inputstr = "ELA :Nathaniel : Amelia)"
-        self.rules = [(":",1),("(",1),(")",1)]
+        self.rules = [(":",1),("\(",1),("\)",1)]
         self.assertFalse(self.ssloader.appyrules(self.inputstr,self.rules))
         
     def test_no_close_bracket(self):
         
         self.inputstr = "ELA :Nathaniel : (Amelia"
-        self.rules = [(":",1),("(",1),(")",1)]
+        self.rules = [(":",1),("\(",1),("\)",1)]
         self.assertFalse(self.ssloader.appyrules(self.inputstr,self.rules))
     
 class Test_teachertype_1student(Test_Base):
@@ -731,7 +731,7 @@ class Test_RecordIdentifcation(Test_Base):
         
         self.assertEquals(recordtype, 'period')
         
-    def test_teacher_edgecase(self):
+    def test_teacher_extra_quote(self):
         self.inputstr = "Science: Jake (Paraic) \""
         recordtype = self.ssloader.identify_record(self.inputstr)
         
@@ -743,23 +743,29 @@ class Test_RecordIdentifcation(Test_Base):
         
         self.assertEquals(recordtype, 'noteacher')
         
-    def test_teacher_edgecase3(self):
+    def test_PERIOD_2(self):
         self.inputstr = "Period 1"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
         self.assertEquals(recordtype, 'ignore')
 
-    def test_teacher_edgecase4(self):
+    def test_PERIOD_1(self):
         self.inputstr = "PERIOD 1"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
         self.assertEquals(recordtype, 'ignore')
         
-    def test_teacher_edgecase5(self):
+    def test_With(self):
         self.inputstr = "Engineering with Paraic"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'staffwith')  
+        self.assertEquals(recordtype, 'staffwith')
+        
+    def test_teacher_Syno_Match(self):
+        self.inputstr = "Humanities Work Period with Johnny"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'wp')  
      
 class Test_RecordIdentifcation_realsample(Test_Base):
     def setUp(self):
@@ -811,6 +817,21 @@ class Test_RecordIdentifcation_realsample2(Test_Base):
                 recordtype="dow"
             results[recordtype] += 1
            
+
+class Test_PreProcessRecordsWith(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_(self):
+        
+        self.records = ['09/19/16','8:30- 9:10','^','ELA with Amelia','^','Engineering with Paraic']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','ELA','Amelia',[]],
+                          ['830-910','Tuesday','Engineering','Paraic',[]]]
+        
+        self.assertListEqual(clean_records,expected_results)
         
 class Test_PreProcessRecords(Test_Base):
     def setUp(self):
@@ -1537,7 +1558,7 @@ class Test_DBLoader_All(unittest.TestCase):
                  ('academic.csv',-1,False)]
     
         ssloader = SSLoader(self.databasename)
-        ssloader.run(self.databasename,files,insertprimary=False)
+        ssloader.run(self.databasename,files,insertprimary=True)
     
     def test_(self):
 
@@ -1910,6 +1931,13 @@ class Test_DBInsert_Direct_Nathaniel(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
+    
+    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))    
+    
+    #unittest.TextTestRunner(verbosity=2).run(suite) 
+    #exit()
+    
     # #####################################################################################################
     # unit tests=
     
@@ -1973,10 +2001,12 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsPrep4))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsStaff))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsFriday))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWith))
+    
     
     # dbloader
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
-
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_All))
     
     # dbinsert_direct
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct))
@@ -1984,7 +2014,7 @@ if __name__ == "__main__":
     # db primary record set
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_All))
+
     
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))

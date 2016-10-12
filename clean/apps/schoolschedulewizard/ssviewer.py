@@ -163,7 +163,7 @@ class WizardUI(Tk):
         self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv,width=10,font=font)
         self.dow_entry.grid(row=0,column=6)
         self.dow_entry.focus_get()
-        self.dow_entry_sv.set('MO')
+        #self.dow_entry_sv.set('MO')
         
         self.prep_label = Label(controlpanel,text="prep",width=10,font=font)
         self.prep_label.grid(row=0,column=7)
@@ -173,7 +173,7 @@ class WizardUI(Tk):
         self.prep_entry = Entry(controlpanel,textvariable=self.prep_entry_sv,width=10,font=font)
         self.prep_entry.grid(row=0,column=8)
         self.prep_entry.focus_get()
-        self.prep_entry_sv.set(5)
+        #self.prep_entry_sv.set(5)
         
         self.period_label = Label(controlpanel,text="period",width=10,font=font)
         self.period_label.grid(row=0,column=9)
@@ -183,7 +183,7 @@ class WizardUI(Tk):
         self.period_entry = Entry(controlpanel,textvariable=self.period_entry_sv,width=10,font=font)
         self.period_entry.grid(row=0,column=10)
         self.period_entry.focus_get()
-        self.period_entry_sv.set('830-910')
+        #self.period_entry_sv.set('830-910')
         
         self.teacher_label = Label(controlpanel,text="teacher",width=10,font=font)
         self.teacher_label.grid(row=0,column=11)
@@ -193,7 +193,7 @@ class WizardUI(Tk):
         self.teacher_label = Entry(controlpanel,textvariable=self.teacher_label_sv,width=10,font=font)
         self.teacher_label.grid(row=0,column=12)
         self.teacher_label.focus_get()
-        self.teacher_label_sv.set('Stan')
+        #self.teacher_label_sv.set('Stan')
         
         self.student_label = Label(controlpanel,text="student",width=10,font=font)
         self.student_label.grid(row=0,column=13)
@@ -203,7 +203,7 @@ class WizardUI(Tk):
         self.student_label = Entry(controlpanel,textvariable=self.student_label_sv,width=10,font=font)
         self.student_label.grid(row=0,column=14)
         self.student_label.focus_get()
-        self.student_label_sv.set('Nathaniel')
+        #self.student_label_sv.set('Nathaniel')
         
         
         self.viewcontrolpanel = Frame(self.master)
@@ -260,7 +260,7 @@ class WizardUI(Tk):
         self.viewdata_label = Entry(self.viewcontrolpanel,textvariable=self.viewdata_label_sv,font=font)
         self.viewdata_label.grid(row=0,column=9)
         self.viewdata_label.focus_get()
-        self.viewdata_label_sv.set("teacher")
+        self.viewdata_label_sv.set("subject,teacher")
 
         self.recalc_button = Button(self.viewcontrolpanel,command=self.viewer,text="calc",name="vc")
         self.recalc_button.grid(row=0,column=10)
@@ -271,7 +271,7 @@ class WizardUI(Tk):
         #self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
     
-    def viewer(self):
+    def viewer(self,ui=True):
 
         xaxis_type = self.viewxaxis_label_sv.get() # period
         yaxis_type = self.viewyaxis_label_sv.get() # dow
@@ -312,39 +312,47 @@ class WizardUI(Tk):
                     except Exception, e:
                         log.log(thisfuncname(),2,msg="attr not found on object",error=e,
                                 attr=ztype,xval=str(xval),yval=str(yval))
-                        celltext.append("**")
-                print celltext
+                        celltext.append("??")
                 values[x].append(",".join(celltext))
                 
 
-        self.bgmaxrows=len(values)
-        self.bgmaxcols=len(values[0])
-    
-        widget_args=dict(background='white',width=1,height=1,wraplength=180,
-                         highlightbackground='black',highlightthickness=1,
-                         values=self.enums['dow'])
-        widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
-    
-        mytextalphanum = TextAlphaNumRO(name='textalphanum')
-    
-        try:
-            self.viewergrid.destroy()
-        except:
-            pass
-    
-        self.viewergrid = TkImageLabelGrid(self,'viewergrid',
-                                           mytextalphanum,10,10,
-                                           0,0,self.bgmaxrows,self.bgmaxcols,
-                                           True,False,{},widgetcfg)
-    
-        self.viewergrid.grid(row=3,column=0,sticky=NSEW)
-        self.grid_rowconfigure(3, weight=10, uniform="foo")
+        if ui==True:
+            self.bgmaxrows=len(values)
+            self.bgmaxcols=len(values[0])
         
-
-        for x in range(len(values)):
-            for y in range(len(values[x])):
-                self.viewergrid.widgets[x][y].sv.set(values[x][y])
+            widget_args=dict(background='white',width=1,height=1,wraplength=180,
+                             highlightbackground='black',highlightthickness=1,
+                             values=self.enums['dow'])
+            widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
         
+            mytextalphanum = TextAlphaNumRO(name='textalphanum')
+        
+            try:
+                self.viewergrid.destroy()
+            except:
+                pass
+        
+            self.viewergrid = TkImageLabelGrid(self,'viewergrid',
+                                               mytextalphanum,10,10,
+                                               0,0,self.bgmaxrows,self.bgmaxcols,
+                                               True,False,{},widgetcfg)
+        
+            self.viewergrid.grid(row=3,column=0,sticky=NSEW)
+            self.grid_rowconfigure(3, weight=10, uniform="foo")
+            
+    
+            for x in range(len(values)):
+                for y in range(len(values[x])):
+                    self.viewergrid.widgets[x][y].sv.set(values[x][y])
+        else:
+            results = []
+            for x in range(len(values)):
+                row=[]
+                for y in range(len(values[x])):
+                    row.append(values[x][y])
+                results.append(row)
+            return results
+            
         
     @logger(log)    
     def save(self,saveversion=None):
@@ -564,10 +572,7 @@ class WizardUI(Tk):
             whereclause.append( ['student',"=","\""+student+"\""])
         log.log(thisfuncname(),3,msg="loading",student=str(student))
         
-        
-        
-        #whereclause.append( ['teacher',"<>","\""+"??"+"\""]
-        #whereclause.append( ['status',"=","\"" + "complete" + "\""])
+        whereclause.append( ['status',"=","\"" + "master" + "\""])
         
         # get enums
         self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
@@ -618,11 +623,27 @@ class WizardUI(Tk):
 if __name__ == "__main__":
     #master = Tk()
     
+    enableui = True
+    
     if len(sys.argv) <= 1:
         raise Exception("provide a database name; no extension")
     else:
         log.log(thisfuncname(),3,msg="using database",database=sys.argv[1])
+        
+        try:
+            if sys.argv[2] == "True":
+                enableui = True
+        except:
+            pass
+        
     of = ObjFactory(True)
     app = WizardUI(sys.argv[1],of,sys.argv[1],maxentrycols=12,maxentryrows=20)
+        
+    if enableui == True:
+        app.mainloop()       
+    else:
+        app.load()
+        app.viewer(False)
+        
     
-    app.mainloop()
+    

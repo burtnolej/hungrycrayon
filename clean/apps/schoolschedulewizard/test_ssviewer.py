@@ -7,68 +7,56 @@ from ttk import *
 
 import unittest
 
-from sswizard import schoolschedgeneric, WizardUI
+from ssviewer import WizardUI
 from database_util import Database
 from database_table_util import tbl_rows_get
 from misc_utils_objectfactory import ObjFactory
 
 from shutil import copyfile
 from os import remove, path
-
-class Test_Base(unittest.TestCase):
-    def setUp(self,dbname,refdbname):
-        dbpath = '/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard/'
-        self.dbname = dbname
-        self.dbfilename = path.join(dbpath,self.dbname)
-        self.database = Database(self.dbfilename)
-        self.of = ObjFactory(True)
-        self.ui = WizardUI(self.dbname, self.of,refdbname)       
-        self.ui.dbname_entry_sv.set(dbname)
         
-        parent_name = self.ui.entrygrid.widgets[0][0].winfo_parent()
-        self.parent_widget = self.ui.entrygrid.widgets[0][0]._nametowidget(parent_name)
-        self.parent_widget.update()
-
-    def tearDown(self):
-        self.ui.destroy()
-        copyfile(self.dbfilename+".sqlite.backup",self.dbfilename+".sqlite")
-        
-class Test_Input_New_Save_Persist(Test_Base):
+class Test_Nathaniel(unittest.TestCase):
+    
+    # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
     
     def setUp(self):
-        Test_Base.setUp(self,'tmp','test_quadref')
+        self.databasename = "test_ssloader"
     
-        self.ui.dbname_entry_sv.set(self.dbname)
-    
-        self.ui.entrygrid.widgets[1][0].sv.set('Nathaniel')
-        self.ui.entrygrid.widgets[0][1].sv.set('830-910')
-        self.ui.entrygrid.widgets[1][1].sv.set('AMEL.AC.ELA.MO')
-    
-        self.ui.save(1)
-        self.ui.persist()
+        of = ObjFactory(True)
+        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
+        self.app.load(saveversion=1,student="Nathaniel")
+        
           
-    def test_dbwrite(self):
-        
-        expected_result = [['830-910', u'Nathaniel','AMEL.AC.ELA.MO', u'MO', '1']]
-        
-        cols = ['period','student','session','dow','saveversion']
+    def test_(self):
 
-        with self.database:
-            colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,
-                                                  [['saveversion',"=",'1']])
+        results = self.app.viewer(False)
         
-        self.assertListEqual(expected_result,rows)
+        expected_results = [["","MO","TU","TH","WE","FR"],                                                                                                                                                                                                                
+                            ["830-910","ELA,Amelia","Math,Stan","Math,Stan","ELA,Amelia","Humanities,A"],                                                                                                                                                                                                     
+                            ["910-950","Core,??","Work Period,Dylan","Core,??","Work Period,Moira","Music,??"],                                                                                                                                                                                               
+                            ["950-1030","Work Period,Karolina","Activity Period,Aaron","Work Period,Issey","OT,??","STEM,??"],                                                                                                                                                                                
+                            ["1030-1110","Activity Period,Dylan","Chess,Rahul","Chess,Rahul","Activity Period,Issey","Art,??"],                                                                                                                                                                               
+                            ["1110-1210","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??"],                                                                                                                                                                     
+                            ["1210-100","Science,Paraic","History,Samantha","History,Samantha","Science,Paraic","??,??"],                                                                                                                                                                                         
+                            ["100-140","Chess,Rahul","Work Period,Karolina","Work Period,Aaron","Chess,Rahul","??,??"],                                                                                                                                                                                            
+                            ["140-220","Work Period,Johnny","Movement,??","Movement,??","Work Period,Issey","??,??"],                                                                                                                                                                                            
+                            ["220-300","Speech,??","Student News,??","Student News,??","Counseling,Alexa","??,??"],                                                                                                                                                                                           
+                            ["300-330","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??","??,??"]]
+
+
+        
+        self.assertListEqual(expected_results,results)
 
     def tearDown(self):
-        self.ui.destroy()
-        os.remove(self.dbname+".sqlite")
+        pass
 
       
                 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Load))    
+    # functional tests
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Nathaniel))    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
