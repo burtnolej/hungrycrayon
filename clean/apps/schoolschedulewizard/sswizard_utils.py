@@ -432,13 +432,14 @@ def dbinsert_direct(database,records,tblname,source):
 	    d['userobjid'] = _getuserobjid(enums,['period','dow','student'],d)
 	    d['dow'] = _dow
 	    d['saveversion'] = 1
-	    d['status'] = 'master'
+	   
 	    d.pop('type')
 	
 	d['teacher'] = d['adult']
 	d.pop('adult')
 
-
+	d['status'] = 'master'
+	    
 	d['__id'] = IDGenerator().getid()
 	d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
 

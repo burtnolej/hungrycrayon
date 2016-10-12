@@ -1,11 +1,11 @@
 from misc_utils_log import Log, logger
-log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,pidlogname=True,proclogname=False)
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=5,pidlogname=True,proclogname=False)
 
 from misc_utils import os_file_to_string, thisfuncname
 from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _gencoldefn, tbl_exists, \
      tbl_create, tbl_remove
 from database_util import Database 
-from sswizard_utils import getdbenum, session_code_gen, dbinsert
+from sswizard_utils import getdbenum, session_code_gen, dbinsert, dbinsert_direct
 
 from sswizard_query_utils import _sessionenum, _maxlessonenum, _maxsessionenum
 
@@ -48,8 +48,9 @@ class SSLoader(object):
         self.database = Database(databasename)
         self.prep = prep
         
-        self.rules = {'computertime':[("Computer Time",1),(":",0)],
-	              'Movement':[("Movement",1),(":",0)],
+        self.rules = {'computertime':[("Computer Time",1),(":",0),("with",0)],
+	              'Movement':[("Movement",1),(":",0),("with",0)],
+	              'Engineering':[("Engineering",1),(":",0),("with",0)],
 	              'Art':[("Art",1),(":",0)],
 	              'Music':[("Music",1),(":",0)],
                       'teacher':[(":",1),("(",1),(")",1)],
@@ -149,9 +150,9 @@ class SSLoader(object):
 		#   continue
             elif recordtype == 'staffname':
                 staffname = self.extract_staff(record)
-                log.log(thisfuncname(),3,msg="this is a staff file",staffname=staffname)
+                log.log(thisfuncname(),10,msg="this is a staff file",staffname=staffname)
                 staffrecordflag=True
-	    elif recordtype in ['Movement','Art','Music']:
+	    elif recordtype in ['Movement','Art','Music','Engineering']:
 		if staffrecordflag == True:
 		    subject = recordtype
 		    teacher = staffname
@@ -188,7 +189,7 @@ class SSLoader(object):
 		
 	    elif recordtype == 'academicname':
                 academicname = self.extract_staff(record)
-                log.log(thisfuncname(),3,msg="this is an academic file",academicname=academicname)
+                log.log(thisfuncname(),10,msg="this is an academic file",academicname=academicname)
                 academicrecordflag=True
             elif recordtype == 'date':
                 pass
@@ -257,7 +258,7 @@ class SSLoader(object):
         
         for name,syno in rows:
 	    self.synonyms[syno]=name
-	    log.log(thisfuncname(),3,msg="adding synonym to lookup",name=name,syno=syno)
+	    log.log(thisfuncname(),10,msg="adding synonym to lookup",name=name,syno=syno)
 	
 	rows = [row[1] for row in rows]
 
@@ -502,7 +503,7 @@ class SSLoader(object):
                     new_value = self.validate_token2(orig_value,self.valid_values[self.fields[i]])
 		    
 		    if self.synonyms.has_key(new_value):
-			log.log(thisfuncname(),3,msg="synonym, swapping",new_value=self.synonyms[new_value],old_value=new_value)
+			log.log(thisfuncname(),10,msg="synonym, swapping",new_value=self.synonyms[new_value],old_value=new_value)
 			new_value = self.synonyms[new_value]
 		    
             except SSLoaderNoMatchException:
@@ -541,9 +542,9 @@ class SSLoader(object):
 		    log.log(thisfuncname(),10,msg="failed to fuzzy match",token=token,validvalue=str(value),similarity=similarity)          
 		    
 	    else:
-		log.log(thisfuncname(),3,msg="size difference too big to fuzzy match",result=result)
+		log.log(thisfuncname(),10,msg="size difference too big to fuzzy match",result=result)
                     
-        log.log(thisfuncname(),2,msg="failed to validate token",token=token,file=self.inputfile)
+        log.log(thisfuncname(),10,msg="failed to validate token",token=token,file=self.inputfile)
         raise SSLoaderNoMatchException
 
 
@@ -592,6 +593,7 @@ class SSLoader(object):
 		colndefn,rows,exec_str = tbl_rows_get(self.database,'session',['__id','teacher','code','subject','enum'],whereclause)
 		
 	    if len(rows) == 0:
+		d['status'] = "complete"
 		d['source'] = self.inputfile
 		d['__id'] = IDGenerator().getid()
 		d['__timestamp'] = datetime.now().strftime("%H:%M:%S")	
@@ -608,7 +610,7 @@ class SSLoader(object):
 		d['enum'] = int(session_count)
 		dbinsert(self.database,'session',[d.values()],d.keys())
 		
-		log.log(thisfuncname(),3,msg="createing session",record=d)
+		log.log(thisfuncname(),10,msg="createing session",record=d)
 		
 		sessioncode = d['code']
 		subject = "??"
@@ -668,6 +670,7 @@ class SSLoader(object):
 		d['student'] = student
 		student_enum = enums['student']['name2enum'][student]
 		
+		dow_enum = enums['dow']['name2enum'][_dow]
 		d['dow'] = enums['dow']['name2code'][_dow]
 		
 		# set prep per student as could be cross preps
@@ -680,7 +683,7 @@ class SSLoader(object):
 		d['session'] = ".".join([d['teacher'],d['subject'],_dow]) 
 		
 		# create userobjid
-		d['userobjid'] = ",".join(map(str,[d['period'],student_enum,_sessionenum,d['teacher']]))
+		d['userobjid'] = ",".join(map(str,[d['period'],dow_enum,student_enum]))
 		
 		# set the saveversion
 		d['saveversion'] = 1
@@ -715,7 +718,7 @@ class SSLoader(object):
         dbsessionrows = []
         
         for record in records:
-            
+
             d = dict(zip(cols,record))
 
             # get an id
@@ -726,12 +729,17 @@ class SSLoader(object):
             
             try:
                 student = d['students'][0]
+		d['prep'] = int(self.prepmap[student])
             except IndexError:
-                log.log(thisfuncname(),3,msg="no student name found, creating session only",record=record)
-                #continue
-            
-            d['prep'] = int(self.prepmap[student])
+                log.log(thisfuncname(),10,msg="no student name found, creating session only",record=record)
+		d['prep']=-1
 
+
+	    # set status
+	    d['status'] = "complete"
+	    if d['teacher'] == '??':
+		d['status'] = "incomplete"
+		
             # lookup period enum
             _period = d['period']
             d['period'] =  int(enums['period']['name2enum'][_period])
@@ -766,22 +774,19 @@ class SSLoader(object):
             d.pop('type')
             d.pop('enum')
 
-            # store the day code for the lesson record
+	    dow_enum = enums['dow']['name2enum'][d['dow']]
             d['dow'] = enums['dow']['name2code'][d['dow']]
             
             # store the period name for the lesson record
             d['period'] = _period
-	    
-	    # set status
-	    d['status'] = "complete"
-	    if d['teacher'] == '??':
-		d['status'] = "incomplete"
             
             for student in _students:
 
                 # student enum
                 d['student'] = student
                 student_enum = enums['student']['name2enum'][student]
+		
+
                 
                 # set prep per student as could be cross preps
                 d['prep'] = int(self.prepmap[student])
@@ -797,7 +802,7 @@ class SSLoader(object):
 		then parse list setting the tags
 		'''
 		
-                d['userobjid'] = ",".join(map(str,[d['period'],student_enum,session_count]))   
+                d['userobjid'] = ",".join(map(str,[d['period'],dow_enum,student_enum]))   
                 
                 # set the saveversion
                 d['saveversion'] = 1
@@ -943,11 +948,13 @@ class SSLoader(object):
     	
     def ssloader(self,files,databasename="htmlparser"):
         
-        for file,prep in files:
+        for _file,prep,dbloader in files:
             
-            self.inputfile = file
+            log.log(thisfuncname(),3,msg="loading",file=_file,prep=prep,dbloaderflag=dbloader)
+	    
+            self.inputfile = _file
 	    self.prep = prep
-            fileasstring = self.file2string(file)
+            fileasstring = self.file2string(_file)
     
             records = self.string2records(fileasstring)
     
@@ -957,26 +964,60 @@ class SSLoader(object):
             for clean_record in clean_records:
                 validated_clean_records.append(self.validate_tokens(clean_record))
                 
-	    self.dbloader(validated_clean_records)
- 
+	    if dbloader == True:
+		self.dbloader(validated_clean_records)
+	    else:
+		self.dbupdater(validated_clean_records)
+		
+
+    def run(self,dbname,files,insertprimary=True):
+
+	def _getprimarykeyhash(pred=None,predval=None):
+    
+	    cols = ['dow','period','student']
+	    hashmap = self.primary_record_set()
+	    
+	    # add the key components to the flat output record
+	    results = []      
+	    for hashkey in hashmap:
+		hashmap[hashkey].pop('source')
+		d = dict(zip(cols,hashkey.split(".")))
+		results.append(hashmap[hashkey].values())
+	    results.sort()
+	    return results   
+
+	self.databasename = dbname
+	self.database = Database(self.databasename)
+	try:
+	    with self.database:
+		tbl_remove(self.database,'lesson')
+		tbl_remove(self.database,'session')
+	except:
+	    pass
+
+	self.ssloader = SSLoader(self.databasename)
+	self.ssloader.ssloader(files,self.databasename)
+
+	log.log(thisfuncname(),3,msg="creating master record set")    
+	cols = ['status','teachers','student','subject','period','dow']
+	rows = _getprimarykeyhash()
+	
+	# strip out required columns from the primarykeyhash
+	newrows = []
+	for row in rows:    
+	    d = dict(zip(cols,row))
+	    newrows.append([d['period'],d['dow'],d['subject'][0],d['teachers'][0],d['student'],'1-on-1'])
+    
+	if insertprimary==True:
+	    log.log(thisfuncname(),10,msg="loading master record set")    
+	    dbinsert_direct(self.database,newrows,'session','dbinsert')
+	    dbinsert_direct(self.database,newrows,'lesson','dbinsert')
+
 if __name__ == "__main__":
     databasename = "test_ssloader"
     
-    database = Database(databasename)
-    
-    '''try:
-	with database:
-	    tbl_remove(database,'lesson')
-	    tbl_remove(database,'session')
-    except:
-	pass'''
+    files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
+             ('academic.csv',-1,False)]
     
     ssloader = SSLoader(databasename)
- 
-    #files = [("prep4data.csv",4),("prep6data.csv",6),("prep5data.csv",5),("staffdata.csv",-1)]
-    #files = [("prep4data.csv",4),("prep6data.csv",6),("prep5data.csv",5)]
-	
-    files = [("staffdata.csv",-1)]
-    
-    ssloader.ssloader(files,databasename)
-    
+    ssloader.run(databasename,files)

@@ -39,8 +39,8 @@ def _maxsessionenum(database):
         return [None,[[0]],None]
 
 def _distinct(database,value,table):
-    exec_str = "select distinct({1}) from {0}".format(table,value)
-    tbl_query(database,exec_str)
+    exec_str = "select distinct({1}) from {0} order by prep".format(table,value)
+    return tbl_query(database,exec_str)
 
 def _execfunc(database,value,prep,dow):
     exec_str = "select s.code "
@@ -64,19 +64,22 @@ def _columnheaderexecfunc(database,pred=None,predvalue=None):
         exec_str = exec_str + " where {0} = {1}".format(pred,predvalue)
     return(tbl_query(database,exec_str))
 
-def _pivotexecfunc(database,ycoltype,xcoltype,tblname,whereclause=None,result="count(*)"):
+def _pivotexecfunc(database,title,ycoltype,xcoltype,tblname,distinct=False,master=False,whereclause=None,result="count(*)"):
     
     headers = {}
     with database:
         for hdrtype in [ycoltype,xcoltype]:        
-            #_,headers[hdrtype],_ =  tbl_query(database,"select distinct({0}) from {1}".format(hdrtype,tblname))
-            _,headers[hdrtype],_ =  tbl_query(database,"select name from {0}".format(hdrtype))
+            if distinct==True:
+                _,headers[hdrtype],_ =  tbl_query(database,"select distinct({0}) from {1}".format(hdrtype,tblname))
+            else:
+                _,headers[hdrtype],_ =  tbl_query(database,"select name from {0}".format(hdrtype))
+                headers['dow'] = ['MO','TU','WE','TH','FR']
             headers[hdrtype] = [_hdrtype[0] for _hdrtype in headers[hdrtype]]
 
-    headers['dow'] = ['MO','TU','WE','TH','FR']
+    
 
     resulttable = []
-    resulttable.append([""] + headers[ycoltype])
+    resulttable.append([title] + headers[ycoltype])
     with database:
         for xaxishdr in headers[xcoltype]:
             row=[]
@@ -85,21 +88,29 @@ def _pivotexecfunc(database,ycoltype,xcoltype,tblname,whereclause=None,result="c
                 exec_str = "select {1} from {0} ".format(tblname,result)
                 #exec_str = "select subject,teacher from {0} ".format(tblname)
                 exec_str += "where {1} = {0} ".format("\""+str(yaxishdr)+"\"",ycoltype)
-                exec_str += " and {1} = {0} ".format("\""+str(xaxishdr)+"\"",xcoltype) 
+                exec_str += " and {1} = {0} ".format("\""+str(xaxishdr)+"\"",xcoltype)
+                if master == True:
+                    exec_str += " and status = \"master\" "
                 
                 if whereclause <> None:
                     for pred,op,predval in whereclause:
                         exec_str += " and {0} {1} {2} ".format(pred,op,"\""+str(predval)+"\"")
                 
                 _,results,_ = tbl_query(database,exec_str)
+                
                 try:
-                    row.append(",".join(results[0]))
+                    if len(results[0]) > 1:
+                        row.append(",".join(results[0]))
+                           
+                    else:
+                        row.append(results[0][0])
+                    
                     pass
                 except:
                     row.append(0)
             resulttable.append(row)
             
-    row=[""]      
+    row=[title]      
     with database:
         for yaxishdr in headers[ycoltype]:
             exec_str = "select count(*) from {0} ".format(tblname)
@@ -118,32 +129,24 @@ if __name__ == "__main__":
     
     from pprint import pprint
     
-    database = Database('test_ssloader_new')
+    database = Database('test_ssloader')
     
-    '''results = _pivotexecfunc(database,'period','dow','lesson',[['teacher','=','Stan'],['status','=','complete']],"distinct(student)")
+    with database:
+        _,students,_ = _distinct(database,"name","student")
+        #_,adults,_ = _distinct(database,"name","adult")
     
-    expected_results = [['','830-910','910-950','950-1030','1030-1110','1110-1210','1210-100','100-140','140-220','220-300','300-330'],
-                        ['MO','Clayton','Simon A',0,'Yosef',0,'Booker','Thomas','Ashley','Coby',0],
-                        ['TU','Nathaniel','Bruno',0,'Peter',0,'Jake','Orig','Oscar','Jack',0],
-                        ['WE','Clayton','Simon A',0,'Yosef',0,'Booker','Thomas','Ashley','Coby',0],
-                        ['TH','Nathaniel','Bruno',0,'Peter',0,'Jake','Orig','Oscar','Jack',0]]'''
-    
-    '''for i in range(len(results)-2):
-        if expected_results[i] == results[i]: 
-            print "True"
-        else:
-            print "False",results[i]'''
-            
+    for student in students:
+    #for adult in adults:
+        print
+        print
+        
+        results = _pivotexecfunc(database,student[0],'dow','period','lesson',[['student','=',student[0]]],"subject,teacher")
+        #results = _pivotexecfunc(database,adult[0],'dow','period','lesson',[['teacher','=',adult[0]]],"student")
 
-    results = _pivotexecfunc(database,'dow','period','lesson',[['student','=','Booker']],"subject,teacher")
-    
-    print results
-    
-    for i in range(len(results)-1):
-        print results[i]
-        '''if expected_results[i] == results[i]: 
-            print "True"
-        else:
-            print "False",results[i]'''
-    #pprint(results)
-    
+        for i in range(len(results)-1):
+            row=[]
+            for item in results[i]:
+                row.append(str(item))
+            print "^".join(row)
+            
+        

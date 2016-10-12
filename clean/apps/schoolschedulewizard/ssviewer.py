@@ -618,8 +618,11 @@ class WizardUI(Tk):
 if __name__ == "__main__":
     #master = Tk()
     
-    
+    if len(sys.argv) <= 1:
+        raise Exception("provide a database name; no extension")
+    else:
+        log.log(thisfuncname(),3,msg="using database",database=sys.argv[1])
     of = ObjFactory(True)
-    app = WizardUI('test_ssloader',of,'test_ssloader',maxentrycols=12,maxentryrows=20)
+    app = WizardUI(sys.argv[1],of,sys.argv[1],maxentrycols=12,maxentryrows=20)
     
     app.mainloop()

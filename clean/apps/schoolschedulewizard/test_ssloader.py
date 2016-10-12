@@ -769,7 +769,7 @@ class Test_RecordIdentifcation_realsample(Test_Base):
 
     def test_(self):
         
-        results = {'noteacher':0,'teacher':0,'date':0,'period':0,'SSLoaderNoRulesMatchException':0,
+        results = {'dow':0,'noteacher':0,'ignore':0,'teacher':0,'date':0,'period':0,'SSLoaderNoRulesMatchException':0,
                    'SSLoaderMultiRuleMatchException':0,'block':0,'eol':0,'blankrow':0,'_ENDCELL_':0,'_CRETURN_':0}
         
         for record in self.records:
@@ -778,12 +778,15 @@ class Test_RecordIdentifcation_realsample(Test_Base):
             except Exception, e:
                 results[e.__class__.__name__]+=1
                 continue
+            
+            if recordtype.startswith("dow"):
+                recordtype="dow"
             results[recordtype] += 1
 
 
         self.assertEquals(results['noteacher'],5)
-        self.assertEquals(results['teacher'],5)
-        self.assertEquals(results['SSLoaderNoRulesMatchException'],6)
+        self.assertEquals(results['teacher'],6)
+        self.assertEquals(results['SSLoaderNoRulesMatchException'],0)
         self.assertEquals(results['period'],1)
         
 class Test_RecordIdentifcation_realsample2(Test_Base):
@@ -794,7 +797,7 @@ class Test_RecordIdentifcation_realsample2(Test_Base):
 
     def test_(self):
         
-        results = {'noteacher':0,'teacher':0,'date':0,'period':0,'SSLoaderNoRulesMatchException':0,
+        results = {'dow':0,'noteacher':0,'teacher':0,'ignore':0,'date':0,'period':0,'SSLoaderNoRulesMatchException':0,
                    'SSLoaderMultiRuleMatchException':0,'block':0,'eol':0,'_ENDCELL_':0,'blankrow':0}
         
         for record in self.records:
@@ -803,8 +806,10 @@ class Test_RecordIdentifcation_realsample2(Test_Base):
             except Exception, e:
                 results[e.__class__.__name__]+=1
                 continue
+            
+            if recordtype.startswith("dow"):
+                recordtype="dow"
             results[recordtype] += 1
-        print results
            
         
 class Test_PreProcessRecords(Test_Base):
@@ -1112,17 +1117,17 @@ class Test_DBLoader_Prep5Computertime(Test_Base):
         
     def test_session(self):
         
-        expected_results = [['', 5, 9], [u'Monday', 1, 1], [u'Tuesday', 1, 1], [u'Wednesday', 1, 1], [u'Thursday', 1, 1], [u'Friday', 1, 0], ['', 5, 4]]
-        self.ssloader.ssloader([('prep5data_testcomputertime.csv',5)],self.databasename)
-        results =  _pivotexecfunc(self.ssloader.database,'period','dow','session')
+        expected_results = [['test', 5, 9], [u'Monday', 1, 1], [u'Tuesday', 1, 1], [u'Wednesday', 1, 1], [u'Thursday', 1, 1], [u'Friday', 1, 0], ['test', 5, 4]]
+        self.ssloader.ssloader([('prep5data_testcomputertime.csv',5,True)],self.databasename)
+        results =  _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
         self.assertListEqual(results,expected_results)
         
 
     def test_lesson(self):
         
-        expected_results = [['', u'Bruno', u'Clayton', u'Jack', u'Jake', u'Nathaniel', u'Orig', u'Oscar', u'Peter', u'Stephen'], [u'Computer Time', 9, 9, 9, 9, 9, 9, 9, 9, 9], ['', 9, 9, 9, 9, 9, 9, 9, 9, 9]]
-        self.ssloader.ssloader([('prep5data_testcomputertime.csv',5)],self.databasename)
-        results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson')
+        expected_results = [['test', u'Bruno', u'Clayton', u'Jack', u'Jake', u'Nathaniel', u'Orig', u'Oscar', u'Peter', u'Stephen'], [u'Computer Time', 9, 9, 9, 9, 9, 9, 9, 9, 9], ['test', 9, 9, 9, 9, 9, 9, 9, 9, 9]]
+        self.ssloader.ssloader([('prep5data_testcomputertime.csv',5,True)],self.databasename)
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
         
         self.assertListEqual(results,expected_results)
     
@@ -1140,7 +1145,7 @@ class Test_DBLoader_Prep5_1period(Test_Base):
         
     def test_lesson(self):
         
-        expected_results = [['', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
+        expected_results = [['test', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
                             [u'ELA', 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Math', 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
@@ -1154,26 +1159,27 @@ class Test_DBLoader_Prep5_1period(Test_Base):
                             [u'Music', 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0], 
                             [u'STEM', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], 
                             [u'Art', 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-                            ['', 5, 5, 5, 5, 5, 5, 5, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1]]
+                            ['test', 5, 5, 5, 5, 5, 5, 5, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1]]
 
-        self.ssloader.ssloader([('prep5data_test1period.csv',5)],self.databasename)        
-        results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson')
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
+
 
         self.assertListEqual(results,expected_results)
         
     def test_session(self):
         
-        expected_results = [['', 1], 
+        expected_results = [['test', 1], 
                             [u'Monday', 5], 
                             [u'Tuesday', 6], 
                             [u'Wednesday', 4], 
                             [u'Thursday', 6], 
                             [u'Friday', 4], 
-                            ['', 25]]
+                            ['test', 25]]
 
 
-        self.ssloader.ssloader([('prep5data_test1period.csv',5)],self.databasename)        
-        results = _pivotexecfunc(self.ssloader.database,'period','dow','session')
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
 
         self.assertListEqual(results,expected_results)
         
@@ -1191,7 +1197,7 @@ class Test_DBLoader_Prep5(Test_Base):
         
     def test_lesson(self):
         
-        expected_results = [['', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
+        expected_results = [['test', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
                             [u'ELA', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Math', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
@@ -1215,25 +1221,25 @@ class Test_DBLoader_Prep5(Test_Base):
                             [u'Computer Time', 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Reading', 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Independent Reading', 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            ['', 44, 45, 44, 43, 45, 47, 45, 46, 44, 4, 4, 4, 4, 4, 4, 4, 4]]
+                            ['test', 44, 45, 44, 43, 45, 47, 45, 46, 44, 4, 4, 4, 4, 4, 4, 4, 4]]
 
-        self.ssloader.ssloader([('prep5data.csv',5)],self.databasename)        
-        results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson')
+        self.ssloader.ssloader([('prep5data.csv',5,True)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
         
         self.assertListEqual(results,expected_results)
         
     def test_session(self):
         
-        expected_results = [['', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
+        expected_results = [['test', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
                             [u'Monday', 5, 5, 6, 6, 1, 4, 6, 5, 5, 1], 
                             [u'Tuesday', 6, 8, 5, 6, 1, 5, 7, 5, 5, 1],
                             [u'Wednesday', 4, 6, 5, 5, 1, 5, 7, 5, 5, 1], 
                             [u'Thursday', 6, 8, 5, 7, 1, 4, 6, 5, 5, 1],
                             [u'Friday', 4, 5, 4, 4, 1, 0, 0, 0, 0, 0], 
-                            ['', 25, 32, 25, 28, 5, 18, 26, 20, 20, 4]]
+                            ['test', 25, 32, 25, 28, 5, 18, 26, 20, 20, 4]]
 
-        self.ssloader.ssloader([('prep5data.csv',5)],self.databasename)        
-        results = _pivotexecfunc(self.ssloader.database,'period','dow','session')
+        self.ssloader.ssloader([('prep5data.csv',5,True)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
         self.assertListEqual(results,expected_results)
         
         
@@ -1252,31 +1258,31 @@ class Test_DBLoader_Staff_Issey(Test_Base):
         
     def test_lesson(self):
 
-        expected_result = [['', u'Nick', u'Peter', u'Jack', u'Jake', u'Orig', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Bruno', u'Nathaniel', u'Clayton', u'Mackenzie', u'Lucy', u'Oscar', u'Simon A'], 
+        expected_result = [['test', u'Nick', u'Peter', u'Jack', u'Jake', u'Orig', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Bruno', u'Nathaniel', u'Clayton', u'Mackenzie', u'Lucy', u'Oscar', u'Simon A'], 
                            [u'Work Period', 2, 3, 1, 4, 2, 4, 1, 3, 3, 3, 3, 4, 3, 2, 1, 2, 3, 1], 
                            [u'Student News', 0, 0, 0, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
                            [u'Activity Period', 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 2, 1, 1, 1, 0],
                            [u'Independent Reading', 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                            [u'Core', 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                           ['', 2, 4, 2, 5, 4, 6, 3, 4, 4, 4, 3, 5, 4, 4, 2, 3, 4, 1]]
+                           ['test', 2, 4, 2, 5, 4, 6, 3, 4, 4, 4, 3, 5, 4, 4, 2, 3, 4, 1]]
 
 
-        self.ssloader.ssloader([('staffdata_issey.csv',-1)],self.databasename)        
-        results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson')
+        self.ssloader.ssloader([('staffdata_issey.csv',-1,True)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
         self.assertListEqual(results,expected_result)
 
     def test_session(self):
 
-        expected_results = [['', 1, 2, 3, 4, 6, 7, 8, 9], 
+        expected_results = [['test', 1, 2, 3, 4, 6, 7, 8, 9], 
+                            [u'Monday', 1, 1, 1, 1, 1, 1, 1, 2], 
                             [u'Tuesday', 1, 1, 1, 1, 1, 1, 1, 1], 
                             [u'Wednesday', 1, 1, 1, 1, 1, 1, 1, 1], 
                             [u'Thursday', 1, 1, 1, 2, 1, 1, 1, 1],
-                            [u'Monday', 0, 1, 1, 1, 0, 1, 1, 2], 
-                            ['', 3, 4, 4, 5, 3, 4, 4, 5]]
+                            ['test', 4, 4, 4, 5, 4, 4, 4, 5]]
 
 
-        self.ssloader.ssloader([('staffdata_issey.csv',-1)],self.databasename)  
-        results = _pivotexecfunc(self.ssloader.database,'period','dow','session')
+        self.ssloader.ssloader([('staffdata_issey.csv',-1,True)],self.databasename)  
+        results = _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
         
         self.assertListEqual(results,expected_results)
         
@@ -1294,60 +1300,40 @@ class Test_DBLoader_Staff(Test_Base):
         
     def test_lesson(self):
         
-        expected_results = [['', u'OmerC', u'Ashley', u'Tristan', u'Yosef', u'Coby', u'Nathaniel', u'Clayton', u'Jake', u'Peter', u'Thomas', u'Simon A', u'Orig', u'Jack', u'Bruno', u'Nick', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Mackenzie', u'Lucy', u'Oscar', u'Booker', u'Tris', u'Prep 4', u'Donovan'], 
+        expected_results = [['test', u'OmerC', u'Ashley', u'Tristan', u'Yosef', u'Coby', u'Nathaniel', u'Clayton', u'Jake', u'Peter', u'Thomas', u'Simon A', u'Orig', u'Jack', u'Bruno', u'Nick', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Mackenzie', u'Lucy', u'Oscar', u'Booker', u'Tris', u'Prep 4', u'Donovan'], 
                             [u'ELA', 1, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Activity Period', 4, 5, 2, 7, 5, 3, 5, 5, 3, 5, 4, 1, 4, 3, 2, 3, 2, 3, 2, 1, 1, 1, 2, 4, 2, 0, 0, 1], 
                             [u'Student News', 1, 3, 1, 2, 3, 0, 3, 1, 3, 2, 0, 5, 1, 3, 3, 2, 0, 0, 2, 3, 2, 4, 4, 3, 1, 0, 0, 2], 
                             [u'Debate', 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Work Period', 7, 8, 4, 8, 9, 8, 5, 8, 7, 9, 7, 7, 5, 8, 7, 8, 8, 10, 7, 9, 9, 8, 8, 7, 6, 1, 0, 6], 
+                            [u'Work Period', 7, 8, 4, 8, 9, 9, 6, 8, 7, 9, 7, 7, 5, 8, 7, 8, 8, 10, 7, 9, 9, 8, 8, 7, 6, 1, 0, 6], 
                             [u'Independent Reading', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [u'Core', 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'History', 0, 0, 2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Chess', 0, 0, 0, 1, 2, 4, 1, 3, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Counseling', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0], 
-                            [u'Movement', 0, 1, 0, 0, 0, 0, 5, 1, 3, 1, 0, 2, 1, 3, 2, 3, 3, 3, 0, 0, 0, 0, 0, 3, 1, 0, 3, 1], 
+                            [u'Movement', 0, 1, 0, 0, 0, 0, 5, 1, 2, 1, 0, 3, 1, 3, 2, 3, 3, 3, 0, 0, 0, 0, 0, 3, 1, 0, 3, 1], 
                             [u'Psychology Reading', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [u'Psychology', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
                             [u'Independent Art', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], 
-                            ['', 13, 17, 10, 20, 21, 15, 21, 21, 17, 23, 14, 19, 11, 17, 14, 16, 15, 18, 11, 13, 12, 15, 14, 17, 11, 2, 3, 10]]
+                            ['test', 13, 17, 10, 20, 21, 16, 22, 21, 16, 23, 14, 20, 11, 17, 14, 16, 15, 18, 11, 13, 12, 15, 14, 17, 11, 2, 3, 10]]
 
 
-        self.ssloader.ssloader([('staffdata.csv',-1)],self.databasename)        
-        results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson')
+        self.ssloader.ssloader([('staffdata.csv',-1,True)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
         self.assertListEqual(results,expected_results)
 
     def test_session(self):
-        expected_results = [['', 1, 2, 3, 4, 6, 7, 8, 9], 
+        expected_results = [['test', 1, 2, 3, 4, 6, 7, 8, 9], 
                             [u'Thursday', 8, 8, 9, 9, 6, 9, 8, 9], 
-                            [u'Monday', 5, 8, 8, 8, 8, 8, 7, 8], 
+                            [u'Monday', 6, 8, 8, 8, 8, 8, 8, 8], 
                             [u'Tuesday', 7, 8, 10, 9, 9, 8, 9, 9], 
                             [u'Wednesday', 7, 8, 9, 8, 9, 8, 8, 9], 
-                            ['', 27, 32, 36, 34, 32, 33, 32, 35]]
+                            ['test', 28, 32, 36, 34, 32, 33, 33, 35]]
 
-        self.ssloader.ssloader([('staffdata.csv',-1)],self.databasename)
-        results = _pivotexecfunc(self.ssloader.database,'period','dow','session')
+        self.ssloader.ssloader([('staffdata.csv',-1,True)],self.databasename)
+        results = _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
 
         self.assertListEqual(results,expected_results)
-        
-            
-class Test_DBLoader_Staff_with_Prep5(Test_Base):
-    def setUp(self):
-        self.databasename = "test_ssloader"
-        self.database = Database(self.databasename)
-        try:
-            with self.database:
-                tbl_remove(self.database,'lesson')
-                tbl_remove(self.database,'session')
-        except:
-            pass
-
-    def test_(self):
-
-        self.ssloader = SSLoader("test_ssloader")      
-        self.ssloader.ssloader([('staffdata.csv',-1)],self.databasename)
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data.csv',5)],self.databasename) 
-
         
 
 class Test_DBLoader_Staff_with_Prep5_Period1(Test_Base):
@@ -1364,11 +1350,11 @@ class Test_DBLoader_Staff_with_Prep5_Period1(Test_Base):
     def test_lesson(self):
 
         self.ssloader = SSLoader("test_ssloader")        
-        self.ssloader.ssloader([('staffdata_1period_Issey.csv',-1)],self.databasename)
+        self.ssloader.ssloader([('staffdata_1period_Issey.csv',-1,True)],self.databasename)
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data_test1period.csv',5)],self.databasename) 
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename) 
     
-        results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson')
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
     
         cols = ['status','dow','period','session','teacher']
         
@@ -1397,7 +1383,7 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
             pass
     
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data_test1period.csv',5)],self.databasename)  
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)  
         
         self.ssloader = SSLoader("test_ssloader")
         self.ssloader.inputfile = "test_academic_1period_3teachers.csv"
@@ -1468,7 +1454,7 @@ class Test_DBLoader_Academic(unittest.TestCase):
             pass
     
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data.csv',5)],self.databasename)  
+        self.ssloader.ssloader([('prep5data.csv',5,True)],self.databasename)  
         
         self.ssloader = SSLoader("test_ssloader")
         self.ssloader.inputfile = "academic.csv"
@@ -1535,87 +1521,27 @@ class Test_DBLoader_Academic(unittest.TestCase):
         
 class Test_DBLoader_All(unittest.TestCase):
     def setUp(self):  
-
-        '''self.databasename = "test_ssloader"
+        
+        self.databasename = "test_ssloader"
+        self.ssloader = SSLoader("test_ssloader")
         self.database = Database(self.databasename)
         try:
             with self.database:
                 tbl_remove(self.database,'lesson')
                 tbl_remove(self.database,'session')
         except:
-            pass'''
+            pass
     
-        self.ssloader = SSLoader("test_ssloader")
-        '''self.ssloader.ssloader([('prep5data.csv',5)],self.databasename)
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep4data.csv',4)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep6data.csv',6)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('staffdata.csv',-1)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.inputfile = "academic.csv"
-        fileasstring = self.ssloader.file2string("academic.csv")
 
-        records = self.ssloader.string2records(fileasstring)
-
-        self.clean_records,_,_ = self.ssloader.pre_process_records(records)
-        
-        self.validated_clean_records = []
-        for clean_record in self.clean_records:
-            self.validated_clean_records.append(self.ssloader.validate_tokens(clean_record))
-      
-        self.ssloader.dbupdater(self.validated_clean_records)'''
-        pass
-        
-    def _getprimarykeyhash(self,pred=None,predval=None):
-        
-        cols = ['dow','period','student']
-        hashmap = self.ssloader.primary_record_set()
-        results = []      
-        for hashkey in hashmap:
-            
-            hashmap[hashkey].pop('source')
-
-            d = dict(zip(cols,hashkey.split(".")))
-
-            #if d[pred] == predval:
-                #hashmap[hashkey].pop('student')
-            results.append(hashmap[hashkey].values())
-           
-        results.sort()
-          
-        return results  
+        files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
+                 ('academic.csv',-1,False)]
+    
+        ssloader = SSLoader(self.databasename)
+        ssloader.run(self.databasename,files,insertprimary=False)
     
     def test_(self):
+
         pass
-    
-        self.databasename = "test_ssloader_new"
-        self.database = Database(self.databasename)
-        
-        #cols = ['status','teachers','subject','period','dow','student']
-        cols = ['status','teachers','student','subject','period','dow']
-        rows = self._getprimarykeyhash()
-        #rows = self.ssloader.primary_record_set()
-        
-        #for row in rows:
-        #    print row
-        
-        newrows = []
-        for row in rows:
-            
-            d = dict(zip(cols,row))
-
-
-            newrows.append([d['period'],d['dow'],d['subject'][0],d['teachers'][0],d['student'],'1-on-1'])
-        
-        dbinsert_direct(self.database,newrows,'session','test')
-        dbinsert_direct(self.database,newrows,'lesson','test')
-
 
 class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
     def setUp(self):  
@@ -1630,7 +1556,7 @@ class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
             pass
     
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data_test1period.csv',5)],self.databasename)  
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)  
         
         self.ssloader = SSLoader("test_ssloader")
         self.ssloader.inputfile = "test_academic_1period_3teachers.csv"
@@ -1668,11 +1594,11 @@ class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
         
     def test_Nathaniel(self):
 
-        expected_results = [['primary.','Amelia','ELA','830-910','MO'],
-                            ['primary.','Stan','Math','830-910','TU'],
-                            ['primary.','Amelia','ELA','830-910','WE'],
-                            ['primary.','Stan','Math','830-910','TH'],
-                            ['primary.','A','Humanities','830-910','FR']]
+        expected_results = [['primary',['Amelia'],['ELA'],'830-910','MO'],
+                            ['primary',['Stan'],['Math'],'830-910','TU'],
+                            ['primary',['Amelia'],['ELA'],'830-910','WE'],
+                            ['primary',['Stan'],['Math'],'830-910','TH'],
+                            ['primary',['A'],['Humanities'],'830-910','FR']]
 
         expected_results.sort()
         
@@ -1680,23 +1606,23 @@ class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
         
     def test_Friday(self):
         
-        expected_results =[['primary.','A','Humanities','830-910','FR'],
-                           ['primary.','B','Art','830-910','FR'],
-                           ['primary.','A','Humanities','830-910','FR'],
-                           ['primary.','A','Humanities','830-910','FR'],
-                           ['primary.','B','Art','830-910','FR'],
-                           ['primary.','B','Art','830-910','FR'],
-                           ['primary.','B','Art','830-910','FR'],
-                           ['primary.','A','Humanities','830-910','FR'],
-                           ['primary.','B','Art','830-910','FR'],
-                           ['primary.','D','Music','830-910','FR'],
-                           ['primary.','D','Music','830-910','FR'],
-                           ['primary.','D','Music','830-910','FR'],
-                           ['primary.','C','STEM','830-910','FR'],
-                           ['primary.','C','STEM','830-910','FR'],
-                           ['primary.','C','STEM','830-910','FR'],
-                           ['primary.','C','STEM','830-910','FR'],
-                           ['primary.','C','STEM','830-910','FR']]
+        expected_results =[['primary',['A'],['Humanities'],'830-910','FR'],
+                           ['primary',['B'],['Art'],'830-910','FR'],
+                           ['primary',['A'],['Humanities'],'830-910','FR'],
+                           ['primary',['A'],['Humanities'],'830-910','FR'],
+                           ['primary',['B'],['Art'],'830-910','FR'],
+                           ['primary',['B'],['Art'],'830-910','FR'],
+                           ['primary',['B'],['Art'],'830-910','FR'],
+                           ['primary',['A'],['Humanities'],'830-910','FR'],
+                           ['primary',['B'],['Art'],'830-910','FR'],
+                           ['primary',['D'],['Music'],'830-910','FR'],
+                           ['primary',['D'],['Music'],'830-910','FR'],
+                           ['primary',['D'],['Music'],'830-910','FR'],
+                           ['primary',['C'],['STEM'],'830-910','FR'],
+                           ['primary',['C'],['STEM'],'830-910','FR'],
+                           ['primary',['C'],['STEM'],'830-910','FR'],
+                           ['primary',['C'],['STEM'],'830-910','FR'],
+                           ['primary',['C'],['STEM'],'830-910','FR']]
         
         expected_results.sort()
         
@@ -1704,15 +1630,18 @@ class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
     
     def test_FOrig(self):
          
-        expected_results =[['primary.','Paraic','Engineering','830-910','MO'],
-                           ['unset','??','Student News','830-910','TU'],
-                           ['primary.','Paraic','Engineering','830-910','WE'],
-                           ['unset','??','Student News','830-910','TH'],
-                           ['primary.','A','Humanities','830-910','FR']]
+        expected_results =[['primary',['Paraic'],['Engineering'],'830-910','MO'],
+                           ['unset',['??'],['Student News'],'830-910','TU'],
+                           ['primary',['Paraic'],['Engineering'],'830-910','WE'],
+                           ['unset',['??'],['Student News'],'830-910','TH'],
+                           ['primary',['A'],['Humanities'],'830-910','FR']]
         
         expected_results.sort()
         
         self.assertListEqual(self._getprimarykeyhash('student','Orig'),expected_results)
+        
+    def tearDown(self):
+        copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
 
     
 class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
@@ -1728,10 +1657,10 @@ class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
             pass
     
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data_test1period.csv',5)],self.databasename)  
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)  
         
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('staffdata_830910.csv',-1)],self.databasename)  
+        self.ssloader.ssloader([('staffdata_830910.csv',-1,True)],self.databasename)  
      
         self.ssloader = SSLoader("test_ssloader")
         self.ssloader.inputfile = "test_academic_1period_3teachers.csv"
@@ -1772,8 +1701,8 @@ class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
         expected_results = [['primary', [u'A'], [u'Humanities'], u'830-910', u'FR'],
                             ['primary', [u'Issey'], [u'Student News'], u'830-910', u'TH'],
                             ['primary', [u'Johnny'], [u'Student News'], u'830-910', u'TU'],
-                            ['primary', [u'Paraic'], [u'Engineering'], u'830-910', u'WE'],
-                            ['primary', [u'Paraic', u'Issey'], [u'Engineering'], u'830-910', u'MO']]
+                            ['primary', [u'Paraic'], [u'Engineering'], u'830-910', u'MO'],
+                            ['primary', [u'Paraic'], [u'Engineering'], u'830-910', u'WE']]
 
 
         
@@ -1784,7 +1713,7 @@ class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
 
     def test_Bruno(self):        
 
-        expected_results = [['primary', [u'Rahul',u'Dylan'], [u'Movement'], u'830-910', u'MO'],
+        expected_results = [['unset', [u'??'], [u'Movement'], u'830-910', u'MO'],
                             ['primary', [u'Johnny'], [u'Student News'], u'830-910', u'TU'],
                             ['unset', ['??'], [u'Core'], u'830-910', u'TH'],
                             ['primary', [u'B'], [u'Art'], u'830-910', u'FR']]
@@ -1793,12 +1722,15 @@ class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
         
         self.assertListEqual(self._getprimarykeyhash('student','Bruno'),expected_results)
         
+    def tearDown(self):
+        copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
+        
 class Test_DBLoader_Primary_Record_Set_Nathaniel(unittest.TestCase):
     def setUp(self):  
 
-        self.databasename = "test_ssloader"
+        self.databasename = "test_ssloader_prset_nathaniel"
         self.database = Database(self.databasename)
-        self.ssloader = SSLoader("test_ssloader")
+        self.ssloader = SSLoader("test_ssloader_prset_nathaniel")
     
     def _getprimarykeyhash(self,pred,predval):
         
@@ -1876,6 +1808,8 @@ class Test_DBLoader_Primary_Record_Set_Nathaniel(unittest.TestCase):
         
         self.assertListEqual(expected_results,results)
 
+
+
 class Test_DBInsert_Direct(unittest.TestCase):
     def setUp(self):  
 
@@ -1907,7 +1841,7 @@ class Test_DBInsert_Direct(unittest.TestCase):
         dbinsert_direct(self.database,records,'session','test')
         
         with self.database:
-            _,rows,_ = tbl_rows_get(self.database,'session',['code','dow','period','adult','subject'])
+            _,rows,_ = tbl_rows_get(self.database,'session',['code','dow','period','teacher','subject'])
         
         rows.sort()
          
@@ -1915,12 +1849,12 @@ class Test_DBInsert_Direct(unittest.TestCase):
         
     def test_lesson(self):
         
-        records = [['100-140', 'Tuesday', 'STEM', 'Thea', u'Simon A','1-on-1'], 
-                  ['1210-100', 'Wednesday', 'Humanities', 'Jess', 'Liam','1-on-1']]
+        records = [['100-140', 'TU', 'STEM', 'Thea', u'Simon A','1-on-1'], 
+                  ['1210-100', 'WE', 'Humanities', 'Jess', 'Liam','1-on-1']]
             
         
-        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.TU'], 
-                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.WE']]
+        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday'], 
+                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday']]
         
 
         expected_results.sort()
@@ -1941,98 +1875,36 @@ class Test_DBInsert_Direct(unittest.TestCase):
 class Test_DBInsert_Direct_Nathaniel(unittest.TestCase):
     def setUp(self):  
 
-        self.databasename = "test_ssloader"
+        #self.databasename = "test_ssloader"
+        self.databasename = "test_ssloader_insertdirect_nathaniel"
         self.database = Database(self.databasename)
-        '''try:
-            with self.database:
-                tbl_remove(self.database,'lesson')
-                tbl_remove(self.database,'session')
-        except:
-            pass'''
+        
+        #files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
+        #         ('academic.csv',-1,False)]
     
-        self.ssloader = SSLoader("test_ssloader")
-        '''self.ssloader.ssloader([('prep5data.csv',5)],self.databasename)
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep4data.csv',4)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep6data.csv',6)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('staffdata.csv',-1)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.inputfile = "academic.csv"
-        fileasstring = self.ssloader.file2string("academic.csv")
+        #ssloader = SSLoader(self.databasename)
+        #ssloader.run(self.databasename,files)
 
-        records = self.ssloader.string2records(fileasstring)
-
-        self.clean_records,_,_ = self.ssloader.pre_process_records(records)
-        
-        self.validated_clean_records = []
-        for clean_record in self.clean_records:
-            self.validated_clean_records.append(self.ssloader.validate_tokens(clean_record))'''
-            
-            
-    def _getprimarykeyhash(self,pred,predval):
-        
-        cols = ['dow','period','student']
-        hashmap = self.ssloader.primary_record_set()
-        results = []      
-        for hashkey in hashmap:
-            
-            hashmap[hashkey].pop('source')
-
-            d = dict(zip(cols,hashkey.split(".")))
-
-            if d[pred] == predval:
-                #hashmap[hashkey].pop('student')
-                results.append(hashmap[hashkey].values())
-           
-        results.sort()
-        
-        return results
-          
                    
     def test_(self):
 
-        expected_results = [["","MO","TU","WE","TH","FR"],                                                                                                                                                                                                                
+        expected_results = [["Nathaniel","MO","TU","WE","TH","FR"],                                                                                                                                                                                                                
                             ["830-910","ELA,Amelia","Math,Stan","ELA,Amelia","Math,Stan","Humanities,A"],                                                                                                                                                                                                     
                             ["910-950","Core,??","Work Period,Dylan","Work Period,Moira","Core,??","Music,??"],                                                                                                                                                                                               
                             ["950-1030","Work Period,Karolina","Activity Period,Aaron","OT,??","Work Period,Issey","STEM,??"],                                                                                                                                                                                
                             ["1030-1110","Activity Period,Dylan","Chess,Rahul","Activity Period,Issey","Chess,Rahul","Art,??"],                                                                                                                                                                               
                             ["1110-1210","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??"],                                                                                                                                                                     
-                            ["1210-100","Science,Paraic","History,??","Science,Paraic","History,??",0],                                                                                                                                                                                         
+                            ["1210-100","Science,Paraic","History,Samantha","Science,Paraic","History,Samantha",0],                                                                                                                                                                                         
                             ["100-140","Chess,Rahul","Work Period,Karolina","Chess,Rahul","Work Period,Aaron",0],                                                                                                                                                                                            
                             ["140-220","Work Period,Johnny","Movement,??","Work Period,Issey","Movement,??",0],                                                                                                                                                                                            
                             ["220-300","Speech,??","Student News,??","Counseling,Alexa","Student News,??",0],                                                                                                                                                                                           
-                            ["300-330","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??",0],
-                            ["",10,10,10,10,5]]
-
-        self.databasename = "test_ssloader_new"
-        self.database = Database(self.databasename)
+                            ["300-330","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??",0]]
         
-        cols = ['status','student','teachers','subject','period','dow']
-        rows = self._getprimarykeyhash('student','Nathaniel')
+        results = _pivotexecfunc(self.database,'Nathaniel','dow','period','lesson',False,True,[['student','=','Nathaniel']],"subject,teacher")
         
-        print rows
-        newrows = []
-        for row in rows:
-            
-            d = dict(zip(cols,row))
-            
-            newrows.append([d['period'],d['dow'],d['subject'][0],d['teachers'][0],'Nathaniel','1-on-1'])
-        
-        dbinsert_direct(self.database,newrows,'session','test')
-        dbinsert_direct(self.database,newrows,'lesson','test')
-        
-        results = _pivotexecfunc(self.database,'dow','period','lesson',[['student','=','Nathaniel']],"subject,teacher")
-        
-        self.assertListEqual(expected_results, results)
+        self.assertListEqual(expected_results, results[:-1])
         
     def tearDown(self):
-        #copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
         pass
             
 if __name__ == "__main__":
@@ -2042,7 +1914,7 @@ if __name__ == "__main__":
     # unit tests=
     
     # loadrefobjects
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
     
     # loadsynonyms
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadSynonyms))
@@ -2103,40 +1975,37 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsFriday))
     
     # dbloader
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
 
-
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct))
+    
+    # dbinsert_direct
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct))
+    
+    # db primary record set
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_All))
+    
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
     
     
     # ######################################################################################################
     # functional tests
     
     # 1 period of 1 prep
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_Issey))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic_Stan))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_Issey))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic_Stan))
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff))
-    
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_withs))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_All))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Primary_Record_Set))
-    
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
+
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
     
