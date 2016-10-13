@@ -18,6 +18,10 @@ def _colorexecfunc(database,value):
     exec_str = "select rgb from {0} ".format(value)
     return(tbl_query(database,exec_str))
 
+def _rowcount(database,table):
+    exec_str = "select count(*) from {0} ".format(table)
+    return(tbl_query(database,exec_str))
+
 def _sessionenum(database,code,period,prep):
     exec_str = "select enum from session where code = {0} ".format(code)
     exec_str += " and period = {0} ".format(period)
@@ -54,6 +58,16 @@ def _execfunc(database,value,prep,dow):
     
     return(tbl_query(database,exec_str))
 
+def _findsessions(database,period,dow,teacher):
+    
+    exec_str = "select __id,teacher,code,subject,enum "
+    exec_str += " from session"
+    exec_str += " where period = {0}".format("\"" + str(period) + "\"")
+    exec_str += " and dow = {0}".format("\"" + dow + "\"")                 
+    exec_str += " and teacher = {0}".format("\"" + teacher + "\"")
+    
+    return(tbl_query(database,exec_str))
+    
 def _rowheaderexecfunc(database):
     exec_str = "select name from period"
     return(tbl_query(database,exec_str))

@@ -16,9 +16,9 @@ from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
 from sswizard_query_utils import *
 
 from database_util import Database
-from database_table_util import tbl_rows_get, tbl_query
+from database_table_util import tbl_rows_get, tbl_query, tbl_remove
 
-from sswizard_utils import dropdown_build, setenums, session_code_gen, dbinsert
+from sswizard_utils import dropdown_build, setenums, session_code_gen, dbinsert, dbinsert_direct
             
 '''def _execfunc(database,value,prep):
     
@@ -264,17 +264,144 @@ class Test_DBLoader(unittest.TestCase):
     def tearDown(self):
         copyfile("test_sswizard_utils.sqlite.backup","test_sswizard_utils.sqlite")
 
+class Test_DBInsert_Direct(unittest.TestCase):
+    def setUp(self):  
+
+        #Test_Base.setUp(self)
         
-    
+        self.databasename = "test_ssloader"
+
+        self.database = Database(self.databasename)
+        
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+        
+
+    def test_session(self):
+        
+        records = [['100-140', 'Tuesday', 'STEM', 'Thea', u'Simon A','1-on-1'], 
+                  ['1210-100', 'Wednesday', 'Humanities', 'Jess', 'Liam','1-on-1']]
+            
+        
+        expected_results =  [['Thea.STEM.Tuesday', 'Tuesday',7,'Thea', 'STEM'], 
+                             ['Jess.Humanities.Wednesday', 'Wednesday',6, 'Jess','Humanities']]
+            
+        expected_results.sort()
+        
+        dbinsert_direct(self.database,records,'session','test')
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'session',['code','dow','period','teacher','subject'])
+        
+        rows.sort()
+         
+        #print expected_results,rows
+        
+        self.assertListEqual(expected_results,rows)
+        
+    def test_lesson(self):
+        
+        records = [['100-140', 'TU', 'STEM', 'Thea', u'Simon A','1-on-1'], 
+                  ['1210-100', 'WE', 'Humanities', 'Jess', 'Liam','1-on-1']]
+            
+        
+        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday'], 
+                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday']]
+        
+
+        expected_results.sort()
+        
+        dbinsert_direct(self.database,records,'lesson','test')
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',['student','dow','period','teacher','subject','session'])
+        
+        rows.sort()
+        
+        self.assertListEqual(expected_results,rows)
+        
+    def tearDown(self):
+        copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
+        
+class Test_DBInsert_Direct_Convert_Input_Types(unittest.TestCase):
+    # pass in dow code's instead of names and period enums not names
+    def setUp(self):  
+
+        #Test_Base.setUp(self)
+        
+        self.databasename = "test_ssloader"
+
+        self.database = Database(self.databasename)
+        
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+        
+
+    def test_session(self):
+        
+        records = [[7, 'TU', 'STEM', 'Thea', u'Simon A','1-on-1'], 
+                  [6, 'WE', 'Humanities', 'Jess', 'Liam','1-on-1']]
+            
+        
+        expected_results =  [['Thea.STEM.Tuesday', 'Tuesday',7,'Thea', 'STEM'], 
+                             ['Jess.Humanities.Wednesday', 'Wednesday',6, 'Jess','Humanities']]
+            
+        expected_results.sort()
+        
+        dbinsert_direct(self.database,records,'session','test')
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'session',['code','dow','period','teacher','subject'])
+        
+        rows.sort()
+         
+        #print expected_results,rows
+        
+        self.assertListEqual(expected_results,rows)
+        
+    def test_lesson(self):
+        
+        records = [[7, 'Tuesday', 'STEM', 'Thea', u'Simon A','1-on-1'], 
+                  [6, 'Wednesday', 'Humanities', 'Jess', 'Liam','1-on-1']]
+            
+        
+        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday'], 
+                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday']]
+        
+
+        expected_results.sort()
+        
+        dbinsert_direct(self.database,records,'lesson','test')
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',['student','dow','period','teacher','subject','session'])
+        
+        rows.sort()
+        
+        self.assertListEqual(expected_results,rows)
+        
+    def tearDown(self):
+        copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dropdown))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetEnums))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
     
-    
+    # dbinsert_direct
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Convert_Input_Types))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
 

@@ -5,8 +5,8 @@ from os import path as ospath
 from ssloader import SSLoader, SSLoaderRuleException, SSLoaderRecordEndException, SSLoaderNoMatchException
 
 from database_table_util import tbl_rows_get, tbl_query
-from database_util import Database, tbl_remove
-from sswizard_query_utils import _pivotexecfunc
+from database_util import Database, tbl_remove, tbl_exists
+from sswizard_query_utils import _pivotexecfunc, _rowcount
 from sswizard_utils import dbbulkloader, _isenum, dbinsert_direct
 
 
@@ -482,11 +482,11 @@ class Test_ValidateTokens_Multi(Test_Base):
         self.ssloader.inputfile = "test"
         self.valid_students = self.ssloader.loadrefobjects('quadref','student')
         
-        self.record = ['830-910','Monday','WP','Amelia',['Nathaniel']]
+        self.record = ['830-910','Monday','WP','Amelia',['Nathaniel'],'teacher']
         
     def test_(self):
         new_record = self.ssloader.validate_tokens(self.record)
-        expected_results = ['830-910','Monday','Work Period','Amelia',['Nathaniel']]
+        expected_results = ['830-910','Monday','Work Period','Amelia',['Nathaniel'],'teacher']
         self.assertListEqual(new_record,expected_results)
         
         
@@ -828,8 +828,8 @@ class Test_PreProcessRecordsWith(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','ELA','Amelia',[]],
-                          ['830-910','Tuesday','Engineering','Paraic',[]]]
+        expected_results = [['830-910','Monday','ELA','Amelia',[],'staffwith'],
+                          ['830-910','Tuesday','Engineering','Paraic',[],'staffwith']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -844,9 +844,9 @@ class Test_PreProcessRecords(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel']],
-                          ['830-910','Tuesday','Math','Stan',['CLayton']],
-                          ['830-910','Wednesday','Engineering','Paraic',['Orig','Stephen','Oscar']]]
+        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel'],'teacher'],
+                          ['830-910','Tuesday','Math','Stan',['CLayton'],'teacher'],
+                          ['830-910','Wednesday','Engineering','Paraic',['Orig','Stephen','Oscar'],'teacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -857,9 +857,9 @@ class Test_PreProcessRecords(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel']],
-                          ['830-910','Tuesday','Math','Stan',['CLayton']],
-                          ['830-910','Wednesday','Engineering','Paraic',['Orig','Stephen','Oscar']]]
+        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel'],'teacher'],
+                          ['830-910','Tuesday','Math','Stan',['CLayton'],'teacher'],
+                          ['830-910','Wednesday','Engineering','Paraic',['Orig','Stephen','Oscar'],'teacher']]
         
         #@self.assertListEqual(clean_records,expected_results)
         
@@ -869,8 +869,8 @@ class Test_PreProcessRecords(Test_Base):
     
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel']],
-                            ['830-910','Tuesday','Math','Stan',['CLayton']]]
+        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel'],'teacher'],
+                            ['830-910','Tuesday','Math','Stan',['CLayton'],'teacher']]
 
             
         self.assertListEqual(clean_records,expected_results)
@@ -886,8 +886,8 @@ class Test_PreProcessRecordsStaff(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie']],
-                          ['830-910','Thursday','Work PEriod','Moira',['Nick']]]
+        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'noteacher'],
+                          ['830-910','Thursday','Work PEriod','Moira',['Nick'],'noteacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -900,10 +900,10 @@ class Test_PreProcessRecordsStaff(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie']],
-                          ['830-910','Thursday','Work PEriod','Moira',['Nick']],
-                          ['830-910','Tuesday','Work Period','John',['MacKenzie']],
-                           ['830-910','Thursday','Work PEriod','John',['Nick']]]
+        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'noteacher'],
+                          ['830-910','Thursday','Work PEriod','Moira',['Nick'],'noteacher'],
+                          ['830-910','Tuesday','Work Period','John',['MacKenzie'],'noteacher'],
+                           ['830-910','Thursday','Work PEriod','John',['Nick'],'noteacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -919,8 +919,8 @@ class Test_PreProcessRecordsNewPeriod(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel']],
-                          ['910-950','Monday','Math','Stan',['CLayton']]]
+        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel'],'teacher'],
+                          ['910-950','Monday','Math','Stan',['CLayton'],'teacher']]
 
         self.assertListEqual(clean_records,expected_results)
         
@@ -933,8 +933,8 @@ class Test_PreProcessRecordsNewPeriod(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel']],
-                          ['910-950','Monday','Math','Stan',['CLayton']]]
+        expected_results = [['830-910','Monday','ELA','Amelia',['Nathaniel'],'teacher'],
+                          ['910-950','Monday','Math','Stan',['CLayton'],'teacher']]
 
         self.assertListEqual(clean_records,expected_results)
         
@@ -997,15 +997,15 @@ class Test_PreProcessRecordsComputerTime(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['1110-1210','Monday','Computer Time','??',self.students],
-                            ['1110-1210','Tuesday','Computer Time','??',self.students],
-                            ['1110-1210','Wednesday','Computer Time','??',self.students],
-                            ['1110-1210','Thursday','Computer Time','??',self.students],
-                            ['1110-1210','Friday','Computer Time','??',self.students],
-                            ['230-300','Monday','Computer Time','??',self.students],
-                            ['230-300','Tuesday','Computer Time','??',self.students],
-                            ['230-300','Wednesday','Computer Time','??',self.students],
-                            ['230-300','Thursday','Computer Time','??',self.students]]    
+        expected_results = [['1110-1210','Monday','Computer Time','??',self.students,'computertime'],
+                            ['1110-1210','Tuesday','Computer Time','??',self.students,'computertime'],
+                            ['1110-1210','Wednesday','Computer Time','??',self.students,'computertime'],
+                            ['1110-1210','Thursday','Computer Time','??',self.students,'computertime'],
+                            ['1110-1210','Friday','Computer Time','??',self.students,'computertime'],
+                            ['230-300','Monday','Computer Time','??',self.students,'computertime'],
+                            ['230-300','Tuesday','Computer Time','??',self.students,'computertime'],
+                            ['230-300','Wednesday','Computer Time','??',self.students,'computertime'],
+                            ['230-300','Thursday','Computer Time','??',self.students,'computertime']]    
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1030,10 +1030,10 @@ class Test_PreProcessRecordsFriday(Test_Base):
         
         friday_clean_records = [ record for record in clean_records if record[1] == "Friday"]
                 
-        expected_results = [['830-910','Friday','Humanities','A',['Orig', 'Jake', 'Nathaniel', 'Stephen']],
-                            ['830-910','Friday','Music','D',['Coby', 'THomas', 'Yosef']],
-                            ['830-910','Friday','STEM','C',['Tris', 'Ashley', 'Simon', 'Booker', 'Omer']],
-                            ['830-910','Friday','ART','B', ['Clayton', 'Bruno', 'Oscar', 'Peter', 'Jack']]]
+        expected_results = [['830-910','Friday','Humanities','A',['Orig', 'Jake', 'Nathaniel', 'Stephen'],'teacher'],
+                            ['830-910','Friday','Music','D',['Coby', 'THomas', 'Yosef'],'teacher'],
+                            ['830-910','Friday','STEM','C',['Tris', 'Ashley', 'Simon', 'Booker', 'Omer'],'teacher'],
+                            ['830-910','Friday','ART','B', ['Clayton', 'Bruno', 'Oscar', 'Peter', 'Jack'],'teacher']]
         
         self.assertListEqual(friday_clean_records,expected_results)
 
@@ -1047,9 +1047,9 @@ class Test_ValidateTokens(Test_Base):
         
     def test_(self):
         
-        record = ['830-910','monday','ELA','amelia',['Nathoniel']]
+        record = ['830-910','monday','ELA','amelia',['Nathoniel'],'teacher']
         
-        expected_results = ['830-910','Monday','ELA','Amelia',['Nathaniel']]
+        expected_results = ['830-910','Monday','ELA','Amelia',['Nathaniel'],'teacher']
         results =  self.ssloader.validate_tokens(record)
         
         self.assertListEqual(results,expected_results)
@@ -1087,8 +1087,8 @@ class Test_DBLoader(Test_Base):
         
     def test_session(self):
         
-        records = [['100-140', 'Tuesday', 'STEM', 'Thea', [u'Simon A']], 
-                  ['1210-100', 'Wednesday', 'Humanities', 'Jess', ['Liam']]]
+        records = [['100-140', 'Tuesday', 'STEM', 'Thea', [u'Simon A'],'academic'], 
+                  ['1210-100', 'Wednesday', 'Humanities', 'Jess', ['Liam'],'academic']]
             
         
         expected_results =  [['Thea.STEM.Tuesday', 'Tuesday',7,'Thea', 'STEM'], 
@@ -1105,8 +1105,8 @@ class Test_DBLoader(Test_Base):
         
     def test_lesson(self):
         
-        records = [['100-140', 'Tuesday', 'STEM', 'Thea', [u'Simon A']], 
-                  ['1210-100', 'Wednesday', 'Humanities', 'Jess', ['Liam']]]
+        records = [['100-140', 'Tuesday', 'STEM', 'Thea', [u'Simon A'],'academic'], 
+                  ['1210-100', 'Wednesday', 'Humanities', 'Jess', ['Liam'],'academic']]
             
         
         expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday'], 
@@ -1164,6 +1164,26 @@ class Test_DBLoader_Prep5_1period(Test_Base):
         except:
             pass
         
+    def test_lesson_num_rows(self):
+        
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename) 
+        
+        with self.database:
+            _,result,_ = _rowcount(self.database,'lesson')
+            
+        self.assertEqual(result[0][0],52)
+        
+        
+    def test_session_num_rows(self):
+        
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename) 
+        
+        with self.database:
+            _,result,_ = _rowcount(self.database,'session')
+            
+        self.assertEqual(result[0][0],25)
+            
+            
     def test_lesson(self):
         
         expected_results = [['test', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
@@ -1184,7 +1204,6 @@ class Test_DBLoader_Prep5_1period(Test_Base):
 
         self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
-
 
         self.assertListEqual(results,expected_results)
         
@@ -1392,6 +1411,9 @@ class Test_DBLoader_Staff_with_Prep5_Period1(Test_Base):
         self.assertListEqual(rows,expected_results)
 
 class Test_DBLoader_Academic_Stan(unittest.TestCase):
+    
+    # 2 sessions are not implied by the academic and need to be added
+    
     def setUp(self):  
 
         self.databasename = "test_ssloader"
@@ -1404,64 +1426,74 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
             pass
     
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.inputfile = "test_academic_1period_3teachers.csv"
-        fileasstring = self.ssloader.file2string("test_academic_1period_3teachers.csv")
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)])  
+        self.ssloader.ssloader([('test_academic_1period_3teachers.csv',-1,False)])   
 
-        records = self.ssloader.string2records(fileasstring)
-
-        self.clean_records,_,_ = self.ssloader.pre_process_records(records)
-        
-        self.validated_clean_records = []
-        for clean_record in self.clean_records:
-            self.validated_clean_records.append(self.ssloader.validate_tokens(clean_record))
-
-    '''def test_clean_records(self):
-        
-        expected_results = [[u'830-910', 'Monday', '??', u'Stan', ['Clayton']],
-                            [u'830-910', 'Tuesday', '??', u'Stan', ['Nathaniel']],          
-                            [u'830-910', 'Wednesday', '??', u'Stan', ['Clayton']],                
-                            [u'830-910', 'Thursday', '??', u'Stan', ['Nathaniel']],               
-                            [u'830-910', 'Monday', '??', u'Amelia', ['Nathaniel']],                                      
-                            [u'830-910', 'Tuesday', 'Work Period', u'Amelia', ['Peter','Jack']],                                        
-                            [u'830-910', 'Wednesday', '??', u'Amelia', ['Nathaniel']],                                                 
-                            [u'830-910', 'Thursday', 'Work Period', u'Amelia', ['Jack']],
-                            [u'830-910', 'Monday', '??', u'Paraic', []],    
-                            [u'830-910', 'Tuesday', '??', u'Paraic', ['Jake']],      
-                            [u'830-910', 'Wednesday', '??', u'Paraic', []],    
-                            [u'830-910', 'Thursday', '??', u'Paraic', ['Jake']]]
-        
-        self.assertListEqual(expected_results,self.clean_records)'''
-        
-
-    def test_lesson(self):
+    def test_lesson_from_academic(self):
 
         expected_results = [[u'complete', u'MO', u'830-910', u'Stan.Math.Monday', u'Clayton'],
                             [u'complete', u'TU', u'830-910', u'Stan.Math.Tuesday', u'Nathaniel'],
                             [u'complete', u'WE', u'830-910', u'Stan.Math.Wednesday', u'Clayton'], 
                             [u'complete', u'TH', u'830-910', u'Stan.Math.Thursday', u'Nathaniel'],
                             [u'complete', u'MO', u'830-910', u'Amelia.ELA.Monday', u'Nathaniel'], 
-                            [u'complete', u'TU', u'830-910', u'Amelia.??.Tuesday', u'Peter'], 
-                            [u'complete', u'TU', u'830-910', u'Amelia.??.Tuesday', u'Jack'], 
+                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday', u'Peter'], 
+                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday', u'Jack'], 
                             [u'complete', u'WE', u'830-910', u'Amelia.ELA.Wednesday', u'Nathaniel'],
-                            [u'complete', u'TH', u'830-910', u'Amelia.??.Thursday', u'Jack'], 
+                            [u'complete', u'TH', u'830-910', u'Amelia.Work Period.Thursday', u'Jack'], 
                             [u'complete', u'TU', u'830-910', u'Paraic.Science.Tuesday', u'Jake'], 
                             [u'complete', u'TH', u'830-910', u'Paraic.Science.Thursday', u'Jake']]
-        
-        
-        self.ssloader.dbupdater(self.validated_clean_records)   
     
         cols = ['status','dow','period','session','student']
         
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['source','=',"\"" + "test_academic_1period_3teachers.csv" + "\""]])
+
+        #for row in rows:
+        #    print row
             
-        #results = _pivotexecfunc(self.ssloader.database,'student','subject','lesson')
-        
         self.assertListEqual(expected_results,rows)
         
+    def test_session_from_academic(self):
+    
+        expected_results = [[u'complete', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday'],
+                            [u'complete', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday']]
+
+        cols = ['status','dow','period','subject','code']
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'session',cols,[['source','=',"\"" + "test_academic_1period_3teachers.csv" + "\""]])
+
+        self.assertListEqual(expected_results,rows)
+        
+class Test_DBLoader_Academic_Stan_Orphan(unittest.TestCase):
+    
+    # this finds a session in the academic file that has not previously been added so adds the session and adds the lesson
+    def setUp(self):  
+
+        self.databasename = "test_ssloader"
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+    
+        self.ssloader = SSLoader("test_ssloader")
+        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)])  
+        self.ssloader.ssloader([('test_academic_1period_3teachers_orphansession.csv',-1,False)])   
+        
+    def test_session_from_academic(self):
+    
+        cols = ['status','dow','period','teacher']
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'session',cols,[['source','=',"\"" + "test_academic_1period_3teachers.csv" + "\""]])
+
+        for row in rows:
+            print row
+            
+        #self.assertListEqual(expected_results,rows)     
 class Test_DBLoader_Academic(unittest.TestCase):
     def setUp(self):  
 
@@ -1829,70 +1861,6 @@ class Test_DBLoader_Primary_Record_Set_Nathaniel(unittest.TestCase):
         
         self.assertListEqual(expected_results,results)
 
-
-
-class Test_DBInsert_Direct(unittest.TestCase):
-    def setUp(self):  
-
-        #Test_Base.setUp(self)
-        
-        self.databasename = "test_ssloader"
-
-        self.database = Database(self.databasename)
-        
-        try:
-            with self.database:
-                tbl_remove(self.database,'lesson')
-                tbl_remove(self.database,'session')
-        except:
-            pass
-        
-
-    def test_session(self):
-        
-        records = [['100-140', 'Tuesday', 'STEM', 'Thea', u'Simon A','1-on-1'], 
-                  ['1210-100', 'Wednesday', 'Humanities', 'Jess', 'Liam','1-on-1']]
-            
-        
-        expected_results =  [['Thea.STEM.Tuesday', 'Tuesday',7,'Thea', 'STEM'], 
-                             ['Jess.Humanities.Wednesday', 'Wednesday',6, 'Jess','Humanities']]
-            
-        expected_results.sort()
-        
-        dbinsert_direct(self.database,records,'session','test')
-        
-        with self.database:
-            _,rows,_ = tbl_rows_get(self.database,'session',['code','dow','period','teacher','subject'])
-        
-        rows.sort()
-         
-        self.assertListEqual(expected_results,rows)
-        
-    def test_lesson(self):
-        
-        records = [['100-140', 'TU', 'STEM', 'Thea', u'Simon A','1-on-1'], 
-                  ['1210-100', 'WE', 'Humanities', 'Jess', 'Liam','1-on-1']]
-            
-        
-        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday'], 
-                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday']]
-        
-
-        expected_results.sort()
-        
-        dbinsert_direct(self.database,records,'lesson','test')
-        
-        with self.database:
-            _,rows,_ = tbl_rows_get(self.database,'lesson',['student','dow','period','teacher','subject','session'])
-        
-        rows.sort()
-        
-        self.assertListEqual(expected_results,rows)
-        
-    def tearDown(self):
-        copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
-
-
 class Test_DBInsert_Direct_Nathaniel(unittest.TestCase):
     def setUp(self):  
 
@@ -1931,9 +1899,7 @@ class Test_DBInsert_Direct_Nathaniel(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_All))   
     
     #unittest.TextTestRunner(verbosity=2).run(suite) 
     #exit()
@@ -2007,9 +1973,7 @@ if __name__ == "__main__":
     # dbloader
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_All))
-    
-    # dbinsert_direct
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct))
+
     
     # db primary record set
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))
@@ -2024,7 +1988,10 @@ if __name__ == "__main__":
     # functional tests
     
     # 1 period of 1 prep
+
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))
+    
+
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_Issey))
@@ -2039,6 +2006,3 @@ if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
     
-    
-
-
