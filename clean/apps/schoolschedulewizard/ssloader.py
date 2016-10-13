@@ -72,7 +72,8 @@ class SSLoader(object):
                       'teacher':[(":",1),("\(",1),("\)",1)],
                       'date':[("/",2)],
                       'noteacher': [(":",1),("\(",0),("\)",0)],
-	              'wp': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0)],
+	              #'wp': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0)],
+	              #'wpwith': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0),("with",1)],
                       'period' :[(":",2),("-",1)],
 	              'ignore' : [("^Period",1),(":",0),("\(",0),("\)",0)],
 	              'ignore2' : [("Lunch",1),(":",0),("\(",0),("\)",0)],
@@ -81,13 +82,15 @@ class SSLoader(object):
                       '_ENDCELL_' :[("\^",1)],
                       '_CRETURN_' :[("\&",1)],
                       'staffname':[('\+',2)],
-	              'staffwith':[('with',1),(":",0),("\(",0),("\)",0)],
+	              #'staffwith':[('with',1),(":",0),("\(",0),("\)",0)],
+	              'with':[(' with ',1),(":",0),("\(",0),("\)",0)],
 	              'dow1':[('Monday',1)],
 	              'dow2':[('Tuesday',1)],
 	              'dow3':[('Wednesday',1)],
 	              'dow4':[('Thursday',1)],
 	              'dow5':[('Friday',1)],
-	              'academicname':[('-',2)]})
+	              'academicname':[('-',2)],
+	              'studentname':[('\*',2)]})
         
         self.synonyms = {}
         self.valid_values = {}
@@ -117,11 +120,11 @@ class SSLoader(object):
         lastrecordtype = None
         staffrecordflag = False
 	academicrecordflag = False
+	studentfile=False
 	
 	enums = {'maps':{},'enums':{},'codes':{}}	
 	getdbenum(enums,self.database,'name','period')
 
-	
         for record in records:
             try:
                 recordtype = self.identify_record(record)
@@ -133,7 +136,6 @@ class SSLoader(object):
 		    _errors.append((record,str(e)))
 		    log.log(thisfuncname(),2,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
 		    continue
-
 
 	    if  recordtype == 'academicstudent':
 		period = enums['period']['name'][periodidx]
@@ -171,6 +173,11 @@ class SSLoader(object):
                 #    _errors.append((record,str(e)))
 		#   log.log(thisfuncname(),1,msg="failed while extracting subject, teacher etc",error=e,emsg=e.message,record=record)
 		#   continue
+	    elif recordtype == 'studentname':
+		# this function actually extrats staff and students
+		studentname = self.extract_staff(record)
+		log.log(thisfuncname(),10,msg="this is a student file",studentname=studentname)
+		studentfile=True
             elif recordtype == 'staffname':
                 staffname = self.extract_staff(record)
                 log.log(thisfuncname(),10,msg="this is a staff file",staffname=staffname)
@@ -184,18 +191,24 @@ class SSLoader(object):
 		    _record = [locals()[field] for field in self.fields]
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
-	    elif recordtype == "staffwith":
+	    #elif recordtype == "staffwith":
+	    elif recordtype == "with":
 		
 		try:
-		    subject,_,teacher = record.split(" ")
+		    subject,teacher = record.split(" with ")
 		except:
-		    log.log(thisfuncname(),msg="could not parse",recordtype=recordtype,record=record)
+		    log.log(thisfuncname(),2,msg="could not parse",recordtype=recordtype,record=record)
 		
 		# if this is a staff file then use the staff member whose schedule we are reading
 		# for the primary teacher (until a teacher2 field is implemented)
 		if staffrecordflag == True:
 		    teacher = staffname
-		students = []
+		    students = []
+		elif studentfile == True:
+		    students = [studentname]
+		else:
+		    students = []
+		    
 		dow = self.valid_values['dow'][dowidx]
 		_record = [locals()[field] for field in self.fields]
 		_records.append(_record)
@@ -211,11 +224,17 @@ class SSLoader(object):
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
 		else:
+		    subject = "Computer Time"
+		    dow = self.valid_values['dow'][dowidx]
+		    _record = [locals()[field] for field in self.fields]
+		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="skipping Computer Time as Staff File",record=_record)
 	    elif recordtype[:3] == 'dow':
 		periodidx=-1
 		dow = record
 		log.log(thisfuncname(),10,msg="setting dow",dow=dow)
+	    elif recordtype == "wpwith":
+		pass
 		
 	    elif recordtype == 'academicname':
                 academicname = self.extract_staff(record)
@@ -342,6 +361,14 @@ class SSLoader(object):
                 # ignore this &; do not change last char
                 continue
             elif fileasstring[i] == "&":
+		
+		if fileasstring[i-4:i] == "with":
+		    record += " "
+		    lastchar = " "
+		    continue
+		elif fileasstring[i-5:i] == "with ":
+		    continue
+                
                 records.append(record.strip())
                 record=""
                 lastchar = fileasstring[i]
@@ -410,7 +437,7 @@ class SSLoader(object):
         return(subject,_rest)
     
     def extract_staff(self,record):
-        if record[-2:] <> "++" and record[-2:] <> "--":
+        if record[-2:] <> "++" and record[-2:] <> "--" and record[-2:] <> "**":
             raise SSLoaderBadTokenException
 
         return(record[:-2])
@@ -605,12 +632,6 @@ class SSLoader(object):
     def dbupdater(self,records):
 	
 	cols = ['period','dow','subject','teacher','students']
-	
-	def _updaterecordval(record, new_value,obj_type,cols):
-	    _idx = cols.index(obj_type)
-	    record.pop(_idx)
-	    record.insert(_idx,new_value) 
-	    return(record)
 
         dblessonrows = []
         dbsessionrows = []
@@ -783,11 +804,12 @@ class SSLoader(object):
             self.inputfile = _file
 	    self.prep = prep
             fileasstring = self.file2string(_file)
-    
+
             records = self.string2records(fileasstring)
-    
+
+	    
             clean_records,_,_ = self.pre_process_records(records)
-    
+	    
             self.validated_clean_records = []
             for clean_record in clean_records:
                 self.validated_clean_records.append(self.validate_tokens(clean_record))
