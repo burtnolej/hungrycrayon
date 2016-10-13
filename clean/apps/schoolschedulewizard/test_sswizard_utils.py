@@ -309,8 +309,8 @@ class Test_DBInsert_Direct(unittest.TestCase):
                   ['1210-100', 'WE', 'Humanities', 'Jess', 'Liam','1-on-1']]
             
         
-        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday'], 
-                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday']]
+        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday','7.2.15'], 
+                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday','6.4.24']]
         
 
         expected_results.sort()
@@ -318,7 +318,7 @@ class Test_DBInsert_Direct(unittest.TestCase):
         dbinsert_direct(self.database,records,'lesson','test')
         
         with self.database:
-            _,rows,_ = tbl_rows_get(self.database,'lesson',['student','dow','period','teacher','subject','session'])
+            _,rows,_ = tbl_rows_get(self.database,'lesson',['student','dow','period','teacher','subject','session','userobjid'])
         
         rows.sort()
         
@@ -401,7 +401,7 @@ if __name__ == "__main__":
     
     # dbinsert_direct
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Convert_Input_Types))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Convert_Input_Types))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
 

@@ -367,6 +367,9 @@ def _isenum(enums,objtype,value):
     if value in enums[objtype]['name']:
 	return enums[objtype]['name2enum'][value]
     
+    if value in enums[objtype]['code2enum'].keys():
+	return enums[objtype]['code2enum'][value]
+    
 def _isname(enums,objtype,value):    
     ''' ensures that value is a name by converting from code if required ''' 
     
