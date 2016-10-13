@@ -1425,7 +1425,7 @@ class Test_DBLoader_Student_3Student(Test_Base):
                                  ['test', 31, 27]]
 
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
-
+            
         self.assertListEqual(results,self.expected_results)
  
 class Test_DBLoader_Staff(Test_Base):
@@ -1696,33 +1696,33 @@ class Test_DBLoader_Academic(unittest.TestCase):
         
         # rest are missing because session not created from a previous load
         expected_results = [[u'complete', u'MO', u'830-910', u'Stan.Math.Monday', u'Clayton'], 
-                            [u'complete', u'MO', u'910-950', u'Stan.??.Monday', u'Simon A'], 
-                            [u'complete', u'MO', u'1030-1110', u'Stan.??.Monday', u'Yosef'], 
-                            [u'complete', u'MO', u'1210-100', u'Stan.??.Monday', u'Booker'], 
-                            [u'complete', u'MO', u'100-140', u'Stan.??.Monday', u'Thomas'], 
-                            [u'complete', u'MO', u'140-220', u'Stan.??.Monday', u'Ashley'],
-                            [u'complete', u'MO', u'220-300', u'Stan.??.Monday', u'Coby'], 
+                            [u'incomplete', u'MO', u'910-950', u'Stan.??.Monday', u'Simon A'], 
+                            [u'incomplete', u'MO', u'1030-1110', u'Stan.??.Monday', u'Yosef'], 
+                            [u'incomplete', u'MO', u'1210-100', u'Stan.??.Monday', u'Booker'], 
+                            [u'incomplete', u'MO', u'100-140', u'Stan.??.Monday', u'Thomas'], 
+                            [u'incomplete', u'MO', u'140-220', u'Stan.??.Monday', u'Ashley'],
+                            [u'incomplete', u'MO', u'220-300', u'Stan.??.Monday', u'Coby'], 
                             [u'complete', u'TU', u'830-910', u'Stan.Math.Tuesday', u'Nathaniel'], 
-                            [u'complete', u'TU', u'910-950', u'Stan.??.Tuesday', u'Bruno'], 
+                            [u'incomplete', u'TU', u'910-950', u'Stan.??.Tuesday', u'Bruno'], 
                             [u'complete', u'TU', u'1030-1110', u'Stan.Math.Tuesday', u'Peter'],
-                            [u'complete', u'TU', u'1210-100', u'Stan.??.Tuesday', u'Jake'], 
+                            [u'incomplete', u'TU', u'1210-100', u'Stan.??.Tuesday', u'Jake'], 
                             [u'complete', u'TU', u'100-140', u'Stan.Math.Tuesday', u'Orig'], 
                             [u'complete', u'TU', u'140-220', u'Stan.Math.Tuesday', u'Oscar'], 
-                            [u'complete', u'TU', u'220-300', u'Stan.??.Tuesday', u'Jack'], 
+                            [u'incomplete', u'TU', u'220-300', u'Stan.??.Tuesday', u'Jack'], 
                             [u'complete', u'WE', u'830-910', u'Stan.Math.Wednesday', u'Clayton'], 
-                            [u'complete', u'WE', u'910-950', u'Stan.??.Wednesday', u'Simon A'], 
-                            [u'complete', u'WE', u'1030-1110', u'Stan.??.Wednesday', u'Yosef'], 
-                            [u'complete', u'WE', u'1210-100', u'Stan.??.Wednesday', u'Booker'], 
-                            [u'complete', u'WE', u'100-140', u'Stan.??.Wednesday', u'Thomas'], 
-                            [u'complete', u'WE', u'140-220', u'Stan.??.Wednesday', u'Ashley'], 
-                            [u'complete', u'WE', u'220-300', u'Stan.??.Wednesday', u'Coby'], 
+                            [u'incomplete', u'WE', u'910-950', u'Stan.??.Wednesday', u'Simon A'], 
+                            [u'incomplete', u'WE', u'1030-1110', u'Stan.??.Wednesday', u'Yosef'], 
+                            [u'incomplete', u'WE', u'1210-100', u'Stan.??.Wednesday', u'Booker'], 
+                            [u'incomplete', u'WE', u'100-140', u'Stan.??.Wednesday', u'Thomas'], 
+                            [u'incomplete', u'WE', u'140-220', u'Stan.??.Wednesday', u'Ashley'], 
+                            [u'incomplete', u'WE', u'220-300', u'Stan.??.Wednesday', u'Coby'], 
                             [u'complete', u'TH', u'830-910', u'Stan.Math.Thursday', u'Nathaniel'], 
                             [u'complete', u'TH', u'910-950', u'Stan.Math Activity Period.Thursday', u'Bruno'], 
-                            [u'complete', u'TH', u'1030-1110', u'Stan.??.Thursday', u'Peter'],
-                            [u'complete', u'TH', u'1210-100', u'Stan.??.Thursday', u'Jake'], 
+                            [u'incomplete', u'TH', u'1030-1110', u'Stan.??.Thursday', u'Peter'],
+                            [u'incomplete', u'TH', u'1210-100', u'Stan.??.Thursday', u'Jake'], 
                             [u'complete', u'TH', u'100-140', u'Stan.Math.Thursday', u'Orig'], 
                             [u'complete', u'TH', u'140-220', u'Stan.Math.Thursday', u'Oscar'], 
-                            [u'complete', u'TH', u'220-300', u'Stan.??.Thursday', u'Jack']]
+                            [u'incomplete', u'TH', u'220-300', u'Stan.??.Thursday', u'Jack']]
 
 
         self.ssloader.dbupdater(self.validated_clean_records)   
@@ -1853,7 +1853,7 @@ class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
         self.assertListEqual(self._getprimarykeyhash('dow','FR'),expected_results)
     
     def test_FOrig(self):
-         
+        
         expected_results =[['primary',['Paraic'],['Engineering'],'830-910','MO'],
                            ['unset',['??'],['Student News'],'830-910','TU'],
                            ['primary',['Paraic'],['Engineering'],'830-910','WE'],
@@ -1863,6 +1863,7 @@ class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
         expected_results.sort()
         
         self.assertListEqual(self._getprimarykeyhash('student','Orig'),expected_results)
+        
         
     def tearDown(self):
         copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
@@ -2070,16 +2071,14 @@ class Test_DBInsert_Direct_Nathaniel(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_3Student))  
-    
-    
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter))
-    
-    unittest.TextTestRunner(verbosity=2).run(suite) 
-    exit()
     
     # #####################################################################################################
     # unit tests=
+    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
+    #unittest.TextTestRunner(verbosity=2).run(suite) 
+    #exit()
+    
     
     # loadrefobjects
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
@@ -2172,11 +2171,10 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic_Stan))
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_3Student))  
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_1Student_1Period))  
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student))
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
 
     unittest.TextTestRunner(verbosity=2).run(suite) 

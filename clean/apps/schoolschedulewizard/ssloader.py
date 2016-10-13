@@ -223,12 +223,19 @@ class SSLoader(object):
 		    _record = [locals()[field] for field in self.fields]
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
-		else:
+		elif studentfile == True:
+		    students = [studentname]	    
 		    subject = "Computer Time"
 		    dow = self.valid_values['dow'][dowidx]
 		    _record = [locals()[field] for field in self.fields]
 		    _records.append(_record)
-		    log.log(thisfuncname(),10,msg="skipping Computer Time as Staff File",record=_record)
+		    log.log(thisfuncname(),10,msg="record addede",record=_record)
+		else:
+		    subject = "Computer Time"
+		    #dow = self.valid_values['dow'][dowidx]
+		    #_record = [locals()[field] for field in self.fields]
+		    #_records.append(_record)
+		    #log.log(thisfuncname(),10,msg="skipping Computer Time as Staff File",record=_record)
 	    elif recordtype[:3] == 'dow':
 		periodidx=-1
 		dow = record
@@ -791,7 +798,10 @@ class SSLoader(object):
 		hashmap[hashkey]['status'] = "primary"
 	    elif hashmap[hashkey]['subject'] == "Computer Time":
 		hashmap[hashkey]['status'] = "primary"
-
+	    elif hashmap[hashkey]['status'] <> "unset":
+		hashmap[hashkey]['status'] = "conflict"
+	    else:
+		hashmap[hashkey]['status'] <> "unset"
 	    
 	return (hashmap)
     	

@@ -485,12 +485,14 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	d['teacher'] = d['adult']
 	d.pop('adult')
 
-	if masterstatus == False:
-	    # set status
-	    d['status'] = "complete"
-	    if d['teacher'] == '??':
-		d['status'] = "incomplete"
-	else:
+	# set status
+	d['status'] = "complete"
+	if d['teacher'] == '??' or d['subject'] == '??':
+	    d['status'] = "incomplete"
+	d['substatus'] = "notset"
+	
+	if masterstatus == True:
+	    d['substatus'] = d['status']
 	    d['status'] = 'master'
 	    
 	d['__id'] = IDGenerator().getid()
