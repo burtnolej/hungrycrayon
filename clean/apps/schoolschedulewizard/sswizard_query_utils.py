@@ -8,7 +8,7 @@ from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 
 from sqlite3 import OperationalError
 
-__all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfunc']
+__all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfunc', '_versions']
 
 def _dowexecfunc(database,value,prep,*args):
     exec_str = "select code from dow "
@@ -26,6 +26,16 @@ def _sessionenum(database,code,period,prep):
     exec_str = "select enum from session where code = {0} ".format(code)
     exec_str += " and period = {0} ".format(period)
     exec_str += " and prep = {0} ".format(prep)
+    return(tbl_query(database,exec_str))
+
+def _versions(database,period,dow,student):
+    exec_str = "select dow,period,subject,teacher,source,session from lesson"
+    exec_str += " where period = \"{0}\" ".format(period)
+    exec_str += " and student = \"{0}\" ".format(student)
+    exec_str += " and dow = \"{0}\" ".format(dow)
+    
+    print exec_str
+    
     return(tbl_query(database,exec_str))
 
 def _maxlessonenum(database):

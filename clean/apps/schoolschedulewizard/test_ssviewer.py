@@ -6,7 +6,7 @@ from Tkinter import *
 from ttk import *
 
 import unittest
-
+from ssloader import SSLoader
 from ssviewer import WizardUI
 from database_util import Database
 from database_table_util import tbl_rows_get
@@ -29,7 +29,7 @@ class Test_Nathaniel(unittest.TestCase):
           
     def test_(self):
 
-        results = self.app.viewer(False,'student','Nathaniel',["teacher"])
+        results = self.app.viewer(False,'student','Nathaniel',["subject","teacher"])
         
         expected_results = [["","MO","TU","TH","WE","FR"],                                                                                                                                                                                                                
                             ["830-910","ELA,Amelia","Math,Stan","Math,Stan","ELA,Amelia","Humanities,A"],                                                                                                                                                                                                     
@@ -85,12 +85,56 @@ class Test_Johnny(unittest.TestCase):
     def tearDown(self):
         pass
     
-                
+    
+class Test_Nathaniel_Conflict(unittest.TestCase):
+    
+    # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
+    
+    def setUp(self):
+        self.databasename = "test_ssloader"
+        
+        self.ssloader = SSLoader("test_ssloader")
+        self.ssloader.run(self.databasename, [('prep5data_test1period1Monday.csv',5,True),
+                           ('prep5studentNathanielPeriod1.csv',-1,True)])  
+    
+
+        of = ObjFactory(True)
+        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
+        self.app.load(saveversion=1,student="Nathaniel")
+
+    def test_(self):    
+        
+        results = self.app.viewer(False,'student','Nathaniel',["subject","teacher"])
+
+        print results
+        
+class Test_Get_Details(unittest.TestCase):
+    
+    # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
+    
+    def setUp(self):
+        self.databasename = "test_ssloader"
+        
+        self.ssloader = SSLoader("test_ssloader")
+        self.ssloader.run(self.databasename, [('prep5data_test1period1Monday.csv',5,True),
+                           ('prep5studentNathanielPeriod1.csv',-1,True)])  
+    
+
+        of = ObjFactory(True)
+        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
+        self.app.load(saveversion=1,student="Nathaniel")
+
+    def test_(self):    
+        
+        self.app.viewer(True,'student','Nathaniel',["subject","teacher"])
+        
+        self.app.mainloop()
+
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
     # functional tests
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Nathaniel))    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Get_Details))    
     
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Johnny))

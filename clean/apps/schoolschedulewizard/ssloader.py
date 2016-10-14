@@ -751,11 +751,13 @@ class SSLoader(object):
 			try:
 			    items.index(newitem)
 			except:
+			    log.log(thisfuncname(),3,msg="conflicting item",newitem=str(newitem),items=items)
 			    items.append(newitem)
 		else:
 		    try:
 			items.index(newitem)
 		    except:
+			log.log(thisfuncname(),3,msg="conflicting item",newitem=str(newitem),items=items)
 			items.append(newitem)
 		
 	def _itemset(items):
@@ -861,7 +863,12 @@ class SSLoader(object):
 		results.append(hashmap[hashkey].values())
 	    results.sort()
 	    return results   
-
+    
+	def _formatval(objtype):
+	    if len(d[objtype]) > 1:
+		return( "["+",".join(d[objtype])+"]")
+	    return(",".join(d[objtype]))
+	    
 	self.databasename = dbname
 	self.database = Database(self.databasename)
 	try:
@@ -882,7 +889,9 @@ class SSLoader(object):
 	newrows = []
 	for row in rows:    
 	    d = dict(zip(cols,row))
-	    newrows.append([d['period'],d['dow'],d['subject'][0],d['teachers'][0],d['student'],'1-on-1'])
+	    
+	    newrows.append([d['period'],d['dow'],_formatval('subject'),_formatval('teachers'),d['student'],'1-on-1'])
+	    #newrows.append([d['period'],d['dow'],d['subject'][0],d['teachers'][0],d['student'],'1-on-1'])
     
 	if insertprimary==True:
 	    log.log(thisfuncname(),10,msg="loading master record set")    
@@ -894,6 +903,13 @@ if __name__ == "__main__":
     
     files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
              ('academic.csv',-1,False)]
+    
+
+    # prod 
+    #files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staff.csv',-1,True),
+    #         ('prep5student.csv',-1,True),('prep4student.csv',-1,True),('prep6student.csv',-1,True),
+    #         ('academic.csv',-1,False)]
+
     
     ssloader = SSLoader(databasename)
     ssloader.run(databasename,files)

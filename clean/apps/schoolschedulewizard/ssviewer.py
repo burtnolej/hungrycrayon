@@ -271,6 +271,37 @@ class WizardUI(Tk):
         #self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
     
+    def dump(self,value):
+        
+        with self.database:
+            cols,rows,_ = _versions(self.database,*value)
+
+        if len(rows) <> 0:
+            self.bgmaxrows=len(rows)
+            self.bgmaxcols=len(rows[0])
+        
+        
+            widget_args=dict(background='white',width=1,height=1,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
+            widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
+            mytextalphanum = TextAlphaNumRO(name='textalphanum')
+        
+            try:
+                self.versionsgrid.destroy()
+            except:
+                pass
+        
+            self.versionsgrid = TkImageLabelGrid(self,'versionsgrid',mytextalphanum,10,10,0,0,self.bgmaxrows,self.bgmaxcols,True,False,{},widgetcfg)
+        
+            self.versionsgrid.grid(row=4,column=0,sticky=NSEW)
+            self.grid_rowconfigure(4, weight=3, uniform="foo")
+            
+            for x in range(len(rows)):
+                for y in range(len(rows[x])):
+                    widget = self.versionsgrid.widgets[x][y]
+                    widget.sv.set(rows[x][y])
+        else:
+            self.versionsgrid.destroy()
+
     def viewer(self,ui=True,source_type=None,source_value=None,ztypes=None):
 
         xaxis_type = self.viewxaxis_label_sv.get() # period
@@ -290,8 +321,8 @@ class WizardUI(Tk):
         xaxis_enum = self.enums[xaxis_type]['name2enum']
         yaxis_enum = self.enums[yaxis_type]['code2enum']
         
-        values = []
-        row=['']
+        values = [] # contains the values displayed on the grid
+        row=[''] # 
 
         values = [['']]    
         for yval in yaxis_enum.keys():
@@ -313,10 +344,8 @@ class WizardUI(Tk):
                         _vals = source_obj.lessons[yval][xval]
                         for _val in _vals:
                             zval = getattr(_val,ztype)
-                            print getattr(_val,"substatus").name
                             celltext.append(zval.name)
-                        #zval = getattr(source_obj.lessons[yval][xval][0],ztype)
-                        #celltext.append(zval.name)
+
                     except Exception, e:
                         log.log(thisfuncname(),2,msg="attr not found on object",error=e,
                                 attr=ztype,xval=str(xval),yval=str(yval))
@@ -328,11 +357,8 @@ class WizardUI(Tk):
             self.bgmaxrows=len(values)
             self.bgmaxcols=len(values[0])
         
-            widget_args=dict(background='white',width=1,height=1,wraplength=180,
-                             highlightbackground='black',highlightthickness=1,
-                             values=self.enums['dow'])
+            widget_args=dict(background='white',width=1,height=4,wraplength=180,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
             widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
-        
             mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
             try:
@@ -340,18 +366,19 @@ class WizardUI(Tk):
             except:
                 pass
         
-            self.viewergrid = TkImageLabelGrid(self,'viewergrid',
-                                               mytextalphanum,10,10,
-                                               0,0,self.bgmaxrows,self.bgmaxcols,
-                                               True,False,{},widgetcfg)
+            self.viewergrid = TkImageLabelGrid(self,'viewergrid',mytextalphanum,10,10,0,0,self.bgmaxrows,self.bgmaxcols,True,False,{},widgetcfg)
         
             self.viewergrid.grid(row=3,column=0,sticky=NSEW)
             self.grid_rowconfigure(3, weight=10, uniform="foo")
             
-    
             for x in range(len(values)):
                 for y in range(len(values[x])):
-                    self.viewergrid.widgets[x][y].sv.set(values[x][y])
+                    widget = self.viewergrid.widgets[x][y]
+                    widget.sv.set(values[x][y])
+                    if x > 0 and y > 0:
+                        key = [self.enums[xaxis_type]['enum2name'][x],self.enums[yaxis_type]['code'][y-1],source_value]                           
+                        widget.bind("<Button-1>",lambda e,key=key:self.dump(key))
+                    
         else:
             results = []
             for x in range(len(values)):

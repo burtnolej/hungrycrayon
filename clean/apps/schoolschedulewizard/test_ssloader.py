@@ -2030,53 +2030,53 @@ class Test_DBLoader_Primary_Record_Set_Nathaniel(unittest.TestCase):
         
         # expected_results are hand generated from source production files and presented in Prep5_Nathaniel_expected_results.csv
         # the expected_results do not necessarilly match the individual student schedule source prod files as they are known to not always reconcile
-        
-        expected_results = [['primary',["Amelia"],["ELA"],"830-910","MO"],
-                            ['unset',["??"],["Core"],"910-950","MO"],
-                            ['primary',["Karolina"],["Work Period"],"950-1030","MO"],
-                            ['primary',[u"Dylan"],[u"Activity Period"],u"1030-1110",u"MO"],
-                            ['unset',["??"],["Computer Time"],"1110-1210","MO"],
-                            ['primary',["Paraic"],["Science"],"1210-100","MO"],
-                            ['primary',["Rahul"],["Chess"],"100-140","MO"],
-                            ['primary',["Johnny"],["Work Period"],"140-220","MO"],
-                            ['unset',["??"],["Speech"],"220-300","MO"],
-                            ['unset',["??"],["Computer Time"],"300-330","MO"],
-                            ['primary',["Stan"],["Math"],"830-910","TU"],
-                            ['primary',["Dylan"],["Work Period"],"910-950","TU"],
-                            ['primary',["Aaron"],["Activity Period"],"950-1030","TU"],
-                            ['primary',["Rahul"],["Chess"],"1030-1110","TU"],
-                            ['unset',["??"],["Computer Time"],"1110-1210","TU"],
-                            ['primary',["Samantha"],["History"],"1210-100","TU"],
-                            ['primary',["Karolina"],["Work Period"],"100-140","TU"],
-                            ['unset',["??"],["Movement"],"140-220","TU"],
-                            ['unset',["??"],["Student News"],"220-300","TU"],
-                            ['unset',["??"],["Computer Time"],"300-330","TU"],
-                            ['primary',["Amelia"],["ELA"],"830-910","WE"],
-                            ['primary',["Moira"],["Work Period"],"910-950","WE"],
-                            ['unset',["??"],["OT"],"950-1030","WE"],
-                            ['primary',["Issey"],["Activity Period"],"1030-1110","WE"],
-                            ['unset',["??"],["Computer Time"],"1110-1210","WE"],
-                            ['primary',["Paraic"],["Science"],"1210-100","WE"],
-                            ['primary',["Rahul"],["Chess"],"100-140","WE"],
-                            ['primary',["Issey"],["Work Period"],"140-220","WE"],
-                            ['primary',["Alexa"],["Counseling"],"220-300","WE"],
-                            ['unset',["??"],["Computer Time"],"300-330","WE"],
-                            ['primary',["Stan"],["Math"],"830-910","TH"],
-                            ['unset',["??"],["Core"],"910-950","TH"],
-                            ['primary',["Issey"],["Work Period"],"950-1030","TH"],
-                            ['primary',["Rahul"],["Chess"],"1030-1110","TH"],
-                            ['unset',["??"],["Computer Time"],"1110-1210","TH"],
-                            ['primary',["Samantha"],["History"],"1210-100","TH"],
-                            ['primary',["Aaron"],["Work Period"],"100-140","TH"],
-                            ['unset',["??"],["Movement"],"140-220","TH"],
-                            ['unset',["??"],["Student News"],"220-300","TH"],
-                            ['unset',["??"],["Computer Time"],"300-330","TH"],
-                            ['primary',["A"],["Humanities"],"830-910","FR"],
-                            ['unset',["??"],["Music"],"910-950","FR"],
-                            ['unset',["??"],["STEM"],"950-1030","FR"],
-                            ['unset',["??"],["Art"],"1030-1110","FR"],
-                            ['unset',["??"],["Computer Time"],"1110-1210","FR"]]
                               
+        expected_results = [['primary', [u'A'], [u'Humanities'], u'830-910', u'FR'], 
+                            ['primary', [u'Aaron'], [u'Activity Period'], u'950-1030', u'TU'], 
+                            ['primary', [u'Aaron', u'Issey'], [u'Work Period'], u'100-140', u'TH'], 
+                            ['primary', [u'Alexa'], [u'Counseling'], u'220-300', u'WE'], 
+                            ['primary', [u'Amelia'], [u'ELA'], u'830-910', u'MO'], 
+                            ['primary', [u'Amelia'], [u'ELA'], u'830-910', u'WE'], 
+                            ['primary', [u'Dylan'], [u'Activity Period'], u'1030-1110', u'MO'], 
+                            ['primary', [u'Dylan'], [u'Work Period'], u'910-950', u'TU'], 
+                            ['primary', [u'Issey'], [u'Activity Period'], u'1030-1110', u'WE'], 
+                            ['primary', [u'Issey'], [u'Work Period'], u'140-220', u'WE'], 
+                            ['primary', [u'Issey'], [u'Work Period'], u'950-1030', u'TH'], 
+                            ['primary', [u'Johnny'], [u'Work Period'], u'140-220', u'MO'], 
+                            ['primary', [u'Karolina'], [u'Work Period'], u'100-140', u'TU'],
+                            ['primary', [u'Karolina'], [u'Work Period'], u'950-1030', u'MO'], 
+                            ['primary', [u'Moira'], [u'Work Period'], u'910-950', u'WE'], 
+                            ['primary', [u'Paraic'], [u'Science'], u'1210-100', u'MO'], 
+                            ['primary', [u'Paraic'], [u'Science'], u'1210-100', u'WE'], 
+                            ['primary', [u'Rahul'], [u'Chess'], u'100-140', u'MO'], 
+                            ['primary', [u'Rahul'], [u'Chess'], u'100-140', u'WE'], 
+                            ['primary', [u'Rahul'], [u'Chess'], u'1030-1110', u'TH'], 
+                            ['primary', [u'Rahul'], [u'Chess'], u'1030-1110', u'TU'], 
+                            ['primary', [u'Samantha'], [u'History'], u'1210-100', u'TH'], 
+                            ['primary', [u'Samantha'], [u'History', u'Movement'], u'1210-100', u'TU'], 
+                            ['primary', [u'Stan'], [u'Math'], u'830-910', u'TH'], 
+                            ['primary', [u'Stan'], [u'Math'], u'830-910', u'TU'],
+                            ['unset', ['??'], [u'Art'], u'1030-1110', u'FR'],
+                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'FR'],
+                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'MO'], 
+                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'TH'], 
+                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'TU'], 
+                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'WE'], 
+                            ['unset', ['??'], [u'Computer Time'], u'300-330', u'MO'], 
+                            ['unset', ['??'], [u'Computer Time'], u'300-330', u'TH'], 
+                            ['unset', ['??'], [u'Computer Time'], u'300-330', u'TU'], 
+                            ['unset', ['??'], [u'Computer Time'], u'300-330', u'WE'],
+                            ['unset', ['??'], [u'Core'], u'910-950', u'MO'], 
+                            ['unset', ['??'], [u'Core'], u'910-950', u'TH'],
+                            ['unset', ['??'], [u'Movement'], u'140-220', u'TH'], 
+                            ['unset', ['??'], [u'Movement'], u'140-220', u'TU'], 
+                            ['unset', ['??'], [u'Music'], u'910-950', u'FR'], 
+                            ['unset', ['??'], [u'OT'], u'950-1030', u'WE'], 
+                            ['unset', ['??'], [u'STEM'], u'950-1030', u'FR'], 
+                            ['unset', ['??'], [u'Speech'], u'220-300', u'MO'], 
+                            ['unset', ['??'], [u'Student News'], u'220-300', u'TH'], 
+                            ['unset', ['??'], [u'Student News'], u'220-300', u'TU']]
+
         expected_results.sort()
             
         results = self._getprimarykeyhash('student','Nathaniel') 
@@ -2125,7 +2125,7 @@ if __name__ == "__main__":
     # #####################################################################################################
     # unit tests=
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff_Student))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
     #unittest.TextTestRunner(verbosity=2).run(suite) 
     #exit()
     
