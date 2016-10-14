@@ -1868,7 +1868,57 @@ class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
     def tearDown(self):
         copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
 
+
+class Test_DBLoader_Primary_Record_Set_With_Staff_Student(unittest.TestCase):
     
+    # test that multiple values are stored when there is a conflict on subject and teacher
+    
+    def setUp(self):  
+
+        self.databasename = "test_ssloader"
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+    
+        self.ssloader = SSLoader("test_ssloader")
+        self.ssloader.ssloader([('prep5data_test1period1Monday.csv',5,True)],self.databasename)  
+                
+        self.ssloader = SSLoader("test_ssloader")
+        self.ssloader.ssloader([('prep5studentNathanielPeriod1.csv',-1,True)],self.databasename)
+  
+    def _getprimarykeyhash(self,pred,predval):
+        
+        cols = ['dow','period','student']
+        hashmap = self.ssloader.primary_record_set()
+        results = []      
+        for hashkey in hashmap:
+            
+            hashmap[hashkey].pop('source')
+
+            d = dict(zip(cols,hashkey.split(".")))
+
+            if d[pred] == predval:
+                hashmap[hashkey].pop('student')
+                results.append(hashmap[hashkey].values())
+           
+        results.sort()
+          
+        return results            
+
+    def test_Nathaniel(self):
+
+        expected_results = [['primary', [u'Amelia'], [u'ELA', u'Student News'], u'830-910', u'MO']]
+        
+        self.assertListEqual(self._getprimarykeyhash('student','Nathaniel'),expected_results)
+        
+    def tearDown(self):
+        copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
+        pass
+        
 class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
     def setUp(self):  
 
@@ -1920,7 +1970,7 @@ class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
         results.sort()
           
         return results            
-
+       
     def test_FOrig(self):
 
         expected_results = [['primary', [u'A'], [u'Humanities'], u'830-910', u'FR'],
@@ -2075,7 +2125,7 @@ if __name__ == "__main__":
     # #####################################################################################################
     # unit tests=
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff_Student))
     #unittest.TextTestRunner(verbosity=2).run(suite) 
     #exit()
     
@@ -2153,7 +2203,7 @@ if __name__ == "__main__":
     # db primary record set
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff))
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff_Student))  
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
     
     

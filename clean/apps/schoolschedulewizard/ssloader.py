@@ -747,6 +747,16 @@ class SSLoader(object):
 		if len(items) == 1:
 		    if items[0] == "??":
 			items[0] = newitem
+		    else:
+			try:
+			    items.index(newitem)
+			except:
+			    items.append(newitem)
+		else:
+		    try:
+			items.index(newitem)
+		    except:
+			items.append(newitem)
 		
 	def _itemset(items):
 	    # return True if list still equals initial value ["??"]
@@ -760,6 +770,8 @@ class SSLoader(object):
 	    _,rows,_ = tbl_rows_get(self.database,'lesson',cols)
 
 	sessionhashmap = self._sessionhashmapget()
+	
+	
 	
 	hashmap={}
 	for row in rows:
@@ -775,8 +787,11 @@ class SSLoader(object):
 
 	    _additem(hashmap[hashkey]['teacher'],d['teacher'])
 	    _additem(hashmap[hashkey]['subject'],d['subject'])
+	    
+	    
 
-	for row in rows:
+
+	'''for row in rows:
 
 	    d = dict(zip(cols,row))
 	     
@@ -786,7 +801,7 @@ class SSLoader(object):
 		for newteacher in sessions:
 		    _additem(hashmap[hashkey]['teacher'],newteacher)	
 	    except KeyError:
-		pass    
+		pass'''
 
 
 	for row in rows:
@@ -803,7 +818,7 @@ class SSLoader(object):
 		hashmap[hashkey]['status'] = "conflict"
 	    else:
 		hashmap[hashkey]['status'] <> "unset"
-	    
+
 	return (hashmap)
     	
     def ssloader(self,files,databasename="htmlparser"):
