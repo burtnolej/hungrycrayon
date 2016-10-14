@@ -271,13 +271,16 @@ class WizardUI(Tk):
         #self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
     
-    def viewer(self,ui=True):
+    def viewer(self,ui=True,source_type=None,source_value=None,ztypes=None):
 
         xaxis_type = self.viewxaxis_label_sv.get() # period
         yaxis_type = self.viewyaxis_label_sv.get() # dow
 
-        source_type,source_value = self.viewfocus_label_sv.get().split("=")
-        ztypes = self.viewdata_label_sv.get().split(",")
+        if source_type == None or source_value == None:
+            source_type,source_value = self.viewfocus_label_sv.get().split("=")
+        
+        if ztypes == None:
+            ztypes = self.viewdata_label_sv.get().split(",")
         
         source_obj = self.of.object_get(source_type,source_value)
         
@@ -307,8 +310,13 @@ class WizardUI(Tk):
                 
                 for ztype in ztypes:
                     try:
-                        zval = getattr(source_obj.lessons[yval][xval][0],ztype)
-                        celltext.append(zval.name)
+                        _vals = source_obj.lessons[yval][xval]
+                        for _val in _vals:
+                            zval = getattr(_val,ztype)
+                            print getattr(_val,"substatus").name
+                            celltext.append(zval.name)
+                        #zval = getattr(source_obj.lessons[yval][xval][0],ztype)
+                        #celltext.append(zval.name)
                     except Exception, e:
                         log.log(thisfuncname(),2,msg="attr not found on object",error=e,
                                 attr=ztype,xval=str(xval),yval=str(yval))
@@ -578,7 +586,7 @@ class WizardUI(Tk):
         self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
 
         # load from database
-        cols = ['period','student','session','dow','teacher','subject','userobjid']        
+        cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus']        
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)

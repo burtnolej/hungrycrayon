@@ -224,7 +224,8 @@ class SSLoader(object):
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
 		elif studentfile == True:
-		    students = [studentname]	    
+		    students = [studentname]
+		    teacher = "??"
 		    subject = "Computer Time"
 		    dow = self.valid_values['dow'][dowidx]
 		    _record = [locals()[field] for field in self.fields]
