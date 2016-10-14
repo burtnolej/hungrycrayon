@@ -1373,7 +1373,54 @@ class Test_DBLoader_Staff_Issey(Test_Base):
         
         self.assertListEqual(results,expected_results)
      
+
+class Test_DBLoader_Staff_Dylan(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,prep=-1)
         
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+        
+    def test_lesson(self):
+
+        expected_result = [['test', u'Booker', u'Thomas', u'Ashley', u'Yosef', u'Coby', u'Nathaniel', u'Clayton', u'Stephen', u'Oscar', u'OmerC', u'Shane', u'Tristan', u'Bruno', u'Asher', u'Nick', u'Simon A', u'Prep 4'], 
+                           [u'Movement', 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 3], 
+                           [u'Activity Period', 0, 0, 0, 1, 2, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0], 
+                           [u'Work Period', 0, 2, 4, 0, 1, 1, 0, 0, 0, 4, 0, 1, 0, 0, 0, 3, 0], 
+                           [u'Core', 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                           [u'Psychology Reading', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
+                           [u'Psychology', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
+                           [u'Student News', 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
+                           ['test', 1, 6, 6, 1, 6, 2, 2, 1, 1, 5, 2, 4, 1, 1, 1, 4, 3]]
+
+
+
+        self.ssloader.ssloader([('staffdata_dylan.csv',-1,True)],self.databasename)        
+        print _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
+        #self.assertListEqual(results,expected_result)
+
+    def test_session(self):
+
+        expected_results =[['test', 1, 2, 3, 4, 6, 7, 8, 9], 
+                           [u'Monday', 1, 1, 1, 1, 1, 1, 1, 1], 
+                           [u'Tuesday', 1, 1, 2, 1, 1, 1, 1, 1], 
+                           [u'Wednesday', 1, 1, 1, 1, 1, 1, 1, 1], 
+                           [u'Thursday', 1, 1, 1, 1, 1, 1, 1, 2], 
+                           ['test', 4, 4, 5, 4, 4, 4, 4, 5]]
+
+
+
+        self.ssloader.ssloader([('staffdata_dylan.csv',-1,True)],self.databasename)  
+        print _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
+        
+        #self.assertListEqual(results,expected_results)
+     
+       
 class Test_DBLoader_Student_1Student_1Period(Test_Base):
     def setUp(self):
         Test_Base.setUp(self,prep=-1)
@@ -1414,15 +1461,18 @@ class Test_DBLoader_Student_3Student(Test_Base):
         
         self.expected_results = [['test', u'Asher', u'Nick'], 
                                  [u'Science', 2, 0], 
-                                 [u'Math', 2, 2],
+                                 [u'Math', 2, 2], 
                                  [u'Work Period', 8, 7], 
                                  [u'Counseling', 1, 0], 
-                                 [u'Activity Period', 4, 3],
-                                 [u'Computer Time', 9, 9],
-                                 [u'Humanities', 4, 4],
+                                 [u'Movement', 7, 9], 
+                                 [u'Activity Period', 4, 3], 
+                                 [u'Computer Time', 9, 9], 
+                                 [u'Humanities', 4, 4], 
                                  [u'Core', 1, 0], 
-                                 [u'Student News', 0, 2],
-                                 ['test', 31, 27]]
+                                 [u'Music', 1, 0], 
+                                 [u'Student News', 0, 2], 
+                                 ['test', 39, 36]]
+
 
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
             
@@ -1536,24 +1586,24 @@ class Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter(Test_Base):
         
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['student','==',"\"" + "Peter" + "\""]])
-
-        expected_results = [['complete','WE','830-910','Issey.Work Period.Wednesday','Issey'],
-                            ['complete','MO','830-910','Stan.Work Period.Monday','Stan'],
-                            ['complete','TU','830-910','Amelia.Work Period.Tuesday','Amelia'],
-                            ['complete','TH','830-910','John.Work Period.Thursday','John'],
-                            ['complete','WE','830-910','Issey.Work Period.Wednesday','Issey'],
-                            ['incomplete','MO','830-910','??.Work Period.Monday','??'],
-                            ['incomplete','TU','830-910','??.Work Period.Tuesday','??'],
-                            ['incomplete','WE','830-910','??.Work Period.Wednesday','??'],
-                            ['incomplete','TH','830-910','??.Work Period.Thursday','??'],
-                            ['complete','FR','830-910','B.Art.Friday','B']]
+            
+        expected_results = [[u'complete', u'FR', u'830-910', u'B.Art.Friday', u'B'], 
+                            [u'complete', u'MO', u'830-910', u'Stan.Work Period.Monday', u'Stan'], 
+                            [u'complete', u'TH', u'830-910', u'John.Work Period.Thursday', u'John'], 
+                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday', u'Amelia'], 
+                            [u'complete', u'WE', u'830-910', u'Issey.Work Period.Wednesday', u'Issey'],
+                            [u'complete', u'WE', u'830-910', u'Issey.Work Period.Wednesday', u'Issey'], 
+                            [u'incomplete', u'FR', u'830-910', u'??.Art.Friday', u'??'],
+                            [u'incomplete', u'MO', u'830-910', u'??.Work Period.Monday', u'??'],
+                            [u'incomplete', u'TH', u'830-910', u'??.Work Period.Thursday', u'??'],
+                            [u'incomplete', u'TU', u'830-910', u'??.Work Period.Tuesday', u'??'],
+                            [u'incomplete', u'WE', u'830-910', u'??.Work Period.Wednesday', u'??']]
     
         expected_results.sort()
         rows.sort()
                    
         self.assertListEqual(rows,expected_results)
-        
-        
+
     def test_lesson_primary_set(self):
 
 
@@ -1911,7 +1961,10 @@ class Test_DBLoader_Primary_Record_Set_With_Staff_Student(unittest.TestCase):
 
     def test_Nathaniel(self):
 
-        expected_results = [['primary', [u'Amelia'], [u'ELA', u'Student News'], u'830-910', u'MO']]
+        expected_results = [['primary', [u'Amelia'], [u'ELA', u'Student News'], u'830-910', u'MO'], 
+                            ['unset', ['??'], [u'Movement'], u'830-910', u'TH'], 
+                            ['unset', ['??'], [u'Movement'], u'830-910', u'TU'], 
+                            ['unset', ['??'], [u'Movement'], u'830-910', u'WE']]
         
         self.assertListEqual(self._getprimarykeyhash('student','Nathaniel'),expected_results)
         
@@ -2125,7 +2178,7 @@ if __name__ == "__main__":
     # #####################################################################################################
     # unit tests=
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_Dylan))
     #unittest.TextTestRunner(verbosity=2).run(suite) 
     #exit()
     

@@ -1,5 +1,5 @@
 from misc_utils_log import Log, logger
-log = Log(cacheflag=True,logdir="/tmp/log",verbosity=5,pidlogname=True,proclogname=False)
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,pidlogname=True,proclogname=False)
 
 from misc_utils import os_file_to_string, thisfuncname, IDGenerator
 from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _gencoldefn, tbl_exists, \
@@ -191,6 +191,14 @@ class SSLoader(object):
 		    _record = [locals()[field] for field in self.fields]
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
+		if studentfile == True:
+		    subject = recordtype
+		    teacher = "??"
+		    students = [studentname]
+		    dow = self.valid_values['dow'][dowidx]
+		    _record = [locals()[field] for field in self.fields]
+		    _records.append(_record)
+		    log.log(thisfuncname(),10,msg="record added",record=_record)		
 	    #elif recordtype == "staffwith":
 	    elif recordtype == "with":
 		
@@ -902,13 +910,13 @@ if __name__ == "__main__":
     databasename = "test_ssloader"
     
     files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
-             ('academic.csv',-1,False)]
+             ('academic.csv',-1,True)]
     
 
     # prod 
     #files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staff.csv',-1,True),
     #         ('prep5student.csv',-1,True),('prep4student.csv',-1,True),('prep6student.csv',-1,True),
-    #         ('academic.csv',-1,False)]
+    #         ('academic.csv',-1,True)]
 
     
     ssloader = SSLoader(databasename)
