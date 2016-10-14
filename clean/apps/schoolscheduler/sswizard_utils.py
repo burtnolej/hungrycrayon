@@ -16,6 +16,12 @@ from sswizard_query_utils import _sessionenum, _maxlessonenum, _maxsessionenum
 
 log = Log(cacheflag=True,logdir="/tmp/log",pidlogname=False,proclogname=False)
 
+def _updaterecordval(record, new_value,obj_type,cols):
+    _idx = cols.index(obj_type)
+    record.pop(_idx)
+    record.insert(_idx,new_value) 
+    return(record)
+
 def update_callback(ui,widget,new_value):        
     ''' via BaseTk class; all entry widgets assign a callback to the change event
     to call this function if it exists '''
@@ -215,7 +221,7 @@ def getdbenum(enums,database,fldname,tblname,**kwargs):
     enums[tblname]['name'] = enums[tblname]['name2code'].keys()
     enums[tblname]['code'] = enums[tblname]['name2code'].values()
     
-    log.log(thisfuncname(),10,msg="created enums",tblname=tblname,names=enums[tblname]['name'])
+    log.log(thisfuncname(),3,msg="created enums",tblname=tblname,names=enums[tblname]['name'])
             
 
 def lookupenum(enums,converttype,fieldtype,code):
@@ -354,11 +360,36 @@ def dbbulkloader(database,dbrecords,tblname,cols,maxsize=300):
 
 def _isenum(enums,objtype,value):
     
+    ''' ensures that value is an enum by converting from name if required ''' 
     if value in enums[objtype]['enum2name'].keys(): 
 	return value
     
     if value in enums[objtype]['name']:
 	return enums[objtype]['name2enum'][value]
+    
+    if value in enums[objtype]['code2enum'].keys():
+	return enums[objtype]['code2enum'][value]
+    
+def _isname(enums,objtype,value):    
+    ''' ensures that value is a name by converting from code if required ''' 
+    
+    if value in enums[objtype]['name']: 
+	return value
+    
+    elif value in enums[objtype]['code2name'].keys():
+	return enums[objtype]['code2name'][value]
+    
+    elif value in enums[objtype]['enum2name'].keys():
+	return enums[objtype]['enum2name'][value]
+    
+def _iscode(enums,objtype,value):    
+    ''' ensures that value is a code by converting from code if required ''' 
+    
+    if value in enums[objtype]['code2name'].keys():
+	return value
+    
+    if value in enums[objtype]['name']:
+	return enums[objtype]['name2code'][value]
 
 def _loadprepmapper(database):
     cols = ['name','prep']
@@ -374,9 +405,16 @@ def _getuserobjid(enums,cols,d):
     return(".".join(map(str,[_isenum(enums,col,d[col]) for col in cols])))	    
     
 @logger(log)
-def dbinsert_direct(database,records,tblname,source):
-
-    # assumes all fields have been validated
+def dbinsert_direct(database,records,tblname,source,masterstatus=True):
+    '''
+    
+    records : list of records where a record is of the form ('period','dow','subject','adult','student','type')
+    
+    assumes all fields have been validated; student can be list or a single name
+    
+    if this is being called after primary_record_set, pass in false as masterstatus and status will be set
+    to complete/incomplete depending on values
+    '''
     
     from misc_utils import IDGenerator
     from datetime import datetime
@@ -415,30 +453,48 @@ def dbinsert_direct(database,records,tblname,source):
 	if tblname == 'session':
 	    
 	    d = dict(zip(cols,record))
-	    
+	    d['dow'] = _isname(enums,'dow',d['dow'])
 	    d['period'] = _isenum(enums,'period',d['period'])
 	    d['code'] = ".".join([d['adult'],d['subject'],d['dow']])
 	    #d['userobjid'] = _getuserobjid(enums,['period','dow','subject','adult'],d)
-	    d['prep'] = int(prepmap[d['student']])
+	    
+	    # if student is a list and has more than 1 member, set prep to unknown (-1)
+	    if isinstance(d['student'],list) == True:
+		if len(d['student']) == 1:
+		    d['prep'] = int(prepmap[d['student'][0]])
+		else:
+		    d['prep'] = -1
+	    else:
+		d['prep'] = int(prepmap[d['student']])
 	    d.pop('student')
 
 	elif tblname == 'lesson':
 
 	    d = dict(zip(cols,record))
-	    _dow = d['dow']
-	    d['dow'] = enums['dow']['code2name'][d['dow']]
-	    d['session'] = ".".join([d['adult'],d['subject'],d['dow']])
+
+	    d['dow'] = _iscode(enums,'dow',d['dow'])
+	    d['period'] = _isname(enums,'period',d['period'])
+	    d['session'] = ".".join([d['adult'],d['subject'],_isname(enums,'dow',d['dow'])])
 	    d['prep'] = int(prepmap[d['student']])
 	    d['userobjid'] = _getuserobjid(enums,['period','dow','student'],d)
-	    d['dow'] = _dow
+
 	    d['saveversion'] = 1
-	    d['status'] = 'master'
+	   
 	    d.pop('type')
 	
 	d['teacher'] = d['adult']
 	d.pop('adult')
 
-
+	# set status
+	d['status'] = "complete"
+	if d['teacher'] == '??' or d['subject'] == '??':
+	    d['status'] = "incomplete"
+	d['substatus'] = "notset"
+	
+	if masterstatus == True:
+	    d['substatus'] = d['status']
+	    d['status'] = 'master'
+	    
 	d['__id'] = IDGenerator().getid()
 	d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
 
@@ -482,7 +538,7 @@ def dbinsert(database,dbclassname,rows,colnames):
             with database:
                 try:
                     exec_str,result = dbobj.persist()
-                    log.log(thisfuncname(),6,func=dbobj.persist,exec_str=exec_str,result=result)
+                    log.log(thisfuncname(),4,func=dbobj.persist,exec_str=exec_str,result=result)
                 except Exception, e:
                     log.log(thisfuncname(),1,func=dbobj.persist,error=str(e))
 

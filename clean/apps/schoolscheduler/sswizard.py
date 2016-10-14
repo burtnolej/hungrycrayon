@@ -681,5 +681,5 @@ if __name__ == "__main__":
     
     of = ObjFactory(True)
     #app = WizardUI('htmlparser',of,'quadref',maxentrycols=12,maxentryrows=20)
-    app = WizardUI('quad_new',of,'quad_new',maxentrycols=12,maxentryrows=20)
+    app = WizardUI('quad',of,'quad',maxentrycols=12,maxentryrows=20)
     app.mainloop()

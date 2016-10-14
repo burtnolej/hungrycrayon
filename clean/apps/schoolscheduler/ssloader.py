@@ -1,13 +1,20 @@
 from misc_utils_log import Log, logger
 log = Log(cacheflag=True,logdir="/tmp/log",verbosity=5,pidlogname=True,proclogname=False)
 
-from misc_utils import os_file_to_string, thisfuncname
+from misc_utils import os_file_to_string, thisfuncname, IDGenerator
 from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _gencoldefn, tbl_exists, \
      tbl_create, tbl_remove
 from database_util import Database 
-from sswizard_utils import getdbenum, session_code_gen, dbinsert, dbinsert_direct
+from sswizard_utils import getdbenum, session_code_gen, dbinsert, dbinsert_direct, _updaterecordval
 
-from sswizard_query_utils import _sessionenum, _maxlessonenum, _maxsessionenum
+from collections import OrderedDict
+
+from sswizard_query_utils import _sessionenum, _maxlessonenum, _maxsessionenum, _findsessions
+
+
+from datetime import datetime
+from copy import deepcopy
+import re
 
 class SSLoaderRuleException(Exception):
     def __repr__(self):
@@ -48,29 +55,42 @@ class SSLoader(object):
         self.database = Database(databasename)
         self.prep = prep
         
-        self.rules = {'computertime':[("Computer Time",1),(":",0)],
-	              'Movement':[("Movement",1),(":",0)],
-	              'Engineering':[("Engineering",1),(":",0)],
+        #add in |; so 'Music':[("Music"|"Cello",1),(":",0)],
+	
+	# add an extra field in lesson and session; lessontype
+	
+	# add rules to pick out the WP/Work P/W Period/ to set lessontype
+	# and find subject
+	
+	#self.rules = {'wp': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0)]}
+	
+        self.rules = OrderedDict({'computertime':[("Computer Time",1),(":",0),("with",0)],
+	              'Movement':[("Movement",1),(":",0),("with",0)],
+	              'Engineering':[("Engineering",1),(":",0),("with",0)],
 	              'Art':[("Art",1),(":",0)],
 	              'Music':[("Music",1),(":",0)],
-                      'teacher':[(":",1),("(",1),(")",1)],
+                      'teacher':[(":",1),("\(",1),("\)",1)],
                       'date':[("/",2)],
-                      'noteacher': [(":",1),("(",0),(")",0)],
+                      'noteacher': [(":",1),("\(",0),("\)",0)],
+	              #'wp': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0)],
+	              #'wpwith': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0),("with",1)],
                       'period' :[(":",2),("-",1)],
-	              'ignore' : [("Period",1),(":",0),("(",0),(")",0)],
-	              'ignore2' : [("Lunch",1),(":",0),("(",0),(")",0)],
+	              'ignore' : [("^Period",1),(":",0),("\(",0),("\)",0)],
+	              'ignore2' : [("Lunch",1),(":",0),("\(",0),("\)",0)],
                       #_ENDCELL_' :[("_ENDCELL_",1)],
                       #'_CRETURN_' :[("_CRETURN_",1)]}
-                      '_ENDCELL_' :[("^",1)],
-                      '_CRETURN_' :[("&",1)],
-                      'staffname':[('+',2)],
-	              'staffwith':[('with',1),(":",0),("(",0),(")",0)],
+                      '_ENDCELL_' :[("\^",1)],
+                      '_CRETURN_' :[("\&",1)],
+                      'staffname':[('\+',2)],
+	              #'staffwith':[('with',1),(":",0),("\(",0),("\)",0)],
+	              'with':[(' with ',1),(":",0),("\(",0),("\)",0)],
 	              'dow1':[('Monday',1)],
 	              'dow2':[('Tuesday',1)],
 	              'dow3':[('Wednesday',1)],
 	              'dow4':[('Thursday',1)],
 	              'dow5':[('Friday',1)],
-	              'academicname':[('-',2)]}
+	              'academicname':[('-',2)],
+	              'studentname':[('\*',2)]})
         
         self.synonyms = {}
         self.valid_values = {}
@@ -80,7 +100,13 @@ class SSLoader(object):
         self.valid_values['teacher'] = self.loadrefobjects(databasename,'adult',True)
         self.valid_values['subject'] = self.loadrefobjects(databasename,'subject',True)
     
-        self.fields = ['period','dow','subject','teacher','students']
+	self.enums = {'maps':{},'enums':{},'codes':{}}
+	
+        getdbenum(self.enums,self.database,'name','period')
+        getdbenum(self.enums,self.database,'name','student')
+        getdbenum(self.enums,self.database,'name','dow')
+	
+        self.fields = ['period','dow','subject','teacher','students',"recordtype"]
 
         self.prepmap = self.loadprepmapper()
         
@@ -94,11 +120,11 @@ class SSLoader(object):
         lastrecordtype = None
         staffrecordflag = False
 	academicrecordflag = False
+	studentfile=False
 	
 	enums = {'maps':{},'enums':{},'codes':{}}	
 	getdbenum(enums,self.database,'name','period')
 
-	
         for record in records:
             try:
                 recordtype = self.identify_record(record)
@@ -110,7 +136,6 @@ class SSLoader(object):
 		    _errors.append((record,str(e)))
 		    log.log(thisfuncname(),2,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
 		    continue
-
 
 	    if  recordtype == 'academicstudent':
 		period = enums['period']['name'][periodidx]
@@ -148,6 +173,11 @@ class SSLoader(object):
                 #    _errors.append((record,str(e)))
 		#   log.log(thisfuncname(),1,msg="failed while extracting subject, teacher etc",error=e,emsg=e.message,record=record)
 		#   continue
+	    elif recordtype == 'studentname':
+		# this function actually extrats staff and students
+		studentname = self.extract_staff(record)
+		log.log(thisfuncname(),10,msg="this is a student file",studentname=studentname)
+		studentfile=True
             elif recordtype == 'staffname':
                 staffname = self.extract_staff(record)
                 log.log(thisfuncname(),10,msg="this is a staff file",staffname=staffname)
@@ -161,15 +191,28 @@ class SSLoader(object):
 		    _record = [locals()[field] for field in self.fields]
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
-	    elif recordtype == "staffwith":
+	    #elif recordtype == "staffwith":
+	    elif recordtype == "with":
+		
+		try:
+		    subject,teacher = record.split(" with ")
+		except:
+		    log.log(thisfuncname(),2,msg="could not parse",recordtype=recordtype,record=record)
+		
+		# if this is a staff file then use the staff member whose schedule we are reading
+		# for the primary teacher (until a teacher2 field is implemented)
 		if staffrecordflag == True:
-		    subject,_,_ = record.split(" ")
 		    teacher = staffname
 		    students = []
-		    dow = self.valid_values['dow'][dowidx]
-		    _record = [locals()[field] for field in self.fields]
-		    _records.append(_record)
-		    log.log(thisfuncname(),10,msg="record added",record=_record)
+		elif studentfile == True:
+		    students = [studentname]
+		else:
+		    students = []
+		    
+		dow = self.valid_values['dow'][dowidx]
+		_record = [locals()[field] for field in self.fields]
+		_records.append(_record)
+		log.log(thisfuncname(),10,msg="record added",record=_record)
             elif recordtype == 'computertime':
                 if self.prep <> -1:
 		    students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
@@ -180,12 +223,26 @@ class SSLoader(object):
 		    _record = [locals()[field] for field in self.fields]
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
+		elif studentfile == True:
+		    students = [studentname]
+		    teacher = "??"
+		    subject = "Computer Time"
+		    dow = self.valid_values['dow'][dowidx]
+		    _record = [locals()[field] for field in self.fields]
+		    _records.append(_record)
+		    log.log(thisfuncname(),10,msg="record addede",record=_record)
 		else:
-		    log.log(thisfuncname(),10,msg="skipping Computer Time as Staff File",record=_record)
+		    subject = "Computer Time"
+		    #dow = self.valid_values['dow'][dowidx]
+		    #_record = [locals()[field] for field in self.fields]
+		    #_records.append(_record)
+		    #log.log(thisfuncname(),10,msg="skipping Computer Time as Staff File",record=_record)
 	    elif recordtype[:3] == 'dow':
 		periodidx=-1
 		dow = record
 		log.log(thisfuncname(),10,msg="setting dow",dow=dow)
+	    elif recordtype == "wpwith":
+		pass
 		
 	    elif recordtype == 'academicname':
                 academicname = self.extract_staff(record)
@@ -312,6 +369,14 @@ class SSLoader(object):
                 # ignore this &; do not change last char
                 continue
             elif fileasstring[i] == "&":
+		
+		if fileasstring[i-4:i] == "with":
+		    record += " "
+		    lastchar = " "
+		    continue
+		elif fileasstring[i-5:i] == "with ":
+		    continue
+                
                 records.append(record.strip())
                 record=""
                 lastchar = fileasstring[i]
@@ -345,7 +410,9 @@ class SSLoader(object):
             log.log(thisfuncname(),10,msg="skipoing as blank row",record=record,matches=match)
             return('blankrow')
         elif len(match) > 1:
-            raise SSLoaderMultiRuleMatchException
+            log.log(thisfuncname(),3,msg="multiple rules matched picking on priority",mathes=match)
+	    return(match[0])
+	    #raise SSLoaderMultiRuleMatchException
         elif len(match) == 0:
             raise SSLoaderNoRulesMatchException
         else:
@@ -353,8 +420,22 @@ class SSLoader(object):
             return(match[0])
         
     def appyrules(self,record,rules):
-        for char,count in rules:    
-            if record.lower().count(char.lower()) <> count:
+	
+        for char,count in rules:
+	    p = re.compile(char.lower())
+	    if char.count("=") == 1:
+		# match any synonym
+		objtype,value = char.split("=")
+		synomatch=False
+		for syno,master_value in self.synonyms.iteritems():
+		    if master_value==value and record.count(syno) == count:
+			synomatch=True
+
+		if synomatch==False:
+		    return False
+	    
+	    #elif record.lower().count(char.lower()) <> count:
+            elif len(p.findall(record.lower())) <> count:
                 return False
         return True
     
@@ -364,7 +445,7 @@ class SSLoader(object):
         return(subject,_rest)
     
     def extract_staff(self,record):
-        if record[-2:] <> "++" and record[-2:] <> "--":
+        if record[-2:] <> "++" and record[-2:] <> "--" and record[-2:] <> "**":
             raise SSLoaderBadTokenException
 
         return(record[:-2])
@@ -500,11 +581,18 @@ class SSLoader(object):
                     for _value in orig_value:
                         new_value.append(self.validate_token2(_value,self.valid_values[self.fields[i]]))
                 else:
-                    new_value = self.validate_token2(orig_value,self.valid_values[self.fields[i]])
+                    try:
+			new_value = self.validate_token2(orig_value,self.valid_values[self.fields[i]])
 		    
-		    if self.synonyms.has_key(new_value):
-			log.log(thisfuncname(),10,msg="synonym, swapping",new_value=self.synonyms[new_value],old_value=new_value)
-			new_value = self.synonyms[new_value]
+			if self.synonyms.has_key(new_value):
+			    log.log(thisfuncname(),10,msg="synonym, swapping",new_value=self.synonyms[new_value],old_value=new_value)
+			    new_value = self.synonyms[new_value]
+		    except KeyError:
+			# not all fields have (or need) valid values to compare against
+			# one example would be recordtype; where values are generated by the program
+			# not from the user / file input
+			log.log(thisfuncname(),10,msg="no valid values available",objtype=self.fields[i])
+			new_value = orig_value
 		    
             except SSLoaderNoMatchException:
                 log.log(thisfuncname(),2,msg="failed to validate record",record=record,file=self.inputfile)
@@ -548,302 +636,72 @@ class SSLoader(object):
         raise SSLoaderNoMatchException
 
 
-	
     @logger(log)
     def dbupdater(self,records):
-        
-        from misc_utils import IDGenerator
-        from datetime import datetime
-	from copy import deepcopy
+	
+	cols = ['period','dow','subject','teacher','students']
 
-        enums = {'maps':{},'enums':{},'codes':{}}
-        
-        getdbenum(enums,self.database,'name','period')
-        getdbenum(enums,self.database,'name','student')
-        getdbenum(enums,self.database,'name','dow')
-        
-        cols = ['period','dow','subject','teacher','students']
-        
-        session_count=0
-        lesson_count=0
-        
         dblessonrows = []
         dbsessionrows = []
         
 	dbrecords = []
         for record in records:
-
-            whereclause = []
             d = dict(zip(cols,record))
 
-	    if len(d['students']) == 0:
-		log.log(thisfuncname(),2,msg="0 students - check input file",record=record)
-		continue
-	    
-	    #_dow = enums['dow']['name2code'][d['dow']]
-	    _period = enums['period']['name2enum'][d['period']]
-	    
-	    #whereclause.append(['student',"=","\"" + d['students'][0] + "\""])
-	    whereclause.append(['period',"=","\"" + str(_period) + "\""])
-	    whereclause.append(['dow',"=","\"" + d['dow'] + "\""])                 
-	    whereclause.append(['teacher',"=","\"" + d['teacher'] + "\""])   
-	    
+	    # determine if a session for this record already exists by looking for the key period.dow.teacher in sessions table
+	    _period = self.enums['period']['name2enum'][d['period']]
 	    with self.database:
-		#colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',['__id','teacher','session','subject'],whereclause)
-		colndefn,rows,exec_str = tbl_rows_get(self.database,'session',['__id','teacher','code','subject','enum'],whereclause)
-		
+		colndefn,rows,exec_str = _findsessions(self.database,_period,d['dow'],d['teacher'])
+	    
+	    _record = deepcopy(record) # take a copy as sometimes inspect record for testing
+	    
+	    # if nothing is found
 	    if len(rows) == 0:
-		d['source'] = self.inputfile
-		d['__id'] = IDGenerator().getid()
-		d['__timestamp'] = datetime.now().strftime("%H:%M:%S")	
-		d['prep'] = int(self.prepmap[d['students'][0]])
-		#d['period'] = _period
-		d['code'] = ".".join([d['teacher'],d['subject'],d['dow']])
 		d['type'] = "1-on-1"
 		if len(d['students']) > 1:d['type'] = "Group"
-		_students = d.pop('students')
-		with self.database:
-		    _,_session_count,_ = _maxsessionenum(self.database)		    
-	    
-		session_count = int(_session_count[0][0])+1
-		d['enum'] = int(session_count)
-		dbinsert(self.database,'session',[d.values()],d.keys())
-		
-		log.log(thisfuncname(),10,msg="createing session",record=d)
-		
-		sessioncode = d['code']
-		subject = "??"
-		sessionenum = session_count		
-		
+		_record.append(d['type']) # add type
+		dbsessionrows.append(_record)
+		subject = d['subject']
 	    else:
 		sessioncode = rows[0][2]
 		subject = rows[0][3]
 		sessionenum = rows[0][4]
-		
-	    _record = deepcopy(record) # take a copy as sometimes inspect record for testing
-	    _record.append(sessioncode) # add sessioncode for inserting into lesson
-	    _record.pop(2) # remove old subject
-	    _record.insert(2,subject) # add new subject
-	    _record.append(sessionenum) # add session_enum
-	    
-	    dbrecords.append(_record)
 
-	cols = ['period','dow','subject','teacher','students','session','sessionenum']
-	
-	with self.database:
-	    _,_lesson_count,_ = _maxlessonenum(self.database)		    
+	    _updaterecordval(_record,subject,'subject',cols)
+
+	    for student in d['students']:
+		__record = deepcopy(_record)
+		_updaterecordval(__record,student,'students',cols)
+		dblessonrows.append(__record)
     
-	lesson_count = int(_lesson_count[0][0])+1
+	dbinsert_direct(self.database,dbsessionrows,'session',self.inputfile,masterstatus=False)
+	dbinsert_direct(self.database,dblessonrows,'lesson',self.inputfile,masterstatus=False)
 
-	for record in dbrecords:
-	    
-	    d = dict(zip(cols,record))
-
-	    # set status
-	    d['status'] = "complete"
-		
-	    # move students so we can insert to sessions
-	    _students = d.pop('students')  
-	    _dow = d['dow']
-	    
-	    # set who loaded the record
-	    d['source'] = self.inputfile
-
-	    _sessionenum = d['sessionenum']
-	    d.pop('sessionenum')
-	    
-	    for student in _students:
-	
-		_period =  int(enums['period']['name2enum'][d['period']])
-		_prep = int(self.prepmap[student])
-		_code = "\"" + d['session'] + "\""
-		
-		#with self.database:
-		#    _,session_enum,exec_str = _sessionenum(self.database,_code,_period,_prep)
-		    
-		#if len(session_enum) == 0:
-		#    log.log(thisfuncname(),2,msg="no session exists;need to create",record=record)
-		#    continue
-		
-		# student enum
-		d['student'] = student
-		student_enum = enums['student']['name2enum'][student]
-		
-		dow_enum = enums['dow']['name2enum'][_dow]
-		d['dow'] = enums['dow']['name2code'][_dow]
-		
-		# set prep per student as could be cross preps
-		d['prep'] = int(self.prepmap[student])
-		
-		# lesson enum
-		d['enum'] = lesson_count
-		
-		# code
-		d['session'] = ".".join([d['teacher'],d['subject'],_dow]) 
-		
-		# create userobjid
-		d['userobjid'] = ",".join(map(str,[d['period'],dow_enum,student_enum]))
-		
-		# set the saveversion
-		d['saveversion'] = 1
-		
-		d['__id'] = IDGenerator().getid()
-		d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
-
-		dbinsert(self.database,'lesson',[d.values()],d.keys())
-		
-		lesson_count += 1
-
-	    
-    @logger(log)
+ 
     def dbloader(self,records):
-        
-        from misc_utils import IDGenerator
-        from datetime import datetime
-
-        enums = {'maps':{},'enums':{},'codes':{}}
-        
-        getdbenum(enums,self.database,'name','period')
-        getdbenum(enums,self.database,'name','student')
-        getdbenum(enums,self.database,'name','dow')
-        
-        
-        cols = ['period','dow','subject','teacher','students']
-        
-        session_count=0
-        lesson_count=0
         
         dblessonrows = []
         dbsessionrows = []
         
+        cols = ['period','dow','subject','teacher','students',"recordtype"]
+	_idx = cols.index('students')
+	
         for record in records:
-            
-            d = dict(zip(cols,record))
-
-            # get an id
-            d['__id'] = IDGenerator().getid()
-            d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
-            
-            # lookup prep
-            
-            try:
-                student = d['students'][0]
-            except IndexError:
-                log.log(thisfuncname(),10,msg="no student name found, creating session only",record=record)
-                #continue
-            
-            d['prep'] = int(self.prepmap[student])
-
-            # lookup period enum
-            _period = d['period']
-            d['period'] =  int(enums['period']['name2enum'][_period])
-            
-            # lookup session code
-            d['code'] = ".".join([d['teacher'],d['subject'],d['dow']]) 
-            
-            # create session type
-            d['type'] = "1-on-1"
-            if len(d['students']) > 1:d['type'] = "Group"
-            
-            # move students so we can insert to sessions
-            _students = d.pop('students')
-
-	    # set who loaded the record
-	    d['source'] = self.inputfile            
-
-            # insert session record
-            d['enum'] = int(session_count)
+	    d = dict(zip(cols,record))
+            dbsessionrows.append(record)
 	    
-            #dbinsert(self.database,'session',[d.values()],d.keys())
-            dbsessionrows.append(d.values())
+	    if len(d['students']) > 1:
+		pass
 	    
-	    # set the cols so we can do a bulk load to db later
-	    if session_count ==0: dbsessioncols = d.keys()
-
-            # change col name for session code
-            d['session'] = d['code']
-            d.pop('code')
-
-            # get rid of remaining fields not needed for lesson record
-            d.pop('type')
-            d.pop('enum')
-
-	    dow_enum = enums['dow']['name2enum'][d['dow']]
-            d['dow'] = enums['dow']['name2code'][d['dow']]
-            
-            # store the period name for the lesson record
-            d['period'] = _period
-	    
-	    # set status
-	    d['status'] = "complete"
-	    if d['teacher'] == '??':
-		d['status'] = "incomplete"
-            
-            for student in _students:
-
-                # student enum
-                d['student'] = student
-                student_enum = enums['student']['name2enum'][student]
+            for student in d['students']:
+		_record = deepcopy(record)
+		_record.pop(_idx)
+		_record.insert(_idx,student)
 		
-
-                
-                # set prep per student as could be cross preps
-                d['prep'] = int(self.prepmap[student])
+		dblessonrows.append(_record)
 		
-                # lesson enum
-                d['enum'] = int(lesson_count)
-                
-                # create userobjid
-		
-		'''
-		periodenum dayenum studenenum
-		load them all into a hash using userobjid; set a complete and incomplete attribute and store the asociated id
-		then parse list setting the tags
-		'''
-		
-                d['userobjid'] = ",".join(map(str,[d['period'],dow_enum,student_enum]))   
-                
-                # set the saveversion
-                d['saveversion'] = 1
-                
-                # insert lesson record
-		#if d['teacher'] <> "??":
-		dblessonrows.append(d.values())
-		#else:
-		#    log.log(thisfuncname(),3,msg="no teacher provided; not creating lesson from session",record=d)
-
-                # set the cols so we can do a bulk load to db later
-                if lesson_count ==0: dblessoncols = d.keys()
-
-                lesson_count += 1
-                
-            session_count+=1
-            
-        with self.database:
-            
-            dblessoncoldefn = _gencoldefn(dblessonrows[0],dblessoncols)
-	    dbsessioncoldefn = _gencoldefn(dbsessionrows[0],dbsessioncols)
-	    
-	    if not tbl_exists(self.database,'lesson') ==True:
-		tbl_create(self.database,'lesson',dblessoncoldefn)    
-		
-	    if not tbl_exists(self.database,'session') ==True:
-		tbl_create(self.database,'session',dbsessioncoldefn)    
-
-	    maxrowsize = 300
-            dblessonrows = _quotestrs(dblessonrows)
-	    dbsessionrows = _quotestrs(dbsessionrows)
-	    for starti in range(0,len(dblessonrows),maxrowsize):
-		if starti+maxrowsize > len(dblessonrows):
-		    endi = len(dblessonrows)
-		else:
-		    endi = starti + (maxrowsize-1)
-		
-		tbl_rows_insert(self.database,'lesson',dblessoncols,dblessonrows[starti:endi])
-		log.log(thisfuncname(),10,msg="loaded rows to lesson",numrow=endi-starti)
-		    
-	    tbl_rows_insert(self.database,'session',dbsessioncols,dbsessionrows)               
-	    log.log(thisfuncname(),10,msg="loaded row to session",numrows=len(dbsessionrows))
+	dbinsert_direct(self.database,dbsessionrows,'session',self.inputfile,masterstatus=False)
+	dbinsert_direct(self.database,dblessonrows,'lesson',self.inputfile,masterstatus=False)    
 
     def _sessionhashmapget(self):
 	
@@ -941,34 +799,44 @@ class SSLoader(object):
 		hashmap[hashkey]['status'] = "primary"
 	    elif hashmap[hashkey]['subject'] == "Computer Time":
 		hashmap[hashkey]['status'] = "primary"
-
+	    elif hashmap[hashkey]['status'] <> "unset":
+		hashmap[hashkey]['status'] = "conflict"
+	    else:
+		hashmap[hashkey]['status'] <> "unset"
 	    
 	return (hashmap)
     	
     def ssloader(self,files,databasename="htmlparser"):
         
-        for file,prep in files:
+        for _file,prep,dbloader in files:
             
-            self.inputfile = file
+            log.log(thisfuncname(),3,msg="loading",file=_file,prep=prep,dbloaderflag=dbloader)
+	    
+            self.inputfile = _file
 	    self.prep = prep
-            fileasstring = self.file2string(file)
-    
-            records = self.string2records(fileasstring)
-    
-            clean_records,_,_ = self.pre_process_records(records)
-    
-            validated_clean_records = []
-            for clean_record in clean_records:
-                validated_clean_records.append(self.validate_tokens(clean_record))
-                
-	    self.dbloader(validated_clean_records)
+            fileasstring = self.file2string(_file)
 
-    def run(self,dbname):
+            records = self.string2records(fileasstring)
+
+	    
+            clean_records,_,_ = self.pre_process_records(records)
+	    
+            self.validated_clean_records = []
+            for clean_record in clean_records:
+                self.validated_clean_records.append(self.validate_tokens(clean_record))
+                
+	    if dbloader == True:
+		self.dbloader(self.validated_clean_records)
+	    else:
+		self.dbupdater(self.validated_clean_records)
+		
+
+    def run(self,dbname,files,insertprimary=True):
 
 	def _getprimarykeyhash(pred=None,predval=None):
     
 	    cols = ['dow','period','student']
-	    hashmap = self.ssloader.primary_record_set()
+	    hashmap = self.primary_record_set()
 	    
 	    # add the key components to the flat output record
 	    results = []      
@@ -987,46 +855,11 @@ class SSLoader(object):
 		tbl_remove(self.database,'session')
 	except:
 	    pass
-    
-	# load in prep 5 via dbinsert
-	print "loading prep5"
-	self.ssloader = SSLoader(self.databasename)
-	self.ssloader.ssloader([('prep5data.csv',5)],self.databasename)
-    
-	# load in prep 4 via dbinsert
-	print "loading prep4"
-	self.ssloader = SSLoader(self.databasename)
-	self.ssloader.ssloader([('prep4data.csv',4)],self.databasename)  
 
-	# load in prep 6 via dbinsert
-	print "loading prep6"
 	self.ssloader = SSLoader(self.databasename)
-	self.ssloader.ssloader([('prep6data.csv',6)],self.databasename)  
+	self.ssloader.ssloader(files,self.databasename)
 
-	# load in staff via dbinsert
-	print "loading staff"
-	self.ssloader = SSLoader(self.databasename)
-	self.ssloader.ssloader([('staff.csv',-1)],self.databasename)  
-
-	# load in academic via dbupdater
-	print "loading academic"
-	self.ssloader = SSLoader(self.databasename)
-	self.ssloader.inputfile = "academic.csv"
-	fileasstring = self.ssloader.file2string("academic.csv")
-	records = self.ssloader.string2records(fileasstring)
-	self.clean_records,_,_ = self.ssloader.pre_process_records(records)
-
-	self.validated_clean_records = []
-	for clean_record in self.clean_records:
-	    self.validated_clean_records.append(self.ssloader.validate_tokens(clean_record))
-
-	self.ssloader.dbupdater(self.validated_clean_records)
-	
-	# create master record set in _new
-	print "creating master record"
-	self.databasename = dbname + "_new"
-	self.database = Database(self.databasename)
-    
+	log.log(thisfuncname(),3,msg="creating master record set")    
 	cols = ['status','teachers','student','subject','period','dow']
 	rows = _getprimarykeyhash()
 	
@@ -1036,12 +869,17 @@ class SSLoader(object):
 	    d = dict(zip(cols,row))
 	    newrows.append([d['period'],d['dow'],d['subject'][0],d['teachers'][0],d['student'],'1-on-1'])
     
-	print "loading master record"
-	dbinsert_direct(self.database,newrows,'session','test')
-	dbinsert_direct(self.database,newrows,'lesson','test')
+	if insertprimary==True:
+	    log.log(thisfuncname(),10,msg="loading master record set")    
+	    dbinsert_direct(self.database,newrows,'session','dbinsert')
+	    dbinsert_direct(self.database,newrows,'lesson','dbinsert')
 
 if __name__ == "__main__":
     databasename = "quad"
-    
+
+    files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staff.csv',-1,True),
+             ('prep5student.csv',-1,True),('prep4student.csv',-1,True),('prep6student.csv',-1,True),
+             ('academic.csv',-1,False)]
+
     ssloader = SSLoader(databasename)
-    ssloader.run(databasename)
+    ssloader.run(databasename,files)
