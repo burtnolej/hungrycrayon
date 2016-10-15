@@ -455,18 +455,23 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    d = dict(zip(cols,record))
 	    d['dow'] = _isname(enums,'dow',d['dow'])
 	    d['period'] = _isenum(enums,'period',d['period'])
-	    d['code'] = ".".join([d['adult'],d['subject'],d['dow']])
+	    d['code'] = ".".join([d['adult'],d['subject'],d['dow'],_isname(enums,'period',d['period'])])
+	    d['lessoncount'] = 0
 	    #d['userobjid'] = _getuserobjid(enums,['period','dow','subject','adult'],d)
 	    
 	    # if student is a list and has more than 1 member, set prep to unknown (-1)
 	    if isinstance(d['student'],list) == True:
 		if len(d['student']) == 1:
 		    d['prep'] = int(prepmap[d['student'][0]])
+		    
 		else:
 		    d['prep'] = -1
+		d['numstudents'] = len(d['students'])
+		
 	    else:
 		d['prep'] = int(prepmap[d['student']])
-	    d.pop('student')
+		d['numstudents'] = 0
+	    #d.pop('student')
 
 	elif tblname == 'lesson':
 
@@ -474,7 +479,7 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 
 	    d['dow'] = _iscode(enums,'dow',d['dow'])
 	    d['period'] = _isname(enums,'period',d['period'])
-	    d['session'] = ".".join([d['adult'],d['subject'],_isname(enums,'dow',d['dow'])])
+	    d['session'] = ".".join([d['adult'],d['subject'],_isname(enums,'dow',d['dow']),d['period']])
 	    d['prep'] = int(prepmap[d['student']])
 	    d['userobjid'] = _getuserobjid(enums,['period','dow','student'],d)
 
@@ -542,7 +547,7 @@ def dbinsert(database,dbclassname,rows,colnames):
                 except Exception, e:
                     log.log(thisfuncname(),1,func=dbobj.persist,error=str(e))
 
-    
+
 if __name__ == "__main__":
     
     session_code_gen('quadref',False)

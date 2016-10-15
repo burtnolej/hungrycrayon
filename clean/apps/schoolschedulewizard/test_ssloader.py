@@ -1138,8 +1138,8 @@ class Test_DBLoader(Test_Base):
                   ['1210-100', 'Wednesday', 'Humanities', 'Jess', ['Liam'],'academic']]
             
         
-        expected_results =  [['Thea.STEM.Tuesday', 'Tuesday',7,'Thea', 'STEM'], 
-                             ['Jess.Humanities.Wednesday', 'Wednesday',6, 'Jess','Humanities']]
+        expected_results =  [['Thea.STEM.Tuesday.100-140', 'Tuesday',7,'Thea', 'STEM'], 
+                             ['Jess.Humanities.Wednesday.1210-100', 'Wednesday',6, 'Jess','Humanities']]
             
             
         self.ssloader.dbloader(records)
@@ -1156,8 +1156,8 @@ class Test_DBLoader(Test_Base):
                   ['1210-100', 'Wednesday', 'Humanities', 'Jess', ['Liam'],'academic']]
             
         
-        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday'], 
-                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday']]
+        expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday.100-140'], 
+                             ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday.1210-100']]
             
             
         self.ssloader.dbloader(records)
@@ -1553,12 +1553,12 @@ class Test_DBLoader_Staff_with_Prep5_Period1(Test_Base):
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['student','==',"\"" + "Peter" + "\""]])
 
-        expected_results = [['complete','WE','830-910','Issey.Work Period.Wednesday','Issey'],
-                            ['incomplete','MO','830-910','??.Work Period.Monday','??'],
-                            ['incomplete','TU','830-910','??.Work Period.Tuesday','??'],
-                            ['incomplete','WE','830-910','??.Work Period.Wednesday','??'],
-                            ['incomplete','TH','830-910','??.Work Period.Thursday','??'],
-                            ['complete','FR','830-910','B.Art.Friday','B']]
+        expected_results = [['complete','WE','830-910','Issey.Work Period.Wednesday.830-910','Issey'],
+                            ['incomplete','MO','830-910','??.Work Period.Monday.830-910','??'],
+                            ['incomplete','TU','830-910','??.Work Period.Tuesday.830-910','??'],
+                            ['incomplete','WE','830-910','??.Work Period.Wednesday.830-910','??'],
+                            ['incomplete','TH','830-910','??.Work Period.Thursday.830-910','??'],
+                            ['complete','FR','830-910','B.Art.Friday.830-910','B']]
     
         self.assertListEqual(rows,expected_results)
         
@@ -1587,17 +1587,17 @@ class Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter(Test_Base):
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['student','==',"\"" + "Peter" + "\""]])
             
-        expected_results = [[u'complete', u'FR', u'830-910', u'B.Art.Friday', u'B'], 
-                            [u'complete', u'MO', u'830-910', u'Stan.Work Period.Monday', u'Stan'], 
-                            [u'complete', u'TH', u'830-910', u'John.Work Period.Thursday', u'John'], 
-                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday', u'Amelia'], 
-                            [u'complete', u'WE', u'830-910', u'Issey.Work Period.Wednesday', u'Issey'],
-                            [u'complete', u'WE', u'830-910', u'Issey.Work Period.Wednesday', u'Issey'], 
-                            [u'incomplete', u'FR', u'830-910', u'??.Art.Friday', u'??'],
-                            [u'incomplete', u'MO', u'830-910', u'??.Work Period.Monday', u'??'],
-                            [u'incomplete', u'TH', u'830-910', u'??.Work Period.Thursday', u'??'],
-                            [u'incomplete', u'TU', u'830-910', u'??.Work Period.Tuesday', u'??'],
-                            [u'incomplete', u'WE', u'830-910', u'??.Work Period.Wednesday', u'??']]
+        expected_results = [[u'complete', u'FR', u'830-910', u'B.Art.Friday.830-910', u'B'], 
+                            [u'complete', u'MO', u'830-910', u'Stan.Work Period.Monday.830-910', u'Stan'], 
+                            [u'complete', u'TH', u'830-910', u'John.Work Period.Thursday.830-910', u'John'], 
+                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday.830-910', u'Amelia'], 
+                            [u'complete', u'WE', u'830-910', u'Issey.Work Period.Wednesday.830-910', u'Issey'],
+                            [u'complete', u'WE', u'830-910', u'Issey.Work Period.Wednesday.830-910', u'Issey'], 
+                            [u'incomplete', u'FR', u'830-910', u'??.Art.Friday.830-910', u'??'],
+                            [u'incomplete', u'MO', u'830-910', u'??.Work Period.Monday.830-910', u'??'],
+                            [u'incomplete', u'TH', u'830-910', u'??.Work Period.Thursday.830-910', u'??'],
+                            [u'incomplete', u'TU', u'830-910', u'??.Work Period.Tuesday.830-910', u'??'],
+                            [u'incomplete', u'WE', u'830-910', u'??.Work Period.Wednesday.830-910', u'??']]
     
         expected_results.sort()
         rows.sort()
@@ -1619,11 +1619,11 @@ class Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter(Test_Base):
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['student','==',"\"" + "Peter" + "\""],
                                                                  ['status','=',"\"master\""]])
 
-        expected_results = [['master','WE','830-910','Issey.Work Period.Wednesday','Issey'],
-                            ['master','MO','830-910','Stan.Work Period.Monday','Stan'],
-                            ['master','TU','830-910','Amelia.Work Period.Tuesday','Amelia'],
-                            ['master','TH','830-910','John.Work Period.Thursday','John'],
-                            ['master','FR','830-910','B.Art.Friday','B']]
+        expected_results = [['master','WE','830-910','Issey.Work Period.Wednesday.830-910','Issey'],
+                            ['master','MO','830-910','Stan.Work Period.Monday.830-910','Stan'],
+                            ['master','TU','830-910','Amelia.Work Period.Tuesday.830-910','Amelia'],
+                            ['master','TH','830-910','John.Work Period.Thursday.830-910','John'],
+                            ['master','FR','830-910','B.Art.Friday.830-910','B']]
     
         expected_results.sort()
         rows.sort()
@@ -1652,17 +1652,17 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
 
     def test_lesson_from_academic(self):
 
-        expected_results = [[u'complete', u'MO', u'830-910', u'Stan.Math.Monday', u'Clayton'],
-                            [u'complete', u'TU', u'830-910', u'Stan.Math.Tuesday', u'Nathaniel'],
-                            [u'complete', u'WE', u'830-910', u'Stan.Math.Wednesday', u'Clayton'], 
-                            [u'complete', u'TH', u'830-910', u'Stan.Math.Thursday', u'Nathaniel'],
-                            [u'complete', u'MO', u'830-910', u'Amelia.ELA.Monday', u'Nathaniel'], 
-                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday', u'Peter'], 
-                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday', u'Jack'], 
-                            [u'complete', u'WE', u'830-910', u'Amelia.ELA.Wednesday', u'Nathaniel'],
-                            [u'complete', u'TH', u'830-910', u'Amelia.Work Period.Thursday', u'Jack'], 
-                            [u'complete', u'TU', u'830-910', u'Paraic.Science.Tuesday', u'Jake'], 
-                            [u'complete', u'TH', u'830-910', u'Paraic.Science.Thursday', u'Jake']]
+        expected_results = [[u'complete', u'MO', u'830-910', u'Stan.Math.Monday.830-910', u'Clayton'],
+                            [u'complete', u'TU', u'830-910', u'Stan.Math.Tuesday.830-910', u'Nathaniel'],
+                            [u'complete', u'WE', u'830-910', u'Stan.Math.Wednesday.830-910', u'Clayton'], 
+                            [u'complete', u'TH', u'830-910', u'Stan.Math.Thursday.830-910', u'Nathaniel'],
+                            [u'complete', u'MO', u'830-910', u'Amelia.ELA.Monday.830-910', u'Nathaniel'], 
+                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday.830-910', u'Peter'], 
+                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday.830-910', u'Jack'], 
+                            [u'complete', u'WE', u'830-910', u'Amelia.ELA.Wednesday.830-910', u'Nathaniel'],
+                            [u'complete', u'TH', u'830-910', u'Amelia.Work Period.Thursday.830-910', u'Jack'], 
+                            [u'complete', u'TU', u'830-910', u'Paraic.Science.Tuesday.830-910', u'Jake'], 
+                            [u'complete', u'TH', u'830-910', u'Paraic.Science.Thursday.830-910', u'Jake']]
     
         cols = ['status','dow','period','session','student']
         
@@ -1676,8 +1676,8 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
         
     def test_session_from_academic(self):
     
-        expected_results = [[u'complete', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday'],
-                            [u'complete', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday']]
+        expected_results = [[u'complete', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday.830-910'],
+                            [u'complete', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday.830-910']]
 
         cols = ['status','dow','period','subject','code']
         
@@ -1745,34 +1745,34 @@ class Test_DBLoader_Academic(unittest.TestCase):
     def test_(self):
         
         # rest are missing because session not created from a previous load
-        expected_results = [[u'complete', u'MO', u'830-910', u'Stan.Math.Monday', u'Clayton'], 
-                            [u'incomplete', u'MO', u'910-950', u'Stan.??.Monday', u'Simon A'], 
-                            [u'incomplete', u'MO', u'1030-1110', u'Stan.??.Monday', u'Yosef'], 
-                            [u'incomplete', u'MO', u'1210-100', u'Stan.??.Monday', u'Booker'], 
-                            [u'incomplete', u'MO', u'100-140', u'Stan.??.Monday', u'Thomas'], 
-                            [u'incomplete', u'MO', u'140-220', u'Stan.??.Monday', u'Ashley'],
-                            [u'incomplete', u'MO', u'220-300', u'Stan.??.Monday', u'Coby'], 
-                            [u'complete', u'TU', u'830-910', u'Stan.Math.Tuesday', u'Nathaniel'], 
-                            [u'incomplete', u'TU', u'910-950', u'Stan.??.Tuesday', u'Bruno'], 
-                            [u'complete', u'TU', u'1030-1110', u'Stan.Math.Tuesday', u'Peter'],
-                            [u'incomplete', u'TU', u'1210-100', u'Stan.??.Tuesday', u'Jake'], 
-                            [u'complete', u'TU', u'100-140', u'Stan.Math.Tuesday', u'Orig'], 
-                            [u'complete', u'TU', u'140-220', u'Stan.Math.Tuesday', u'Oscar'], 
-                            [u'incomplete', u'TU', u'220-300', u'Stan.??.Tuesday', u'Jack'], 
-                            [u'complete', u'WE', u'830-910', u'Stan.Math.Wednesday', u'Clayton'], 
-                            [u'incomplete', u'WE', u'910-950', u'Stan.??.Wednesday', u'Simon A'], 
-                            [u'incomplete', u'WE', u'1030-1110', u'Stan.??.Wednesday', u'Yosef'], 
-                            [u'incomplete', u'WE', u'1210-100', u'Stan.??.Wednesday', u'Booker'], 
-                            [u'incomplete', u'WE', u'100-140', u'Stan.??.Wednesday', u'Thomas'], 
-                            [u'incomplete', u'WE', u'140-220', u'Stan.??.Wednesday', u'Ashley'], 
-                            [u'incomplete', u'WE', u'220-300', u'Stan.??.Wednesday', u'Coby'], 
-                            [u'complete', u'TH', u'830-910', u'Stan.Math.Thursday', u'Nathaniel'], 
-                            [u'complete', u'TH', u'910-950', u'Stan.Math Activity Period.Thursday', u'Bruno'], 
-                            [u'incomplete', u'TH', u'1030-1110', u'Stan.??.Thursday', u'Peter'],
-                            [u'incomplete', u'TH', u'1210-100', u'Stan.??.Thursday', u'Jake'], 
-                            [u'complete', u'TH', u'100-140', u'Stan.Math.Thursday', u'Orig'], 
-                            [u'complete', u'TH', u'140-220', u'Stan.Math.Thursday', u'Oscar'], 
-                            [u'incomplete', u'TH', u'220-300', u'Stan.??.Thursday', u'Jack']]
+        expected_results = [[u'complete', u'MO', u'830-910', u'Stan.Math.Monday.830-910', u'Clayton'], 
+                            [u'incomplete', u'MO', u'910-950', u'Stan.??.Monday.910-950', u'Simon A'], 
+                            [u'incomplete', u'MO', u'1030-1110', u'Stan.??.Monday.1030-1110', u'Yosef'], 
+                            [u'incomplete', u'MO', u'1210-100', u'Stan.??.Monday.1210-100', u'Booker'], 
+                            [u'incomplete', u'MO', u'100-140', u'Stan.??.Monday.100-140', u'Thomas'], 
+                            [u'incomplete', u'MO', u'140-220', u'Stan.??.Monday.140-220', u'Ashley'],
+                            [u'incomplete', u'MO', u'220-300', u'Stan.??.Monday.220-300', u'Coby'], 
+                            [u'complete', u'TU', u'830-910', u'Stan.Math.Tuesday.830-910', u'Nathaniel'], 
+                            [u'incomplete', u'TU', u'910-950', u'Stan.??.Tuesday.910-950', u'Bruno'], 
+                            [u'complete', u'TU', u'1030-1110', u'Stan.Math.Tuesday.1030-1110', u'Peter'],
+                            [u'incomplete', u'TU', u'1210-100', u'Stan.??.Tuesday.1210-100', u'Jake'], 
+                            [u'complete', u'TU', u'100-140', u'Stan.Math.Tuesday.100-140', u'Orig'], 
+                            [u'complete', u'TU', u'140-220', u'Stan.Math.Tuesday.140-220', u'Oscar'], 
+                            [u'incomplete', u'TU', u'220-300', u'Stan.??.Tuesday.220-300', u'Jack'], 
+                            [u'complete', u'WE', u'830-910', u'Stan.Math.Wednesday.830-910', u'Clayton'], 
+                            [u'incomplete', u'WE', u'910-950', u'Stan.??.Wednesday.910-950', u'Simon A'], 
+                            [u'incomplete', u'WE', u'1030-1110', u'Stan.??.Wednesday.1030-1110', u'Yosef'], 
+                            [u'incomplete', u'WE', u'1210-100', u'Stan.??.Wednesday.1210-100', u'Booker'], 
+                            [u'incomplete', u'WE', u'100-140', u'Stan.??.Wednesday.100-140', u'Thomas'], 
+                            [u'incomplete', u'WE', u'140-220', u'Stan.??.Wednesday.140-220', u'Ashley'], 
+                            [u'incomplete', u'WE', u'220-300', u'Stan.??.Wednesday.220-300', u'Coby'], 
+                            [u'complete', u'TH', u'830-910', u'Stan.Math.Thursday.830-910', u'Nathaniel'], 
+                            [u'complete', u'TH', u'910-950', u'Stan.Math Activity Period.Thursday.910-950', u'Bruno'], 
+                            [u'incomplete', u'TH', u'1030-1110', u'Stan.??.Thursday.1030-1110', u'Peter'],
+                            [u'incomplete', u'TH', u'1210-100', u'Stan.??.Thursday.1210-100', u'Jake'], 
+                            [u'complete', u'TH', u'100-140', u'Stan.Math.Thursday.100-140', u'Orig'], 
+                            [u'complete', u'TH', u'140-220', u'Stan.Math.Thursday.140-220', u'Oscar'], 
+                            [u'incomplete', u'TH', u'220-300', u'Stan.??.Thursday.220-300', u'Jack']]
 
 
         self.ssloader.dbupdater(self.validated_clean_records)   
