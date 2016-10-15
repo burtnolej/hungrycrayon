@@ -463,15 +463,21 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    if isinstance(d['student'],list) == True:
 		if len(d['student']) == 1:
 		    d['prep'] = int(prepmap[d['student'][0]])
-		    
 		else:
 		    d['prep'] = -1
-		d['numstudents'] = len(d['students'])
+		d['numstudents'] = len(d['student']) # keep track of the number of students in this session (aka the number of lessons that exist)
 		
 	    else:
 		d['prep'] = int(prepmap[d['student']])
 		d['numstudents'] = 0
-	    #d.pop('student')
+	    d.pop('student')
+	    
+	    # specify if a session was created without children (ie student could not be
+	    # determined from info provided in the input file
+	    if d['numstudents'] == 0:
+		d['status'] = "nochildrenatinit"
+	    else:
+		d['status'] = "childrenatinit"
 
 	elif tblname == 'lesson':
 
@@ -486,19 +492,21 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    d['saveversion'] = 1
 	   
 	    d.pop('type')
+    
+	    # set status
+	    d['status'] = "complete"
+	    if d['adult'] == '??' or d['subject'] == '??':
+		d['status'] = "incomplete"
+	      
 	
 	d['teacher'] = d['adult']
 	d.pop('adult')
 
-	# set status
-	d['status'] = "complete"
-	if d['teacher'] == '??' or d['subject'] == '??':
-	    d['status'] = "incomplete"
-	d['substatus'] = "notset"
-	
 	if masterstatus == True:
 	    d['substatus'] = d['status']
 	    d['status'] = 'master'
+	else:
+	    d['substatus'] = "notset"  
 	    
 	d['__id'] = IDGenerator().getid()
 	d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
@@ -548,6 +556,11 @@ def dbinsert(database,dbclassname,rows,colnames):
                     log.log(thisfuncname(),1,func=dbobj.persist,error=str(e))
 
 
+def updatelessoncount():
+    ''' iterate over each session and using the session code, count how many lessons exist
+    for that session '''
+    pass
+    
 if __name__ == "__main__":
     
     session_code_gen('quadref',False)

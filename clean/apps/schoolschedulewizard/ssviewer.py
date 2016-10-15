@@ -278,10 +278,10 @@ class WizardUI(Tk):
             
         value = [self.enums['period']['name2enum'][value[0]],self.enums['dow']['code2name'][value[1]]]
         
-        with self.database:           
-            cols,rows,_ = _sessionversions(self.database,*value)
-            
-            print rows
+        #with self.database:           
+        #    cols,rows,_ = _sessionversions(self.database,*value)
+        #    
+        #    print rows
 
         if len(rows) <> 0:
             self.bgmaxrows=len(rows)

@@ -1676,8 +1676,8 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
         
     def test_session_from_academic(self):
     
-        expected_results = [[u'complete', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday.830-910'],
-                            [u'complete', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday.830-910']]
+        expected_results = [[u'childrenatinit', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday.830-910'],
+                            [u'childrenatinit', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday.830-910']]
 
         cols = ['status','dow','period','subject','code']
         
@@ -1969,7 +1969,7 @@ class Test_DBLoader_Primary_Record_Set_With_Staff_Student(unittest.TestCase):
         self.assertListEqual(self._getprimarykeyhash('student','Nathaniel'),expected_results)
         
     def tearDown(self):
-        copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
+        #copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
         pass
         
 class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
@@ -2178,7 +2178,7 @@ if __name__ == "__main__":
     # #####################################################################################################
     # unit tests=
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_Dylan))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff_Student))
     #unittest.TextTestRunner(verbosity=2).run(suite) 
     #exit()
     
