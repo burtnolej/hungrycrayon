@@ -15,7 +15,7 @@ from misc_utils_objectfactory import ObjFactory
 from shutil import copyfile
 from os import remove, path
         
-class Test_Nathaniel(unittest.TestCase):
+class Test_Viewer_Student_TeacherSubject(unittest.TestCase):
     
     # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
     
@@ -31,26 +31,53 @@ class Test_Nathaniel(unittest.TestCase):
 
         results = self.app.viewer(False,'student','Nathaniel',["subject","teacher"])
         
-        expected_results = [["","MO","TU","TH","WE","FR"],                                                                                                                                                                                                                
-                            ["830-910","ELA,Amelia","Math,Stan","Math,Stan","ELA,Amelia","Humanities,A"],                                                                                                                                                                                                     
-                            ["910-950","Core,??","Work Period,Dylan","Core,??","Work Period,Moira","Music,??"],                                                                                                                                                                                               
-                            ["950-1030","Work Period,Karolina","Activity Period,Aaron","Work Period,Issey","OT,??","STEM,??"],                                                                                                                                                                                
-                            ["1030-1110","Activity Period,Dylan","Chess,Rahul","Chess,Rahul","Activity Period,Issey","Art,??"],                                                                                                                                                                               
-                            ["1110-1210","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??"],                                                                                                                                                                     
-                            ["1210-100","Science,Paraic","History,Samantha","History,Samantha","Science,Paraic","??,??"],                                                                                                                                                                                         
-                            ["100-140","Chess,Rahul","Work Period,Karolina","Work Period,Aaron","Chess,Rahul","??,??"],                                                                                                                                                                                            
-                            ["140-220","Work Period,Johnny","Movement,??","Movement,??","Work Period,Issey","??,??"],                                                                                                                                                                                            
-                            ["220-300","Speech,??","Student News,??","Student News,??","Counseling,Alexa","??,??"],                                                                                                                                                                                           
-                            ["300-330","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??","??,??"]]
+        expected_results = [['', u'MO', u'TU', u'TH', u'WE', u'FR'], 
+                            [u'830-910', u'Movement,Amelia', u'Movement,Stan', u'Movement,Stan', u'Movement,Amelia', u'Humanities,A'], 
+                            [u'910-950', u'Core,??', u'[Activity Period,Work Period],Dylan', u'Core,??', u'[Work Period,Activity Period],[Amelia,Moira,Issey]', u'Music,??'], 
+                            [u'950-1030', u'[Activity Period,Work Period],Karolina', u'[Math,Activity Period],[Stan,Aaron]', u'[Math,Work Period],[Stan,Issey]', u'OT,Melissa', u'STEM,??'], 
+                            [u'1030-1110', u'[ELA,Activity Period],[Amelia,Dylan]', u'[Chess,Work Period],[Stan,Rahul]', u'[Chess,Work Period],[Stan,Rahul]', u'[ELA,Activity Period,Work Period],[Amelia,Issey]', u'Art,??'], 
+                            [u'1110-1210', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??'], 
+                            [u'1210-100', u'Science,Paraic', u'History,Samantha', u'History,Samantha', u'Science,Paraic', '??,??'],
+                            [u'100-140', u'[Chess,Work Period],[SONJA,Rahul]', u'Work Period,[Sam,Karolina,Samantha]', u'Work Period,[Sam,Aaron,Issey,Samantha]', u'Chess,Rahul', '??,??'],
+                            [u'140-220', u'Work Period,[Paraic,Issey]', u'Movement,??', u'Movement,??', u'Work Period,Issey', '??,??'],
+                            [u'220-300', u'Speech,??', u'Student News,Karolina', u'Student News,??', u'Counseling,Alexa', '??,??'], 
+                            [u'300-330', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', '??,??']]
 
-
-        
         self.assertListEqual(expected_results,results)
+        
+        #print expected_results,results
 
     def tearDown(self):
         pass
 
+        
+class Test_Viewer_Student_TeacherSubject_Version(unittest.TestCase):
+    
+    # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
+    
+    def setUp(self):
+        self.databasename = "test_ssloader_all"
+    
+        of = ObjFactory(True)
+        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
+        self.app.load(saveversion=1,student="Nathaniel")
+        
+          
+    def test_(self):
 
+        expected_results = [[u'lesson', u'TU', u'830-910', u'Movement', u'??', u'prep5data.csv', u'??.Movement.Tuesday.830-910'], 
+                            [u'lesson', u'TU', u'830-910', u'Movement', u'??', u'prep5student.csv', u'??.Movement.Tuesday.830-910'], 
+                            [u'lesson', u'TU', u'830-910', u'??', u'Stan', u'academic.csv', u'Stan.??.Tuesday.830-910'], 
+                            [u'lesson', u'TU', u'830-910', u'Movement', u'Stan', u'dbinsert', u'Stan.Movement.Tuesday.830-910']]
+
+        results = self.app.viewer(True,'student','Nathaniel',["subject","teacher"])
+        
+        print self.app.dump(['830-910','WE','Nathaniel'])
+
+
+    def tearDown(self):
+        pass
+    
 class Test_Johnny(unittest.TestCase):
     
     # example of a multiple student in one session
@@ -134,10 +161,8 @@ if __name__ == "__main__":
     suite = unittest.TestSuite()
     
     # functional tests
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Get_Details))    
-    
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Johnny))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Student_TeacherSubject))    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Student_TeacherSubject_Version))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

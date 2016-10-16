@@ -1648,21 +1648,21 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
     
         self.ssloader = SSLoader("test_ssloader")
         self.ssloader.ssloader([('prep5data_test1period.csv',5,True)])  
-        self.ssloader.ssloader([('test_academic_1period_3teachers.csv',-1,False)])   
+        self.ssloader.ssloader([('test_academic_1period_3teachers.csv',-1,True)])   
 
     def test_lesson_from_academic(self):
 
-        expected_results = [[u'complete', u'MO', u'830-910', u'Stan.Math.Monday.830-910', u'Clayton'],
-                            [u'complete', u'TU', u'830-910', u'Stan.Math.Tuesday.830-910', u'Nathaniel'],
-                            [u'complete', u'WE', u'830-910', u'Stan.Math.Wednesday.830-910', u'Clayton'], 
-                            [u'complete', u'TH', u'830-910', u'Stan.Math.Thursday.830-910', u'Nathaniel'],
-                            [u'complete', u'MO', u'830-910', u'Amelia.ELA.Monday.830-910', u'Nathaniel'], 
+        expected_results = [[u'incomplete', u'MO', u'830-910', u'Stan.??.Monday.830-910', u'Clayton'],
+                            [u'incomplete', u'TU', u'830-910', u'Stan.??.Tuesday.830-910', u'Nathaniel'],
+                            [u'incomplete', u'WE', u'830-910', u'Stan.??.Wednesday.830-910', u'Clayton'], 
+                            [u'incomplete', u'TH', u'830-910', u'Stan.??.Thursday.830-910', u'Nathaniel'],
+                            [u'incomplete', u'MO', u'830-910', u'Amelia.??.Monday.830-910', u'Nathaniel'], 
                             [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday.830-910', u'Peter'], 
                             [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday.830-910', u'Jack'], 
-                            [u'complete', u'WE', u'830-910', u'Amelia.ELA.Wednesday.830-910', u'Nathaniel'],
+                            [u'incomplete', u'WE', u'830-910', u'Amelia.??.Wednesday.830-910', u'Nathaniel'],
                             [u'complete', u'TH', u'830-910', u'Amelia.Work Period.Thursday.830-910', u'Jack'], 
-                            [u'complete', u'TU', u'830-910', u'Paraic.Science.Tuesday.830-910', u'Jake'], 
-                            [u'complete', u'TH', u'830-910', u'Paraic.Science.Thursday.830-910', u'Jake']]
+                            [u'incomplete', u'TU', u'830-910', u'Paraic.??.Tuesday.830-910', u'Jake'], 
+                            [u'incomplete', u'TH', u'830-910', u'Paraic.??.Thursday.830-910', u'Jake']]
     
         cols = ['status','dow','period','session','student']
         
@@ -1676,13 +1676,24 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
         
     def test_session_from_academic(self):
     
-        expected_results = [[u'childrenatinit', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday.830-910'],
-                            [u'childrenatinit', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday.830-910']]
+        expected_results = [[u'childrenatinit', u'Monday', 1, u'??', u'Stan.??.Monday.830-910'],                                                                                                                                                                              
+                            [u'childrenatinit', u'Tuesday', 1, u'??', u'Stan.??.Tuesday.830-910'],                                                                                                                                                                                                                                                       
+                            [u'childrenatinit', u'Wednesday', 1, u'??', u'Stan.??.Wednesday.830-910'],
+                            [u'childrenatinit', u'Thursday', 1, u'??', u'Stan.??.Thursday.830-910'],
+                            [u'childrenatinit', u'Monday', 1, u'??', u'Amelia.??.Monday.830-910'],
+                            [u'childrenatinit', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday.830-910'],
+                            [u'childrenatinit', u'Wednesday', 1, u'??', u'Amelia.??.Wednesday.830-910'],
+                            [u'childrenatinit', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday.830-910'],
+                            [u'childrenatinit', u'Tuesday', 1, u'??', u'Paraic.??.Tuesday.830-910'],
+                            [u'childrenatinit', u'Thursday', 1, u'??', u'Paraic.??.Thursday.830-910']]
 
         cols = ['status','dow','period','subject','code']
         
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'session',cols,[['source','=',"\"" + "test_academic_1period_3teachers.csv" + "\""]])
+
+        #for row in rows:
+        #    print row
 
         self.assertListEqual(expected_results,rows)
         
@@ -1714,7 +1725,8 @@ class Test_DBLoader_Academic_Stan_Orphan(unittest.TestCase):
         for row in rows:
             print row
             
-        #self.assertListEqual(expected_results,rows)     
+        #self.assertListEqual(expected_results,rows)    
+        
 class Test_DBLoader_Academic(unittest.TestCase):
     def setUp(self):  
 
@@ -1728,54 +1740,39 @@ class Test_DBLoader_Academic(unittest.TestCase):
             pass
     
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data.csv',5,True)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.inputfile = "academic.csv"
-        fileasstring = self.ssloader.file2string("academic.csv")
-
-        records = self.ssloader.string2records(fileasstring)
-
-        self.clean_records,_,_ = self.ssloader.pre_process_records(records)
-        
-        self.validated_clean_records = []
-        for clean_record in self.clean_records:
-            self.validated_clean_records.append(self.ssloader.validate_tokens(clean_record))
+        self.results = self.ssloader.run("test_ssloader",[('prep5data.csv',5,True),
+                                                          ('academic.csv',-1,True)],True)
             
     def test_(self):
-        
-        # rest are missing because session not created from a previous load
-        expected_results = [[u'complete', u'MO', u'830-910', u'Stan.Math.Monday.830-910', u'Clayton'], 
+
+        expected_results = [[u'incomplete', u'MO', u'830-910', u'Stan.??.Monday.830-910', u'Clayton'],
                             [u'incomplete', u'MO', u'910-950', u'Stan.??.Monday.910-950', u'Simon A'], 
                             [u'incomplete', u'MO', u'1030-1110', u'Stan.??.Monday.1030-1110', u'Yosef'], 
-                            [u'incomplete', u'MO', u'1210-100', u'Stan.??.Monday.1210-100', u'Booker'], 
+                            [u'incomplete', u'MO', u'1210-100', u'Stan.??.Monday.1210-100', u'Booker'],
                             [u'incomplete', u'MO', u'100-140', u'Stan.??.Monday.100-140', u'Thomas'], 
-                            [u'incomplete', u'MO', u'140-220', u'Stan.??.Monday.140-220', u'Ashley'],
+                            [u'incomplete', u'MO', u'140-220', u'Stan.??.Monday.140-220', u'Ashley'], 
                             [u'incomplete', u'MO', u'220-300', u'Stan.??.Monday.220-300', u'Coby'], 
-                            [u'complete', u'TU', u'830-910', u'Stan.Math.Tuesday.830-910', u'Nathaniel'], 
+                            [u'incomplete', u'TU', u'830-910', u'Stan.??.Tuesday.830-910', u'Nathaniel'], 
                             [u'incomplete', u'TU', u'910-950', u'Stan.??.Tuesday.910-950', u'Bruno'], 
-                            [u'complete', u'TU', u'1030-1110', u'Stan.Math.Tuesday.1030-1110', u'Peter'],
+                            [u'incomplete', u'TU', u'1030-1110', u'Stan.??.Tuesday.1030-1110', u'Peter'], 
                             [u'incomplete', u'TU', u'1210-100', u'Stan.??.Tuesday.1210-100', u'Jake'], 
-                            [u'complete', u'TU', u'100-140', u'Stan.Math.Tuesday.100-140', u'Orig'], 
-                            [u'complete', u'TU', u'140-220', u'Stan.Math.Tuesday.140-220', u'Oscar'], 
+                            [u'incomplete', u'TU', u'100-140', u'Stan.??.Tuesday.100-140', u'Orig'], 
+                            [u'incomplete', u'TU', u'140-220', u'Stan.??.Tuesday.140-220', u'Oscar'], 
                             [u'incomplete', u'TU', u'220-300', u'Stan.??.Tuesday.220-300', u'Jack'], 
-                            [u'complete', u'WE', u'830-910', u'Stan.Math.Wednesday.830-910', u'Clayton'], 
+                            [u'incomplete', u'WE', u'830-910', u'Stan.??.Wednesday.830-910', u'Clayton'], 
                             [u'incomplete', u'WE', u'910-950', u'Stan.??.Wednesday.910-950', u'Simon A'], 
                             [u'incomplete', u'WE', u'1030-1110', u'Stan.??.Wednesday.1030-1110', u'Yosef'], 
                             [u'incomplete', u'WE', u'1210-100', u'Stan.??.Wednesday.1210-100', u'Booker'], 
                             [u'incomplete', u'WE', u'100-140', u'Stan.??.Wednesday.100-140', u'Thomas'], 
-                            [u'incomplete', u'WE', u'140-220', u'Stan.??.Wednesday.140-220', u'Ashley'], 
+                            [u'incomplete', u'WE', u'140-220', u'Stan.??.Wednesday.140-220', u'Ashley'],
                             [u'incomplete', u'WE', u'220-300', u'Stan.??.Wednesday.220-300', u'Coby'], 
-                            [u'complete', u'TH', u'830-910', u'Stan.Math.Thursday.830-910', u'Nathaniel'], 
-                            [u'complete', u'TH', u'910-950', u'Stan.Math Activity Period.Thursday.910-950', u'Bruno'], 
-                            [u'incomplete', u'TH', u'1030-1110', u'Stan.??.Thursday.1030-1110', u'Peter'],
+                            [u'incomplete', u'TH', u'830-910', u'Stan.??.Thursday.830-910', u'Nathaniel'],
+                            [u'incomplete', u'TH', u'910-950', u'Stan.??.Thursday.910-950', u'Bruno'], 
+                            [u'incomplete', u'TH', u'1030-1110', u'Stan.??.Thursday.1030-1110', u'Peter'], 
                             [u'incomplete', u'TH', u'1210-100', u'Stan.??.Thursday.1210-100', u'Jake'], 
-                            [u'complete', u'TH', u'100-140', u'Stan.Math.Thursday.100-140', u'Orig'], 
-                            [u'complete', u'TH', u'140-220', u'Stan.Math.Thursday.140-220', u'Oscar'], 
+                            [u'incomplete', u'TH', u'100-140', u'Stan.??.Thursday.100-140', u'Orig'], 
+                            [u'incomplete', u'TH', u'140-220', u'Stan.??.Thursday.140-220', u'Oscar'],
                             [u'incomplete', u'TH', u'220-300', u'Stan.??.Thursday.220-300', u'Jack']]
-
-
-        self.ssloader.dbupdater(self.validated_clean_records)   
     
         cols = ['status','dow','period','session','student']
         
@@ -1791,7 +1788,43 @@ class Test_DBLoader_Academic(unittest.TestCase):
             _,rows,_ = tbl_rows_get(self.database,'session',cols,[['teacher','=',"\"" + "Stan" + "\""],
                                                                   ['source','=',"\"" + "academic.csv" + "\""]])
 
-        self.assertEqual(len(rows),18)
+        self.assertEqual(len(rows),28)
+        
+        cols = ['status','dow','period','session','student']
+        
+        self.expected_results = [[u'master', u'MO', u'220-300', u'Stan.??.Monday.220-300', u'Coby'], 
+                                 [u'master', u'MO', u'100-140', u'Stan.??.Monday.100-140', u'Thomas'], 
+                                 [u'master', u'WE', u'830-910', u'Stan.Math.Wednesday.830-910', u'Clayton'], 
+                                 [u'master', u'TU', u'910-950', u'Stan.Math Activity Period.Tuesday.910-950', u'Bruno'], 
+                                 [u'master', u'MO', u'1210-100', u'Stan.??.Monday.1210-100', u'Booker'],
+                                 [u'master', u'TH', u'1210-100', u'Stan.Math.Thursday.1210-100', u'Jake'], 
+                                 [u'master', u'TU', u'100-140', u'Stan.Math.Tuesday.100-140', u'Orig'], 
+                                 [u'master', u'WE', u'140-220', u'Stan.??.Wednesday.140-220', u'Ashley'], 
+                                 [u'master', u'MO', u'830-910', u'Stan.Math.Monday.830-910', u'Clayton'], 
+                                 [u'master', u'WE', u'220-300', u'Stan.??.Wednesday.220-300', u'Coby'], 
+                                 [u'master', u'TH', u'1030-1110', u'Stan.Math.Thursday.1030-1110', u'Peter'], 
+                                 [u'master', u'TH', u'910-950', u'Stan.Math Activity Period.Thursday.910-950', u'Bruno'], 
+                                 [u'master', u'WE', u'1030-1110', u'Stan.??.Wednesday.1030-1110', u'Yosef'],
+                                 [u'master', u'TU', u'1030-1110', u'Stan.Math.Tuesday.1030-1110', u'Peter'], 
+                                 [u'master', u'MO', u'1030-1110', u'Stan.??.Monday.1030-1110', u'Yosef'],
+                                 [u'master', u'TH', u'830-910', u'Stan.Math.Thursday.830-910', u'Nathaniel'], 
+                                 [u'master', u'TU', u'830-910', u'Stan.Math.Tuesday.830-910', u'Nathaniel'], 
+                                 [u'master', u'MO', u'910-950', u'Stan.??.Monday.910-950', u'Simon A'], 
+                                 [u'master', u'MO', u'140-220', u'Stan.??.Monday.140-220', u'Ashley'], 
+                                 [u'master', u'WE', u'910-950', u'Stan.??.Wednesday.910-950', u'Simon A'], 
+                                 [u'master', u'TH', u'140-220', u'Stan.Math.Thursday.140-220', u'Oscar'],
+                                 [u'master', u'TH', u'100-140', u'Stan.Math.Thursday.100-140', u'Orig'], 
+                                 [u'master', u'TU', u'140-220', u'Stan.Math.Tuesday.140-220', u'Oscar'],
+                                 [u'master', u'WE', u'1210-100', u'Stan.??.Wednesday.1210-100', u'Booker'], 
+                                 [u'master', u'WE', u'100-140', u'Stan.??.Wednesday.100-140', u'Thomas'], 
+                                 [u'master', u'TU', u'1210-100', u'Stan.Math.Tuesday.1210-100', u'Jake']]
+        
+
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['status','=',"\"" + "master" + "\""],
+                                                                 ['teacher','=',"\"" + "Stan" + "\""]])    
+            
+        self.assertListEqual(rows,self.expected_results)
         
 class Test_DBLoader_All(unittest.TestCase):
     def setUp(self):  
@@ -1806,7 +1839,6 @@ class Test_DBLoader_All(unittest.TestCase):
         except:
             pass
     
-
         files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
                  ('academic.csv',-1,False)]
     
@@ -1817,339 +1849,233 @@ class Test_DBLoader_All(unittest.TestCase):
 
         pass
 
-class Test_DBLoader_Primary_Record_Set(unittest.TestCase):
-    def setUp(self):  
+class Test_Primary_Record_Base(unittest.TestCase):
+    
+    def cleandb(self,database):
 
-        self.databasename = "test_ssloader"
-        self.database = Database(self.databasename)
         try:
-            with self.database:
+            with database:
                 tbl_remove(self.database,'lesson')
                 tbl_remove(self.database,'session')
         except:
             pass
+        
+    def filter_results(self,idx,value):
+        filtered_results=[]
+        for result in self.results:
+            if result[idx] == value:
+                filtered_results.append(result)
+    
+        filtered_results.sort()
+        
+        return filtered_results    
+
+class Test_DBLoader_Primary_Record_Set(Test_Primary_Record_Base):
+    def setUp(self):  
+
+        self.databasename = "test_ssloader"
+        self.database = Database(self.databasename)
+        
+        self.cleandb(self.database)
     
         self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.inputfile = "test_academic_1period_3teachers.csv"
-        fileasstring = self.ssloader.file2string("test_academic_1period_3teachers.csv")
-
-        records = self.ssloader.string2records(fileasstring)
-
-        self.clean_records,_,_ = self.ssloader.pre_process_records(records)
-        
-        self.validated_clean_records = []
-        for clean_record in self.clean_records:
-            self.validated_clean_records.append(self.ssloader.validate_tokens(clean_record))
-            
-        self.ssloader.dbupdater(self.validated_clean_records)
-
-    
-    def _getprimarykeyhash(self,pred,predval):
-        
-        cols = ['dow','period','student']
-        hashmap = self.ssloader.primary_record_set()
-        results = []      
-        for hashkey in hashmap:
-            
-            hashmap[hashkey].pop('source')
-
-            d = dict(zip(cols,hashkey.split(".")))
-
-            if d[pred] == predval:
-                hashmap[hashkey].pop('student')
-                results.append(hashmap[hashkey].values())
-           
-        results.sort()
-          
-        return results
+        self.results = self.ssloader.run("test_ssloader",[('prep5data_test1period.csv',5,True),
+                                           ('test_academic_1period_3teachers.csv',-1,True)],False)
         
     def test_Nathaniel(self):
 
-        expected_results = [['primary',['Amelia'],['ELA'],'830-910','MO'],
-                            ['primary',['Stan'],['Math'],'830-910','TU'],
-                            ['primary',['Amelia'],['ELA'],'830-910','WE'],
-                            ['primary',['Stan'],['Math'],'830-910','TH'],
-                            ['primary',['A'],['Humanities'],'830-910','FR']]
+        expected_results = [[u'830-910', u'MO', u'ELA', u'Amelia', u'Nathaniel', '1-on-1'],
+                            [u'830-910', u'TU', u'Math', u'Stan', u'Nathaniel', '1-on-1'],
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Nathaniel', '1-on-1'],
+                            [u'830-910', u'TH', u'Math', u'Stan', u'Nathaniel', '1-on-1'],
+                            [u'830-910', u'WE', u'ELA', u'Amelia', u'Nathaniel', '1-on-1']]
 
         expected_results.sort()
         
-        self.assertListEqual(self._getprimarykeyhash('student','Nathaniel'),expected_results)
+        self.assertListEqual(self.filter_results(4,'Nathaniel'),expected_results)
         
     def test_Friday(self):
-        
-        expected_results =[['primary',['A'],['Humanities'],'830-910','FR'],
-                           ['primary',['B'],['Art'],'830-910','FR'],
-                           ['primary',['A'],['Humanities'],'830-910','FR'],
-                           ['primary',['A'],['Humanities'],'830-910','FR'],
-                           ['primary',['B'],['Art'],'830-910','FR'],
-                           ['primary',['B'],['Art'],'830-910','FR'],
-                           ['primary',['B'],['Art'],'830-910','FR'],
-                           ['primary',['A'],['Humanities'],'830-910','FR'],
-                           ['primary',['B'],['Art'],'830-910','FR'],
-                           ['primary',['D'],['Music'],'830-910','FR'],
-                           ['primary',['D'],['Music'],'830-910','FR'],
-                           ['primary',['D'],['Music'],'830-910','FR'],
-                           ['primary',['C'],['STEM'],'830-910','FR'],
-                           ['primary',['C'],['STEM'],'830-910','FR'],
-                           ['primary',['C'],['STEM'],'830-910','FR'],
-                           ['primary',['C'],['STEM'],'830-910','FR'],
-                           ['primary',['C'],['STEM'],'830-910','FR']]
-        
+                
+        expected_results = [[u'830-910', u'FR', u'Art', u'B', u'Bruno', '1-on-1'], 
+                            [u'830-910', u'FR', u'Art', u'B', u'Clayton', '1-on-1'], 
+                            [u'830-910', u'FR', u'Art', u'B', u'Jack', '1-on-1'], 
+                            [u'830-910', u'FR', u'Art', u'B', u'Oscar', '1-on-1'], 
+                            [u'830-910', u'FR', u'Art', u'B', u'Peter', '1-on-1'], 
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Jake', '1-on-1'],
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Nathaniel', '1-on-1'], 
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Orig', '1-on-1'], 
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Stephen', '1-on-1'], 
+                            [u'830-910', u'FR', u'Music', u'D', u'Coby', '1-on-1'], 
+                            [u'830-910', u'FR', u'Music', u'D', u'Thomas', '1-on-1'], 
+                            [u'830-910', u'FR', u'Music', u'D', u'Yosef', '1-on-1'], 
+                            [u'830-910', u'FR', u'STEM', u'C', u'Ashley', '1-on-1'], 
+                            [u'830-910', u'FR', u'STEM', u'C', u'Booker', '1-on-1'], 
+                            [u'830-910', u'FR', u'STEM', u'C', u'OmerC', '1-on-1'], 
+                            [u'830-910', u'FR', u'STEM', u'C', u'Simon A', '1-on-1'], 
+                            [u'830-910', u'FR', u'STEM', u'C', u'Tris', '1-on-1']]
+
         expected_results.sort()
         
-        self.assertListEqual(self._getprimarykeyhash('dow','FR'),expected_results)
+        self.assertListEqual(self.filter_results(1,'FR'),expected_results)
     
     def test_FOrig(self):
-        
-        expected_results =[['primary',['Paraic'],['Engineering'],'830-910','MO'],
-                           ['unset',['??'],['Student News'],'830-910','TU'],
-                           ['primary',['Paraic'],['Engineering'],'830-910','WE'],
-                           ['unset',['??'],['Student News'],'830-910','TH'],
-                           ['primary',['A'],['Humanities'],'830-910','FR']]
+
+        expected_results = [[u'830-910', u'FR', u'Humanities', u'A', u'Orig', '1-on-1'],
+                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', '1-on-1'], 
+                            [u'830-910', u'TH', u'Student News', '??', u'Orig', '1-on-1'], 
+                            [u'830-910', u'TU', u'Student News', '??', u'Orig', '1-on-1'], 
+                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', '1-on-1']]
         
         expected_results.sort()
         
-        self.assertListEqual(self._getprimarykeyhash('student','Orig'),expected_results)
-        
+        self.assertListEqual(self.filter_results(4,'Orig'),expected_results)
         
     def tearDown(self):
         copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
 
 
-class Test_DBLoader_Primary_Record_Set_With_Staff_Student(unittest.TestCase):
+class Test_DBLoader_Primary_Record_Set_With_Staff_Student(Test_Primary_Record_Base):
     
     # test that multiple values are stored when there is a conflict on subject and teacher
     
     def setUp(self):  
-
         self.databasename = "test_ssloader"
         self.database = Database(self.databasename)
-        try:
-            with self.database:
-                tbl_remove(self.database,'lesson')
-                tbl_remove(self.database,'session')
-        except:
-            pass
-    
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data_test1period1Monday.csv',5,True)],self.databasename)  
-                
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5studentNathanielPeriod1.csv',-1,True)],self.databasename)
-  
-    def _getprimarykeyhash(self,pred,predval):
-        
-        cols = ['dow','period','student']
-        hashmap = self.ssloader.primary_record_set()
-        results = []      
-        for hashkey in hashmap:
-            
-            hashmap[hashkey].pop('source')
 
-            d = dict(zip(cols,hashkey.split(".")))
-
-            if d[pred] == predval:
-                hashmap[hashkey].pop('student')
-                results.append(hashmap[hashkey].values())
-           
-        results.sort()
-          
-        return results            
+        self.ssloader = SSLoader("test_ssloader")
+        self.results = self.ssloader.run("test_ssloader",[('prep5data_test1period1Monday.csv',5,True),
+                                                          ('prep5studentNathanielPeriod1.csv',-1,True)],False)  
 
     def test_Nathaniel(self):
-
-        expected_results = [['primary', [u'Amelia'], [u'ELA', u'Student News'], u'830-910', u'MO'], 
-                            ['unset', ['??'], [u'Movement'], u'830-910', u'TH'], 
-                            ['unset', ['??'], [u'Movement'], u'830-910', u'TU'], 
-                            ['unset', ['??'], [u'Movement'], u'830-910', u'WE']]
         
-        self.assertListEqual(self._getprimarykeyhash('student','Nathaniel'),expected_results)
+        expected_results = [[u'830-910', u'MO', u'[ELA,Student News]', u'Amelia', u'Nathaniel', '1-on-1'],
+                            [u'830-910', u'TH', u'Movement', '??', u'Nathaniel', '1-on-1'], 
+                            [u'830-910', u'TU', u'Movement', '??', u'Nathaniel', '1-on-1'], 
+                            [u'830-910', u'WE', u'Movement', '??', u'Nathaniel', '1-on-1']]
         
-    def tearDown(self):
-        #copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
-        pass
-        
-class Test_DBLoader_Primary_Record_Set_With_Staff(unittest.TestCase):
-    def setUp(self):  
-
-        self.databasename = "test_ssloader"
-        self.database = Database(self.databasename)
-        try:
-            with self.database:
-                tbl_remove(self.database,'lesson')
-                tbl_remove(self.database,'session')
-        except:
-            pass
-    
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)  
-        
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.ssloader([('staffdata_830910.csv',-1,True)],self.databasename)  
-     
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.inputfile = "test_academic_1period_3teachers.csv"
-        fileasstring = self.ssloader.file2string("test_academic_1period_3teachers.csv")
-
-        records = self.ssloader.string2records(fileasstring)
-
-        self.clean_records,_,_ = self.ssloader.pre_process_records(records)
-        
-        self.validated_clean_records = []
-        for clean_record in self.clean_records:
-            self.validated_clean_records.append(self.ssloader.validate_tokens(clean_record))
-            
-        self.ssloader.dbupdater(self.validated_clean_records)
-
-    
-    def _getprimarykeyhash(self,pred,predval):
-        
-        cols = ['dow','period','student']
-        hashmap = self.ssloader.primary_record_set()
-        results = []      
-        for hashkey in hashmap:
-            
-            hashmap[hashkey].pop('source')
-
-            d = dict(zip(cols,hashkey.split(".")))
-
-            if d[pred] == predval:
-                hashmap[hashkey].pop('student')
-                results.append(hashmap[hashkey].values())
-           
-        results.sort()
-          
-        return results            
-       
-    def test_FOrig(self):
-
-        expected_results = [['primary', [u'A'], [u'Humanities'], u'830-910', u'FR'],
-                            ['primary', [u'Issey'], [u'Student News'], u'830-910', u'TH'],
-                            ['primary', [u'Johnny'], [u'Student News'], u'830-910', u'TU'],
-                            ['primary', [u'Paraic'], [u'Engineering'], u'830-910', u'MO'],
-                            ['primary', [u'Paraic'], [u'Engineering'], u'830-910', u'WE']]
-
-
-        
-        expected_results.sort()
-        
-        self.assertListEqual(self._getprimarykeyhash('student','Orig'),expected_results)
-
-
-    def test_Bruno(self):        
-
-        expected_results = [['unset', [u'??'], [u'Movement'], u'830-910', u'MO'],
-                            ['primary', [u'Johnny'], [u'Student News'], u'830-910', u'TU'],
-                            ['unset', ['??'], [u'Core'], u'830-910', u'TH'],
-                            ['primary', [u'B'], [u'Art'], u'830-910', u'FR']]
-        
-        expected_results.sort()
-        
-        self.assertListEqual(self._getprimarykeyhash('student','Bruno'),expected_results)
+        self.assertListEqual(self.filter_results(4,'Nathaniel'),expected_results)
         
     def tearDown(self):
         copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
         
-class Test_DBLoader_Primary_Record_Set_Nathaniel(unittest.TestCase):
+class Test_DBLoader_Primary_Record_Set_With_Staff(Test_Primary_Record_Base):
     def setUp(self):  
 
-        self.databasename = "test_ssloader_prset_nathaniel"
+        self.databasename = "test_ssloader"
         self.database = Database(self.databasename)
-        self.ssloader = SSLoader("test_ssloader_prset_nathaniel")
+        self.cleandb(self.database)
     
-    def _getprimarykeyhash(self,pred,predval):
+        files = [('prep5data_test1period.csv',5,True),('staffdata_830910.csv',-1,True),('test_academic_1period_3teachers.csv',-1,True)]
+    
+        ssloader = SSLoader(self.databasename)
+        self.results = ssloader.run(self.databasename,files,False)
+       
+    def test_FOrig(self):
+
+        expected_results = [[u'830-910', u'FR', u'Humanities', u'A', u'Orig', '1-on-1'],
+                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', '1-on-1'], 
+                            [u'830-910', u'TH', u'Student News', u'Issey', u'Orig', '1-on-1'],
+                            [u'830-910', u'TU', u'Student News', u'Johnny', u'Orig', '1-on-1'], 
+                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', '1-on-1']]
+
+        expected_results.sort()
         
-        cols = ['dow','period','student']
-        hashmap = self.ssloader.primary_record_set()
-        results = []      
-        for hashkey in hashmap:
-            
-            hashmap[hashkey].pop('source')
+        self.assertListEqual(self.filter_results(4,'Orig'),expected_results)
 
-            d = dict(zip(cols,hashkey.split(".")))
-
-            if d[pred] == predval:
-                hashmap[hashkey].pop('student')
-                results.append(hashmap[hashkey].values())
-           
-        results.sort()
-          
-        return results            
+    def test_Bruno(self):        
+        
+        expected_results = [[u'830-910', u'FR', u'Art', u'B', u'Bruno', '1-on-1'], 
+                            [u'830-910', u'MO', u'Movement', '??', u'Bruno', '1-on-1'], 
+                            [u'830-910', u'TH', u'Core', '??', u'Bruno', '1-on-1'],
+                            [u'830-910', u'TU', u'Student News', u'Johnny', u'Bruno', '1-on-1']]
+        
+        expected_results.sort()
+        
+        self.assertListEqual(self.filter_results(4,'Bruno'),expected_results)
+        
+    def tearDown(self):
+        copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
+        
+class Test_DBLoader_Primary_Record_Set_Nathaniel(Test_Primary_Record_Base):
+    def setUp(self):  
+        
+        self.databasename = "test_ssloader"
+        self.database = Database(self.databasename)
+    
+        self.cleandb(self.database)
+    
+        self.ssloader = SSLoader("test_ssloader")
+        self.results = self.ssloader.run("test_ssloader",[('prep5data.csv',5,True)],False) 
 
     def test_Nathaniel(self):
         
         # expected_results are hand generated from source production files and presented in Prep5_Nathaniel_expected_results.csv
         # the expected_results do not necessarilly match the individual student schedule source prod files as they are known to not always reconcile
-                              
-        expected_results = [['primary', [u'A'], [u'Humanities'], u'830-910', u'FR'], 
-                            ['primary', [u'Aaron'], [u'Activity Period'], u'950-1030', u'TU'], 
-                            ['primary', [u'Aaron', u'Issey'], [u'Work Period'], u'100-140', u'TH'], 
-                            ['primary', [u'Alexa'], [u'Counseling'], u'220-300', u'WE'], 
-                            ['primary', [u'Amelia'], [u'ELA'], u'830-910', u'MO'], 
-                            ['primary', [u'Amelia'], [u'ELA'], u'830-910', u'WE'], 
-                            ['primary', [u'Dylan'], [u'Activity Period'], u'1030-1110', u'MO'], 
-                            ['primary', [u'Dylan'], [u'Work Period'], u'910-950', u'TU'], 
-                            ['primary', [u'Issey'], [u'Activity Period'], u'1030-1110', u'WE'], 
-                            ['primary', [u'Issey'], [u'Work Period'], u'140-220', u'WE'], 
-                            ['primary', [u'Issey'], [u'Work Period'], u'950-1030', u'TH'], 
-                            ['primary', [u'Johnny'], [u'Work Period'], u'140-220', u'MO'], 
-                            ['primary', [u'Karolina'], [u'Work Period'], u'100-140', u'TU'],
-                            ['primary', [u'Karolina'], [u'Work Period'], u'950-1030', u'MO'], 
-                            ['primary', [u'Moira'], [u'Work Period'], u'910-950', u'WE'], 
-                            ['primary', [u'Paraic'], [u'Science'], u'1210-100', u'MO'], 
-                            ['primary', [u'Paraic'], [u'Science'], u'1210-100', u'WE'], 
-                            ['primary', [u'Rahul'], [u'Chess'], u'100-140', u'MO'], 
-                            ['primary', [u'Rahul'], [u'Chess'], u'100-140', u'WE'], 
-                            ['primary', [u'Rahul'], [u'Chess'], u'1030-1110', u'TH'], 
-                            ['primary', [u'Rahul'], [u'Chess'], u'1030-1110', u'TU'], 
-                            ['primary', [u'Samantha'], [u'History'], u'1210-100', u'TH'], 
-                            ['primary', [u'Samantha'], [u'History', u'Movement'], u'1210-100', u'TU'], 
-                            ['primary', [u'Stan'], [u'Math'], u'830-910', u'TH'], 
-                            ['primary', [u'Stan'], [u'Math'], u'830-910', u'TU'],
-                            ['unset', ['??'], [u'Art'], u'1030-1110', u'FR'],
-                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'FR'],
-                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'MO'], 
-                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'TH'], 
-                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'TU'], 
-                            ['unset', ['??'], [u'Computer Time'], u'1110-1210', u'WE'], 
-                            ['unset', ['??'], [u'Computer Time'], u'300-330', u'MO'], 
-                            ['unset', ['??'], [u'Computer Time'], u'300-330', u'TH'], 
-                            ['unset', ['??'], [u'Computer Time'], u'300-330', u'TU'], 
-                            ['unset', ['??'], [u'Computer Time'], u'300-330', u'WE'],
-                            ['unset', ['??'], [u'Core'], u'910-950', u'MO'], 
-                            ['unset', ['??'], [u'Core'], u'910-950', u'TH'],
-                            ['unset', ['??'], [u'Movement'], u'140-220', u'TH'], 
-                            ['unset', ['??'], [u'Movement'], u'140-220', u'TU'], 
-                            ['unset', ['??'], [u'Music'], u'910-950', u'FR'], 
-                            ['unset', ['??'], [u'OT'], u'950-1030', u'WE'], 
-                            ['unset', ['??'], [u'STEM'], u'950-1030', u'FR'], 
-                            ['unset', ['??'], [u'Speech'], u'220-300', u'MO'], 
-                            ['unset', ['??'], [u'Student News'], u'220-300', u'TH'], 
-                            ['unset', ['??'], [u'Student News'], u'220-300', u'TU']]
+        
+        expected_results = [[u'100-140', u'MO', u'ELA', u'Aaron', u'Orig', '1-on-1'], 
+                            [u'100-140', u'TH', u'Math', u'Stan', u'Orig', '1-on-1'], 
+                            [u'100-140', u'TU', u'Math', u'Stan', u'Orig', '1-on-1'], 
+                            [u'100-140', u'WE', u'ELA', u'Aaron', u'Orig', '1-on-1'], 
+                            [u'1030-1110', u'FR', u'Art', '??', u'Orig', '1-on-1'], 
+                            [u'1030-1110', u'MO', u'Core', '??', u'Orig', '1-on-1'],
+                            [u'1030-1110', u'TH', u'Chess', '??', u'Orig', '1-on-1'], 
+                            [u'1030-1110', u'TU', u'Chess', '??', u'Orig', '1-on-1'], 
+                            [u'1110-1210', u'FR', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'1110-1210', u'MO', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'1110-1210', u'TH', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'1110-1210', u'TU', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'1110-1210', u'WE', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'1210-100', u'MO', u'Student News', '??', u'Orig', '1-on-1'], 
+                            [u'1210-100', u'TH', u'Work Period', '??', u'Orig', '1-on-1'], 
+                            [u'1210-100', u'TU', u'Music', '??', u'Orig', '1-on-1'], 
+                            [u'1210-100', u'WE', u'OT', '??', u'Orig', '1-on-1'],
+                            [u'140-220', u'MO', u'Work Period', '??', u'Orig', '1-on-1'],
+                            [u'140-220', u'TH', u'Work Period', '??', u'Orig', '1-on-1'], 
+                            [u'140-220', u'TU', u'Work Period', '??', u'Orig', '1-on-1'], 
+                            [u'140-220', u'WE', u'Work Period', '??', u'Orig', '1-on-1'], 
+                            [u'220-300', u'MO', u'Movement', '??', u'Orig', '1-on-1'], 
+                            [u'220-300', u'TH', u'Activity Period', '??', u'Orig', '1-on-1'], 
+                            [u'220-300', u'TU', u'Movement', '??', u'Orig', '1-on-1'],
+                            [u'220-300', u'WE', u'Movement', '??', u'Orig', '1-on-1'],
+                            [u'300-330', u'MO', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'300-330', u'TH', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'300-330', u'TU', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'300-330', u'WE', u'Computer Time', '??', u'Orig', '1-on-1'], 
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Orig', '1-on-1'], 
+                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', '1-on-1'],
+                            [u'830-910', u'TH', u'Student News', '??', u'Orig', '1-on-1'], 
+                            [u'830-910', u'TU', u'Student News', '??', u'Orig', '1-on-1'], 
+                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', '1-on-1'],
+                            [u'910-950', u'FR', u'Core', '??', u'Orig', '1-on-1'], 
+                            [u'910-950', u'MO', u'Science', u'Paraic', u'Orig', '1-on-1'],
+                            [u'910-950', u'TH', u'History', '??', u'Orig', '1-on-1'],
+                            [u'910-950', u'TU', u'History', '??', u'Orig', '1-on-1'],
+                            [u'910-950', u'WE', u'Science', u'Paraic', u'Orig', '1-on-1'], 
+                            [u'950-1030', u'FR', u'STEM', '??', u'Orig', '1-on-1'], 
+                            [u'950-1030', u'MO', u'Work Period', '??', u'Orig', '1-on-1'],
+                            [u'950-1030', u'TH', u'Core', '??', u'Orig', '1-on-1'], 
+                            [u'950-1030', u'TU', u'Work Period', '??', u'Orig', '1-on-1'], 
+                            [u'950-1030', u'WE', u'Work Period', '??', u'Orig', '1-on-1']]
 
         expected_results.sort()
-            
-        results = self._getprimarykeyhash('student','Nathaniel') 
-        
-        self.assertListEqual(expected_results,results)
+        self.assertListEqual(self.filter_results(4,'Orig'),expected_results)
 
-class Test_DBInsert_Direct_Nathaniel(unittest.TestCase):
+
+class Test_DBInsert_Direct_Nathaniel(Test_Primary_Record_Base):
     def setUp(self):  
 
         #self.databasename = "test_ssloader"
         self.databasename = "test_ssloader_insertdirect_nathaniel"
         self.database = Database(self.databasename)
         
-        #files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
-        #         ('academic.csv',-1,False)]
+        self.cleandb(self.database)
+        
+        files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
+                 ('academic.csv',-1,True)]
     
-        #ssloader = SSLoader(self.databasename)
-        #ssloader.run(self.databasename,files)
+        ssloader = SSLoader(self.databasename)
+        ssloader.run(self.databasename,files)
 
-                   
     def test_(self):
 
         expected_results = [["Nathaniel","MO","TU","WE","TH","FR"],                                                                                                                                                                                                                
@@ -2158,8 +2084,8 @@ class Test_DBInsert_Direct_Nathaniel(unittest.TestCase):
                             ["950-1030","Work Period,Karolina","Activity Period,Aaron","OT,??","Work Period,Issey","STEM,??"],                                                                                                                                                                                
                             ["1030-1110","Activity Period,Dylan","Chess,Rahul","Activity Period,Issey","Chess,Rahul","Art,??"],                                                                                                                                                                               
                             ["1110-1210","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??"],                                                                                                                                                                     
-                            ["1210-100","Science,Paraic","History,Samantha","Science,Paraic","History,Samantha",0],                                                                                                                                                                                         
-                            ["100-140","Chess,Rahul","Work Period,Karolina","Chess,Rahul","Work Period,Aaron",0],                                                                                                                                                                                            
+                            ["1210-100","Science,Paraic",u'History,Samantha',"Science,Paraic","History,Samantha",0],                                                                                                                                                                                         
+                            ["100-140","Chess,Rahul","Work Period,Karolina","Chess,Rahul","Work Period,[Aaron,Issey]",0],                                                                                                                                                                                            
                             ["140-220","Work Period,Johnny","Movement,??","Work Period,Issey","Movement,??",0],                                                                                                                                                                                            
                             ["220-300","Speech,??","Student News,??","Counseling,Alexa","Student News,??",0],                                                                                                                                                                                           
                             ["300-330","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??",0]]
@@ -2167,9 +2093,78 @@ class Test_DBInsert_Direct_Nathaniel(unittest.TestCase):
         results = _pivotexecfunc(self.database,'Nathaniel','dow','period','lesson',False,True,[['student','=','Nathaniel']],"subject,teacher")
         
         self.assertListEqual(expected_results, results[:-1])
-        
+
     def tearDown(self):
         pass
+            
+class Test_Primary_Set_Session(Test_Primary_Record_Base):
+    def setUp(self):  
+
+        #self.databasename = "test_ssloader"
+        self.databasename = "test_ssloader_insertdirect_nathaniel"
+        self.database = Database(self.databasename)
+        
+        self.cleandb(self.database)
+        
+        files = [('prep5studentClaytonPeriod1.csv',-1,True),('prep5data_Clayton_1Period.csv',5,True),
+                 ('staffdata_johnny_1period.csv',-1,True),('test_academic_1period_Stan.csv',-1,True)]
+    
+        ssloader = SSLoader(self.databasename)
+        ssloader.run(self.databasename,files)
+
+    def test_lesson(self):
+
+        expected_results = [[u'master', u'WE', u'830-910', u'[Paraic,Stan]', u'Clayton', u'Engineering'],
+                            [u'master', u'FR', u'830-910', u'A', u'Clayton', u'Humanities'],
+                            [u'master', u'TH', u'830-910', u'Johnny', u'Clayton', u'Student News'],
+                            [u'master', u'TH', u'830-910', u'Stan', u'Nathaniel', u'??'],
+                            [u'master', u'TU', u'830-910', u'[Amelia,Johnny]', u'Clayton', u'[Activity Period,Work Period]'],
+                            [u'master', u'MO', u'830-910', u'Stan', u'Clayton', u'Math'],
+                            [u'master', u'TU', u'830-910', u'Stan', u'Nathaniel', u'??']]
+        
+        expected_results.sort()
+        
+        cols = ['status','dow','period','teacher','student','subject']
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['status','=','\"master\"']])
+        
+        rows.sort()
+        
+        self.assertListEqual(rows,expected_results)
+
+    def test_session(self):
+
+        expected_results = [[u'master', u'Thursday', 1, u'Johnny', u'Student News'],
+                            [u'master', u'Monday', 1, u'Johnny', u'Movement'],
+                            [u'master', u'Tuesday', 1, u'Amelia', u'Activity Period'],
+                            [u'master', u'Wednesday', 1, u'Johnny', u'Movement'],
+                            [u'master', u'Thursday', 1, u'??', u'Student News'],
+                            [u'master', u'Thursday', 1, u'Stan', u'??'],
+                            [u'master', u'Tuesday', 1, u'??', u'Work Period'],
+                            [u'master', u'Monday', 1, u'??', u'Math'],
+                            [u'master', u'Tuesday', 1, u'Johnny', u'Work Period'],
+                            [u'master', u'Tuesday', 1, u'Stan', u'??'],
+                            [u'master', u'Wednesday', 1, u'Rahul', u'Movement'],
+                            [u'master', u'Wednesday', 1, u'Stan', u'??'],
+                            [u'master', u'Tuesday', 1, u'Rahul', u'Movement'],
+                            [u'master', u'Monday', 1, u'Stan', u'??'],
+                            [u'master', u'Wednesday', 1, u'Paraic', u'Engineering'],
+                            [u'master', u'Friday', 1, u'A', u'Humanities']]
+
+        cols = ['status','dow','period','teacher','subject']
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'session',cols,[['status','=','\"master\"']])
+
+        for row in rows:
+            print row
+        #self.assertListEqual(rows,expected_results)    
+
+    def tearDown(self):
+        pass
+            
+            
             
 if __name__ == "__main__":
     suite = unittest.TestSuite()
@@ -2178,9 +2173,11 @@ if __name__ == "__main__":
     # #####################################################################################################
     # unit tests=
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff_Student))
-    #unittest.TextTestRunner(verbosity=2).run(suite) 
-    #exit()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Primary_Set_Session))
+    
+    
+    unittest.TextTestRunner(verbosity=2).run(suite) 
+    exit()
     
     
     # loadrefobjects
@@ -2258,6 +2255,8 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff_Student))  
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Primary_Set_Session))
     
     
     # ######################################################################################################

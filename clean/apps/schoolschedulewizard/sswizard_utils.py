@@ -445,7 +445,7 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
     
 	tablerow_count = int(_lesson_count[0][0])+1
 
-    cols = ['period','dow','subject','adult','student','type']
+    cols = ['period','dow','subject','adult','student','numstudents']
 
     for record in records:
 	    
@@ -465,11 +465,11 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 		    d['prep'] = int(prepmap[d['student'][0]])
 		else:
 		    d['prep'] = -1
-		d['numstudents'] = len(d['student']) # keep track of the number of students in this session (aka the number of lessons that exist)
+		#d['numstudents'] = len(d['student']) # keep track of the number of students in this session (aka the number of lessons that exist)
 		
 	    else:
 		d['prep'] = int(prepmap[d['student']])
-		d['numstudents'] = 0
+		#d['numstudents'] = 0
 	    d.pop('student')
 	    
 	    # specify if a session was created without children (ie student could not be
@@ -491,14 +491,13 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 
 	    d['saveversion'] = 1
 	   
-	    d.pop('type')
+	    #d.pop('type')
     
 	    # set status
 	    d['status'] = "complete"
 	    if d['adult'] == '??' or d['subject'] == '??':
 		d['status'] = "incomplete"
 	      
-	
 	d['teacher'] = d['adult']
 	d.pop('adult')
 

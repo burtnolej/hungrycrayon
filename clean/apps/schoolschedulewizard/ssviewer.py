@@ -275,14 +275,22 @@ class WizardUI(Tk):
         
         with self.database:
             cols,rows,_ = _versions(self.database,*value)
-            
-        value = [self.enums['period']['name2enum'][value[0]],self.enums['dow']['code2name'][value[1]]]
+            _,subjects,_ = _versions_subjects(self.database,*value)
         
-        #with self.database:           
-        #    cols,rows,_ = _sessionversions(self.database,*value)
-        #    
-        #    print rows
-
+        for subject in subjects:
+            
+            if subject[0] <> "??":
+                _period = sswizard_utils._isenum(self.enums,'period',value[0])
+                _dow = sswizard_utils._isname(self.enums,'dow',value[1])
+                
+                value = [_period,_dow,subject[0]]
+            
+                with self.database: 
+                    cols,sessionrows,_ = _sessionversions(self.database,*value)
+                
+                for session in sessionrows:
+                    print session
+        
         if len(rows) <> 0:
             self.bgmaxrows=len(rows)
             self.bgmaxcols=len(rows[0])
@@ -307,7 +315,13 @@ class WizardUI(Tk):
                     widget = self.versionsgrid.widgets[x][y]
                     widget.sv.set(rows[x][y])
         else:
-            self.versionsgrid.destroy()
+            try:
+                self.versionsgrid.destroy()
+            except AttributeError:
+                pass
+        
+        rows.sort()
+        return rows
 
     def viewer(self,ui=True,source_type=None,source_value=None,ztypes=None):
 
@@ -631,7 +645,7 @@ class WizardUI(Tk):
             for i in range(len(cols)):
                 datamembers[cols[i]] = row[i]
             
-            _,lessontype_code,_ = datamembers['session'].split(".")
+            _,lessontype_code,_,_ = datamembers['session'].split(".")
             #lessontype = self.enums['lessontype']['code2name'][lessontype_code]      
             datamembers['objtype'] = 'lesson'                               
             

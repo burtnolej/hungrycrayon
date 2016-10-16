@@ -8,7 +8,8 @@ from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 
 from sqlite3 import OperationalError
 
-__all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfunc', '_versions', '_sessionversions']
+__all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfunc', '_versions', '_sessionversions', \
+           '_versions_subjects']
 
 def _dowexecfunc(database,value,prep,*args):
     exec_str = "select code from dow "
@@ -33,16 +34,27 @@ def _versions(database,period,dow,student):
     exec_str += " where period = \"{0}\" ".format(period)
     exec_str += " and student = \"{0}\" ".format(student)
     exec_str += " and dow = \"{0}\" ".format(dow)
-    
+
     print exec_str
     
     return(tbl_query(database,exec_str))
 
-def _sessionversions(database,period,dow):
-    exec_str = "select \"session\",dow,period,subject,teacher,source from session"
+def _versions_subjects(database,period,dow,student):
+    exec_str = "select distinct(subject) from lesson"
+    exec_str += " where period = \"{0}\" ".format(period)
+    exec_str += " and student = \"{0}\" ".format(student)
+    exec_str += " and dow = \"{0}\" ".format(dow)
+
+    print exec_str
+    
+    return(tbl_query(database,exec_str))
+
+def _sessionversions(database,period,dow,subject):
+    exec_str = "select \"session\",dow,period,subject,teacher,source,status,substatus from session"
     exec_str += " where period = \"{0}\" ".format(period)
     exec_str += " and dow = \"{0}\" ".format(dow)
-    
+    exec_str += " and subject = \"{0}\" ".format(subject)
+
     print exec_str
     
     return(tbl_query(database,exec_str))

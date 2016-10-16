@@ -11,10 +11,14 @@ from collections import OrderedDict
 
 from sswizard_query_utils import _sessionenum, _maxlessonenum, _maxsessionenum, _findsessions
 
-
 from datetime import datetime
 from copy import deepcopy
 import re
+import os
+import shutil
+
+PRODDIR="/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler"
+DEVDIR="/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard"
 
 class SSLoaderRuleException(Exception):
     def __repr__(self):
@@ -643,49 +647,6 @@ class SSLoader(object):
         log.log(thisfuncname(),10,msg="failed to validate token",token=token,file=self.inputfile)
         raise SSLoaderNoMatchException
 
-
-    @logger(log)
-    def dbupdater(self,records):
-	
-	cols = ['period','dow','subject','teacher','students']
-
-        dblessonrows = []
-        dbsessionrows = []
-        
-	dbrecords = []
-        for record in records:
-            d = dict(zip(cols,record))
-
-	    # determine if a session for this record already exists by looking for the key period.dow.teacher in sessions table
-	    _period = self.enums['period']['name2enum'][d['period']]
-	    with self.database:
-		colndefn,rows,exec_str = _findsessions(self.database,_period,d['dow'],d['teacher'])
-	    
-	    _record = deepcopy(record) # take a copy as sometimes inspect record for testing
-	    
-	    # if nothing is found
-	    if len(rows) == 0:
-		d['type'] = "1-on-1"
-		if len(d['students']) > 1:d['type'] = "Group"
-		_record.append(d['type']) # add type
-		dbsessionrows.append(_record)
-		subject = d['subject']
-	    else:
-		sessioncode = rows[0][2]
-		subject = rows[0][3]
-		sessionenum = rows[0][4]
-
-	    _updaterecordval(_record,subject,'subject',cols)
-
-	    for student in d['students']:
-		__record = deepcopy(_record)
-		_updaterecordval(__record,student,'students',cols)
-		dblessonrows.append(__record)
-    
-	dbinsert_direct(self.database,dbsessionrows,'session',self.inputfile,masterstatus=False)
-	dbinsert_direct(self.database,dblessonrows,'lesson',self.inputfile,masterstatus=False)
-
- 
     def dbloader(self,records):
         
         dblessonrows = []
@@ -696,7 +657,13 @@ class SSLoader(object):
 	
         for record in records:
 	    d = dict(zip(cols,record))
-            dbsessionrows.append(record)
+	    
+	    # switch the last item for a count of number of students
+	    # this is so we can determine which session was created with no students and so
+	    # can be matched up with lessons at the same time/dow later on
+	    _record = deepcopy(record)[:-1]
+	    _record.append(len(d['students']))
+            dbsessionrows.append(_record)
 	    
 	    if len(d['students']) > 1:
 		pass
@@ -711,40 +678,60 @@ class SSLoader(object):
 	dbinsert_direct(self.database,dbsessionrows,'session',self.inputfile,masterstatus=False)
 	dbinsert_direct(self.database,dblessonrows,'lesson',self.inputfile,masterstatus=False)    
 
-    def _sessionhashmapget(self):
+    def primary_record_set_session(self):
 	
-	enums = {'maps':{},'enums':{},'codes':{}}
-	
-	getdbenum(enums,self.database,'name','period')
-	getdbenum(enums,self.database,'name','dow')
-
-	cols = ['period','dow','teacher','subject']
+	def _additem(items,newitem):
+	    # if newitem is not 'notset/??' then add item to the list of items if its not already present.
+	    
+	    if newitem <> "??":
+		# if items is unset then set it
+		if len(items) == 1:
+		    if items[0] == "??":
+			items[0] = newitem
+		    else:
+			try:
+			    items.index(newitem)
+			except:
+			    log.log(thisfuncname(),3,msg="conflicting item",newitem=str(newitem),items=items)
+			    items.append(newitem)
+		else:
+		    try:
+			items.index(newitem)
+		    except:
+			log.log(thisfuncname(),3,msg="conflicting item",newitem=str(newitem),items=items)
+			items.append(newitem)
+		
+	def _itemset(items):
+	    # return True if list still equals initial value ["??"]
+	    if items <> ["??"]: return True
+	    return False
+	    
+	cols = ['period','dow','teacher','subject','status','source','numstudents']
 	
 	with self.database:
 	    _,rows,_ = tbl_rows_get(self.database,'session',cols)
-
+	    
 	hashmap={}
 	for row in rows:
 
 	    d = dict(zip(cols,row))
 	    
-	    try:
-		_dow = enums['dow']['name2code'][d['dow']]
-		_period = enums['period']['enum2name'][d['period']]
-	    except:
-		continue
+	    hashkey = ".".join([d['dow'],str(d['period']),d['subject'],d['teacher']])
 	    
-	    hashkey = ".".join([_dow,str(_period),d['subject']])
-	    
-	    if hashmap.has_key(hashkey) == False:		
-		hashmap[hashkey] = []
+	    if hashmap.has_key(hashkey) == False:
+		hashmap[hashkey] = dict(teacher=d['teacher'],subject=d['subject'],
+			                status="unset",period=d['period'],
+			                dow=d['dow'],source="",numstudents=0)	
 		
-	    if d['teacher'] <> '??':
-		hashmap[hashkey].append(d['teacher'])
+	    if hashmap[hashkey]['teacher'] <> "??" and hashmap[hashkey]['subject'] <> "??":
+		hashmap[hashkey]['status'] = "completed"
+	    elif hashmap[hashkey]['teacher'] <> "??" or hashmap[hashkey]['subject'] <> "??":
+		hashmap[hashkey]['status'] = "incomplete"
 
-	return hashmap
+	    hashmap[hashkey]['numstudents'] += int(d['numstudents'])
 	    
-	
+	return (hashmap)
+    
     def primary_record_set(self):
 	
 	def _additem(items,newitem):
@@ -779,10 +766,7 @@ class SSLoader(object):
 	with self.database:
 	    _,rows,_ = tbl_rows_get(self.database,'lesson',cols)
 
-	sessionhashmap = self._sessionhashmapget()
-	
-	
-	
+
 	hashmap={}
 	for row in rows:
 
@@ -798,22 +782,6 @@ class SSLoader(object):
 	    _additem(hashmap[hashkey]['teacher'],d['teacher'])
 	    _additem(hashmap[hashkey]['subject'],d['subject'])
 	    
-	    
-
-
-	'''for row in rows:
-
-	    d = dict(zip(cols,row))
-	     
-	    try:
-		sessions = sessionhashmap[".".join([d['dow'],str(d['period']),d['subject']])]
-		
-		for newteacher in sessions:
-		    _additem(hashmap[hashkey]['teacher'],newteacher)	
-	    except KeyError:
-		pass'''
-
-
 	for row in rows:
 	    
 	    d = dict(zip(cols,row))
@@ -840,10 +808,7 @@ class SSLoader(object):
             self.inputfile = _file
 	    self.prep = prep
             fileasstring = self.file2string(_file)
-
             records = self.string2records(fileasstring)
-
-	    
             clean_records,_,_ = self.pre_process_records(records)
 	    
             self.validated_clean_records = []
@@ -856,23 +821,8 @@ class SSLoader(object):
 		self.dbupdater(self.validated_clean_records)
 		
 
-    def run(self,dbname,files,insertprimary=True):
-
-	def _getprimarykeyhash(pred=None,predval=None):
-    
-	    cols = ['dow','period','student']
-	    hashmap = self.primary_record_set()
-	    
-	    # add the key components to the flat output record
-	    results = []      
-	    for hashkey in hashmap:
-		hashmap[hashkey].pop('source')
-		d = dict(zip(cols,hashkey.split(".")))
-		results.append(hashmap[hashkey].values())
-	    results.sort()
-	    return results   
-    
-	def _formatval(objtype):
+    def run(self,dbname,files,insertprimary=True):    
+	def _formatval(objtype,d):
 	    if len(d[objtype]) > 1:
 		return( "["+",".join(d[objtype])+"]")
 	    return(",".join(d[objtype]))
@@ -890,34 +840,39 @@ class SSLoader(object):
 	self.ssloader.ssloader(files,self.databasename)
 
 	log.log(thisfuncname(),3,msg="creating master record set")    
-	cols = ['status','teachers','student','subject','period','dow']
-	rows = _getprimarykeyhash()
-	
-	# strip out required columns from the primarykeyhash
+
+	hashmap = self.primary_record_set()
 	newrows = []
-	for row in rows:    
-	    d = dict(zip(cols,row))
-	    
-	    newrows.append([d['period'],d['dow'],_formatval('subject'),_formatval('teachers'),d['student'],'1-on-1'])
-	    #newrows.append([d['period'],d['dow'],d['subject'][0],d['teachers'][0],d['student'],'1-on-1'])
+	for key,d in hashmap.iteritems():
+	    newrows.append([d['period'],d['dow'],_formatval('subject',d),_formatval('teacher',d),d['student'],'1-on-1'])
     
+	hashmap = self.primary_record_set_session()
+	newsessionrows = []
+	for key,d in hashmap.iteritems():
+	    newsessionrows.append([d['period'],d['dow'],d['subject'],d['teacher'],[],d['numstudents']])    
+
 	if insertprimary==True:
 	    log.log(thisfuncname(),10,msg="loading master record set")    
-	    dbinsert_direct(self.database,newrows,'session','dbinsert')
+	    dbinsert_direct(self.database,newsessionrows,'session','dbinsert')
 	    dbinsert_direct(self.database,newrows,'lesson','dbinsert')
+	else:
+	    return newrows
 
 if __name__ == "__main__":
-    databasename = "test_ssloader"
     
-    files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
-             ('academic.csv',-1,True)]
-    
-
-    # prod 
-    #files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staff.csv',-1,True),
-    #         ('prep5student.csv',-1,True),('prep4student.csv',-1,True),('prep6student.csv',-1,True),
-    #         ('academic.csv',-1,True)]
-
+    if os.getcwd() == DEVDIR:
+	databasename = "test_ssloader"
+	files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
+	         ('academic.csv',-1,True)]
+    elif os.getcwd() == PRODDIR:
+	
+	databasename = "quad"
+	shutil.copyfile(databasename+".sqlite.backup",databasename+".sqlite")
+	files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staff.csv',-1,True),
+	         ('prep5student.csv',-1,True),('prep4student.csv',-1,True),('prep6student.csv',-1,True),
+	         ('academic.csv',-1,True)]
+    else:
+	raise Exception("do not know how to run in this working dir",dir=os.getcwd())
     
     ssloader = SSLoader(databasename)
     ssloader.run(databasename,files)
