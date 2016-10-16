@@ -1,5 +1,5 @@
 from misc_utils_log import Log, logger
-log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,pidlogname=True,proclogname=False)
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=5,pidlogname=True,proclogname=False)
 
 from misc_utils import os_file_to_string, thisfuncname, IDGenerator
 from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _gencoldefn, tbl_exists, \
@@ -76,6 +76,7 @@ class SSLoader(object):
                       'teacher':[(":",1),("\(",1),("\)",1)],
                       'date':[("/",2)],
                       'noteacher': [(":",1),("\(",0),("\)",0)],
+	              'subject': [("subject=",1),("\(",0),("\)",0),(":",0),('Computer Time',0)],
 	              #'wp': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0)],
 	              #'wpwith': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0),("with",1)],
                       'period' :[(":",2),("-",1)],
@@ -186,7 +187,8 @@ class SSLoader(object):
                 staffname = self.extract_staff(record)
                 log.log(thisfuncname(),10,msg="this is a staff file",staffname=staffname)
                 staffrecordflag=True
-	    elif recordtype in ['Movement','Art','Music','Engineering']:
+	    #elif recordtype in ['Movement','Art','Music','Engineering']:
+	    elif recordtype == 'subject':
 		if staffrecordflag == True:
 		    subject = recordtype
 		    teacher = staffname
@@ -196,7 +198,7 @@ class SSLoader(object):
 		    _records.append(_record)
 		    log.log(thisfuncname(),10,msg="record added",record=_record)
 		if studentfile == True:
-		    subject = recordtype
+		    subject = record
 		    teacher = "??"
 		    students = [studentname]
 		    dow = self.valid_values['dow'][dowidx]
@@ -290,8 +292,9 @@ class SSLoader(object):
 		    periodidx+=1
 		    log.log(thisfuncname(),10,msg="period increment",old_periodidx=old_periodidx,periodidx=periodidx,lastrecordtype=lastrecordtype)
             else:
-                log.log(thisfuncname(),0,msg="could not identify record",recordtype=recordtype,record=record)
-                raise SSLoaderFatal
+                log.log(thisfuncname(),1,msg="could not identify record",recordtype=recordtype,record=record)
+                #raise SSLoaderFatal
+		continue
             
             lastrecordtype = recordtype
         
@@ -436,15 +439,26 @@ class SSLoader(object):
         for char,count in rules:
 	    p = re.compile(char.lower())
 	    if char.count("=") == 1:
-		# match any synonym
-		objtype,value = char.split("=")
-		synomatch=False
-		for syno,master_value in self.synonyms.iteritems():
-		    if master_value==value and record.count(syno) == count:
-			synomatch=True
-
-		if synomatch==False:
-		    return False
+		if char[-1] == "=":
+		    # match any of objtype
+		    objtype = char[:-1]
+		    objtypematch=False
+		    for value in self.valid_values[objtype]:
+			if record.lower()==value.lower():
+			    objtypematch=True
+    
+		    if objtypematch==False:
+			return False
+		else:
+		    # match any synonym
+		    objtype,value = char.split("=")
+		    synomatch=False
+		    for syno,master_value in self.synonyms.iteritems():
+			if master_value==value and record.count(syno) == count:
+			    synomatch=True
+    
+		    if synomatch==False:
+			return False
 	    
 	    #elif record.lower().count(char.lower()) <> count:
             elif len(p.findall(record.lower())) <> count:
