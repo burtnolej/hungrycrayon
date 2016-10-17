@@ -271,13 +271,67 @@ class WizardUI(Tk):
         #self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
     
-    def viewer(self,ui=True):
+    def dump(self,value):
+        
+        with self.database:
+            cols,rows,_ = _versions(self.database,*value)
+            _,subjects,_ = _versions_subjects(self.database,*value)
+        
+        for subject in subjects:
+            
+            if subject[0] <> "??":
+                _period = sswizard_utils._isenum(self.enums,'period',value[0])
+                _dow = sswizard_utils._isname(self.enums,'dow',value[1])
+                
+                value = [_period,_dow,subject[0]]
+            
+                with self.database: 
+                    cols,sessionrows,_ = _sessionversions(self.database,*value)
+        
+        rows = rows + sessionrows
+        
+        if len(rows) <> 0:
+            self.bgmaxrows=len(rows)
+            self.bgmaxcols=len(rows[0])
+        
+            widget_args=dict(background='white',width=1,height=1,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
+            widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
+            mytextalphanum = TextAlphaNumRO(name='textalphanum')
+        
+            try:
+                self.versionsgrid.destroy()
+            except:
+                pass
+        
+            self.versionsgrid = TkImageLabelGrid(self,'versionsgrid',mytextalphanum,10,10,0,0,self.bgmaxrows,self.bgmaxcols,True,False,{},widgetcfg)
+        
+            self.versionsgrid.grid(row=4,column=0,sticky=NSEW)
+            self.grid_rowconfigure(4, weight=3, uniform="foo")
+            
+            for x in range(len(rows)):
+                for y in range(len(rows[x])):
+                    widget = self.versionsgrid.widgets[x][y]
+                    widget.sv.set(rows[x][y])
+
+        else:
+            try:
+                self.versionsgrid.destroy()
+            except AttributeError:
+                pass
+        
+        rows.sort()
+        return rows
+
+    def viewer(self,ui=True,source_type=None,source_value=None,ztypes=None):
 
         xaxis_type = self.viewxaxis_label_sv.get() # period
         yaxis_type = self.viewyaxis_label_sv.get() # dow
 
-        source_type,source_value = self.viewfocus_label_sv.get().split("=")
-        ztypes = self.viewdata_label_sv.get().split(",")
+        if source_type == None or source_value == None:
+            source_type,source_value = self.viewfocus_label_sv.get().split("=")
+        
+        if ztypes == None:
+            ztypes = self.viewdata_label_sv.get().split(",")
         
         source_obj = self.of.object_get(source_type,source_value)
         
@@ -287,8 +341,8 @@ class WizardUI(Tk):
         xaxis_enum = self.enums[xaxis_type]['name2enum']
         yaxis_enum = self.enums[yaxis_type]['code2enum']
         
-        values = []
-        row=['']
+        values = [] # contains the values displayed on the grid
+        row=[''] # 
 
         values = [['']]    
         for yval in yaxis_enum.keys():
@@ -307,24 +361,24 @@ class WizardUI(Tk):
                 
                 for ztype in ztypes:
                     try:
-                        zval = getattr(source_obj.lessons[yval][xval][0],ztype)
-                        celltext.append(zval.name)
+                        _vals = source_obj.lessons[yval][xval]
+                        for _val in _vals:
+                            zval = getattr(_val,ztype)
+                            celltext.append(zval.name)
+
                     except Exception, e:
                         log.log(thisfuncname(),2,msg="attr not found on object",error=e,
                                 attr=ztype,xval=str(xval),yval=str(yval))
-                        celltext.append("??")
-                values[x].append(",".join(celltext))
+                        celltext.append("")
+                values[x].append("\n".join(celltext))
                 
 
         if ui==True:
             self.bgmaxrows=len(values)
             self.bgmaxcols=len(values[0])
         
-            widget_args=dict(background='white',width=1,height=1,wraplength=180,
-                             highlightbackground='black',highlightthickness=1,
-                             values=self.enums['dow'])
+            widget_args=dict(background='white',width=1,height=4,wraplength=240,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
             widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
-        
             mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
             try:
@@ -332,18 +386,20 @@ class WizardUI(Tk):
             except:
                 pass
         
-            self.viewergrid = TkImageLabelGrid(self,'viewergrid',
-                                               mytextalphanum,10,10,
-                                               0,0,self.bgmaxrows,self.bgmaxcols,
-                                               True,False,{},widgetcfg)
+            self.viewergrid = TkImageLabelGrid(self,'viewergrid',mytextalphanum,10,10,0,0,self.bgmaxrows,self.bgmaxcols,True,False,{},widgetcfg)
         
             self.viewergrid.grid(row=3,column=0,sticky=NSEW)
             self.grid_rowconfigure(3, weight=10, uniform="foo")
             
-    
             for x in range(len(values)):
                 for y in range(len(values[x])):
-                    self.viewergrid.widgets[x][y].sv.set(values[x][y])
+                    widget = self.viewergrid.widgets[x][y]
+                    widget.sv.set(values[x][y])
+                    
+                    if x > 0 and y > 0:
+                        key = [self.enums[xaxis_type]['enum2name'][x],self.enums[yaxis_type]['code'][y-1],source_value]                           
+                        widget.bind("<Button-1>",lambda e,key=key:self.dump(key))
+                    
         else:
             results = []
             for x in range(len(values)):
@@ -578,7 +634,7 @@ class WizardUI(Tk):
         self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
 
         # load from database
-        cols = ['period','student','session','dow','teacher','subject','userobjid']        
+        cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype']        
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
@@ -589,7 +645,7 @@ class WizardUI(Tk):
             for i in range(len(cols)):
                 datamembers[cols[i]] = row[i]
             
-            _,lessontype_code,_ = datamembers['session'].split(".")
+            _,lessontype_code,_,_ = datamembers['session'].split(".")
             #lessontype = self.enums['lessontype']['code2name'][lessontype_code]      
             datamembers['objtype'] = 'lesson'                               
             

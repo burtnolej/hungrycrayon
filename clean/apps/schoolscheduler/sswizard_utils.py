@@ -444,18 +444,20 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    _,_lesson_count,_ = _maxlessonenum(database)		    
     
 	tablerow_count = int(_lesson_count[0][0])+1
-
-    cols = ['period','dow','subject','adult','student','type']
-
+	
+    lcols = ['period','dow','subject','adult','student','recordtype']
+    scols = ['period','dow','subject','adult','student','recordtype','numstudents']
+    
     for record in records:
-	    
+
 	# prepare fields to complete record
 	if tblname == 'session':
 	    
-	    d = dict(zip(cols,record))
+	    d = dict(zip(scols,record))
 	    d['dow'] = _isname(enums,'dow',d['dow'])
 	    d['period'] = _isenum(enums,'period',d['period'])
-	    d['code'] = ".".join([d['adult'],d['subject'],d['dow']])
+	    d['code'] = ".".join([d['adult'],d['subject'],d['dow'],_isname(enums,'period',d['period'])])
+	    d['lessoncount'] = 0
 	    #d['userobjid'] = _getuserobjid(enums,['period','dow','subject','adult'],d)
 	    
 	    # if student is a list and has more than 1 member, set prep to unknown (-1)
@@ -464,36 +466,47 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 		    d['prep'] = int(prepmap[d['student'][0]])
 		else:
 		    d['prep'] = -1
+		#d['numstudents'] = len(d['student']) # keep track of the number of students in this session (aka the number of lessons that exist)
+		
 	    else:
 		d['prep'] = int(prepmap[d['student']])
+		#d['numstudents'] = 0
 	    d.pop('student')
+	    
+	    # specify if a session was created without children (ie student could not be
+	    # determined from info provided in the input file
+	    if d['numstudents'] == 0:
+		d['status'] = "nochildrenatinit"
+	    else:
+		d['status'] = "childrenatinit"
 
 	elif tblname == 'lesson':
 
-	    d = dict(zip(cols,record))
+	    d = dict(zip(lcols,record))
 
 	    d['dow'] = _iscode(enums,'dow',d['dow'])
 	    d['period'] = _isname(enums,'period',d['period'])
-	    d['session'] = ".".join([d['adult'],d['subject'],_isname(enums,'dow',d['dow'])])
+	    d['session'] = ".".join([d['adult'],d['subject'],_isname(enums,'dow',d['dow']),d['period']])
 	    d['prep'] = int(prepmap[d['student']])
 	    d['userobjid'] = _getuserobjid(enums,['period','dow','student'],d)
 
 	    d['saveversion'] = 1
 	   
-	    d.pop('type')
-	
+	    #d.pop('type')
+    
+	    # set status
+	    d['status'] = "complete"
+	    if d['adult'] == '??' or d['subject'] == '??':
+		d['status'] = "incomplete"
+	      
 	d['teacher'] = d['adult']
 	d.pop('adult')
 
-	# set status
-	d['status'] = "complete"
-	if d['teacher'] == '??' or d['subject'] == '??':
-	    d['status'] = "incomplete"
-	d['substatus'] = "notset"
-	
 	if masterstatus == True:
 	    d['substatus'] = d['status']
 	    d['status'] = 'master'
+	else:
+	    d['substatus'] = "notset"  
 	    
 	d['__id'] = IDGenerator().getid()
 	d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
@@ -542,6 +555,11 @@ def dbinsert(database,dbclassname,rows,colnames):
                 except Exception, e:
                     log.log(thisfuncname(),1,func=dbobj.persist,error=str(e))
 
+
+def updatelessoncount():
+    ''' iterate over each session and using the session code, count how many lessons exist
+    for that session '''
+    pass
     
 if __name__ == "__main__":
     
