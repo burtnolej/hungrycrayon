@@ -30,12 +30,10 @@ def _sessionenum(database,code,period,prep):
     return(tbl_query(database,exec_str))
 
 def _versions(database,period,dow,student):
-    exec_str = "select \"lesson\",dow,period,subject,teacher,source,session from lesson"
+    exec_str = "select \"lesson\",dow,period,subject,teacher,source,recordtype from lesson"
     exec_str += " where period = \"{0}\" ".format(period)
     exec_str += " and student = \"{0}\" ".format(student)
     exec_str += " and dow = \"{0}\" ".format(dow)
-
-    print exec_str
     
     return(tbl_query(database,exec_str))
 
@@ -44,17 +42,17 @@ def _versions_subjects(database,period,dow,student):
     exec_str += " where period = \"{0}\" ".format(period)
     exec_str += " and student = \"{0}\" ".format(student)
     exec_str += " and dow = \"{0}\" ".format(dow)
-
-    print exec_str
     
     return(tbl_query(database,exec_str))
 
 def _sessionversions(database,period,dow,subject):
-    exec_str = "select \"session\",dow,period,subject,teacher,source,status,substatus from session"
+    exec_str = "select \"session\",dow,period,subject,teacher,source,recordtype from session"
     exec_str += " where period = \"{0}\" ".format(period)
     exec_str += " and dow = \"{0}\" ".format(dow)
     exec_str += " and subject = \"{0}\" ".format(subject)
-
+    exec_str += " and substatus = \"nochildrenatinit\" "
+    exec_str += " and status = \"master\" "
+    
     print exec_str
     
     return(tbl_query(database,exec_str))

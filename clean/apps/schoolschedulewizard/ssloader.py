@@ -55,19 +55,8 @@ class SSLoaderFatal(Exception):
 class SSLoader(object):
     
     def __init__(self,databasename,prep=-1):
-        
-        self.database = Database(databasename)
-        self.prep = prep
-        
-        #add in |; so 'Music':[("Music"|"Cello",1),(":",0)],
 	
-	# add an extra field in lesson and session; lessontype
-	
-	# add rules to pick out the WP/Work P/W Period/ to set lessontype
-	# and find subject
-	
-	#self.rules = {'wp': [("Subject=Work Period",1),("\(",0),("\)",0),(":",0)]}
-	
+	self.database = Database(databasename)
 	_rules = [('computertime',[("Computer Time",1),(":",0),("with",0)]),
 
 	          ('wp.student.nosubject.noteacher', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",1),('Computer Time',0),('with',0)]),
@@ -925,8 +914,10 @@ class SSLoader(object):
 	    # switch the last item for a count of number of students
 	    # this is so we can determine which session was created with no students and so
 	    # can be matched up with lessons at the same time/dow later on
-	    _record = deepcopy(record)[:-1]
+	    #_record = deepcopy(record)[:-1]
+	    _record = deepcopy(record)
 	    _record.append(len(d['students']))
+	    
             dbsessionrows.append(_record)
 	    
 	    if len(d['students']) > 1:
@@ -970,7 +961,7 @@ class SSLoader(object):
 	    if items <> ["??"]: return True
 	    return False
 	    
-	cols = ['period','dow','teacher','subject','status','source','numstudents']
+	cols = ['period','dow','teacher','subject','status','source','recordtype','numstudents']
 	
 	with self.database:
 	    _,rows,_ = tbl_rows_get(self.database,'session',cols)
@@ -985,6 +976,7 @@ class SSLoader(object):
 	    if hashmap.has_key(hashkey) == False:
 		hashmap[hashkey] = dict(teacher=d['teacher'],subject=d['subject'],
 			                status="unset",period=d['period'],
+		                        recordtype=d['recordtype'],
 			                dow=d['dow'],source="",numstudents=0)	
 		
 	    if hashmap[hashkey]['teacher'] <> "??" and hashmap[hashkey]['subject'] <> "??":
@@ -1024,7 +1016,7 @@ class SSLoader(object):
 	    if items <> ["??"]: return True
 	    return False
 	    
-	cols = ['period','dow','student','teacher','subject','status','source']
+	cols = ['period','dow','student','teacher','subject','status','source','recordtype']
 	
 	# order by makes sure any completed records get 
 	with self.database:
@@ -1041,10 +1033,11 @@ class SSLoader(object):
 	    if hashmap.has_key(hashkey) == False:		
 		hashmap[hashkey] = dict(subject=["??"],teacher=["??"], \
 		                        student=d['student'],status="unset",period=d['period'],\
-		                        dow=d['dow'],source="")
+		                        dow=d['dow'],source="",recordtype=['??'])
 
 	    _additem(hashmap[hashkey]['teacher'],d['teacher'])
 	    _additem(hashmap[hashkey]['subject'],d['subject'])
+	    _additem(hashmap[hashkey]['recordtype'],d['recordtype'])
 	    
 	for row in rows:
 	    
@@ -1108,12 +1101,12 @@ class SSLoader(object):
 	hashmap = self.primary_record_set()
 	newrows = []
 	for key,d in hashmap.iteritems():
-	    newrows.append([d['period'],d['dow'],_formatval('subject',d),_formatval('teacher',d),d['student'],'1-on-1'])
+	    newrows.append([d['period'],d['dow'],_formatval('subject',d),_formatval('teacher',d),d['student'],_formatval('recordtype',d)])
     
 	hashmap = self.primary_record_set_session()
 	newsessionrows = []
 	for key,d in hashmap.iteritems():
-	    newsessionrows.append([d['period'],d['dow'],d['subject'],d['teacher'],[],d['numstudents']])    
+	    newsessionrows.append([d['period'],d['dow'],d['subject'],d['teacher'],[],d['recordtype'],d['numstudents']])    
 
 	if insertprimary==True:
 	    log.log(thisfuncname(),10,msg="loading master record set")    

@@ -445,19 +445,15 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
     
 	tablerow_count = int(_lesson_count[0][0])+1
 	
-    cols = ['period','dow','subject','adult','student','numstudents']
+    lcols = ['period','dow','subject','adult','student','recordtype']
+    scols = ['period','dow','subject','adult','student','recordtype','numstudents']
     
-
     for record in records:
-	
-	if masterstatus == False:
-	    d = dict(zip(cols,record))
-	    print d['numstudents']
-	    
+
 	# prepare fields to complete record
 	if tblname == 'session':
 	    
-	    d = dict(zip(cols,record))
+	    d = dict(zip(scols,record))
 	    d['dow'] = _isname(enums,'dow',d['dow'])
 	    d['period'] = _isenum(enums,'period',d['period'])
 	    d['code'] = ".".join([d['adult'],d['subject'],d['dow'],_isname(enums,'period',d['period'])])
@@ -486,7 +482,7 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 
 	elif tblname == 'lesson':
 
-	    d = dict(zip(cols,record))
+	    d = dict(zip(lcols,record))
 
 	    d['dow'] = _iscode(enums,'dow',d['dow'])
 	    d['period'] = _isname(enums,'period',d['period'])

@@ -287,14 +287,12 @@ class WizardUI(Tk):
             
                 with self.database: 
                     cols,sessionrows,_ = _sessionversions(self.database,*value)
-                
-                for session in sessionrows:
-                    print session
+        
+        rows = rows + sessionrows
         
         if len(rows) <> 0:
             self.bgmaxrows=len(rows)
             self.bgmaxcols=len(rows[0])
-        
         
             widget_args=dict(background='white',width=1,height=1,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
             widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
@@ -314,6 +312,7 @@ class WizardUI(Tk):
                 for y in range(len(rows[x])):
                     widget = self.versionsgrid.widgets[x][y]
                     widget.sv.set(rows[x][y])
+
         else:
             try:
                 self.versionsgrid.destroy()
@@ -370,15 +369,15 @@ class WizardUI(Tk):
                     except Exception, e:
                         log.log(thisfuncname(),2,msg="attr not found on object",error=e,
                                 attr=ztype,xval=str(xval),yval=str(yval))
-                        celltext.append("??")
-                values[x].append(",".join(celltext))
+                        celltext.append("")
+                values[x].append("\n".join(celltext))
                 
 
         if ui==True:
             self.bgmaxrows=len(values)
             self.bgmaxcols=len(values[0])
         
-            widget_args=dict(background='white',width=1,height=4,wraplength=180,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
+            widget_args=dict(background='white',width=1,height=4,wraplength=240,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
             widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
             mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
@@ -396,6 +395,7 @@ class WizardUI(Tk):
                 for y in range(len(values[x])):
                     widget = self.viewergrid.widgets[x][y]
                     widget.sv.set(values[x][y])
+                    
                     if x > 0 and y > 0:
                         key = [self.enums[xaxis_type]['enum2name'][x],self.enums[yaxis_type]['code'][y-1],source_value]                           
                         widget.bind("<Button-1>",lambda e,key=key:self.dump(key))
@@ -634,7 +634,7 @@ class WizardUI(Tk):
         self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
 
         # load from database
-        cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus']        
+        cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype']        
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
