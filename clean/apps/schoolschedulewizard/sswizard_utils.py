@@ -444,10 +444,15 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    _,_lesson_count,_ = _maxlessonenum(database)		    
     
 	tablerow_count = int(_lesson_count[0][0])+1
-
+	
     cols = ['period','dow','subject','adult','student','numstudents']
+    
 
     for record in records:
+	
+	if masterstatus == False:
+	    d = dict(zip(cols,record))
+	    print d['numstudents']
 	    
 	# prepare fields to complete record
 	if tblname == 'session':

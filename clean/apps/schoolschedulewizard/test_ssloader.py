@@ -2,7 +2,8 @@ import sys
 import os
 from os import path as ospath
 
-from ssloader import SSLoader, SSLoaderRuleException, SSLoaderRecordEndException, SSLoaderNoMatchException
+from ssloader import SSLoader, SSLoaderRuleException, SSLoaderRecordEndException, SSLoaderNoMatchException, \
+     SSLoaderNoRulesMatchException   
 
 from database_table_util import tbl_rows_get, tbl_query
 from database_util import Database, tbl_remove, tbl_exists
@@ -435,6 +436,18 @@ class Test_LoadSynonyms(Test_Base):
 
         self.assertListEqual(expected_results,rows)
         
+class Test_ValidateTokens_Teacher(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        self.ssloader.inputfile = "test_ssloader.py"
+        
+        self.valid_subjects = self.ssloader.loadrefobjects('quadref','adult')
+        
+    def test_exact_match(self):
+        
+        validated_token = self.ssloader.validate_token2('Eric',self.valid_subjects)
+        
+        self.assertEqual(validated_token,'Eric')
         
 class Test_ValidateTokens_Subject(Test_Base):
     def setUp(self):
@@ -494,6 +507,7 @@ class Test_ValidateTokens_Subject(Test_Base):
         
         with self.assertRaises(SSLoaderNoMatchException):
             validated_token = self.ssloader.validate_token2('Fsxh',self.valid_subjects)
+            
         
 class Test_ValidateTokens_Multi(Test_Base):
     def setUp(self):
@@ -734,7 +748,7 @@ class Test_RecordIdentifcation(Test_Base):
         self.assertEquals(recordtype, 'noteacher')
         
     def test_noteacher2(self):
-        self.inputstr = "Work Period: Oscar, Peter "
+        self.inputstr = "Engineering: Oscar, Peter "
         recordtype = self.ssloader.identify_record(self.inputstr)
         
         self.assertEquals(recordtype, 'noteacher')
@@ -773,38 +787,108 @@ class Test_RecordIdentifcation(Test_Base):
         recordtype = self.ssloader.identify_record(self.inputstr)
         
         self.assertEquals(recordtype, 'ignore')
-        
+    
+    # with
     def test_With(self):
         self.inputstr = "Engineering with Paraic"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'with')
+        self.assertEquals(recordtype, 'subject.nostudent.nosubject.noteacher.with')
         
     def test_teacher_Syno_Match(self):
         self.inputstr = "Humanities Work Period with Johnny"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'with')
+        self.assertEquals(recordtype, 'wp.nostudent.subject.noteacher.with')
         
     def test_teacher_WP_With(self):
         self.inputstr = "Work Period with Alyssa"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'with')
+        self.assertEquals(recordtype, 'wp.nostudent.nosubject.noteacher.with')
+        
+    # with and
+    def test_teacher_WP_With_And(self):
+        self.inputstr = "Work Period with Paraic and Rahul"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'wp.nostudent.nosubject.noteacher.with.and')
+    
+    def test_With_And(self):
+        self.inputstr = "Engineering with Paraic and Eric"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'subject.nostudent.nosubject.noteacher.with.and')
+
+    # Work Period
+    def test_teacher_Start_Work_Period_Students(self):
+        self.inputstr =  'Work Period: Shane, Asher'
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'wp.student.nosubject.noteacher')
+        
+    def test_teacher_Start_Work_Period_Students_Syno(self):
+        self.inputstr =  'WP: Shane, Asher'
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'wp.student.nosubject.noteacher')
+
+    def test_teacher_WP_Teacher(self):
+        self.inputstr = "Work Period: Asher (Alyssa)"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'wp.student.nosubject.teacher')
+        
+    def test_teacher_Work_Period(self):
+        self.inputstr = "Work Period"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'wp.nostudent.nosubject.noteacher')
+        
+    def test_teacher_WP(self):
+        self.inputstr = "WP"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'wp.nostudent.nosubject.noteacher')
+            
+    # Subjects (not Work Period)
+    def test_teacher_Subject_Italian(self):
+        self.inputstr = "Italian"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'subject.nostudent.nosubject.noteacher')
         
     def test_teacher_Movement(self):
         self.inputstr = "Movement"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'subject')      
+        self.assertEquals(recordtype,'subject.nostudent.nosubject.noteacher')   
         
-    def test_teacher_Subject_Italian(self):
-        self.inputstr = "Italian"
+    # Work Period Subjects
+    def test_teacher_Subject_Work_Period(self):
+        self.inputstr = "Humanities Work Period"
         recordtype = self.ssloader.identify_record(self.inputstr)
+         
+        self.assertEquals(recordtype, 'wp.nostudent.subject.noteacher')  
         
-        self.assertEquals(recordtype, 'subject') 
-
-     
+    def test_teacher_Subject_Work_Period(self):
+        self.inputstr = "Math WP"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+         
+        self.assertEquals(recordtype, 'wp.nostudent.subject.noteacher')
+        
+    def test_teacher_Subject_Work_Period_Student(self):
+        self.inputstr = "Math WP: Jack"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+         
+        self.assertEquals(recordtype, 'wp.student.subject.noteacher')
+        
+    def test_teacher_Subject_Work_Period_Student_Teacher(self):
+        self.inputstr = "Math WP: Jack (Stan)"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+         
+        self.assertEquals(recordtype, 'wp.student.subject.teacher')
+        
 class Test_RecordIdentifcation_realsample(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -866,8 +950,70 @@ class Test_PreProcessRecordsWith(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','ELA','Amelia',[],'with'],
-                          ['830-910','Tuesday','Engineering','Paraic',[],'with']]
+        expected_results = [['830-910','Monday','ELA','Amelia',[],'subject.nostudent.nosubject.noteacher.with'],
+                          ['830-910','Tuesday','Engineering','Paraic',[],'subject.nostudent.nosubject.noteacher.with']]
+        
+        self.assertListEqual(clean_records,expected_results)
+
+class Test_PreProcessRecordsWithAnd(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_(self):
+        
+        self.records = ['09/19/16','8:30- 9:10','^','ELA with Amelia and Paraic','^','Engineering with Paraic']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','ELA','Amelia',[],'subject.nostudent.nosubject.noteacher.with.and'],
+                            ['830-910','Monday','ELA','Paraic',[],'subject.nostudent.nosubject.noteacher.with.and'],
+                          ['830-910','Tuesday','Engineering','Paraic',[],'subject.nostudent.nosubject.noteacher.with']]
+        
+        self.assertListEqual(clean_records,expected_results)
+        
+class Test_PreProcessRecordsWorkPeriodWith(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_(self):
+        
+        self.records = ['09/19/16','8:30- 9:10','^','Work Period with Amelia','^','Work Period with Paraic']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','Amelia',[],'wp.nostudent.nosubject.noteacher.with'],
+                          ['830-910','Tuesday','Work Period','Paraic',[],'wp.nostudent.nosubject.noteacher.with']]
+        
+        self.assertListEqual(clean_records,expected_results)
+        
+class Test_PreProcessRecordsWorkPeriodWithAnd(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_(self):
+        
+        self.records = ['09/19/16','8:30- 9:10','^','Work Period with Amelia and Paraic','^','Work Period with Paraic']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','Amelia',[],'wp.nostudent.nosubject.noteacher.with.and'],
+                            ['830-910','Monday','Work Period','Paraic',[],'wp.nostudent.nosubject.noteacher.with.and'],
+                          ['830-910','Tuesday','Work Period','Paraic',[],'wp.nostudent.nosubject.noteacher.with']]
+        
+        self.assertListEqual(clean_records,expected_results)
+        
+class Test_PreProcessRecordsWorkPeriodWithSubject(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_(self):
+        
+        self.records = ['09/19/16','8:30- 9:10','^','Humanities Work Period with Amelia','^','Math Work Period with Paraic']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','Amelia',[],'wp.nostudent.subject.noteacher.with'],
+                          ['830-910','Tuesday','Work Period','Paraic',[],'wp.nostudent.subject.noteacher.with']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -922,18 +1068,159 @@ class Test_PreProcessRecordStudent(Test_Base):
         self.records = ['Asher**', '^', 'Monday', '^', 'Tuesday', '^', 'Wednesday', '^', 'Thursday', '^', 'Friday', 
                         '8:30- 9:10', '^', 'Science with John', '^', 'Math with Galina', '^', 'Science with John', '^', 'Math with Galina', '^', 'STEM']
 
-        self.expected_results = [['830-910', 'Monday', 'Science', 'John', ['Asher'], 'with'], 
-                                  ['830-910', 'Tuesday', 'Math', 'Galina', ['Asher'], 'with'], 
-                                  ['830-910', 'Wednesday', 'Science', 'John', ['Asher'], 'with'], 
-                                  ['830-910', 'Thursday', 'Math', 'Galina', ['Asher'], 'with'],
-                                  ['830-910', 'Friday', 'STEM', '??', ['Asher'], 'subject']
+        self.expected_results = [['830-910', 'Monday', 'Science', 'John', ['Asher'], 'subject.nostudent.nosubject.noteacher.with'], 
+                                  ['830-910', 'Tuesday', 'Math', 'Galina', ['Asher'], 'subject.nostudent.nosubject.noteacher.with'], 
+                                  ['830-910', 'Wednesday', 'Science', 'John', ['Asher'], 'subject.nostudent.nosubject.noteacher.with'], 
+                                  ['830-910', 'Thursday', 'Math', 'Galina', ['Asher'], 'subject.nostudent.nosubject.noteacher.with'],
+                                  ['830-910', 'Friday', 'STEM', '??', ['Asher'], 'subject.nostudent.nosubject.noteacher']
                                   ]
         self.ssloader.inputfile = "test"
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
         self.assertListEqual(clean_records,self.expected_results)
+
         
+        
+class Test_PreProcessRecordsSubjectWorkPeriod(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_no_teacher(self):
+    
+        self.records = ['Moira++','^','Monday','^','Tuesday','^','Wednesday','^','Thursday','^','Friday','^',
+                        '8:30- 9:10','^','^','Work Period: MacKenzie','^','^','Math WP: Nick']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
+                          ['830-910','Thursday','Work Period','Moira',['Nick'],'wp.student.subject.noteacher']]
+        
+        self.assertListEqual(clean_records,expected_results)
+        
+    def test_with_teacher(self):
+    
+        self.records = ['09/19/16','^','Monday','^','Tuesday','^','Wednesday','^','Thursday','^','Friday','^',
+                        '8:30- 9:10','^','^','Work Period: MacKenzie (Amelia)','^','^','Math WP: Nick (Stan)']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Tuesday','Work Period','Amelia',['MacKenzie'],'wp.student.nosubject.teacher'],
+                          ['830-910','Thursday','Work Period','Stan',['Nick'],'wp.student.subject.teacher']]
+        
+        self.assertListEqual(clean_records,expected_results)
+        
+class Test_PreProcessRecordsWorkPeriodStudent(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_no_teacher(self):
+    
+        self.records = ['09/19/16','8:30- 9:10','^','Work Period: Shane, Asher','^','Work P: Bruno','^','WP: Nick']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','??',['Shane', 'Asher'],'wp.student.nosubject.noteacher'],
+                            ['830-910','Tuesday','Work Period','??',['Bruno'],'wp.student.nosubject.noteacher'],
+                            ['830-910','Wednesday','Work Period','??',['Nick'],'wp.student.nosubject.noteacher']]   
+        
+        self.assertListEqual(clean_records,expected_results)
+        
+class Test_PreProcessRecordsWorkPeriodSubject(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_no_teacher(self):
+    
+        self.records = ['09/19/16','8:30- 9:10','^','Humanities Work Period','^','Math Work P','^','ELA WP']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','??',[],'wp.nostudent.subject.noteacher'],
+                            ['830-910','Tuesday','Work Period','??',[],'wp.nostudent.subject.noteacher'],
+                            ['830-910','Wednesday','Work Period','??',[],'wp.nostudent.subject.noteacher']]   
+        
+        self.assertListEqual(clean_records,expected_results)
+              
+              
+class Test_PreProcessRecordsWorkPeriod2(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_no_teacher(self):
+    
+        self.records = ['09/19/16','8:30- 9:10','^','Work Period','^','Work P','^','WP']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','??',[],'wp.nostudent.nosubject.noteacher'],
+                            ['830-910','Tuesday','Work Period','??',[],'wp.nostudent.nosubject.noteacher'],
+                            ['830-910','Wednesday','Work Period','??',[],'wp.nostudent.nosubject.noteacher']]   
+        
+        self.assertListEqual(clean_records,expected_results)              
+              
+              
+class Test_PreProcessRecordsWorkPeriod2(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_no_teacher(self):
+    
+        self.records = ['09/19/16','8:30- 9:10','^','Work Period','^','Work P','^','WP']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','??',[],'wp.nostudent.nosubject.noteacher'],
+                            ['830-910','Tuesday','Work Period','??',[],'wp.nostudent.nosubject.noteacher'],
+                            ['830-910','Wednesday','Work Period','??',[],'wp.nostudent.nosubject.noteacher']]   
+        
+        self.assertListEqual(clean_records,expected_results)                    
+              
+class Test_PreProcessRecordsWorkPeriodStudentTeacherSubject(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_no_teacher(self):
+    
+        self.records = ['09/19/16','8:30- 9:10','^','Math WP: Jack (Stan)','^','Math Work Period: Jack,Nick (Stan)']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','Stan',['Jack'],'wp.student.subject.teacher'],
+                            ['830-910','Tuesday','Work Period','Stan',['Jack','Nick'],'wp.student.subject.teacher']]   
+        
+        self.assertListEqual(clean_records,expected_results)
+        
+              
+class Test_PreProcessRecordsWorkPeriodStudentSubject(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_no_teacher(self):
+    
+        self.records = ['09/19/16','8:30- 9:10','^','Math WP: Jack','^','Math Work Period: Jack,Nick']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','??',['Jack'],'wp.student.subject.noteacher'],
+                            ['830-910','Tuesday','Work Period','??',['Jack','Nick'],'wp.student.subject.noteacher']]   
+        
+        self.assertListEqual(clean_records,expected_results)
+        
+class Test_PreProcessRecordsWorkPeriodStudentTeacher(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_no_teacher(self):
+    
+        self.records = ['09/19/16','8:30- 9:10','^','WP: Jack (Stan)','^','Work Period: Jack,Nick (Stan)']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','Work Period','Stan',['Jack'],'wp.student.nosubject.teacher'],
+                            ['830-910','Tuesday','Work Period','Stan',['Jack','Nick'],'wp.student.nosubject.teacher']]   
+        
+        self.assertListEqual(clean_records,expected_results)
         
 class Test_PreProcessRecordsStaff(Test_Base):
     def setUp(self):
@@ -946,8 +1233,8 @@ class Test_PreProcessRecordsStaff(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'noteacher'],
-                          ['830-910','Thursday','Work PEriod','Moira',['Nick'],'noteacher']]
+        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
+                          ['830-910','Thursday','Work Period','Moira',['Nick'],'wp.student.nosubject.noteacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -960,10 +1247,10 @@ class Test_PreProcessRecordsStaff(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'noteacher'],
-                          ['830-910','Thursday','Work PEriod','Moira',['Nick'],'noteacher'],
-                          ['830-910','Tuesday','Work Period','John',['MacKenzie'],'noteacher'],
-                           ['830-910','Thursday','Work PEriod','John',['Nick'],'noteacher']]
+        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
+                          ['830-910','Thursday','Work Period','Moira',['Nick'],'wp.student.nosubject.noteacher'],
+                          ['830-910','Tuesday','Work Period','John',['MacKenzie'],'wp.student.nosubject.noteacher'],
+                           ['830-910','Thursday','Work Period','John',['Nick'],'wp.student.nosubject.noteacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1096,6 +1383,7 @@ class Test_PreProcessRecordsFriday(Test_Base):
                             ['830-910','Friday','ART','B', ['Clayton', 'Bruno', 'Oscar', 'Peter', 'Jack'],'teacher']]
         
         self.assertListEqual(friday_clean_records,expected_results)
+        
 
 class Test_ValidateTokens(Test_Base):
 
@@ -1539,7 +1827,6 @@ class Test_DBLoader_Staff(Test_Base):
                              [u'Monday', 6, 8, 8, 8, 8, 8, 8, 8], 
                              [u'Wednesday', 7, 8, 9, 7, 9, 8, 8, 9],
                              ['test', 30, 32, 36, 33, 34, 33, 33, 35]]
-
         
 
         self.ssloader.ssloader([('staffdata.csv',-1,True)],self.databasename)
@@ -1691,31 +1978,28 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['source','=',"\"" + "test_academic_1period_3teachers.csv" + "\""]])
 
-        #for row in rows:
-        #    print row
-            
         self.assertListEqual(expected_results,rows)
         
     def test_session_from_academic(self):
     
-        expected_results = [[u'childrenatinit', u'Monday', 1, u'??', u'Stan.??.Monday.830-910'],                                                                                                                                                                              
-                            [u'childrenatinit', u'Tuesday', 1, u'??', u'Stan.??.Tuesday.830-910'],                                                                                                                                                                                                                                                       
+        expected_results = [[u'childrenatinit', u'Monday', 1, u'??', u'Stan.??.Monday.830-910'],
+                            [u'childrenatinit', u'Tuesday', 1, u'??', u'Stan.??.Tuesday.830-910'],
                             [u'childrenatinit', u'Wednesday', 1, u'??', u'Stan.??.Wednesday.830-910'],
                             [u'childrenatinit', u'Thursday', 1, u'??', u'Stan.??.Thursday.830-910'],
                             [u'childrenatinit', u'Monday', 1, u'??', u'Amelia.??.Monday.830-910'],
                             [u'childrenatinit', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday.830-910'],
                             [u'childrenatinit', u'Wednesday', 1, u'??', u'Amelia.??.Wednesday.830-910'],
                             [u'childrenatinit', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday.830-910'],
+                            [u'nochildrenatinit', u'Monday', 1, u'Engineering', u'Paraic.Engineering.Monday.830-910'],
                             [u'childrenatinit', u'Tuesday', 1, u'??', u'Paraic.??.Tuesday.830-910'],
+                            [u'nochildrenatinit', u'Wednesday', 1, u'Engineering', u'Paraic.Engineering.Wednesday.830-910'],
                             [u'childrenatinit', u'Thursday', 1, u'??', u'Paraic.??.Thursday.830-910']]
+
 
         cols = ['status','dow','period','subject','code']
         
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'session',cols,[['source','=',"\"" + "test_academic_1period_3teachers.csv" + "\""]])
-
-        #for row in rows:
-        #    print row
 
         self.assertListEqual(expected_results,rows)
         
@@ -2197,9 +2481,14 @@ if __name__ == "__main__":
     # #####################################################################################################
     # unit tests=
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Primary_Set_Session))
-    #unittest.TextTestRunner(verbosity=2).run(suite) 
-    #exit()
+    
+    # pre_process_records
+
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Teacher))
+        
+    unittest.TextTestRunner(verbosity=2).run(suite) 
+    exit()
     
     
     # loadrefobjects
@@ -2264,6 +2553,15 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsFriday))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWith))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordStudent))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsSubjectWorkPeriod))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodStudent))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodSubject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriod2))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodStudentTeacherSubject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodStudentSubject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodStudentTeacher))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodWith))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodWithSubject))    
     
     
     # dbloader
