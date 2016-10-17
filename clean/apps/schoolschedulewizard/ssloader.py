@@ -17,8 +17,8 @@ import re
 import os
 import shutil
 
-PRODDIR="/home/burtnolej/Development/pythonapps3/clean/apps/schoolscheduler"
-DEVDIR="/home/burtnolej/Development/pythonapps3/clean/apps/schoolschedulewizard"
+PRODDIR="clean/apps/schoolscheduler"
+DEVDIR="clean/apps/schoolschedulewizard"
 
 class SSLoaderRuleException(Exception):
     def __repr__(self):
@@ -1117,13 +1117,19 @@ class SSLoader(object):
 
 if __name__ == "__main__":
     
-    if os.getcwd() == DEVDIR:
+    if os.environ.has_key("APPROOT") == False:
+	raise Exception("env variable APPROOT is not set")
+    
+    APPROOT = os.environ["APPROOT"]
+    
+    if os.getcwd() == os.path.join(APPROOT,DEVDIR):
 	databasename = "test_ssloader"
+	
 	#files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
 	#         ('academic.csv',-1,True)]
 	files = [('prep6student.csv',5,True)]	
 	
-    elif os.getcwd() == PRODDIR:
+    elif os.getcwd() == os.path.join(APPROOT,PRODDIR):
 	
 	databasename = "quad"
 	shutil.copyfile(databasename+".sqlite.backup",databasename+".sqlite")
@@ -1132,6 +1138,8 @@ if __name__ == "__main__":
 	         ('academic.csv',-1,True)]
     else:
 	raise Exception("do not know how to run in this working dir",dir=os.getcwd())
+    
+    print "".join(["env=","development ","db=",databasename])
     
     ssloader = SSLoader(databasename)
     ssloader.run(databasename,files)
