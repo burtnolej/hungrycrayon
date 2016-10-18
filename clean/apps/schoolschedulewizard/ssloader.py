@@ -77,6 +77,8 @@ class SSLoader(object):
 	          
 	          ('subject.student.subject.teacher',[(":",1),("\(",1),("\)",1)]),
 	          ('subject.student.subject.noteacher',[(":",1),("\(",0),("\)",0)]),
+	          
+	          ('student.student.nosubject.noteacher',[("students=^**",1),(":",0),("\(",0),("\)",0)]),
 	           
 	          #('teacher',[(":",1),("\(",1),("\)",1)]),
 	          ('date',[("/",2)]),
@@ -138,17 +140,21 @@ class SSLoader(object):
 	getdbenum(enums,self.database,'name','period')
 
         for record in records:
+	    
+	    
+	    
             try:
                 recordtype = self.identify_record(record)
             except Exception, e:
-		
-		if  academicrecordflag==True:
-		    recordtype="academicstudent"
-		else:
-		    _errors.append((record,str(e)))
-		    log.log(thisfuncname(),2,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
-		    continue
-
+		log.log(thisfuncname(),1,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
+		continue		
+		#if  academicrecordflag==True:
+		#    recordtype="academicstudent"
+		#else:
+		#    _errors.append((record,str(e)))
+		#    log.log(thisfuncname(),2,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
+		#    continue
+	    
 	    def _addrecord(_locals):
 		_record = [_locals[field] for field in self.fields]
 		_records.append(_record)
@@ -176,9 +182,9 @@ class SSLoader(object):
 		return([])
 	    
 	    def _period():
-		if academicrecordflag == True:
+		if academicrecordflag == True or staffrecordflag == True or studentfile == True:
 		    return(enums['period']['name'][periodidx])
-		return period
+		#return period
 
 		
 	    #items = ['ty','st','su','te','wi']
@@ -290,7 +296,16 @@ class SSLoader(object):
 
 		    _addrecord(locals())
 		
-	    elif  recordtype == 'academicstudent':
+	    elif recordtype == 'student.student.nosubject.noteacher':
+		teacher = _setteacher()
+		dow = _setdow()
+		subject = "??"
+		period = _period()
+		students = [record.lstrip().strip()]
+		_addrecord(locals())
+		
+		
+		'''elif  recordtype == 'academicstudent':
 		period = enums['period']['name'][periodidx]
 		#dow = self.valid_values['dow'][dowidx]
 		subject = "??"
@@ -299,6 +314,7 @@ class SSLoader(object):
 		_record = [locals()[field] for field in self.fields]
 		_records.append(_record)
 		log.log(thisfuncname(),10,msg="record added",record=_record)
+	    '''
 				
 	    elif recordtype[:6] == "ignore":
 		pass
@@ -314,6 +330,7 @@ class SSLoader(object):
 		
 	    elif recordtype == 'subject.student.subject.noteacher':
 		# Science: Oscar, Peter"
+		
 		subject,_rest = self.extract_subject(record)
 		teacher = _setteacher()
 		students = self.extract_students(_rest)
@@ -321,29 +338,8 @@ class SSLoader(object):
 		period = _period()
 		_addrecord(locals())
 		
-		
-	    elif recordtype in ['teacher','noteacher']:
-                #try:
-		subject,_rest = self.extract_subject(record)
-		teacher = "??"
-		
-		if recordtype == 'teacher' : 
-		    teacher,_rest = self.extract_teacher(_rest)
-		elif staffrecordflag == True:
-		    teacher = staffname
-		    
-		students = self.extract_students(_rest)
-		
-		if academicrecordflag==False: # edge case where academic records is matched
-		    dow = self.valid_values['dow'][dowidx]
-		else:
-		    teacher = academicname
-		    period = enums['period']['name'][periodidx]
-		    
-		_record = [locals()[field] for field in self.fields]
-		_records.append(_record)
-		log.log(thisfuncname(),10,msg="record added",record=_record)
-		
+	    # mode determination options
+	    # is it a student file, staff file or an academic file
 	    elif recordtype == 'studentname':
 		# this function actually extrats staff and students
 		studentname = self.extract_staff(record)
@@ -353,6 +349,12 @@ class SSLoader(object):
                 staffname = self.extract_staff(record)
                 log.log(thisfuncname(),10,msg="this is a staff file",staffname=staffname)
                 staffrecordflag=True	
+	    elif recordtype == 'academicname':
+		academicname = self.extract_staff(record)
+		log.log(thisfuncname(),10,msg="this is an academic file",academicname=academicname)
+		academicrecordflag=True
+		
+	    # special use cases
             elif recordtype == 'computertime':
                 if self.prep <> -1:
 		    students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
@@ -374,15 +376,11 @@ class SSLoader(object):
 		else:
 		    subject = "Computer Time"
 
+	    # file markers used to increment axes (period, dow, etc)
 	    elif recordtype[:3] == 'dow':
 		periodidx=-1
 		dow = record
 		log.log(thisfuncname(),10,msg="setting dow",dow=dow)
-		
-	    elif recordtype == 'academicname':
-                academicname = self.extract_staff(record)
-                log.log(thisfuncname(),10,msg="this is an academic file",academicname=academicname)
-                academicrecordflag=True
             elif recordtype == 'date':
                 pass
             elif recordtype == '_CRETURN_':
@@ -998,9 +996,15 @@ class SSLoader(object):
 	    self.prep = prep
             fileasstring = self.file2string(_file)
             records = self.string2records(fileasstring)
+	    
+
             clean_records,_,_ = self.pre_process_records(records)
 	    
+	    
+	    print clean_records
+	    
             self.validated_clean_records = []
+
             for clean_record in clean_records:
                 self.validated_clean_records.append(self.validate_tokens(clean_record))
                 
