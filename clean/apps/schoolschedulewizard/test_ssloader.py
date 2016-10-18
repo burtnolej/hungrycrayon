@@ -739,19 +739,19 @@ class Test_RecordIdentifcation(Test_Base):
         self.inputstr = "ELA: Nathaniel (Amelia)"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'teacher')
+        self.assertEquals(recordtype, 'subject.student.subject.teacher')
             
     def test_noteacher(self):
         self.inputstr = "Science: Oscar, Peter "
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'noteacher')
+        self.assertEquals(recordtype, 'subject.student.subject.noteacher')
         
     def test_noteacher2(self):
         self.inputstr = "Engineering: Oscar, Peter "
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'noteacher')
+        self.assertEquals(recordtype, 'subject.student.subject.noteacher')
         
     def test_date(self):
         self.inputstr =  "09/19/16"
@@ -768,13 +768,13 @@ class Test_RecordIdentifcation(Test_Base):
         self.inputstr = "Science: Jake (Paraic) \""
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'teacher')   
+        self.assertEquals(recordtype, 'subject.student.subject.teacher')   
         
     def test_teacher_edgecase2(self):
         self.inputstr = "Movement: Shane, Asher, Simon B"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
-        self.assertEquals(recordtype, 'noteacher')
+        self.assertEquals(recordtype, 'subject.student.subject.noteacher')
         
     def test_PERIOD_2(self):
         self.inputstr = "Period 1"
@@ -2494,13 +2494,27 @@ if __name__ == "__main__":
     
     # pre_process_records
 
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ValidateTokens_Teacher))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecords))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsNewPeriod))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsPrep4100))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsComputerTime))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsPrep4))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsStaff))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsFriday))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWith))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordStudent))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsSubjectWorkPeriod))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodStudent))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodSubject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriod2))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodStudentTeacherSubject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodStudentSubject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodStudentTeacher))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodWith))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodWithSubject)) '''  
         
-    #unittest.TextTestRunner(verbosity=2).run(suite) 
-    #exit()
+    unittest.TextTestRunner(verbosity=2).run(suite) 
+    exit()
     
     
     # loadrefobjects
