@@ -1085,9 +1085,9 @@ if __name__ == "__main__":
 	env = "PROD"
 	databasename = "quad"
 	shutil.copyfile(databasename+".sqlite.backup",databasename+".sqlite")
-	files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staff.csv',-1,True),
-	         ('prep5student.csv',-1,True),('prep4student.csv',-1,True),('prep6student.csv',-1,True),
-	         ('academic.csv',-1,True),('prep56new.csv',-1,True)]
+
+	files = [('prep56new.csv',-1,True)]
+	
     else:
 	raise Exception("do not know how to run in this working dir",dir=os.getcwd())
     
