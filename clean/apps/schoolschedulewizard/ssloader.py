@@ -68,6 +68,11 @@ class SSLoader(object):
 	          ('wp.nostudent.nosubject.noteacher.with.and', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1),('and',1)]),
 	          ('wp.nostudent.nosubject.noteacher.with', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
 	          ('wp.nostudent.subject.noteacher.with', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
+	          
+	          ('ap.student.subject.teacher',[("Subject=^Activity Period",1),(":",1),("\(",1),("\)",1)]),
+	          ('ap.student.subject.noteacher',[("Subject=^Activity Period",1),(":",1),("\(",0),("\)",0)]),
+	          ('ap.nostudent.nosubject.noteacher', [("Subject=^Activity Period$",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),
+	          
 	          ('subject.nostudent.nosubject.noteacher', [("subject=^**$",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),	          
 	          ('subject.nostudent.nosubject.noteacher.with.and', [("subject=^**",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1),('and',1)]),	   
 	          ('subject.nostudent.nosubject.noteacher.with', [("subject=^**",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),	          	          
@@ -172,18 +177,6 @@ class SSLoader(object):
 		if academicrecordflag == True or  studentfile == True:
 		    return(enums['period']['name'][periodidx])
 		return period
-
-		
-	    # pre pre processors
-	    if recordtype == 'newformat':
-		''' new format requires some pre processing to fit into the previously used formats
-		    make changes then recreate record and re identify '''
-		
-		# "Orig, Stephen, Oscar, Omer(Engineering); Yosef (WP) [Paraic]"
-		
-		
-		
-		
 
 	    #items = ['ty','st','su','te','wi']
 	    #_recordtypeparts = recordtype.split(".")
@@ -324,6 +317,35 @@ class SSLoader(object):
 		period = _period()
 		_addrecord(locals())
 		
+	    elif  recordtype == 'ap.nostudent.nosubject.noteacher':
+		# Activity Period
+		subject = "Activity Period"
+		teacher = _setteacher()
+		students = _setstudent()
+		if studentfile == True:
+		    students = [studentname]		
+		dow = _setdow()	
+		_addrecord(locals())
+		
+	    elif recordtype == 'ap.student.subject.teacher':
+		# Activity Period: Nathaniel (Amelia)"
+		subject,_rest = self.extract_subject(record)
+		teacher,_rest = self.extract_teacher(_rest)
+		students = self.extract_students(_rest)
+		dow = _setdow()
+		period = _period()
+		_addrecord(locals())
+		
+	    elif recordtype == 'ap.student.subject.noteacher':
+		# Activity Period: Oscar, Peter"
+		
+		subject,_rest = self.extract_subject(record)
+		teacher = _setteacher()
+		students = self.extract_students(_rest)
+		dow = _setdow()
+		period = _period()
+		_addrecord(locals())
+
 	    # mode determination options
 	    # is it a student file, staff file or an academic file
 	    elif recordtype == 'studentname':
@@ -955,8 +977,11 @@ class SSLoader(object):
 
 	    _additem(hashmap[hashkey]['teacher'],d['teacher'])
 	    _additem(hashmap[hashkey]['subject'],d['subject'])
-	    _additem(hashmap[hashkey]['recordtype'],d['recordtype'])
 	    
+	    _recordtype = d['recordtype'].split(".")[0]
+	    #_additem(hashmap[hashkey]['recordtype'],d['recordtype'])
+	    _additem(hashmap[hashkey]['recordtype'],_recordtype)
+
 	for row in rows:
 	    
 	    d = dict(zip(cols,row))

@@ -906,14 +906,6 @@ class Test_RecordIdentifcation(Test_Base):
          
         self.assertEquals(recordtype, 'student.student.nosubject.noteacher')
         
-        
-    # new format
-    def test_new_(self):
-        self.inputstr = "Orig, Stephen, Oscar, Omer(Engineering); Yosef (WP) [Paraic]"
-        recordtype = self.ssloader.identify_record(self.inputstr)
-         
-        self.assertEquals(recordtype, 'student.student.nosubject.noteacher')
-        
 class Test_RecordIdentifcation_realsample(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -1836,7 +1828,7 @@ class Test_DBLoader_Staff(Test_Base):
                             [u'Psychology Reading', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [u'Psychology', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
                             [u'Independent Art', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], 
-                            ['test', 13, 17, 10, 20, 21, 16, 22, 21, 16, 23, 14, 20, 11, 17, 14, 16, 15, 18, 11, 13, 12, 15, 14, 17, 11, 2, 3, 10]]
+                            ['test', 13, 17, 10, 20, 21, 16, 22, 21, 17, 23, 14, 20, 11, 17, 14, 16, 15, 18, 11, 13, 12, 15, 14, 17, 11, 2, 3, 10]]
 
 
         self.ssloader.ssloader([('staffdata.csv',-1,True)],self.databasename)        
@@ -1946,7 +1938,7 @@ class Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter(Test_Base):
         self.ssloader = SSLoader("test_ssloader")        
         self.ssloader.run("test_ssloader",files)
     
-        cols = ['status','dow','period','session','teacher']
+        cols = ['status','dow','period','session','te    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))acher']
         
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['student','==',"\"" + "Peter" + "\""],
@@ -2328,36 +2320,36 @@ class Test_DBLoader_Primary_Record_Set(Test_Primary_Record_Base):
         
     def test_Nathaniel(self):
 
-        expected_results = [[u'830-910', u'FR', u'Humanities', u'A', u'Nathaniel', u'subject.student.subject.teacher'],
-                            [u'830-910', u'MO', u'ELA', u'Amelia', u'Nathaniel', u'[subject.student.subject.teacher,student.student.nosubject.noteacher]'],
-                            [u'830-910', u'TH', u'Math', u'Stan', u'Nathaniel', u'[subject.student.subject.teacher,student.student.nosubject.noteacher]'],
-                            [u'830-910', u'TU', u'Math', u'Stan', u'Nathaniel', u'[subject.student.subject.teacher,student.student.nosubject.noteacher]'],
-                            [u'830-910', u'WE', u'ELA', u'Amelia', u'Nathaniel', u'[subject.student.subject.teacher,student.student.nosubject.noteacher]']]
+        expected_results = [[u'830-910', u'FR', u'Humanities', u'A', u'Nathaniel', u'subject'],
+                            [u'830-910', u'MO', u'ELA', u'Amelia', u'Nathaniel', u'[subject,student]'],
+                            [u'830-910', u'TH', u'Math', u'Stan', u'Nathaniel', u'[subject,student]'],
+                            [u'830-910', u'TU', u'Math', u'Stan', u'Nathaniel', u'[subject,student]'],
+                            [u'830-910', u'WE', u'ELA', u'Amelia', u'Nathaniel', u'[subject,student]']]
 
 
         expected_results.sort()
-                
+        
         self.assertListEqual(self.filter_results(4,'Nathaniel'),expected_results)
         
     def test_Friday(self):
                 
-        expected_results = [[u'830-910', u'FR', u'Art', u'B', u'Bruno', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Art', u'B', u'Clayton', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Art', u'B', u'Jack', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Art', u'B', u'Oscar', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Art', u'B', u'Peter', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Humanities', u'A', u'Jake', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Humanities', u'A', u'Nathaniel', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Humanities', u'A', u'Orig', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Humanities', u'A', u'Stephen', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Music', u'D', u'Coby', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Music', u'D', u'Thomas', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'Music', u'D', u'Yosef', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'STEM', u'C', u'Ashley', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'STEM', u'C', u'Booker', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'STEM', u'C', u'OmerC', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'STEM', u'C', u'Simon A', u'subject.student.subject.teacher'],
-                            [u'830-910', u'FR', u'STEM', u'C', u'Tris', u'subject.student.subject.teacher']]
+        expected_results = [[u'830-910', u'FR', u'Art', u'B', u'Bruno', u'subject'],
+                            [u'830-910', u'FR', u'Art', u'B', u'Clayton', u'subject'],
+                            [u'830-910', u'FR', u'Art', u'B', u'Jack', u'subject'],
+                            [u'830-910', u'FR', u'Art', u'B', u'Oscar', u'subject'],
+                            [u'830-910', u'FR', u'Art', u'B', u'Peter', u'subject'],
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Jake', u'subject'],
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Nathaniel', u'subject'],
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Orig', u'subject'],
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Stephen', u'subject'],
+                            [u'830-910', u'FR', u'Music', u'D', u'Coby', u'subject'],
+                            [u'830-910', u'FR', u'Music', u'D', u'Thomas', u'subject'],
+                            [u'830-910', u'FR', u'Music', u'D', u'Yosef', u'subject'],
+                            [u'830-910', u'FR', u'STEM', u'C', u'Ashley', u'subject'],
+                            [u'830-910', u'FR', u'STEM', u'C', u'Booker', u'subject'],
+                            [u'830-910', u'FR', u'STEM', u'C', u'OmerC', u'subject'],
+                            [u'830-910', u'FR', u'STEM', u'C', u'Simon A', u'subject'],
+                            [u'830-910', u'FR', u'STEM', u'C', u'Tris', u'subject']]
 
 
             
@@ -2367,11 +2359,11 @@ class Test_DBLoader_Primary_Record_Set(Test_Primary_Record_Base):
     
     def test_FOrig(self):
 
-        expected_results = [[u'830-910', u'FR', u'Humanities', u'A', u'Orig', u'subject.student.subject.teacher'],
-                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', u'subject.student.subject.teacher'],
-                            [u'830-910', u'TH', u'Student News', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'830-910', u'TU', u'Student News', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', u'subject.student.subject.teacher']]
+        expected_results = [[u'830-910', u'FR', u'Humanities', u'A', u'Orig', u'subject'],
+                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', u'subject'],
+                            [u'830-910', u'TH', u'Student News', '??', u'Orig', u'subject'],
+                            [u'830-910', u'TU', u'Student News', '??', u'Orig', u'subject'],
+                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', u'subject']]
         
         
         expected_results.sort()
@@ -2425,11 +2417,11 @@ class Test_DBLoader_Primary_Record_Set_With_Staff(Test_Primary_Record_Base):
        
     def test_FOrig(self):
 
-        expected_results = [[u'830-910', u'FR', u'Humanities', u'A', u'Orig', u'subject.student.subject.teacher'],
-                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', u'subject.student.subject.teacher'],
-                            [u'830-910', u'TH', u'Student News', u'Issey', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'830-910', u'TU', u'Student News', u'Johnny', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', u'subject.student.subject.teacher']]
+        expected_results = [[u'830-910', u'FR', u'Humanities', u'A', u'Orig', u'subject'],
+                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', u'subject'],
+                            [u'830-910', u'TH', u'Student News', u'Issey', u'Orig', u'subject'],
+                            [u'830-910', u'TU', u'Student News', u'Johnny', u'Orig', u'subject'],
+                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', u'subject']]
 
 
         expected_results.sort()
@@ -2438,10 +2430,10 @@ class Test_DBLoader_Primary_Record_Set_With_Staff(Test_Primary_Record_Base):
 
     def test_Bruno(self):        
         
-        expected_results = [[u'830-910', u'FR', u'Art', u'B', u'Bruno', u'subject.student.subject.teacher'],
-                            [u'830-910', u'MO', u'Movement', '??', u'Bruno', u'subject.student.subject.noteacher'],
-                            [u'830-910', u'TH', u'Core', '??', u'Bruno', u'subject.student.subject.noteacher'],
-                            [u'830-910', u'TU', u'Student News', u'Johnny', u'Bruno', u'subject.student.subject.noteacher']]  
+        expected_results = [[u'830-910', u'FR', u'Art', u'B', u'Bruno', u'subject'],
+                            [u'830-910', u'MO', u'Movement', '??', u'Bruno', u'subject'],
+                            [u'830-910', u'TH', u'Core', '??', u'Bruno', u'subject'],
+                            [u'830-910', u'TU', u'Student News', u'Johnny', u'Bruno', u'subject']]  
         
         expected_results.sort()
         
@@ -2466,50 +2458,50 @@ class Test_DBLoader_Primary_Record_Set_Nathaniel(Test_Primary_Record_Base):
         # expected_results are hand generated from source production files and presented in Prep5_Nathaniel_expected_results.csv
         # the expected_results do not necessarilly match the individual student schedule source prod files as they are known to not always reconcile
         
-        expected_results = [[u'100-140', u'MO', u'ELA', u'Aaron', u'Orig', u'subject.student.subject.teacher'],
-                            [u'100-140', u'TH', u'Math', u'Stan', u'Orig', u'subject.student.subject.teacher'],
-                            [u'100-140', u'TU', u'Math', u'Stan', u'Orig', u'subject.student.subject.teacher'],
-                            [u'100-140', u'WE', u'ELA', u'Aaron', u'Orig', u'subject.student.subject.teacher'],
-                            [u'1030-1110', u'FR', u'Art', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'1030-1110', u'MO', u'Core', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'1030-1110', u'TH', u'Chess', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'1030-1110', u'TU', u'Chess', '??', u'Orig', u'subject.student.subject.noteacher'],
+        expected_results = [[u'100-140', u'MO', u'ELA', u'Aaron', u'Orig', u'subject'],
+                            [u'100-140', u'TH', u'Math', u'Stan', u'Orig', u'subject'],
+                            [u'100-140', u'TU', u'Math', u'Stan', u'Orig', u'subject'],
+                            [u'100-140', u'WE', u'ELA', u'Aaron', u'Orig', u'subject'],
+                            [u'1030-1110', u'FR', u'Art', '??', u'Orig', u'subject'],
+                            [u'1030-1110', u'MO', u'Core', '??', u'Orig', u'subject'],
+                            [u'1030-1110', u'TH', u'Chess', '??', u'Orig', u'subject'],
+                            [u'1030-1110', u'TU', u'Chess', '??', u'Orig', u'subject'],
                             [u'1110-1210', u'FR', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'1110-1210', u'MO', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'1110-1210', u'TH', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'1110-1210', u'TU', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'1110-1210', u'WE', u'Computer Time', '??', u'Orig', u'computertime'],
-                            [u'1210-100', u'MO', u'Student News', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'1210-100', u'TH', u'Work Period', '??', u'Orig', u'wp.student.nosubject.noteacher'],
-                            [u'1210-100', u'TU', u'Music', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'1210-100', u'WE', u'OT', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'140-220', u'MO', u'Work Period', '??', u'Orig', u'wp.student.nosubject.noteacher'],
-                            [u'140-220', u'TH', u'Work Period', '??', u'Orig', u'wp.student.nosubject.noteacher'],
-                            [u'140-220', u'TU', u'Work Period', '??', u'Orig', u'wp.student.nosubject.noteacher'],
-                            [u'140-220', u'WE', u'Work Period', '??', u'Orig', u'wp.student.nosubject.noteacher'],
-                            [u'220-300', u'MO', u'Movement', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'220-300', u'TH', u'Activity Period', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'220-300', u'TU', u'Movement', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'220-300', u'WE', u'Movement', '??', u'Orig', u'subject.student.subject.noteacher'],
+                            [u'1210-100', u'MO', u'Student News', '??', u'Orig', u'subject'],
+                            [u'1210-100', u'TH', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'1210-100', u'TU', u'Music', '??', u'Orig', u'subject'],
+                            [u'1210-100', u'WE', u'OT', '??', u'Orig', u'subject'],
+                            [u'140-220', u'MO', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'140-220', u'TH', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'140-220', u'TU', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'140-220', u'WE', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'220-300', u'MO', u'Movement', '??', u'Orig', u'subject'],
+                            [u'220-300', u'TH', u'Activity Period', '??', u'Orig', u'subject'],
+                            [u'220-300', u'TU', u'Movement', '??', u'Orig', u'subject'],
+                            [u'220-300', u'WE', u'Movement', '??', u'Orig', u'subject'],
                             [u'300-330', u'MO', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'300-330', u'TH', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'300-330', u'TU', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'300-330', u'WE', u'Computer Time', '??', u'Orig', u'computertime'],
-                            [u'830-910', u'FR', u'Humanities', u'A', u'Orig', u'subject.student.subject.teacher'],
-                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', u'subject.student.subject.teacher'],
-                            [u'830-910', u'TH', u'Student News', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'830-910', u'TU', u'Student News', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', u'subject.student.subject.teacher'],
-                            [u'910-950', u'FR', u'Core', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'910-950', u'MO', u'Science', u'Paraic', u'Orig', u'subject.student.subject.teacher'],
-                            [u'910-950', u'TH', u'History', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'910-950', u'TU', u'History', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'910-950', u'WE', u'Science', u'Paraic', u'Orig', u'subject.student.subject.teacher'],
-                            [u'950-1030', u'FR', u'STEM', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'950-1030', u'MO', u'Work Period', '??', u'Orig', u'wp.student.nosubject.noteacher'],
-                            [u'950-1030', u'TH', u'Core', '??', u'Orig', u'subject.student.subject.noteacher'],
-                            [u'950-1030', u'TU', u'Work Period', '??', u'Orig', u'wp.student.nosubject.noteacher'],
-                            [u'950-1030', u'WE', u'Work Period', '??', u'Orig', u'wp.student.nosubject.noteacher']]
+                            [u'830-910', u'FR', u'Humanities', u'A', u'Orig', u'subject'],
+                            [u'830-910', u'MO', u'Engineering', u'Paraic', u'Orig', u'subject'],
+                            [u'830-910', u'TH', u'Student News', '??', u'Orig', u'subject'],
+                            [u'830-910', u'TU', u'Student News', '??', u'Orig', u'subject'],
+                            [u'830-910', u'WE', u'Engineering', u'Paraic', u'Orig', u'subject'],
+                            [u'910-950', u'FR', u'Core', '??', u'Orig', u'subject'],
+                            [u'910-950', u'MO', u'Science', u'Paraic', u'Orig', u'subject'],
+                            [u'910-950', u'TH', u'History', '??', u'Orig', u'subject'],
+                            [u'910-950', u'TU', u'History', '??', u'Orig', u'subject'],
+                            [u'910-950', u'WE', u'Science', u'Paraic', u'Orig', u'subject'],
+                            [u'950-1030', u'FR', u'STEM', '??', u'Orig', u'subject'],
+                            [u'950-1030', u'MO', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'950-1030', u'TH', u'Core', '??', u'Orig', u'subject'],
+                            [u'950-1030', u'TU', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'950-1030', u'WE', u'Work Period', '??', u'Orig', u'wp']]
 
 
         expected_results.sort()
@@ -2631,9 +2623,9 @@ if __name__ == "__main__":
     
     
     # pre_process_records
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_New))
-    unittest.TextTestRunner(verbosity=2).run(suite) 
-    exit()
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
+    #unittest.TextTestRunner(verbosity=2).run(suite) 
+    #exit()
     
     
     # loadrefobjects
@@ -2730,8 +2722,6 @@ if __name__ == "__main__":
     # 1 period of 1 prep
 
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))
-    
-
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_Issey))
