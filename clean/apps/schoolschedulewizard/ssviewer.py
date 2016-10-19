@@ -637,6 +637,9 @@ class WizardUI(Tk):
         cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype']        
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
+            
+            print exec_str
+            
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
         
         # parse rows

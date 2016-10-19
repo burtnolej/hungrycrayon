@@ -906,6 +906,14 @@ class Test_RecordIdentifcation(Test_Base):
          
         self.assertEquals(recordtype, 'student.student.nosubject.noteacher')
         
+        
+    # new format
+    def test_new_(self):
+        self.inputstr = "Orig, Stephen, Oscar, Omer(Engineering); Yosef (WP) [Paraic]"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+         
+        self.assertEquals(recordtype, 'student.student.nosubject.noteacher')
+        
 class Test_RecordIdentifcation_realsample(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -1606,7 +1614,7 @@ class Test_DBLoader_Prep5(Test_Base):
                             [u'ELA', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Math', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Work Period', 7, 6, 8, 8, 7, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0], 
+                            [u'Work Period', 8, 6, 8, 8, 7, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Movement', 2, 7, 3, 3, 4, 5, 3, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Counseling', 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Student News', 2, 2, 3, 1, 4, 3, 3, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0], 
@@ -1626,7 +1634,7 @@ class Test_DBLoader_Prep5(Test_Base):
                             [u'Computer Time', 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Reading', 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Independent Reading', 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            ['test', 44, 45, 44, 43, 45, 47, 45, 46, 44, 4, 4, 4, 4, 4, 4, 4, 4]]
+                            ['test', 45, 45, 44, 43, 45, 47, 45, 46, 44, 4, 4, 4, 4, 4, 4, 4, 4]]
 
         self.ssloader.ssloader([('prep5data.csv',5,True)],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
@@ -1646,9 +1654,8 @@ class Test_DBLoader_Prep5(Test_Base):
         self.ssloader.ssloader([('prep5data.csv',5,True)],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
         self.assertListEqual(results,expected_results)
-        
-        
-    
+             
+     
 class Test_DBLoader_Staff_Issey(Test_Base):
     def setUp(self):
         Test_Base.setUp(self,prep=-1)
@@ -1825,7 +1832,7 @@ class Test_DBLoader_Staff(Test_Base):
                             [u'History', 0, 0, 2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Chess', 0, 0, 0, 1, 2, 4, 1, 3, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                             [u'Counseling', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0], 
-                            [u'Movement', 0, 1, 0, 0, 0, 0, 5, 1, 2, 1, 0, 3, 1, 3, 2, 3, 3, 3, 0, 0, 0, 0, 0, 3, 1, 0, 3, 1], 
+                            [u'Movement', 0, 1, 0, 0, 0, 0, 5, 1, 3, 1, 0, 3, 1, 3, 2, 3, 3, 3, 0, 0, 0, 0, 0, 3, 1, 0, 3, 1], 
                             [u'Psychology Reading', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [u'Psychology', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
                             [u'Independent Art', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], 
@@ -1957,6 +1964,120 @@ class Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter(Test_Base):
         self.assertListEqual(rows,expected_results)
         
 
+class Test_DBLoader_New_Amelia(Test_Base):
+
+    def setUp(self):  
+
+        self.databasename = "test_ssloader"
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+    
+    def test_lesson_records(self):
+
+        cols = ['status','dow','period','session','student']
+        
+        files = [('prep56new_Amelia.csv',-1,True)]
+    
+        self.ssloader = SSLoader("test_ssloader")        
+        self.ssloader.run("test_ssloader",files)
+
+        expected_results = [[u'complete', u'MO', u'830-910', u'Amelia.ELA.Monday.830-910', u'Peter'],
+                            [u'complete', u'MO', u'830-910', u'Amelia.Work Period.Monday.830-910', u'Coby'],
+                            [u'incomplete', u'TU', u'830-910', u'??.Work Period.Tuesday.830-910', u'Peter'],
+                            [u'complete', u'WE', u'830-910', u'Amelia.ELA.Wednesday.830-910', u'Peter'],
+                            [u'complete', u'WE', u'830-910', u'Amelia.Work Period.Wednesday.830-910', u'Coby'],
+                            [u'complete', u'TH', u'830-910', u'Amelia.Work Period.Thursday.830-910', u'Jack'],
+                            [u'complete', u'MO', u'910-950', u'Amelia.ELA.Monday.910-950', u'Bruno'],
+                            [u'complete', u'TU', u'910-950', u'Amelia.ELA.Tuesday.910-950', u'Simon A'],
+                            [u'complete', u'WE', u'910-950', u'Amelia.ELA.Wednesday.910-950', u'Bruno'],
+                            [u'complete', u'TH', u'910-950', u'Amelia.ELA.Thursday.910-950', u'Simon A'],
+                            [u'complete', u'MO', u'950-1030', u'Amelia.ELA.Monday.950-1030', u'Stephen'],
+                            [u'complete', u'TU', u'950-1030', u'Amelia.ELA.Tuesday.950-1030', u'Booker'],
+                            [u'complete', u'WE', u'950-1030', u'Amelia.ELA.Wednesday.950-1030', u'Stephen'],
+                            [u'complete', u'WE', u'950-1030', u'Amelia.Work Period.Wednesday.950-1030', u'Bruno'],
+                            [u'complete', u'MO', u'1030-1110', u'Amelia.ELA.Monday.1030-1110', u'Nathaniel'],
+                            [u'complete', u'TU', u'1030-1110', u'Amelia.ELA.Tuesday.1030-1110', u'Tristan'],
+                            [u'complete', u'WE', u'1030-1110', u'Amelia.ELA.Wednesday.1030-1110', u'Nathaniel'],
+                            [u'complete', u'TH', u'1030-1110', u'Amelia.ELA.Thursday.1030-1110', u'Tristan'],
+                            [u'complete', u'MO', u'1210-100', u'Amelia.ELA.Monday.1210-100', u'Jack'],
+                            [u'incomplete', u'WE', u'1210-100', u'Amelia.??.Wednesday.1210-100', u'Jack'],
+                            [u'complete', u'MO', u'100-140', u'Amelia.ELA.Monday.100-140', u'Clayton'],
+                            [u'complete', u'MO', u'100-140', u'Amelia.Work Period.Monday.100-140', u'Peter'],
+                            [u'complete', u'TU', u'100-140', u'Amelia.ELA.Tuesday.100-140', u'Thomas'],
+                            [u'complete', u'WE', u'100-140', u'Amelia.ELA.Wednesday.100-140', u'Clayton'],
+                            [u'complete', u'WE', u'100-140', u'Amelia.Work Period.Wednesday.100-140', u'Peter'],
+                            [u'complete', u'TH', u'100-140', u'Amelia.ELA.Thursday.100-140', u'Thomas'],
+                            [u'complete', u'MO', u'140-220', u'Amelia.ELA.Monday.140-220', u'Oscar'],
+                            [u'complete', u'MO', u'140-220', u'Amelia.Work Period.Monday.140-220', u'Clayton'],
+                            [u'complete', u'TU', u'140-220', u'Amelia.ELA.Tuesday.140-220', u'Ashley'],
+                            [u'complete', u'WE', u'140-220', u'Amelia.ELA.Wednesday.140-220', u'Oscar'],
+                            [u'complete', u'WE', u'140-220', u'Amelia.Work Period.Wednesday.140-220', u'Clayton'],
+                            [u'complete', u'TH', u'140-220', u'Amelia.ELA.Thursday.140-220', u'Ashley'],
+                            [u'complete', u'TU', u'220-300', u'Amelia.ELA.Tuesday.220-300', u'Coby'],
+                            [u'complete', u'TU', u'220-300', u'Amelia.Work Period.Tuesday.220-300', u'Ashley'],
+                            [u'complete', u'TH', u'220-300', u'Amelia.ELA.Thursday.220-300', u'Coby'],
+                            [u'complete', u'TH', u'220-300', u'Amelia.Work Period.Thursday.220-300', u'Ashley']]
+        
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['source','=',"\"" + "prep56new_Amelia.csv" + "\""]])
+
+        self.assertListEqual(expected_results,rows)
+        
+    def test_lesson_summary(self):
+        
+        self.ssloader = SSLoader("test_ssloader")    
+        self.ssloader.ssloader([('prep56new_Amelia.csv',-1,True)],self.databasename)
+        
+        expected_results = [['test', u'Peter', u'Coby', u'Jack', u'Bruno', u'Simon A', u'Stephen', u'Booker', u'Nathaniel', u'Tristan', u'Clayton', u'Thomas', u'Oscar', u'Ashley'],
+                            [u'ELA', 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2],
+                            [u'Work Period', 3, 2, 1, 1, 0, 0, 0, 0, 0, 2, 0, 0, 2],
+                            [u'??', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            ['test', 5, 4, 3, 3, 2, 2, 1, 2, 2, 4, 2, 2, 4]]
+        
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
+        
+
+        self.assertListEqual(expected_results,results)
+        
+class Test_DBLoader_New(Test_Base):
+
+    def setUp(self):  
+
+        self.databasename = "test_ssloader"
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+        
+    def test_lesson_summary(self):
+        
+        self.ssloader = SSLoader("test_ssloader")    
+        self.ssloader.ssloader([('prep56new.csv',-1,True)],self.databasename)
+        
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
+        
+        for row in results:
+            print row
+        #self.assertListEqual(expected_results,results)
+        
+    def test_lesson_records(self):
+
+        cols = ['status','dow','period','session','student']
+        
+        files = [('prep56new.csv',-1,True)]
+    
+        self.ssloader = SSLoader("test_ssloader")        
+        self.ssloader.run("test_ssloader",files)
+        
 class Test_DBLoader_Academic_Stan(unittest.TestCase):
     
     # 2 sessions are not implied by the academic and need to be added
@@ -2510,11 +2631,7 @@ if __name__ == "__main__":
     
     
     # pre_process_records
-
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff_Student))  
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_New))
     unittest.TextTestRunner(verbosity=2).run(suite) 
     exit()
     

@@ -139,7 +139,7 @@ def _pivotexecfunc(database,title,ycoltype,xcoltype,tblname,distinct=False,maste
                     for pred,op,predval in whereclause:
                         exec_str += " and {0} {1} {2} ".format(pred,op,"\""+str(predval)+"\"")
                 
-                _,results,_ = tbl_query(database,exec_str)
+                _,results,exec_str = tbl_query(database,exec_str)
                 
                 try:
                     if len(results[0]) > 1:

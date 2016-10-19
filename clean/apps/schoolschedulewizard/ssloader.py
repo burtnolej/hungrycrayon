@@ -65,31 +65,23 @@ class SSLoader(object):
 	          ('wp.nostudent.subject.noteacher', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),
 	          ('wp.student.subject.noteacher', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",1),('Computer Time',0),('with',0)]),
 	          ('wp.student.subject.teacher', [("subject=^**",1),("Subject=Work Period",1),("\(",1),("\)",1),(":",1),('Computer Time',0),('with',0)]), 
-
 	          ('wp.nostudent.nosubject.noteacher.with.and', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1),('and',1)]),
 	          ('wp.nostudent.nosubject.noteacher.with', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
-	          
 	          ('wp.nostudent.subject.noteacher.with', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
-	          ('subject.nostudent.nosubject.noteacher', [("subject=^**$",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),
-	          
+	          ('subject.nostudent.nosubject.noteacher', [("subject=^**$",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),	          
 	          ('subject.nostudent.nosubject.noteacher.with.and', [("subject=^**",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1),('and',1)]),	   
-	          ('subject.nostudent.nosubject.noteacher.with', [("subject=^**",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),	          
-	          
+	          ('subject.nostudent.nosubject.noteacher.with', [("subject=^**",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),	          	          
 	          ('subject.student.subject.teacher',[(":",1),("\(",1),("\)",1)]),
 	          ('subject.student.subject.noteacher',[(":",1),("\(",0),("\)",0)]),
-	          
-	          ('student.student.nosubject.noteacher',[("students=^**",1),(":",0),("\(",0),("\)",0)]),
+	          ('student.student.nosubject.noteacher',[("students=^**$",1),(":",0),("\(",0),("\)",0)]),
 	           
-	          #('teacher',[(":",1),("\(",1),("\)",1)]),
 	          ('date',[("/",2)]),
-	          #('noteacher', [(":",1),("\(",0),("\)",0)]),
 	          ('period' ,[(":",2),("-",1)]),
 	          ('ignore' , [("^Period",1),(":",0),("\(",0),("\)",0)]),
 	          ('ignore2' , [("Lunch",1),(":",0),("\(",0),("\)",0)]),
 	          ('_ENDCELL_' ,[("\^",1)]),
 	          ('_CRETURN_' ,[("\&",1)]),
 	          ('staffname',[('\+',2)]),
-	          #('with',[(' with ',1),(":",0),("\(",0),("\)",0)]),
 	          ('dow1',[('Monday',1)]),
 	          ('dow2',[('Tuesday',1)]),
 	          ('dow3',[('Wednesday',1)]),
@@ -148,13 +140,7 @@ class SSLoader(object):
             except Exception, e:
 		log.log(thisfuncname(),1,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
 		continue		
-		#if  academicrecordflag==True:
-		#    recordtype="academicstudent"
-		#else:
-		#    _errors.append((record,str(e)))
-		#    log.log(thisfuncname(),2,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
-		#    continue
-	    
+
 	    def _addrecord(_locals):
 		_record = [_locals[field] for field in self.fields]
 		_records.append(_record)
@@ -182,11 +168,23 @@ class SSLoader(object):
 		return([])
 	    
 	    def _period():
-		if academicrecordflag == True or staffrecordflag == True or studentfile == True:
+		#if academicrecordflag == True or staffrecordflag == True or studentfile == True:
+		if academicrecordflag == True or  studentfile == True:
 		    return(enums['period']['name'][periodidx])
-		#return period
+		return period
 
 		
+	    # pre pre processors
+	    if recordtype == 'newformat':
+		''' new format requires some pre processing to fit into the previously used formats
+		    make changes then recreate record and re identify '''
+		
+		# "Orig, Stephen, Oscar, Omer(Engineering); Yosef (WP) [Paraic]"
+		
+		
+		
+		
+
 	    #items = ['ty','st','su','te','wi']
 	    #_recordtypeparts = recordtype.split(".")
 	    #recordtypeparts = dict(zip(items,_recordtypeparts))
@@ -303,18 +301,6 @@ class SSLoader(object):
 		period = _period()
 		students = [record.lstrip().strip()]
 		_addrecord(locals())
-		
-		
-		'''elif  recordtype == 'academicstudent':
-		period = enums['period']['name'][periodidx]
-		#dow = self.valid_values['dow'][dowidx]
-		subject = "??"
-		teacher = academicname
-		students = [record.lstrip().strip()]
-		_record = [locals()[field] for field in self.fields]
-		_records.append(_record)
-		log.log(thisfuncname(),10,msg="record added",record=_record)
-	    '''
 				
 	    elif recordtype[:6] == "ignore":
 		pass
@@ -375,6 +361,8 @@ class SSLoader(object):
 		    log.log(thisfuncname(),10,msg="record addede",record=_record)
 		else:
 		    subject = "Computer Time"
+
+		
 
 	    # file markers used to increment axes (period, dow, etc)
 	    elif recordtype[:3] == 'dow':
@@ -994,20 +982,22 @@ class SSLoader(object):
 	    
             self.inputfile = _file
 	    self.prep = prep
+	    
             fileasstring = self.file2string(_file)
+	    log.log(thisfuncname(),15,fileasstring=fileasstring)
+	    
             records = self.string2records(fileasstring)
+	    log.log(thisfuncname(),15,records=records)
 	    
-
             clean_records,_,_ = self.pre_process_records(records)
-	    
-	    
-	    print clean_records
+	    log.log(thisfuncname(),15,clean_records=clean_records)
 	    
             self.validated_clean_records = []
 
             for clean_record in clean_records:
                 self.validated_clean_records.append(self.validate_tokens(clean_record))
-                
+	    log.log(thisfuncname(),15,validated_clean_records=self.validated_clean_records)
+	    
 	    if dbloader == True:
 		self.dbloader(self.validated_clean_records)
 	    else:
@@ -1059,23 +1049,24 @@ if __name__ == "__main__":
     APPROOT = os.environ["APPROOT"]
     
     if os.getcwd() == os.path.join(APPROOT,DEVDIR):
+	env = "DEV"
 	databasename = "test_ssloader"
 	
-	#files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
-	#         ('academic.csv',-1,True)]
-	files = [('prep6student.csv',5,True)]	
+	files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staffdata.csv',-1,True),
+	         ('academic.csv',-1,True),('prep56new.csv',-1,True)]
+	#files = [('prep56new_Amelia.csv',5,True)]	
 	
     elif os.getcwd() == os.path.join(APPROOT,PRODDIR):
-	
+	env = "PROD"
 	databasename = "quad"
 	shutil.copyfile(databasename+".sqlite.backup",databasename+".sqlite")
 	files = [('prep5data.csv',5,True),('prep4data.csv',4,True),('prep6data.csv',6,True),('staff.csv',-1,True),
 	         ('prep5student.csv',-1,True),('prep4student.csv',-1,True),('prep6student.csv',-1,True),
-	         ('academic.csv',-1,True)]
+	         ('academic.csv',-1,True),('prep56new.csv',-1,True)]
     else:
 	raise Exception("do not know how to run in this working dir",dir=os.getcwd())
     
-    print "".join(["env=","development ","db=",databasename])
+    print "".join(["env=",env,"db=",databasename])
     
     ssloader = SSLoader(databasename)
     ssloader.run(databasename,files)
