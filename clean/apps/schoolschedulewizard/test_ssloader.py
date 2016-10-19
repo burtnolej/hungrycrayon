@@ -998,8 +998,8 @@ class Test_PreProcessRecordsWorkPeriodWith(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','Amelia',[],'wp.nostudent.nosubject.noteacher.with'],
-                          ['830-910','Tuesday','Work Period','Paraic',[],'wp.nostudent.nosubject.noteacher.with']]
+        expected_results = [['830-910','Monday','??','Amelia',[],'wp.nostudent.nosubject.noteacher.with'],
+                          ['830-910','Tuesday','??','Paraic',[],'wp.nostudent.nosubject.noteacher.with']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1013,9 +1013,9 @@ class Test_PreProcessRecordsWorkPeriodWithAnd(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','Amelia',[],'wp.nostudent.nosubject.noteacher.with.and'],
-                            ['830-910','Monday','Work Period','Paraic',[],'wp.nostudent.nosubject.noteacher.with.and'],
-                          ['830-910','Tuesday','Work Period','Paraic',[],'wp.nostudent.nosubject.noteacher.with']]
+        expected_results = [['830-910','Monday','??','Amelia',[],'wp.nostudent.nosubject.noteacher.with.and'],
+                            ['830-910','Monday','??','Paraic',[],'wp.nostudent.nosubject.noteacher.with.and'],
+                          ['830-910','Tuesday','??','Paraic',[],'wp.nostudent.nosubject.noteacher.with']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1029,8 +1029,8 @@ class Test_PreProcessRecordsWorkPeriodWithSubject(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','Amelia',[],'wp.nostudent.subject.noteacher.with'],
-                          ['830-910','Tuesday','Work Period','Paraic',[],'wp.nostudent.subject.noteacher.with']]
+        expected_results = [['830-910','Monday','Humanities','Amelia',[],'wp.nostudent.subject.noteacher.with'],
+                          ['830-910','Tuesday','Math','Paraic',[],'wp.nostudent.subject.noteacher.with']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1110,8 +1110,8 @@ class Test_PreProcessRecordsSubjectWorkPeriod(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
-                          ['830-910','Thursday','Work Period','Moira',['Nick'],'wp.student.subject.noteacher']]
+        expected_results = [['830-910','Tuesday','??','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
+                          ['830-910','Thursday','Math','Moira',['Nick'],'wp.student.subject.noteacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1122,8 +1122,8 @@ class Test_PreProcessRecordsSubjectWorkPeriod(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Tuesday','Work Period','Amelia',['MacKenzie'],'wp.student.nosubject.teacher'],
-                          ['830-910','Thursday','Work Period','Stan',['Nick'],'wp.student.subject.teacher']]
+        expected_results = [['830-910','Tuesday','??','Amelia',['MacKenzie'],'wp.student.nosubject.teacher'],
+                          ['830-910','Thursday','Math','Stan',['Nick'],'wp.student.subject.teacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1137,9 +1137,9 @@ class Test_PreProcessRecordsWorkPeriodStudent(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','??',['Shane', 'Asher'],'wp.student.nosubject.noteacher'],
-                            ['830-910','Tuesday','Work Period','??',['Bruno'],'wp.student.nosubject.noteacher'],
-                            ['830-910','Wednesday','Work Period','??',['Nick'],'wp.student.nosubject.noteacher']]   
+        expected_results = [['830-910','Monday','??','??',['Shane', 'Asher'],'wp.student.nosubject.noteacher'],
+                            ['830-910','Tuesday','??','??',['Bruno'],'wp.student.nosubject.noteacher'],
+                            ['830-910','Wednesday','??','??',['Nick'],'wp.student.nosubject.noteacher']]   
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1153,9 +1153,9 @@ class Test_PreProcessRecordsWorkPeriodSubject(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','??',[],'wp.nostudent.subject.noteacher'],
-                            ['830-910','Tuesday','Work Period','??',[],'wp.nostudent.subject.noteacher'],
-                            ['830-910','Wednesday','Work Period','??',[],'wp.nostudent.subject.noteacher']]   
+        expected_results = [['830-910','Monday','Humanities','??',[],'wp.nostudent.subject.noteacher'],
+                            ['830-910','Tuesday','Math','??',[],'wp.nostudent.subject.noteacher'],
+                            ['830-910','Wednesday','ELA','??',[],'wp.nostudent.subject.noteacher']]   
         
         self.assertListEqual(clean_records,expected_results)
               
@@ -1170,9 +1170,9 @@ class Test_PreProcessRecordsWorkPeriod2(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','??',[],'wp.nostudent.nosubject.noteacher'],
-                            ['830-910','Tuesday','Work Period','??',[],'wp.nostudent.nosubject.noteacher'],
-                            ['830-910','Wednesday','Work Period','??',[],'wp.nostudent.nosubject.noteacher']]   
+        expected_results = [['830-910','Monday','??','??',[],'wp.nostudent.nosubject.noteacher'],
+                            ['830-910','Tuesday','??','??',[],'wp.nostudent.nosubject.noteacher'],
+                            ['830-910','Wednesday','??','??',[],'wp.nostudent.nosubject.noteacher']]   
         
         self.assertListEqual(clean_records,expected_results)              
               
@@ -1187,9 +1187,9 @@ class Test_PreProcessRecordsWorkPeriod2(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','??',[],'wp.nostudent.nosubject.noteacher'],
-                            ['830-910','Tuesday','Work Period','??',[],'wp.nostudent.nosubject.noteacher'],
-                            ['830-910','Wednesday','Work Period','??',[],'wp.nostudent.nosubject.noteacher']]   
+        expected_results = [['830-910','Monday','??','??',[],'wp.nostudent.nosubject.noteacher'],
+                            ['830-910','Tuesday','??','??',[],'wp.nostudent.nosubject.noteacher'],
+                            ['830-910','Wednesday','??','??',[],'wp.nostudent.nosubject.noteacher']]   
         
         self.assertListEqual(clean_records,expected_results)                    
               
@@ -1203,8 +1203,8 @@ class Test_PreProcessRecordsWorkPeriodStudentTeacherSubject(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','Stan',['Jack'],'wp.student.subject.teacher'],
-                            ['830-910','Tuesday','Work Period','Stan',['Jack','Nick'],'wp.student.subject.teacher']]   
+        expected_results = [['830-910','Monday','Math','Stan',['Jack'],'wp.student.subject.teacher'],
+                            ['830-910','Tuesday','Math','Stan',['Jack','Nick'],'wp.student.subject.teacher']]   
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1219,8 +1219,8 @@ class Test_PreProcessRecordsWorkPeriodStudentSubject(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','??',['Jack'],'wp.student.subject.noteacher'],
-                            ['830-910','Tuesday','Work Period','??',['Jack','Nick'],'wp.student.subject.noteacher']]   
+        expected_results = [['830-910','Monday','Math','??',['Jack'],'wp.student.subject.noteacher'],
+                            ['830-910','Tuesday','Math','??',['Jack','Nick'],'wp.student.subject.noteacher']]   
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1234,8 +1234,8 @@ class Test_PreProcessRecordsWorkPeriodStudentTeacher(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Monday','Work Period','Stan',['Jack'],'wp.student.nosubject.teacher'],
-                            ['830-910','Tuesday','Work Period','Stan',['Jack','Nick'],'wp.student.nosubject.teacher']]   
+        expected_results = [['830-910','Monday','??','Stan',['Jack'],'wp.student.nosubject.teacher'],
+                            ['830-910','Tuesday','??','Stan',['Jack','Nick'],'wp.student.nosubject.teacher']]   
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1250,8 +1250,8 @@ class Test_PreProcessRecordsStaff(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
-                          ['830-910','Thursday','Work Period','Moira',['Nick'],'wp.student.nosubject.noteacher']]
+        expected_results = [['830-910','Tuesday','??','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
+                          ['830-910','Thursday','??','Moira',['Nick'],'wp.student.nosubject.noteacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1264,10 +1264,10 @@ class Test_PreProcessRecordsStaff(Test_Base):
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
-        expected_results = [['830-910','Tuesday','Work Period','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
-                          ['830-910','Thursday','Work Period','Moira',['Nick'],'wp.student.nosubject.noteacher'],
-                          ['830-910','Tuesday','Work Period','John',['MacKenzie'],'wp.student.nosubject.noteacher'],
-                           ['830-910','Thursday','Work Period','John',['Nick'],'wp.student.nosubject.noteacher']]
+        expected_results = [['830-910','Tuesday','??','Moira',['MacKenzie'],'wp.student.nosubject.noteacher'],
+                          ['830-910','Thursday','??','Moira',['Nick'],'wp.student.nosubject.noteacher'],
+                          ['830-910','Tuesday','??','John',['MacKenzie'],'wp.student.nosubject.noteacher'],
+                           ['830-910','Thursday','??','John',['Nick'],'wp.student.nosubject.noteacher']]
         
         self.assertListEqual(clean_records,expected_results)
         
@@ -1357,8 +1357,6 @@ class Test_PreProcessRecordsComputerTime(Test_Base):
         
     def test_(self):
                 
-        print self.records
-        
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
         expected_results = [['1110-1210','Monday','Computer Time','??',self.students,'computertime'],
@@ -1387,8 +1385,6 @@ class Test_PreProcessRecordsFriday(Test_Base):
         self.students.sort()
         
     def test_(self):
-                
-        print self.records
         
         clean_records,_,_ = self.ssloader.pre_process_records(self.records)
         
@@ -1550,26 +1546,27 @@ class Test_DBLoader_Prep5_1period(Test_Base):
             
             
     def test_lesson(self):
-        
-        expected_results = [['test', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
-                            [u'ELA', 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Math', 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Work Period', 0, 0, 0, 0, 0, 4, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Movement', 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Counseling', 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Student News', 0, 0, 2, 1, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Science', 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Core', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Humanities', 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Music', 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0], 
-                            [u'STEM', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], 
+
+        expected_results = [['test', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'],
+                            [u'ELA', 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Math', 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'??', 0, 0, 0, 0, 0, 4, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Movement', 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Counseling', 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Student News', 0, 0, 2, 1, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Science', 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Core', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Humanities', 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Music', 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+                            [u'STEM', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
                             [u'Art', 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
                             ['test', 5, 5, 5, 5, 5, 5, 5, 5, 4, 1, 1, 1, 1, 1, 1, 1, 1]]
 
+
         self.ssloader.ssloader([('prep5data_test1period.csv',5,True)],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
-
+        
         self.assertListEqual(results,expected_results)
         
     def test_session(self):
@@ -1588,6 +1585,36 @@ class Test_DBLoader_Prep5_1period(Test_Base):
 
         self.assertListEqual(results,expected_results)
         
+
+class Test_DBLoader_Prep5Student_WP(Test_Base):
+    
+    # tests that subject specific work periods are parsed correctly
+    
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+        
+    def test_lesson(self):
+        
+        expected_results = [['test', u'Clayton'],
+                            [u'Math', 1],
+                            [u'Humanities', 2],
+                            [u'??', 1],
+                            [u'Student News', 1],
+                            ['test', 5]]
+                            
+        self.ssloader.ssloader([('prep5studentClaytonPeriod1WP.csv',5,True)],self.databasename)        
+        results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
+        
+        self.assertListEqual(results,expected_results)
+        
 class Test_DBLoader_Prep5(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -1602,35 +1629,35 @@ class Test_DBLoader_Prep5(Test_Base):
         
     def test_lesson(self):
         
-        expected_results = [['test', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'], 
-                            [u'ELA', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Math', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Work Period', 8, 6, 8, 8, 7, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Movement', 2, 7, 3, 3, 4, 5, 3, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Counseling', 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Student News', 2, 2, 3, 1, 4, 3, 3, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Science', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Core', 2, 2, 3, 3, 0, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Humanities', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-                            [u'Music', 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-                            [u'STEM', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-                            [u'Art', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-                            [u'Activity Period', 3, 5, 1, 2, 3, 2, 8, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Math Activity Period', 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'History', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Speech', 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'??', 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'OT', 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Chess', 4, 0, 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Computer Time', 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Reading', 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Independent Reading', 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+        expected_results = [['test', u'Nathaniel', u'Clayton', u'Orig', u'Stephen', u'Oscar', u'Peter', u'Jack', u'Jake', u'Bruno', u'Coby', u'Thomas', u'Yosef', u'Tris', u'Ashley', u'Simon A', u'Booker', u'OmerC'],
+                            [u'ELA', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Math', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Engineering', 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'??', 8, 6, 8, 8, 7, 8, 9, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Movement', 2, 7, 3, 3, 4, 5, 3, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Counseling', 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Student News', 2, 2, 3, 1, 4, 3, 3, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Science', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Core', 2, 2, 3, 3, 0, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Humanities', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                            [u'Music', 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                            [u'STEM', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                            [u'Art', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                            [u'Activity Period', 3, 5, 1, 2, 3, 2, 8, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Math Activity Period', 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'History', 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Speech', 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'OT', 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Chess', 4, 0, 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Computer Time', 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Reading', 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Independent Reading', 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             ['test', 45, 45, 44, 43, 45, 47, 45, 46, 44, 4, 4, 4, 4, 4, 4, 4, 4]]
+
 
         self.ssloader.ssloader([('prep5data.csv',5,True)],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
-        
+            
         self.assertListEqual(results,expected_results)
         
     def test_session(self):
@@ -1662,32 +1689,33 @@ class Test_DBLoader_Staff_Issey(Test_Base):
         
     def test_lesson(self):
 
-        expected_result = [['test', u'Nick', u'Peter', u'Jack', u'Jake', u'Orig', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Bruno', u'Nathaniel', u'Clayton', u'Mackenzie', u'Lucy', u'Oscar', u'Simon A'], 
-                           [u'Work Period', 2, 3, 1, 4, 2, 4, 1, 3, 3, 3, 3, 4, 3, 2, 1, 2, 3, 1], 
-                           [u'Student News', 0, 0, 0, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], 
+        expected_result = [['test', u'Nick', u'Peter', u'Jack', u'Jake', u'Orig', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Bruno', u'Nathaniel', u'Clayton', u'Mackenzie', u'Lucy', u'Oscar', u'Simon A'],
+                           [u'??', 2, 3, 1, 4, 2, 4, 1, 3, 3, 3, 3, 4, 3, 2, 1, 2, 3, 1],
+                           [u'Student News', 0, 0, 0, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
                            [u'Activity Period', 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 2, 1, 1, 1, 0],
-                           [u'Independent Reading', 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                           [u'Core', 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                           [u'Independent Reading', 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [u'Core', 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                            ['test', 2, 4, 2, 5, 4, 6, 3, 4, 4, 4, 3, 5, 4, 4, 2, 3, 4, 1]]
 
 
         self.ssloader.ssloader([('staffdata_issey.csv',-1,True)],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
+        
         self.assertListEqual(results,expected_result)
 
     def test_session(self):
 
-        expected_results = [['test', 1, 2, 3, 4, 6, 7, 8, 9], 
-                            [u'Monday', 1, 1, 1, 1, 1, 1, 1, 2], 
-                            [u'Tuesday', 1, 1, 1, 1, 1, 1, 1, 1], 
-                            [u'Wednesday', 1, 1, 1, 1, 1, 1, 1, 1], 
+        expected_results = [['test', 1, 2, 3, 4, 6, 7, 8, 9],
+                            [u'Monday', 1, 1, 1, 1, 1, 1, 1, 2],
+                            [u'Tuesday', 1, 1, 1, 1, 1, 1, 1, 1],
+                            [u'Wednesday', 1, 1, 1, 1, 1, 1, 1, 1],
                             [u'Thursday', 1, 1, 1, 2, 1, 1, 1, 1],
                             ['test', 4, 4, 4, 5, 4, 4, 4, 5]]
 
 
         self.ssloader.ssloader([('staffdata_issey.csv',-1,True)],self.databasename)  
         results = _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
-        
+
         self.assertListEqual(results,expected_results)
      
 
@@ -1777,26 +1805,26 @@ class Test_DBLoader_Student_3Student(Test_Base):
         self.ssloader.ssloader([('prep4student3students.csv',-1,True)],self.databasename)        
         
         self.expected_results = [['test', u'Asher', u'Nick'],
-                                  [u'Science', 2, 0],
-                                  [u'Math', 2, 2],
-                                  [u'STEM', 1, 3],
-                                  [u'Work Period', 8, 7],
-                                  [u'Counseling', 1, 1],
-                                  [u'Movement', 7, 9],
-                                  [u'Activity Period', 4, 3],
-                                  [u'Humanities', 5, 5],
-                                  [u'Drama', 1, 1],
-                                  [u'Computer Time', 9, 9],
-                                  [u'Speech', 1, 0],
-                                  [u'Core', 2, 2],
-                                  [u'OT', 1, 1],
-                                  [u'Music', 1, 0],
-                                  [u'Student News', 0, 2],
-                                  ['test', 45, 45]]
+                                 [u'Science', 2, 0],
+                                 [u'Math', 2, 2],
+                                 [u'STEM', 1, 3],
+                                 [u'??', 8, 7],
+                                 [u'Counseling', 1, 1],
+                                 [u'Movement', 7, 9],
+                                 [u'Activity Period', 4, 3],
+                                 [u'Humanities', 5, 5],
+                                 [u'Drama', 1, 1],
+                                 [u'Computer Time', 9, 9],
+                                 [u'Speech', 1, 0],
+                                 [u'Core', 2, 2],
+                                 [u'OT', 1, 1],
+                                 [u'Music', 1, 0],
+                                 [u'Student News', 0, 2],
+                                 ['test', 45, 45]]
 
 
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
-            
+        
         self.assertListEqual(results,self.expected_results)
  
 class Test_DBLoader_Staff(Test_Base):
@@ -1812,27 +1840,27 @@ class Test_DBLoader_Staff(Test_Base):
             pass
         
     def test_lesson(self):
-        
-        expected_results = [['test', u'OmerC', u'Ashley', u'Tristan', u'Yosef', u'Coby', u'Nathaniel', u'Clayton', u'Jake', u'Peter', u'Thomas', u'Simon A', u'Orig', u'Jack', u'Bruno', u'Nick', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Mackenzie', u'Lucy', u'Oscar', u'Booker', u'Tris', u'Prep 4', u'Donovan'], 
-                            [u'ELA', 1, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Activity Period', 4, 5, 2, 7, 5, 3, 5, 5, 3, 5, 4, 1, 4, 3, 2, 3, 2, 3, 2, 1, 1, 1, 2, 4, 2, 0, 0, 1], 
-                            [u'Student News', 1, 3, 1, 2, 3, 0, 3, 1, 3, 2, 0, 5, 1, 3, 3, 2, 0, 0, 2, 3, 2, 4, 4, 3, 1, 0, 0, 2], 
-                            [u'Debate', 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Work Period', 7, 8, 4, 8, 9, 9, 6, 8, 7, 9, 7, 7, 5, 8, 7, 8, 8, 10, 7, 9, 9, 8, 8, 7, 6, 1, 0, 6], 
+
+        expected_results = [['test', u'OmerC', u'Ashley', u'Tristan', u'Yosef', u'Coby', u'Nathaniel', u'Clayton', u'Jake', u'Peter', u'Thomas', u'Simon A', u'Orig', u'Jack', u'Bruno', u'Nick', u'Stephen', u'Shane', u'Asher', u'Simon B', u'Liam', u'Luke', u'Mackenzie', u'Lucy', u'Oscar', u'Booker', u'Tris', u'Prep 4', u'Donovan'],
+                            [u'ELA', 1, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Activity Period', 4, 5, 2, 7, 5, 3, 5, 5, 3, 5, 4, 1, 4, 3, 2, 3, 2, 3, 2, 1, 1, 1, 2, 4, 2, 0, 0, 1],
+                            [u'Student News', 1, 3, 1, 2, 3, 0, 3, 1, 3, 2, 0, 5, 1, 3, 3, 2, 0, 0, 2, 3, 2, 4, 4, 3, 1, 0, 0, 2],
+                            [u'Debate', 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'??', 7, 8, 4, 8, 9, 9, 6, 8, 7, 9, 7, 7, 5, 8, 7, 8, 8, 10, 7, 9, 9, 8, 8, 7, 6, 1, 0, 6],
                             [u'Independent Reading', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                            [u'Core', 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'History', 0, 0, 2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Chess', 0, 0, 0, 1, 2, 4, 1, 3, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                            [u'Counseling', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0], 
-                            [u'Movement', 0, 1, 0, 0, 0, 0, 5, 1, 3, 1, 0, 3, 1, 3, 2, 3, 3, 3, 0, 0, 0, 0, 0, 3, 1, 0, 3, 1], 
+                            [u'Core', 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'History', 0, 0, 2, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Chess', 0, 0, 0, 1, 2, 4, 1, 3, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Counseling', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
+                            [u'Movement', 0, 1, 0, 0, 0, 0, 5, 1, 3, 1, 0, 3, 1, 3, 2, 3, 3, 3, 0, 0, 0, 0, 0, 3, 1, 0, 3, 1],
                             [u'Psychology Reading', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [u'Psychology', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-                            [u'Independent Art', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], 
+                            [u'Independent Art', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
                             ['test', 13, 17, 10, 20, 21, 16, 22, 21, 17, 23, 14, 20, 11, 17, 14, 16, 15, 18, 11, 13, 12, 15, 14, 17, 11, 2, 3, 10]]
-
 
         self.ssloader.ssloader([('staffdata.csv',-1,True)],self.databasename)        
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
+        
         self.assertListEqual(results,expected_results)
 
     def test_session(self):
@@ -1848,9 +1876,7 @@ class Test_DBLoader_Staff(Test_Base):
         self.ssloader.ssloader([('staffdata.csv',-1,True)],self.databasename)
         results = _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
 
-        print results
-        
-        #self.assertListEqual(results,expected_results)
+        self.assertListEqual(results,expected_results)
         
 
 class Test_DBLoader_Staff_with_Prep5_Period1(Test_Base):
@@ -1878,11 +1904,11 @@ class Test_DBLoader_Staff_with_Prep5_Period1(Test_Base):
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['student','==',"\"" + "Peter" + "\""]])
 
-        expected_results = [['complete','WE','830-910','Issey.Work Period.Wednesday.830-910','Issey'],
-                            ['incomplete','MO','830-910','??.Work Period.Monday.830-910','??'],
-                            ['incomplete','TU','830-910','??.Work Period.Tuesday.830-910','??'],
-                            ['incomplete','WE','830-910','??.Work Period.Wednesday.830-910','??'],
-                            ['incomplete','TH','830-910','??.Work Period.Thursday.830-910','??'],
+        expected_results = [['incomplete','WE','830-910','Issey.??.Wednesday.830-910','Issey'],
+                            ['incomplete','MO','830-910','??.??.Monday.830-910','??'],
+                            ['incomplete','TU','830-910','??.??.Tuesday.830-910','??'],
+                            ['incomplete','WE','830-910','??.??.Wednesday.830-910','??'],
+                            ['incomplete','TH','830-910','??.??.Thursday.830-910','??'],
                             ['complete','FR','830-910','B.Art.Friday.830-910','B']]
     
         self.assertListEqual(rows,expected_results)
@@ -1911,22 +1937,24 @@ class Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter(Test_Base):
         
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['student','==',"\"" + "Peter" + "\""]])
-            
-        expected_results = [[u'complete', u'FR', u'830-910', u'B.Art.Friday.830-910', u'B'], 
-                            [u'complete', u'MO', u'830-910', u'Stan.Work Period.Monday.830-910', u'Stan'], 
-                            [u'complete', u'TH', u'830-910', u'John.Work Period.Thursday.830-910', u'John'], 
-                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday.830-910', u'Amelia'], 
-                            [u'complete', u'WE', u'830-910', u'Issey.Work Period.Wednesday.830-910', u'Issey'],
-                            [u'complete', u'WE', u'830-910', u'Issey.Work Period.Wednesday.830-910', u'Issey'], 
+        
+        expected_results = [[u'complete', u'FR', u'830-910', u'B.Art.Friday.830-910', u'B'],
                             [u'incomplete', u'FR', u'830-910', u'??.Art.Friday.830-910', u'??'],
-                            [u'incomplete', u'MO', u'830-910', u'??.Work Period.Monday.830-910', u'??'],
-                            [u'incomplete', u'TH', u'830-910', u'??.Work Period.Thursday.830-910', u'??'],
-                            [u'incomplete', u'TU', u'830-910', u'??.Work Period.Tuesday.830-910', u'??'],
-                            [u'incomplete', u'WE', u'830-910', u'??.Work Period.Wednesday.830-910', u'??']]
+                            [u'incomplete', u'MO', u'830-910', u'??.??.Monday.830-910', u'??'],
+                            [u'incomplete', u'MO', u'830-910', u'Stan.??.Monday.830-910', u'Stan'],
+                            [u'incomplete', u'TH', u'830-910', u'??.??.Thursday.830-910', u'??'],
+                            [u'incomplete', u'TH', u'830-910', u'John.??.Thursday.830-910', u'John'],
+                            [u'incomplete', u'TU', u'830-910', u'??.??.Tuesday.830-910', u'??'],
+                            [u'incomplete', u'TU', u'830-910', u'Amelia.??.Tuesday.830-910', u'Amelia'],
+                            [u'incomplete', u'WE', u'830-910', u'??.??.Wednesday.830-910', u'??'],
+                            [u'incomplete', u'WE', u'830-910', u'Issey.??.Wednesday.830-910', u'Issey'],
+                            [u'incomplete', u'WE', u'830-910', u'Issey.??.Wednesday.830-910', u'Issey']]
+
+
     
         expected_results.sort()
         rows.sort()
-                   
+        
         self.assertListEqual(rows,expected_results)
 
     def test_lesson_primary_set(self):
@@ -1938,16 +1966,16 @@ class Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter(Test_Base):
         self.ssloader = SSLoader("test_ssloader")        
         self.ssloader.run("test_ssloader",files)
     
-        cols = ['status','dow','period','session','te    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))acher']
+        cols = ['status','dow','period','session','teacher']
         
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['student','==',"\"" + "Peter" + "\""],
                                                                  ['status','=',"\"master\""]])
 
-        expected_results = [['master','WE','830-910','Issey.Work Period.Wednesday.830-910','Issey'],
-                            ['master','MO','830-910','Stan.Work Period.Monday.830-910','Stan'],
-                            ['master','TU','830-910','Amelia.Work Period.Tuesday.830-910','Amelia'],
-                            ['master','TH','830-910','John.Work Period.Thursday.830-910','John'],
+        expected_results = [['master','WE','830-910','Issey.??.Wednesday.830-910','Issey'],
+                            ['master','MO','830-910','Stan.??.Monday.830-910','Stan'],
+                            ['master','TU','830-910','Amelia.??.Tuesday.830-910','Amelia'],
+                            ['master','TH','830-910','John.??.Thursday.830-910','John'],
                             ['master','FR','830-910','B.Art.Friday.830-910','B']]
     
         expected_results.sort()
@@ -2096,10 +2124,10 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
                             [u'incomplete', u'WE', u'830-910', u'Stan.??.Wednesday.830-910', u'Clayton'], 
                             [u'incomplete', u'TH', u'830-910', u'Stan.??.Thursday.830-910', u'Nathaniel'],
                             [u'incomplete', u'MO', u'830-910', u'Amelia.??.Monday.830-910', u'Nathaniel'], 
-                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday.830-910', u'Peter'], 
-                            [u'complete', u'TU', u'830-910', u'Amelia.Work Period.Tuesday.830-910', u'Jack'], 
+                            [u'incomplete', u'TU', u'830-910', u'Amelia.??.Tuesday.830-910', u'Peter'], 
+                            [u'incomplete', u'TU', u'830-910', u'Amelia.??.Tuesday.830-910', u'Jack'], 
                             [u'incomplete', u'WE', u'830-910', u'Amelia.??.Wednesday.830-910', u'Nathaniel'],
-                            [u'complete', u'TH', u'830-910', u'Amelia.Work Period.Thursday.830-910', u'Jack'], 
+                            [u'incomplete', u'TH', u'830-910', u'Amelia.??.Thursday.830-910', u'Jack'], 
                             [u'incomplete', u'TU', u'830-910', u'Paraic.??.Tuesday.830-910', u'Jake'], 
                             [u'incomplete', u'TH', u'830-910', u'Paraic.??.Thursday.830-910', u'Jake']]
     
@@ -2117,9 +2145,9 @@ class Test_DBLoader_Academic_Stan(unittest.TestCase):
                             [u'childrenatinit', u'Wednesday', 1, u'??', u'Stan.??.Wednesday.830-910'],
                             [u'childrenatinit', u'Thursday', 1, u'??', u'Stan.??.Thursday.830-910'],
                             [u'childrenatinit', u'Monday', 1, u'??', u'Amelia.??.Monday.830-910'],
-                            [u'childrenatinit', u'Tuesday', 1, u'Work Period', u'Amelia.Work Period.Tuesday.830-910'],
+                            [u'childrenatinit', u'Tuesday', 1, u'??', u'Amelia.??.Tuesday.830-910'],
                             [u'childrenatinit', u'Wednesday', 1, u'??', u'Amelia.??.Wednesday.830-910'],
-                            [u'childrenatinit', u'Thursday', 1, u'Work Period', u'Amelia.Work Period.Thursday.830-910'],
+                            [u'childrenatinit', u'Thursday', 1, u'??', u'Amelia.??.Thursday.830-910'],
                             [u'nochildrenatinit', u'Monday', 1, u'Engineering', u'Paraic.Engineering.Monday.830-910'],
                             [u'childrenatinit', u'Tuesday', 1, u'??', u'Paraic.??.Tuesday.830-910'],
                             [u'nochildrenatinit', u'Wednesday', 1, u'Engineering', u'Paraic.Engineering.Wednesday.830-910'],
@@ -2388,17 +2416,13 @@ class Test_DBLoader_Primary_Record_Set_With_Staff_Student(Test_Primary_Record_Ba
 
     def test_Nathaniel(self):
         
-        expected_results = [[u'830-910', u'FR', u'Humanities', '??', u'Nathaniel', '1-on-1'],
-                            [u'830-910', u'MO', u'[ELA,Student News]', u'Amelia', u'Nathaniel', '1-on-1'],
-                            [u'830-910', u'TH', u'Movement', '??', u'Nathaniel', '1-on-1'], 
-                            [u'830-910', u'TU', u'Movement', '??', u'Nathaniel', '1-on-1'], 
-                            [u'830-910', u'WE', u'Movement', '??', u'Nathaniel', '1-on-1'],
-                            ]
-           
-        for row in self.filter_results(4,'Nathaniel'):
-            print row
+        expected_results = [[u'830-910', u'FR', u'Humanities', '??', u'Nathaniel', u'subject'],
+                            [u'830-910', u'MO', u'[ELA,Student News]', u'Amelia', u'Nathaniel', u'subject'],
+                            [u'830-910', u'TH', u'Movement', '??', u'Nathaniel', u'subject'],
+                            [u'830-910', u'TU', u'Movement', '??', u'Nathaniel', u'subject'],
+                            [u'830-910', u'WE', u'Movement', '??', u'Nathaniel', u'subject']]
             
-        #self.assertListEqual(self.filter_results(4,'Nathaniel'),expected_results)
+        self.assertListEqual(self.filter_results(4,'Nathaniel'),expected_results)
         
     def tearDown(self):
         copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
@@ -2472,15 +2496,15 @@ class Test_DBLoader_Primary_Record_Set_Nathaniel(Test_Primary_Record_Base):
                             [u'1110-1210', u'TU', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'1110-1210', u'WE', u'Computer Time', '??', u'Orig', u'computertime'],
                             [u'1210-100', u'MO', u'Student News', '??', u'Orig', u'subject'],
-                            [u'1210-100', u'TH', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'1210-100', u'TH', '??', '??', u'Orig', u'wp'],
                             [u'1210-100', u'TU', u'Music', '??', u'Orig', u'subject'],
                             [u'1210-100', u'WE', u'OT', '??', u'Orig', u'subject'],
-                            [u'140-220', u'MO', u'Work Period', '??', u'Orig', u'wp'],
-                            [u'140-220', u'TH', u'Work Period', '??', u'Orig', u'wp'],
-                            [u'140-220', u'TU', u'Work Period', '??', u'Orig', u'wp'],
-                            [u'140-220', u'WE', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'140-220', u'MO', '??', '??', u'Orig', u'wp'],
+                            [u'140-220', u'TH', '??', '??', u'Orig', u'wp'],
+                            [u'140-220', u'TU', '??', '??', u'Orig', u'wp'],
+                            [u'140-220', u'WE', '??', '??', u'Orig', u'wp'],
                             [u'220-300', u'MO', u'Movement', '??', u'Orig', u'subject'],
-                            [u'220-300', u'TH', u'Activity Period', '??', u'Orig', u'subject'],
+                            [u'220-300', u'TH', u'Activity Period', '??', u'Orig', u'ap'],
                             [u'220-300', u'TU', u'Movement', '??', u'Orig', u'subject'],
                             [u'220-300', u'WE', u'Movement', '??', u'Orig', u'subject'],
                             [u'300-330', u'MO', u'Computer Time', '??', u'Orig', u'computertime'],
@@ -2498,14 +2522,14 @@ class Test_DBLoader_Primary_Record_Set_Nathaniel(Test_Primary_Record_Base):
                             [u'910-950', u'TU', u'History', '??', u'Orig', u'subject'],
                             [u'910-950', u'WE', u'Science', u'Paraic', u'Orig', u'subject'],
                             [u'950-1030', u'FR', u'STEM', '??', u'Orig', u'subject'],
-                            [u'950-1030', u'MO', u'Work Period', '??', u'Orig', u'wp'],
+                            [u'950-1030', u'MO', '??', '??', u'Orig', u'wp'],
                             [u'950-1030', u'TH', u'Core', '??', u'Orig', u'subject'],
-                            [u'950-1030', u'TU', u'Work Period', '??', u'Orig', u'wp'],
-                            [u'950-1030', u'WE', u'Work Period', '??', u'Orig', u'wp']]
+                            [u'950-1030', u'TU', '??', '??', u'Orig', u'wp'],
+                            [u'950-1030', u'WE', '??', '??', u'Orig', u'wp']]
 
 
         expected_results.sort()
-
+        
         self.assertListEqual(self.filter_results(4,'Orig'),expected_results)
 
 
@@ -2526,20 +2550,20 @@ class Test_DBInsert_Direct_Nathaniel(Test_Primary_Record_Base):
 
     def test_(self):
 
-        expected_results = [["Nathaniel","MO","TU","WE","TH","FR"],                                                                                                                                                                                                                
-                            ["830-910","ELA,Amelia","Math,Stan","ELA,Amelia","Math,Stan","Humanities,A"],                                                                                                                                                                                                     
-                            ["910-950","Core,??","Work Period,Dylan","Work Period,Moira","Core,??","Music,??"],                                                                                                                                                                                               
-                            ["950-1030","Work Period,Karolina","Activity Period,Aaron","OT,??","Work Period,Issey","STEM,??"],                                                                                                                                                                                
-                            ["1030-1110","Activity Period,Dylan","Chess,Rahul","Activity Period,Issey","Chess,Rahul","Art,??"],                                                                                                                                                                               
-                            ["1110-1210","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??"],                                                                                                                                                                     
-                            ["1210-100","Science,Paraic",u'History,Samantha',"Science,Paraic","History,Samantha",0],                                                                                                                                                                                         
-                            ["100-140","Chess,Rahul","Work Period,Karolina","Chess,Rahul","Work Period,[Aaron,Issey]",0],                                                                                                                                                                                            
-                            ["140-220","Work Period,Johnny","Movement,??","Work Period,Issey","Movement,??",0],                                                                                                                                                                                            
-                            ["220-300","Speech,??","Student News,??","Counseling,Alexa","Student News,??",0],                                                                                                                                                                                           
-                            ["300-330","Computer Time,??","Computer Time,??","Computer Time,??","Computer Time,??",0]]
+        expected_results = [['Nathaniel', 'MO', 'TU', 'WE', 'TH', 'FR'],
+                            [u'830-910', u'ELA,Amelia', u'Math,Stan', u'ELA,Amelia', u'Math,Stan', u'Humanities,A'],                                                                                                                                                                                                                             
+                            [u'910-950', u'Core,??', u'??,Dylan', u'??,Moira', u'Core,??', u'Music,??'],                                                                                                                                                                                                                                                 
+                            [u'950-1030', u'??,Karolina', u'Activity Period,Aaron', u'OT,??', u'??,Issey', u'STEM,??'],                                                                                                                                                                                                                                  
+                            [u'1030-1110', u'Activity Period,Dylan', u'Chess,Rahul', u'Activity Period,Issey', u'Chess,Rahul', u'Art,??'],
+                            [u'1110-1210', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??'],
+                            [u'1210-100', u'Science,Paraic', u'History,Samantha', u'Science,Paraic', u'History,Samantha', 0],
+                            [u'100-140', u'Chess,Rahul', u'??,Karolina', u'Chess,Rahul', u'??,[Aaron,Issey]', 0],
+                            [u'140-220', u'??,Johnny', u'Movement,??', u'??,Issey', u'Movement,??', 0],
+                            [u'220-300', u'Speech,??', u'Student News,??', u'Counseling,Alexa', u'Student News,??', 0],
+                            [u'300-330', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', 0]]
         
         results = _pivotexecfunc(self.database,'Nathaniel','dow','period','lesson',False,True,[['student','=','Nathaniel']],"subject,teacher")
-        
+
         self.assertListEqual(expected_results, results[:-1])
 
     def tearDown(self):
@@ -2561,15 +2585,15 @@ class Test_Primary_Set_Session(Test_Primary_Record_Base):
         ssloader.run(self.databasename,files)
 
     def test_lesson(self):
-
-        expected_results = [[u'master', u'WE', u'830-910', u'[Paraic,Stan]', u'Clayton', u'[Math,Engineering]'],
-                            [u'master', u'FR', u'830-910', u'A', u'Clayton', u'Humanities'],
+        
+        expected_results = [[u'master', u'FR', u'830-910', u'A', u'Clayton', u'Humanities'],
+                            [u'master', u'MO', u'830-910', u'Stan', u'Clayton', u'Math'],
                             [u'master', u'TH', u'830-910', u'Johnny', u'Clayton', u'Student News'],
                             [u'master', u'TH', u'830-910', u'Stan', u'Nathaniel', u'??'],
-                            [u'master', u'TU', u'830-910', u'[Amelia,Johnny]', u'Clayton', u'[Activity Period,Work Period]'],
-                            [u'master', u'MO', u'830-910', u'Stan', u'Clayton', u'Math'],
-                            [u'master', u'TU', u'830-910', u'Stan', u'Nathaniel', u'??']]
-        
+                            [u'master', u'TU', u'830-910', u'Stan', u'Nathaniel', u'??'],
+                            [u'master', u'TU', u'830-910', u'[Amelia,Johnny]', u'Clayton', u'Activity Period'],
+                            [u'master', u'WE', u'830-910', u'[Paraic,Stan]', u'Clayton', u'[Math,Engineering]']]
+
         expected_results.sort()
         
         cols = ['status','dow','period','teacher','student','subject']
@@ -2582,32 +2606,32 @@ class Test_Primary_Set_Session(Test_Primary_Record_Base):
         self.assertListEqual(rows,expected_results)
 
     def test_session(self):
-
+        
         expected_results = [[u'master', u'Thursday', 1, u'Johnny', u'Student News'],
+                            [u'master', u'Tuesday', 1, u'Johnny', u'??'],
                             [u'master', u'Monday', 1, u'Johnny', u'Movement'],
                             [u'master', u'Tuesday', 1, u'Amelia', u'Activity Period'],
                             [u'master', u'Wednesday', 1, u'Johnny', u'Movement'],
                             [u'master', u'Thursday', 1, u'??', u'Student News'],
-                            [u'master', u'Thursday', 1, u'Stan', u'??'],
-                            [u'master', u'Tuesday', 1, u'??', u'Work Period'],
-                            [u'master', u'Monday', 1, u'??', u'Math'],
-                            [u'master', u'Tuesday', 1, u'Johnny', u'Work Period'],
-                            [u'master', u'Tuesday', 1, u'Stan', u'??'],
-                            [u'master', u'Wednesday', 1, u'Rahul', u'Movement'],
-                            [u'master', u'Wednesday', 1, u'Stan', u'??'],
                             [u'master', u'Tuesday', 1, u'Rahul', u'Movement'],
+                            [u'master', u'Thursday', 1, u'Stan', u'??'],
+                            [u'master', u'Monday', 1, u'??', u'Math'],
+                            [u'master', u'Tuesday', 1, u'??', u'??'],
+                            [u'master', u'Wednesday', 1, u'Rahul', u'Movement'],
+                            [u'master', u'Tuesday', 1, u'Stan', u'??'],
+                            [u'master', u'Wednesday', 1, u'Stan', u'??'],
+                            [u'master', u'Friday', 1, u'A', u'Humanities'],
+                            [u'master', u'Wednesday', 1, u'??', u'Math'],
                             [u'master', u'Monday', 1, u'Stan', u'??'],
                             [u'master', u'Wednesday', 1, u'Paraic', u'Engineering'],
-                            [u'master', u'Friday', 1, u'A', u'Humanities']]
+                            [u'master', u'Friday', 1, u'??', u'Humanities']]
 
         cols = ['status','dow','period','teacher','subject']
         
         with self.database:
             _,rows,_ = tbl_rows_get(self.database,'session',cols,[['status','=','\"master\"']])
 
-        for row in rows:
-            print row
-        #self.assertListEqual(rows,expected_results)    
+        self.assertListEqual(rows,expected_results)    
 
     def tearDown(self):
         pass
@@ -2623,7 +2647,7 @@ if __name__ == "__main__":
     
     
     # pre_process_records
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))    
     #unittest.TextTestRunner(verbosity=2).run(suite) 
     #exit()
     
@@ -2721,6 +2745,8 @@ if __name__ == "__main__":
     
     # 1 period of 1 prep
 
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Student_WP))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5))

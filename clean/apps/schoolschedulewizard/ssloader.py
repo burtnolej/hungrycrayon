@@ -185,7 +185,7 @@ class SSLoader(object):
 	    
 	    if  recordtype == 'wp.student.nosubject.noteacher':
 		# WP: Shane, Asher
-		subject = "Work Period"
+		subject = "??"
 		teacher = _setteacher()
 		students = self.extract_students(record.split(":")[1])
 		dow = _setdow()
@@ -193,14 +193,14 @@ class SSLoader(object):
 		_addrecord(locals())
 	    elif  recordtype == 'wp.student.nosubject.teacher':
 		# WP: Shane, Asher (Amelia)
-		subject = "Work Period"
+		subject = "??"
 		teacher,_rest = self.extract_teacher(record.split(":")[1])
 		students = self.extract_students(_rest)
 		dow = _setdow()	
 		_addrecord(locals())
 	    elif  recordtype == 'wp.nostudent.nosubject.noteacher':
 		# Work Period
-		subject = "Work Period"
+		subject = "??"
 		teacher = _setteacher()
 		students = _setstudent()
 		if studentfile == True:
@@ -209,21 +209,21 @@ class SSLoader(object):
 		_addrecord(locals())
 	    elif recordtype == 'wp.nostudent.subject.noteacher':
 		# Humanities Work Period
-		subject = "Work Period"
+		subject = record.split(" ")[0]
 		teacher = _setteacher()
 		students = _setstudent()
 		dow = _setdow()	
 		_addrecord(locals())
 	    elif recordtype == 'wp.student.subject.noteacher':
 		# Math WP: Jack
-		subject = "Work Period"
+		subject = record.split(" ")[0]
 		teacher = _setteacher()
 		students = self.extract_students(record.split(":")[1])
 		dow = _setdow()	
 		_addrecord(locals())
 	    elif recordtype == 'wp.student.subject.teacher':
 		# Math WP: Jack (Stan)
-		subject = "Work Period"
+		subject = record.split(" ")[0]
 		teacher,_rest = self.extract_teacher(record.split(":")[1])
 		students = self.extract_students(_rest)
 		dow = _setdow()	
@@ -233,7 +233,7 @@ class SSLoader(object):
 		_teachers = record.split("with")[1]
 		teachers = _teachers.split("and")
 		
-		subject = "Work Period"
+		subject = "??"
 		students = _setstudent()
 		dow = _setdow()	    
 
@@ -246,13 +246,13 @@ class SSLoader(object):
 		# Work Period with Alyssa
 		teacher = record.split("with")[1]
 		teacher = teacher.lstrip()
-		subject = "Work Period"
+		subject = "??"
 		students = _setstudent()
 		dow = _setdow()	
 		_addrecord(locals())
 	    elif recordtype == 'wp.nostudent.subject.noteacher.with':
 		# Humanities Work Period with Johnny
-		subject = "Work Period"
+		subject = record.split(" ")[0]
 		teacher = record.split("with")[1]
 		teacher = teacher.lstrip()
 		students = _setstudent()
