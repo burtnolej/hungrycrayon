@@ -14,7 +14,7 @@ from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO, TrueFalse
 
 from ui_utils import TkImageWidget, TkImageLabelGrid, geometry_get, font_scale, \
      tkwidgetfactory, geometry_get_dict, tkwidgetimage_set, fontscale, \
-     TkCombobox, TkButton, TkEntry, TkLabel
+     TkCombobox, TkButton, TkEntry, TkLabel, Tk3Label
 import tkFont
 import unittest
 
@@ -1324,10 +1324,29 @@ class Test_Grid_Scrollbars(unittest.TestCase):
     def test_(self):
         self.master.mainloop()
         
+
         
-class Tk3Label(Frame):
-    
-    Frame.__init__(self.master
+class TestTk3Label(unittest.TestCase):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry("100x100+0+0")
+        
+    def test_(self):
+        
+        self.mytextalphanum = TextAlphaNum(name='textalphanum')
+        
+        tk3l = Tk3Label(self.master,self.mytextalphanum)
+        tk3l.grid(sticky=NSEW)
+
+        self.master.grid_rowconfigure(0,weight=1,uniform="foo")
+        self.master.grid_columnconfigure(0,weight=1,uniform="foo")    
+
+        self.master.mainloop()
+
+    def tearDown(self):
+        self.master.destroy() 
+        
+        
 class TestUIScheduler(TestWidget):
     def setUp(self):
         self.master = Tk()
@@ -1341,23 +1360,20 @@ class TestUIScheduler(TestWidget):
         self.wmheight=self.wheight*self.maxrows # master height
         self.wmwidth=self.wwidth*self.maxcols # master width
       
-        font = tkFont.Font(family="monospace", size=12) 
+        #font = tkFont.Font(family="monospace", size=12) 
         self.style = Style()
         self.style.theme_use("default")
         
         self.mytextalphanum = TextAlphaNum(name='textalphanum')
-        widget_args=dict(background='white',width=9,font=font)
+        widget_args=dict(background='white',width=9)
         widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
 
-        self.mytextalphanum.widgettype = TkButton
+        self.mytextalphanum.widgettype = Tk3Label
         self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanum,
                                       self.wmwidth,self.wmheight,
                                       0,0,self.maxrows,self.maxcols
                                       ,True,True,{},widgetcfg)
 
-        #self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanum,
-        #                              self.wmwidth,self.wmheight,
-        #                              0,0,7,5)
         self.tkilg.grid(row=0,column=0,sticky=NSEW)
         self.master.grid_rowconfigure(0, weight=1, uniform="foo")
         self.master.grid_columnconfigure(0, weight=1, uniform="foo") 
@@ -1372,6 +1388,9 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridFocusAppObject))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid2x2even))
+    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTk3Label))
+    
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIScheduler))
     unittest.TextTestRunner(verbosity=2).run(suite)

@@ -243,7 +243,7 @@ class TkImageLabelGrid(Frame):
         self.widgets=[]
 
         self.canvasframe.grid_rowconfigure(0,weight=1,uniform='foo')
-        self.canvasframe.grid_columnconfigure(0,weight=1,uniform='foo')  
+        #self.canvasframe.grid_columnconfigure(0,weight=1,uniform='foo')  
         
         for x in range(self.maxrows):
             ylbls=[]
@@ -380,10 +380,17 @@ class TkImageLabelGrid(Frame):
             
             self.widgets[0][0].sv.set(new_inputmode)
             
-    def reset_framewidth(self,event):
-        self.canvas.itemconfig(self.canvas_window,width=event.width)
+    def reset_framewidth(self,event=None):
         
-    def resize_canvasframe(self,event):
+        if event == None:
+            self.update()
+            width = self.winfo_width()
+        else:
+            width = event.width
+            
+        self.canvas.itemconfig(self.canvas_window,width=width)
+        
+    def resize_canvasframe(self,event=None):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
         
@@ -724,8 +731,36 @@ class TkGridEntry(TkEntry):
 
         self.selectall()
         
+class Tk3Label(_tkframe,TKBase):
+    
+    def __init__(self,master,var,**kwargs):
+    #def __init__(self,master):
         
-
+        from Tkinter import Label as _tklabel
+        
+        _tkframe.__init__(self,master,borderwidth=2,bg='blue')
+        
+        font = tkFont.Font(family="monospace", size=12) 
+        
+        self.toplable_sv = StringVar()
+        self.toplable = _tklabel(self,textvariable=self.toplable_sv,font=font)
+        self.toplable.grid(row=0,sticky=NSEW)
+        #self.toplable_sv.set("top label")
+    
+        self.midlable_sv = StringVar()
+        self.midlable = _tklabel(self,textvariable=self.midlable_sv)
+        self.midlable.grid(row=1,sticky=NSEW)
+        #self.midlable_sv.set("mid label")
+    
+        self.botlable_sv = StringVar()
+        self.botlable = _tklabel(self,textvariable=self.botlable_sv)
+        self.botlable.grid(row=2,sticky=NSEW)
+        #self.botlable_sv.set("bot label")
+        
+        self.grid_rowconfigure(0,weight=1,uniform="foo")
+        self.grid_rowconfigure(1,weight=1,uniform="foo")
+        self.grid_rowconfigure(2,weight=1,uniform="foo")
+        self.grid_columnconfigure(0,weight=1,uniform="foo")
 
 class TkLabel(_tklabel,TKBase):
     def __init__(self,master,var,**kwargs):

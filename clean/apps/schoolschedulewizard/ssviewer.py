@@ -9,7 +9,7 @@ from misc_utils import nxnarraycreate, thisfuncname
 
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get, TkGridCombobox, \
-     TkCombobox
+     TkCombobox, Tk3Label, _tklabel
 
 from misc_utils_objectfactory import ObjFactory
 
@@ -80,7 +80,7 @@ class WizardUI(Tk):
         #self.clipboard=[]
         #self.clipboard_selection=-1
         Tk.__init__(self)
-        self.geometry("2000x500+0+0")
+        self.geometry("2000x1000+0+0")
         
         self.refdatabase = Database(refdbname)
         
@@ -117,160 +117,177 @@ class WizardUI(Tk):
         wmheight=wheight*self.maxrows # master height
         wmwidth=wwidth*self.maxcols # master width 
                 
-        buttonpanel = Frame(self,style='ControlPanel.TFrame')
-        buttonpanel.grid(row=0,column=0,sticky=NSEW)
-                
-        self.dbload_button = Button(buttonpanel,command=lambda: self.load(self.dbload_entry_sv.get()),
-                                    text="dbload",name="dbl")
-    
-        self.dbload_button.grid(row=0,column=0)
-        self.dbload_button.focus_get()
-    
-        self.clear_button = Button(buttonpanel,command=self.clear,text="clear",name="clr")
-        self.clear_button.grid(row=0,column=1)
-        self.clear_button.focus_get()
-
-        self.viewer_button = Button(buttonpanel,command=self.viewer,text="viewer",name="view")
-        self.viewer_button.grid(row=0,column=2)
-        self.viewer_button.focus_get()
+        style.configure('ControlPanel.TFrame',background='lightgrey')
 
         controlpanel = Frame(self,style='ControlPanel.TFrame')
         controlpanel.grid(row=1,column=0,sticky=NSEW,columnspan=2)
         
-        self.dbload_entry_label = Label(controlpanel,text="version",font=font)
-        self.dbload_entry_label.grid(row=0,column=1)
+        self.dbload_entry_label = Label(controlpanel,text="version",width=10,font=font,anchor=E)
+        self.dbload_entry_label.grid(row=0,column=1,pady=5)
         self.dbload_entry_label.focus_get()
         self.dbload_entry_sv = StringVar()
-        self.dbload_entry = Entry(controlpanel,textvariable=self.dbload_entry_sv,font=font)
-        self.dbload_entry.grid(row=0,column=2)
+        self.dbload_entry = Entry(controlpanel,textvariable=self.dbload_entry_sv,width=10,font=font)
+        self.dbload_entry.grid(row=0,column=2,pady=5)
         self.dbload_entry_sv.set('1')
         self.dbload_entry.focus_get()
         
-        self.dbname_entry_label = Label(controlpanel,text="dbname",font=font)
-        self.dbname_entry_label.grid(row=0,column=3)
+        self.dbname_entry_label = Label(controlpanel,text="dbname",width=10,font=font,anchor=E)
+        self.dbname_entry_label.grid(row=0,column=3,pady=5)
         self.dbname_entry_label.focus_get()
         self.dbname_entry_sv = StringVar()
-        self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv,font=font)
-        self.dbname_entry.grid(row=0,column=4)
+        self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv,width=10,font=font)
+        self.dbname_entry.grid(row=0,column=4,pady=5)
         self.dbname_entry.focus_get()
         self.dbname_entry_sv.set(self.dbname)
         
-        self.dow_entry_label = Label(controlpanel,text="dow",width=10,font=font)
-        self.dow_entry_label.grid(row=0,column=5)
+        self.dow_entry_label = Label(controlpanel,text="dow",width=10,font=font,anchor=E)
+        self.dow_entry_label.grid(row=0,column=5,pady=5)
         self.dow_entry_label.focus_get()
         
         self.dow_entry_sv = StringVar()
         self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv,width=10,font=font)
-        self.dow_entry.grid(row=0,column=6)
+        self.dow_entry.grid(row=0,column=6,pady=5)
         self.dow_entry.focus_get()
         #self.dow_entry_sv.set('MO')
         
-        self.prep_label = Label(controlpanel,text="prep",width=10,font=font)
-        self.prep_label.grid(row=0,column=7)
+        self.prep_label = Label(controlpanel,text="prep",width=10,font=font,anchor=E)
+        self.prep_label.grid(row=0,column=7,pady=5)
         self.prep_label.focus_get()
         
         self.prep_entry_sv = StringVar()        
         self.prep_entry = Entry(controlpanel,textvariable=self.prep_entry_sv,width=10,font=font)
-        self.prep_entry.grid(row=0,column=8)
+        self.prep_entry.grid(row=0,column=8,pady=5)
         self.prep_entry.focus_get()
         #self.prep_entry_sv.set(5)
         
-        self.period_label = Label(controlpanel,text="period",width=10,font=font)
-        self.period_label.grid(row=0,column=9)
+        self.period_label = Label(controlpanel,text="period",width=10,font=font,anchor=E)
+        self.period_label.grid(row=0,column=9,pady=5)
         self.period_label.focus_get()
         
         self.period_entry_sv = StringVar()        
         self.period_entry = Entry(controlpanel,textvariable=self.period_entry_sv,width=10,font=font)
-        self.period_entry.grid(row=0,column=10)
+        self.period_entry.grid(row=0,column=10,pady=5)
         self.period_entry.focus_get()
         #self.period_entry_sv.set('830-910')
         
-        self.teacher_label = Label(controlpanel,text="teacher",width=10,font=font)
-        self.teacher_label.grid(row=0,column=11)
+        self.teacher_label = Label(controlpanel,text="teacher",width=10,font=font,anchor=E)
+        self.teacher_label.grid(row=0,column=11,pady=5)
         self.teacher_label.focus_get()
         
         self.teacher_label_sv = StringVar()        
         self.teacher_label = Entry(controlpanel,textvariable=self.teacher_label_sv,width=10,font=font)
-        self.teacher_label.grid(row=0,column=12)
+        self.teacher_label.grid(row=0,column=12,pady=5)
         self.teacher_label.focus_get()
         #self.teacher_label_sv.set('Stan')
         
-        self.student_label = Label(controlpanel,text="student",width=10,font=font)
-        self.student_label.grid(row=0,column=13)
+        self.student_label = Label(controlpanel,text="student",width=10,font=font,anchor=E)
+        self.student_label.grid(row=0,column=13,pady=5)
         self.student_label.focus_get()
         
         self.student_label_sv = StringVar()        
         self.student_label = Entry(controlpanel,textvariable=self.student_label_sv,width=10,font=font)
-        self.student_label.grid(row=0,column=14)
+        self.student_label.grid(row=0,column=14,pady=5)
         self.student_label.focus_get()
-        #self.student_label_sv.set('Nathaniel')
+        self.student_label_sv.set('Nathaniel')
+        
+    
+        self.source_label = Label(controlpanel,text="source",width=10,font=font,anchor=E)
+        self.source_label.grid(row=0,column=15,pady=5)
+        self.source_label.focus_get()
+    
+        self.source_label_sv = StringVar()        
+        self.source_label = Entry(controlpanel,textvariable=self.source_label_sv,width=10,font=font)
+        self.source_label.grid(row=0,column=16,pady=5)
+        self.source_label.focus_get()
+        self.source_label_sv.set('dbinsert')
+        
+        buttonpanel = Frame(controlpanel,style='ControlPanel.TFrame')
+        buttonpanel.grid(row=0,column=17,sticky=NSEW)
+    
+        self.dbload_button = Button(buttonpanel,command=lambda: self.load(self.dbload_entry_sv.get()),
+                                    text="dbload",name="dbl")
+    
+        self.dbload_button.grid(row=0,column=0,pady=5)
+        self.dbload_button.focus_get()
+    
+        self.clear_button = Button(buttonpanel,command=self.clear,text="clear",name="clr")
+        self.clear_button.grid(row=0,column=1,pady=5)
+        self.clear_button.focus_get()
+    
+        self.viewer_button = Button(buttonpanel,command=self.viewer,text="viewer",name="view")
+        self.viewer_button.grid(row=0,column=2,pady=5)
+        self.viewer_button.focus_get()
+
         
         
         self.viewcontrolpanel = Frame(self.master)
         self.viewcontrolpanel.grid(row=2,column=0,sticky=NSEW)
         
-        self.viewxaxis_label = Label(self.viewcontrolpanel,text="xaxis",font=font)
-        self.viewxaxis_label.grid(row=0,column=0)
+        self.viewxaxis_label = Label(self.viewcontrolpanel,text="xaxis",width=10,font=font,anchor=E)
+        self.viewxaxis_label.grid(row=0,column=0,pady=5)
         self.viewxaxis_label.focus_get()
         self.viewxaxis_label_sv = StringVar()
-        self.viewxaxis_label = Entry(self.viewcontrolpanel,textvariable=self.viewxaxis_label_sv,font=font)
-        self.viewxaxis_label.grid(row=0,column=1)
+        self.viewxaxis_label = Entry(self.viewcontrolpanel,textvariable=self.viewxaxis_label_sv,width=10,font=font)
+        self.viewxaxis_label.grid(row=0,column=1,pady=5)
         self.viewxaxis_label.focus_get()
         self.viewxaxis_label_sv.set("period")
         
-        self.viewyaxis_label = Label(self.viewcontrolpanel,text="yaxis",font=font)
-        self.viewyaxis_label.grid(row=0,column=2)
+        self.viewyaxis_label = Label(self.viewcontrolpanel,text="yaxis",width=10,font=font,anchor=E)
+        self.viewyaxis_label.grid(row=0,column=2,pady=5)
         self.viewyaxis_label.focus_get()
         self.viewyaxis_label_sv = StringVar()
-        self.viewyaxis_label = Entry(self.viewcontrolpanel,textvariable=self.viewyaxis_label_sv,font=font)
-        self.viewyaxis_label.grid(row=0,column=3)
+        self.viewyaxis_label = Entry(self.viewcontrolpanel,textvariable=self.viewyaxis_label_sv,width=10,font=font)
+        self.viewyaxis_label.grid(row=0,column=3,pady=5)
         self.viewyaxis_label.focus_get()
         self.viewyaxis_label_sv.set("dow")
         
-        self.viewfocus_label = Label(self.viewcontrolpanel,text="focus",font=font)
-        self.viewfocus_label.grid(row=0,column=4)
+        self.viewfocus_label = Label(self.viewcontrolpanel,text="focus",width=10,font=font,anchor=E)
+        self.viewfocus_label.grid(row=0,column=4,pady=5)
         self.viewfocus_label.focus_get()
         self.viewfocus_label_sv = StringVar()
-        self.viewfocus_label = Entry(self.viewcontrolpanel,textvariable=self.viewfocus_label_sv,font=font)
-        self.viewfocus_label.grid(row=0,column=5)
+        self.viewfocus_label = Entry(self.viewcontrolpanel,textvariable=self.viewfocus_label_sv,width=20,font=font)
+        self.viewfocus_label.grid(row=0,column=5,pady=5)
         self.viewfocus_label.focus_get()
         self.viewfocus_label_sv.set("student=Nathaniel")
         
-        self.viewstudent_label = Label(self.viewcontrolpanel,text="student",font=font)
-        self.viewstudent_label.grid(row=0,column=6)
+        self.viewstudent_label = Label(self.viewcontrolpanel,text="student",width=10,font=font,anchor=E)
+        self.viewstudent_label.grid(row=0,column=6,pady=5)
         self.viewstudent_label.focus_get()
         self.viewstudent_label_sv = StringVar()
-        self.viewstudent_label = Entry(self.viewcontrolpanel,textvariable=self.viewstudent_label_sv,font=font)
-        self.viewstudent_label.grid(row=0,column=7)
+        self.viewstudent_label = Entry(self.viewcontrolpanel,textvariable=self.viewstudent_label_sv,width=10,font=font)
+        self.viewstudent_label.grid(row=0,column=7,pady=5)
         self.viewstudent_label.focus_get()
         self.viewstudent_label_sv.set("Nathaniel")
         
-        self.viewteacher_label = Label(self.viewcontrolpanel,text="dow",font=font)
-        self.viewteacher_label.grid(row=0,column=8)
+        self.viewteacher_label = Label(self.viewcontrolpanel,text="dow",width=10,font=font,anchor=E)
+        self.viewteacher_label.grid(row=0,column=8,pady=5)
         self.viewteacher_label.focus_get()
         self.viewteacher_label_sv = StringVar()
-        self.viewteacher_label = Entry(self.viewcontrolpanel,textvariable=self.viewteacher_label_sv,font=font)
-        self.viewteacher_label.grid(row=0,column=9)
+        self.viewteacher_label = Entry(self.viewcontrolpanel,textvariable=self.viewteacher_label_sv,width=10,font=font)
+        self.viewteacher_label.grid(row=0,column=9,pady=5)
         self.viewteacher_label.focus_get()
         
-        self.viewdata_label = Label(self.viewcontrolpanel,text="data",font=font)
-        self.viewdata_label.grid(row=0,column=8)
+        self.viewdata_label = Label(self.viewcontrolpanel,text="data",width=10,font=font,anchor=E)
+        self.viewdata_label.grid(row=0,column=10,pady=5)
         self.viewdata_label.focus_get()
         self.viewdata_label_sv = StringVar()
-        self.viewdata_label = Entry(self.viewcontrolpanel,textvariable=self.viewdata_label_sv,font=font)
-        self.viewdata_label.grid(row=0,column=9)
+        self.viewdata_label = Entry(self.viewcontrolpanel,textvariable=self.viewdata_label_sv,width=30,font=font)
+        self.viewdata_label.grid(row=0,column=11,pady=5)
         self.viewdata_label.focus_get()
-        self.viewdata_label_sv.set("subject,teacher")
+        self.viewdata_label_sv.set("subject,teacher,recordtype")
+        
 
-        self.recalc_button = Button(self.viewcontrolpanel,command=self.viewer,text="calc",name="vc")
-        self.recalc_button.grid(row=0,column=10)
-        self.recalc_button.focus_get()
+
+
+        #self.recalc_button = Button(self.viewcontrolpanel,command=self.viewer,text="calc",name="vc")
+        #self.recalc_button.grid(row=0,column=10)
+        #self.recalc_button.focus_get()
         
         #self.grid_rowconfigure(0, weight=1, uniform="foo")
         #self.grid_rowconfigure(1, weight=1, uniform="foo")
         #self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
-    
+            
     def dump(self,value):
         
         with self.database:
@@ -370,14 +387,17 @@ class WizardUI(Tk):
                         log.log(thisfuncname(),2,msg="attr not found on object",error=e,
                                 attr=ztype,xval=str(xval),yval=str(yval))
                         celltext.append("")
-                values[x].append("\n".join(celltext))
+                #values[x].append("\n".join(celltext))
+                
+                values[x].append(celltext)
                 
 
         if ui==True:
             self.bgmaxrows=len(values)
             self.bgmaxcols=len(values[0])
         
-            widget_args=dict(background='white',width=1,height=4,wraplength=240,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
+            #,wraplength=240
+            widget_args=dict(background='white',width=1,height=4,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
             widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
             mytextalphanum = TextAlphaNumRO(name='textalphanum')
         
@@ -385,8 +405,10 @@ class WizardUI(Tk):
                 self.viewergrid.destroy()
             except:
                 pass
-        
-            self.viewergrid = TkImageLabelGrid(self,'viewergrid',mytextalphanum,10,10,0,0,self.bgmaxrows,self.bgmaxcols,True,False,{},widgetcfg)
+            
+            mytextalphanum.widgettype = Tk3Label
+            
+            self.viewergrid = TkImageLabelGrid(self,'viewergrid',mytextalphanum,10,10,0,0,self.bgmaxrows,self.bgmaxcols,True,False,{},widgetcfg,1)
         
             self.viewergrid.grid(row=3,column=0,sticky=NSEW)
             self.grid_rowconfigure(3, weight=10, uniform="foo")
@@ -394,11 +416,25 @@ class WizardUI(Tk):
             for x in range(len(values)):
                 for y in range(len(values[x])):
                     widget = self.viewergrid.widgets[x][y]
-                    widget.sv.set(values[x][y])
+                    _value = values[x][y]
+
+                    if isinstance(_value,list) == True:
+
+                        widget.toplable_sv.set(_value[0])
+                        widget.midlable_sv.set(_value[1])
+                        widget.botlable_sv.set(_value[2])
+                    else:
+                        if x == 0 or y == 0:
+                            widget.midlable_sv.set(_value)
+                        else:
+                            widget.toplable_sv.set(_value)
                     
                     if x > 0 and y > 0:
                         key = [self.enums[xaxis_type]['enum2name'][x],self.enums[yaxis_type]['code'][y-1],source_value]                           
-                        widget.bind("<Button-1>",lambda e,key=key:self.dump(key))
+                        #widget.bind("<Button-1>",lambda e,key=key:self.dump(key))
+                        widget.toplable.bind("<Button-1>",lambda e,key=key:self.dump(key))
+                        widget.botlable.bind("<Button-1>",lambda e,key=key:self.dump(key))
+                        widget.midlable.bind("<Button-1>",lambda e,key=key:self.dump(key))
                     
         else:
             results = []
@@ -409,6 +445,9 @@ class WizardUI(Tk):
                 results.append(row)
             return results
             
+        self.viewergrid.reset_framewidth()
+        self.viewergrid.resize_canvasframe()
+        
         
     @logger(log)    
     def save(self,saveversion=None):
@@ -565,7 +604,9 @@ class WizardUI(Tk):
         self.of.store={}
 
     @logger(log)       
-    def load(self,saveversion=None,values=None, dow=None, prep=None, period=None, teacher=None, student=None):
+    def load(self,saveversion=None,values=None, dow=None, prep=None, period=None, teacher=None, student=None, source=None):
+        
+        self.of.reset()
         
         # database name
         if self.dbname_entry_sv.get() <> self.dbname:
@@ -628,13 +669,22 @@ class WizardUI(Tk):
             whereclause.append( ['student',"=","\""+student+"\""])
         log.log(thisfuncname(),3,msg="loading",student=str(student))
         
-        whereclause.append( ['status',"=","\"" + "master" + "\""])
+        # source
+        if source==None: source = self.source_label_sv.get()
+        if source == "":
+            source = "dbinsert"
+        else:
+            whereclause.append( ['source',"=","\""+source+"\""])
+        log.log(thisfuncname(),3,msg="loading",source=str(source))
+        
+        #whereclause.append( ['status',"=","\"" + "master" + "\""])
+        #whereclause.append( ['source',"=","\"" + "prep56new.csv" + "\""])
         
         # get enums
         self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
 
         # load from database
-        cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype']        
+        cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype','source']        
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
             
