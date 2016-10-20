@@ -393,6 +393,9 @@ class TestUIGrid2x2even(TestWidget):
     def setUp(self):
         self.master = Tk()
         
+        self.style = Style()
+        self.style.theme_use("default")
+
         self.custommaster = dict(height=52,width=166,x=0,y=0)
 
         self.button1 = Button(self.master,text="N")
@@ -405,6 +408,7 @@ class TestUIGrid2x2even(TestWidget):
         self.button4.grid(row=1,column=1,sticky=SE)
         
     def test_master(self):
+        self.master.mainloop()
         self.assertWidgetDimensions(self.master,0.01,**self.custommaster)
     
     def test_nwbutton(self):
@@ -609,6 +613,7 @@ class TestUIGrid7x5odd(TestWidget):
 
     def test_master(self):
         
+        self.master.mainloop()
         exp_results = dict(height=self.wmheight,
                            width=self.wmwidth,
                            x=0,
@@ -657,6 +662,8 @@ class TestUIGridCustom(TestWidget):
         self.wmheight=500 # master height
         self.wmwidth=500 # master width
         
+
+
         image_args = dict(pointsize=48,font='Helvetica',gravity='center',
                           rotate=90,label='foobar')
     
@@ -684,18 +691,18 @@ class TestUIGridCustom(TestWidget):
                             
     def test_origin(self):
         
-        #self.master.mainloop()
+        
         exp_results = dict(height=36,width=22,x=0,y=0)
         self.assertWidgetDimensions(self.tkilg.widgets[0][0],0.01,**exp_results)
         
         
     def test_topheader(self):
-        
+
         exp_results = dict(height=36,width=120,x=22,y=0)
         self.assertWidgetDimensions(self.tkilg.widgets[0][1],0.01,**exp_results)
         
     def test_left_leftheader(self):
-        
+        self.master.mainloop()
         exp_results = dict(height=77,width=22,x=0,y=36)
         self.assertWidgetDimensions(self.tkilg.widgets[1][0],0.01,**exp_results)
     
@@ -1318,13 +1325,55 @@ class Test_Grid_Scrollbars(unittest.TestCase):
         self.master.mainloop()
         
         
+class Tk3Label(Frame):
+    
+    Frame.__init__(self.master
+class TestUIScheduler(TestWidget):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry("400x200+0+0")
+   
+        self.maxrows=15 # rows in the grid
+        self.maxcols=5 # cols in the grid
+        self.maxwidgets=self.maxrows*self.maxcols
+        self.wwidth=48 # default button width with text of 3 chars
+        self.wheight=29 # default button height
+        self.wmheight=self.wheight*self.maxrows # master height
+        self.wmwidth=self.wwidth*self.maxcols # master width
+      
+        font = tkFont.Font(family="monospace", size=12) 
+        self.style = Style()
+        self.style.theme_use("default")
+        
+        self.mytextalphanum = TextAlphaNum(name='textalphanum')
+        widget_args=dict(background='white',width=9,font=font)
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+
+        self.mytextalphanum.widgettype = TkButton
+        self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanum,
+                                      self.wmwidth,self.wmheight,
+                                      0,0,self.maxrows,self.maxcols
+                                      ,True,True,{},widgetcfg)
+
+        #self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanum,
+        #                              self.wmwidth,self.wmheight,
+        #                              0,0,7,5)
+        self.tkilg.grid(row=0,column=0,sticky=NSEW)
+        self.master.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.master.grid_columnconfigure(0, weight=1, uniform="foo") 
+        
+    def test_(self):
+        
+        self.master.mainloop()
         
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGridFocusAppObject))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIFrameResizeFont))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_Scrollbars))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIGrid2x2even))
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIScheduler))
     unittest.TextTestRunner(verbosity=2).run(suite)
     exit()
     
