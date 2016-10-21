@@ -209,7 +209,7 @@ class TkImageLabelGrid(Frame):
         
         self.canvas.config(yscrollcommand=vscrollbar.set)        
 
-        self.canvas.config(background='green')
+        self.canvas.config(background='white')
         self.gridname = gridname
     
         self.canvasframe.bind("<Configure>",self.resize_canvasframe)  
@@ -771,7 +771,7 @@ class TkNLabel(_tkframe,TKBase):
         
         _tkframe.__init__(self,master,borderwidth=2,bg='blue')
         
-        self.font = tkFont.Font(family="monospace", size=12) 
+        self.font = tkFont.Font(family="monospace", size=8) 
         
         #self.addlabel()
         #self.addlabel()

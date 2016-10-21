@@ -9,7 +9,7 @@ from misc_utils import nxnarraycreate, thisfuncname
 
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get, TkGridCombobox, \
-     TkCombobox, Tk3Label, _tklabel, TkNLabel
+     TkCombobox, Tk3Label, _tklabel, TkNLabel, _tkbutton
 
 from misc_utils_objectfactory import ObjFactory
 
@@ -27,6 +27,31 @@ from collections import OrderedDict
 
 import tkFont
 import unittest
+
+pink = '#%02x%02x%02x' % (255, 153, 153)
+salmon = '#%02x%02x%02x' % (255, 204, 153)
+lightyellow = '#%02x%02x%02x' % (255, 255, 153)
+lightgreen = '#%02x%02x%02x' % (204, 255, 153)
+lightturquoise = '#%02x%02x%02x' % (153, 255, 204)
+lightblue = '#%02x%02x%02x' % (153, 255, 255)
+lavender = '#%02x%02x%02x' % (153, 153, 255)
+purple = '#%02x%02x%02x' % (204, 153, 255)
+pink = '#%02x%02x%02x' % (255, 153, 204)
+darkgreen = '#%02x%02x%02x' % (0, 102, 0)
+burgundy = '#%02x%02x%02x' % (102, 0, 51)
+karky = '#%02x%02x%02x' % (102, 102, 0)
+darkburgundy = '#%02x%02x%02x' % (102, 0, 51)
+darkgrey = '#%02x%02x%02x' % (0, 51, 51)
+brown = '#%02x%02x%02x' % (102, 51, 0)
+mauve = '#%02x%02x%02x' % (204, 204, 0)
+navyblue = '#%02x%02x%02x' % (0, 0, 51)
+darkyellow = '#%02x%02x%02x' % (155,140,6)
+paleblue = '#%02x%02x%02x' %(173,217,222)
+palegreen = '#%02x%02x%02x' %(183,229,183)
+cerise = '#%02x%02x%02x' %(212, 7, 253)
+
+verydarkgrey = '#%02x%02x%02x' %(54, 46, 55)
+dirtyyellow = '#%02x%02x%02x' %(242, 232, 19)
 
 
 controlpanelconfig = dict(height=300,width=200,x=100,y=100)
@@ -77,10 +102,52 @@ class WizardUI(Tk):
         
         log.log(thisfuncname(),3,msg="initialize",dbname=dbname,refdbname=refdbname)
         
+        #sys.platform == "darwin":
         #self.clipboard=[]
         #self.clipboard_selection=-1
         Tk.__init__(self)
-        self.geometry("2000x1000+0+0")
+        
+        #self.colorpalette = dict(recordtype=dict(wp='green',subject='blue',ap='yellow'))
+        self.colorpalette = dict(wp='green',subject='blue',ap='yellow',
+                                 Movement=pink,ELA=salmon,Humanities=lightyellow,
+                                 Counseling=lightgreen,Math=lightturquoise, 
+                                 Music=lightblue,STEM=lavender,Art=purple,History=pink,
+                                 Science=darkgreen,Core=karky,Chess=burgundy,
+                                 computertime='darkgrey',Speech=darkburgundy,
+                                 Student_News=darkgrey,Computer_Time=brown,
+                                 Activity_Period=mauve,Melissa=navyblue,Amelia=darkgreen,
+                                 Samantha=darkyellow, Alexa=paleblue, Paraic=palegreen, 
+                                 Francisco=cerise,Rahul=verydarkgrey,Dylan=verydarkgrey,
+                                 Moira=verydarkgrey,Issey=verydarkgrey, Daryl=verydarkgrey, 
+                                 Karolina=verydarkgrey)
+        
+
+        self.fontpalette = dict(Amelia='green',Paraic=darkgreen,Stan=lavender,
+                                Samantha=lightgreen,Alexa='blue',Francisco=purple,
+                                Melissa=lightblue,Rahul=dirtyyellow,Dylan=dirtyyellow, 
+                                Moira=dirtyyellow,Issey=dirtyyellow, Daryl=dirtyyellow, 
+                                 Karolina=dirtyyellow)
+                                
+                                
+        ''',ap='yellow',ELA=salmon,Humanities=lightyellow,
+        Movement=pink
+        
+        ,History=pink,
+        Core=karky,Chess=burgundy,
+    computertime='darkgrey',Speech=darkburgundy,
+    Student_News=darkgrey,Computer_Time=brown,
+    Activity_Period=mauve)'''
+        
+        
+        
+        
+        
+        screenwidth = self.winfo_vrootwidth()
+        screenheight = self.winfo_vrootheight()
+        
+        self.geometry(str(screenwidth) + "x" + str(screenheight) +"+0+0")
+        
+        wx = 8
         
         self.refdatabase = Database(refdbname)
         
@@ -92,7 +159,8 @@ class WizardUI(Tk):
         self.of = of
 
         
-        font = tkFont.Font(family="monospace", size=10) 
+        font = tkFont.Font(family="monospace", size=8) 
+        self.font = font
         
         self.lastsaveversion=0
 
@@ -122,81 +190,81 @@ class WizardUI(Tk):
         controlpanel = Frame(self,style='ControlPanel.TFrame')
         controlpanel.grid(row=1,column=0,sticky=NSEW,columnspan=2)
         
-        self.dbload_entry_label = Label(controlpanel,text="version",width=10,font=font,anchor=E)
+        self.dbload_entry_label = Label(controlpanel,text="version",width=wx,font=font,anchor=E)
         self.dbload_entry_label.grid(row=0,column=1,pady=5)
         self.dbload_entry_label.focus_get()
         self.dbload_entry_sv = StringVar()
-        self.dbload_entry = Entry(controlpanel,textvariable=self.dbload_entry_sv,width=10,font=font)
+        self.dbload_entry = Entry(controlpanel,textvariable=self.dbload_entry_sv,width=wx,font=font)
         self.dbload_entry.grid(row=0,column=2,pady=5)
         self.dbload_entry_sv.set('1')
         self.dbload_entry.focus_get()
         
-        self.dbname_entry_label = Label(controlpanel,text="dbname",width=10,font=font,anchor=E)
+        self.dbname_entry_label = Label(controlpanel,text="dbname",width=wx,font=font,anchor=E)
         self.dbname_entry_label.grid(row=0,column=3,pady=5)
         self.dbname_entry_label.focus_get()
         self.dbname_entry_sv = StringVar()
-        self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv,width=10,font=font)
+        self.dbname_entry = Entry(controlpanel,textvariable=self.dbname_entry_sv,width=wx,font=font)
         self.dbname_entry.grid(row=0,column=4,pady=5)
         self.dbname_entry.focus_get()
         self.dbname_entry_sv.set(self.dbname)
         
-        self.dow_entry_label = Label(controlpanel,text="dow",width=10,font=font,anchor=E)
+        self.dow_entry_label = Label(controlpanel,text="dow",width=wx,font=font,anchor=E)
         self.dow_entry_label.grid(row=0,column=5,pady=5)
         self.dow_entry_label.focus_get()
         
         self.dow_entry_sv = StringVar()
-        self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv,width=10,font=font)
+        self.dow_entry = Entry(controlpanel,textvariable=self.dow_entry_sv,width=wx,font=font)
         self.dow_entry.grid(row=0,column=6,pady=5)
         self.dow_entry.focus_get()
         #self.dow_entry_sv.set('MO')
         
-        self.prep_label = Label(controlpanel,text="prep",width=10,font=font,anchor=E)
+        self.prep_label = Label(controlpanel,text="prep",width=wx,font=font,anchor=E)
         self.prep_label.grid(row=0,column=7,pady=5)
         self.prep_label.focus_get()
         
         self.prep_entry_sv = StringVar()        
-        self.prep_entry = Entry(controlpanel,textvariable=self.prep_entry_sv,width=10,font=font)
+        self.prep_entry = Entry(controlpanel,textvariable=self.prep_entry_sv,width=wx,font=font)
         self.prep_entry.grid(row=0,column=8,pady=5)
         self.prep_entry.focus_get()
         #self.prep_entry_sv.set(5)
         
-        self.period_label = Label(controlpanel,text="period",width=10,font=font,anchor=E)
+        self.period_label = Label(controlpanel,text="period",width=wx,font=font,anchor=E)
         self.period_label.grid(row=0,column=9,pady=5)
         self.period_label.focus_get()
         
         self.period_entry_sv = StringVar()        
-        self.period_entry = Entry(controlpanel,textvariable=self.period_entry_sv,width=10,font=font)
+        self.period_entry = Entry(controlpanel,textvariable=self.period_entry_sv,width=wx,font=font)
         self.period_entry.grid(row=0,column=10,pady=5)
         self.period_entry.focus_get()
         #self.period_entry_sv.set('830-910')
         
-        self.teacher_label = Label(controlpanel,text="teacher",width=10,font=font,anchor=E)
+        self.teacher_label = Label(controlpanel,text="teacher",width=wx,font=font,anchor=E)
         self.teacher_label.grid(row=0,column=11,pady=5)
         self.teacher_label.focus_get()
         
         self.teacher_label_sv = StringVar()        
-        self.teacher_label = Entry(controlpanel,textvariable=self.teacher_label_sv,width=10,font=font)
+        self.teacher_label = Entry(controlpanel,textvariable=self.teacher_label_sv,width=wx,font=font)
         self.teacher_label.grid(row=0,column=12,pady=5)
         self.teacher_label.focus_get()
         #self.teacher_label_sv.set('Stan')
         
-        self.student_label = Label(controlpanel,text="student",width=10,font=font,anchor=E)
+        self.student_label = Label(controlpanel,text="student",width=wx,font=font,anchor=E)
         self.student_label.grid(row=0,column=13,pady=5)
         self.student_label.focus_get()
         
         self.student_label_sv = StringVar()        
-        self.student_label = Entry(controlpanel,textvariable=self.student_label_sv,width=10,font=font)
+        self.student_label = Entry(controlpanel,textvariable=self.student_label_sv,width=wx,font=font)
         self.student_label.grid(row=0,column=14,pady=5)
         self.student_label.focus_get()
         self.student_label_sv.set('Nathaniel')
         
     
-        self.source_label = Label(controlpanel,text="source",width=10,font=font,anchor=E)
+        self.source_label = Label(controlpanel,text="source",width=wx,font=font,anchor=E)
         self.source_label.grid(row=0,column=15,pady=5)
         self.source_label.focus_get()
     
         self.source_label_sv = StringVar()        
-        self.source_label = Entry(controlpanel,textvariable=self.source_label_sv,width=10,font=font)
+        self.source_label = Entry(controlpanel,textvariable=self.source_label_sv,width=wx,font=font)
         self.source_label.grid(row=0,column=16,pady=5)
         self.source_label.focus_get()
         self.source_label_sv.set('dbinsert')
@@ -204,17 +272,17 @@ class WizardUI(Tk):
         buttonpanel = Frame(controlpanel,style='ControlPanel.TFrame')
         buttonpanel.grid(row=0,column=17,sticky=NSEW)
     
-        self.dbload_button = Button(buttonpanel,command=lambda: self.load(self.dbload_entry_sv.get()),
+        self.dbload_button = _tkbutton(buttonpanel,font=font,command=lambda: self.load(self.dbload_entry_sv.get()),
                                     text="dbload",name="dbl")
     
         self.dbload_button.grid(row=0,column=0,pady=5)
         self.dbload_button.focus_get()
     
-        self.clear_button = Button(buttonpanel,command=self.clear,text="clear",name="clr")
+        self.clear_button = _tkbutton(buttonpanel,font=font,command=self.clear,text="clear",name="clr")
         self.clear_button.grid(row=0,column=1,pady=5)
         self.clear_button.focus_get()
     
-        self.viewer_button = Button(buttonpanel,command=self.viewer,text="viewer",name="view")
+        self.viewer_button = _tkbutton(buttonpanel,font=font,command=self.viewer,text="viewer",name="view")
         self.viewer_button.grid(row=0,column=2,pady=5)
         self.viewer_button.focus_get()
 
@@ -223,55 +291,55 @@ class WizardUI(Tk):
         self.viewcontrolpanel = Frame(self.master)
         self.viewcontrolpanel.grid(row=2,column=0,sticky=NSEW)
         
-        self.viewxaxis_label = Label(self.viewcontrolpanel,text="xaxis",width=10,font=font,anchor=E)
+        self.viewxaxis_label = Label(self.viewcontrolpanel,text="xaxis",width=wx,font=font,anchor=E)
         self.viewxaxis_label.grid(row=0,column=0,pady=5)
         self.viewxaxis_label.focus_get()
         self.viewxaxis_label_sv = StringVar()
-        self.viewxaxis_label = Entry(self.viewcontrolpanel,textvariable=self.viewxaxis_label_sv,width=10,font=font)
+        self.viewxaxis_label = Entry(self.viewcontrolpanel,textvariable=self.viewxaxis_label_sv,width=wx,font=font)
         self.viewxaxis_label.grid(row=0,column=1,pady=5)
         self.viewxaxis_label.focus_get()
         self.viewxaxis_label_sv.set("period")
         
-        self.viewyaxis_label = Label(self.viewcontrolpanel,text="yaxis",width=10,font=font,anchor=E)
+        self.viewyaxis_label = Label(self.viewcontrolpanel,text="yaxis",width=wx,font=font,anchor=E)
         self.viewyaxis_label.grid(row=0,column=2,pady=5)
         self.viewyaxis_label.focus_get()
         self.viewyaxis_label_sv = StringVar()
-        self.viewyaxis_label = Entry(self.viewcontrolpanel,textvariable=self.viewyaxis_label_sv,width=10,font=font)
+        self.viewyaxis_label = Entry(self.viewcontrolpanel,textvariable=self.viewyaxis_label_sv,width=wx,font=font)
         self.viewyaxis_label.grid(row=0,column=3,pady=5)
         self.viewyaxis_label.focus_get()
         self.viewyaxis_label_sv.set("dow")
         
-        self.viewfocus_label = Label(self.viewcontrolpanel,text="focus",width=10,font=font,anchor=E)
+        self.viewfocus_label = Label(self.viewcontrolpanel,text="focus",width=wx,font=font,anchor=E)
         self.viewfocus_label.grid(row=0,column=4,pady=5)
         self.viewfocus_label.focus_get()
         self.viewfocus_label_sv = StringVar()
-        self.viewfocus_label = Entry(self.viewcontrolpanel,textvariable=self.viewfocus_label_sv,width=20,font=font)
+        self.viewfocus_label = Entry(self.viewcontrolpanel,textvariable=self.viewfocus_label_sv,width=wx*2,font=font)
         self.viewfocus_label.grid(row=0,column=5,pady=5)
         self.viewfocus_label.focus_get()
         self.viewfocus_label_sv.set("student=Nathaniel")
         
-        self.viewstudent_label = Label(self.viewcontrolpanel,text="student",width=10,font=font,anchor=E)
+        self.viewstudent_label = Label(self.viewcontrolpanel,text="student",width=wx,font=font,anchor=E)
         self.viewstudent_label.grid(row=0,column=6,pady=5)
         self.viewstudent_label.focus_get()
         self.viewstudent_label_sv = StringVar()
-        self.viewstudent_label = Entry(self.viewcontrolpanel,textvariable=self.viewstudent_label_sv,width=10,font=font)
+        self.viewstudent_label = Entry(self.viewcontrolpanel,textvariable=self.viewstudent_label_sv,width=wx,font=font)
         self.viewstudent_label.grid(row=0,column=7,pady=5)
         self.viewstudent_label.focus_get()
         self.viewstudent_label_sv.set("Nathaniel")
         
-        self.viewteacher_label = Label(self.viewcontrolpanel,text="dow",width=10,font=font,anchor=E)
+        self.viewteacher_label = Label(self.viewcontrolpanel,text="dow",width=wx,font=font,anchor=E)
         self.viewteacher_label.grid(row=0,column=8,pady=5)
         self.viewteacher_label.focus_get()
         self.viewteacher_label_sv = StringVar()
-        self.viewteacher_label = Entry(self.viewcontrolpanel,textvariable=self.viewteacher_label_sv,width=10,font=font)
+        self.viewteacher_label = Entry(self.viewcontrolpanel,textvariable=self.viewteacher_label_sv,width=wx,font=font)
         self.viewteacher_label.grid(row=0,column=9,pady=5)
         self.viewteacher_label.focus_get()
         
-        self.viewdata_label = Label(self.viewcontrolpanel,text="data",width=10,font=font,anchor=E)
+        self.viewdata_label = Label(self.viewcontrolpanel,text="data",width=wx,font=font,anchor=E)
         self.viewdata_label.grid(row=0,column=10,pady=5)
         self.viewdata_label.focus_get()
         self.viewdata_label_sv = StringVar()
-        self.viewdata_label = Entry(self.viewcontrolpanel,textvariable=self.viewdata_label_sv,width=30,font=font)
+        self.viewdata_label = Entry(self.viewcontrolpanel,textvariable=self.viewdata_label_sv,width=wx*3,font=font)
         self.viewdata_label.grid(row=0,column=11,pady=5)
         self.viewdata_label.focus_get()
         self.viewdata_label_sv.set("subject,teacher,recordtype")
@@ -339,6 +407,32 @@ class WizardUI(Tk):
         rows.sort()
         return rows
 
+    def color_get(self,value):
+        
+        bg = 'lightgrey'
+        fg = 'black'
+             
+        if value.count(" ") > 0:
+            value= value.replace(" ","_")
+            
+        if value.count("[") == 1 and value.count("]") == 1:
+            bg = 'red'
+        
+        if value.count(".") > 0:
+            value = value.split(".")[0]
+            
+        if self.colorpalette.has_key(value):
+            bg = self.colorpalette[value]
+            
+        if self.fontpalette.has_key(value):
+            fg = self.fontpalette[value]
+            
+            
+        return(bg,fg)
+
+
+        
+        
     def viewer(self,ui=True,source_type=None,source_value=None,ztypes=None):
         
         xaxis_type = self.viewxaxis_label_sv.get() # period
@@ -391,14 +485,19 @@ class WizardUI(Tk):
                         if source_obj.lessons[yval].has_key(xval):
                             _vals = source_obj.lessons[yval][xval]
                             
+                            
+                            _valcount=0
                             for _val in _vals:
+                                if _valcount >= 1:
+                                    celltext.append('spacer')
                                 for ztype in ztypes:
                                     if hasattr(_val,ztype) == True:
                                         zval = getattr(_val,ztype)
                                         celltext.append(zval.name)
                                     else:
                                         print "lesson",_val,"does not have attr",ztype
-                                celltext.append('spacer')
+                                
+                                _valcount+=1
                         else:
                             print "source",source_obj.name,"yval=",yval," does not have key",xval
                     else:
@@ -449,6 +548,10 @@ class WizardUI(Tk):
                             elif _value[i] <> "":
                                 _widget,_widget_sv = widget.addlabel()
                                 _widget_sv.set(_value[i])
+                                
+                                _bg,_fg = self.color_get(_value[i])
+                                _widget.config(background=_bg,foreground=_fg)
+                                
                         #widget.toplable_sv.set(_value[0])
                         #widget.midlable_sv.set(_value[1])
                         #widget.botlable_sv.set(_value[2])
@@ -795,6 +898,7 @@ if __name__ == "__main__":
                 enableui = True
         except:
             pass
+
         
     of = ObjFactory(True)
     app = WizardUI(sys.argv[1],of,sys.argv[1],maxentrycols=12,maxentryrows=20)
