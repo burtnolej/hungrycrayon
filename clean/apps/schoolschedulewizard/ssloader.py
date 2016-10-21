@@ -1,5 +1,5 @@
 from misc_utils_log import Log, logger
-log = Log(cacheflag=True,logdir="/tmp/log",verbosity=5,pidlogname=True,proclogname=False)
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,pidlogname=True,proclogname=False)
 
 from misc_utils import os_file_to_string, thisfuncname, IDGenerator
 from database_table_util import tbl_rows_get, tbl_rows_insert, _quotestrs, _gencoldefn, tbl_exists, \
@@ -66,6 +66,7 @@ class SSLoader(object):
 	          ('wp.student.subject.noteacher', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",1),('Computer Time',0),('with',0)]),
 	          ('wp.student.subject.teacher', [("subject=^**",1),("Subject=Work Period",1),("\(",1),("\)",1),(":",1),('Computer Time',0),('with',0)]), 
 	          ('wp.nostudent.nosubject.noteacher.with.and', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1),('and',1)]),
+	          ('wp.nostudent.subject.teacher.with', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",1),('Computer Time',0),('with',1)]), 
 	          ('wp.nostudent.nosubject.noteacher.with', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
 	          ('wp.nostudent.subject.noteacher.with', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
 	          
@@ -77,6 +78,7 @@ class SSLoader(object):
 	          ('subject.nostudent.nosubject.noteacher.with.and', [("subject=^**",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1),('and',1)]),	   
 	          ('subject.nostudent.nosubject.noteacher.with', [("subject=^**",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),	          	          
 	          ('subject.student.subject.teacher',[(":",1),("\(",1),("\)",1)]),
+	          ('subject.student.subject.noteacher.and',[(":",1),("\(",0),("\)",0),("and",1)]),
 	          ('subject.student.subject.noteacher',[(":",1),("\(",0),("\)",0)]),
 	          ('student.student.nosubject.noteacher',[("students=^**$",1),(":",0),("\(",0),("\)",0)]),
 	           
@@ -120,6 +122,7 @@ class SSLoader(object):
         self.fields = ['period','dow','subject','teacher','students',"recordtype"]
 
         self.prepmap = self.loadprepmapper()
+	self.subjectmap = self.loadsubjectmapper()
         
     def pre_process_records(self,records):
 
@@ -138,7 +141,7 @@ class SSLoader(object):
 
         for record in records:
 	    
-	    
+	    subject = ""
 	    
             try:
                 recordtype = self.identify_record(record)
@@ -172,259 +175,308 @@ class SSLoader(object):
 		    return([studentname])
 		return([])
 	    
+	    def _setsubject():
+		if self.subjectmap.has_key(teacher.lower()) and subject == "":
+		    log.log(thisfuncname(),10,msg="overiding subject",teacher=teacher,subject=str(self.subjectmap[teacher.lower()]))
+		    return self.subjectmap[teacher.lower()]
+		elif subject == "" or subject == None:
+		    return "??"
+		return subject
+	    
 	    def _period():
 		#if academicrecordflag == True or staffrecordflag == True or studentfile == True:
-		if academicrecordflag == True or  studentfile == True:
+		#if academicrecordflag == True or  studentfile == True:
+		if academicrecordflag == True:
 		    return(enums['period']['name'][periodidx])
 		return period
 
-	    #items = ['ty','st','su','te','wi']
-	    #_recordtypeparts = recordtype.split(".")
-	    #recordtypeparts = dict(zip(items,_recordtypeparts))
-	    #print recordtypeparts['ty']
-	    
-	    if  recordtype == 'wp.student.nosubject.noteacher':
-		# WP: Shane, Asher
-		subject = "??"
-		teacher = _setteacher()
-		students = self.extract_students(record.split(":")[1])
-		dow = _setdow()
+	    try:
 		
-		_addrecord(locals())
-	    elif  recordtype == 'wp.student.nosubject.teacher':
-		# WP: Shane, Asher (Amelia)
-		subject = "??"
-		teacher,_rest = self.extract_teacher(record.split(":")[1])
-		students = self.extract_students(_rest)
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif  recordtype == 'wp.nostudent.nosubject.noteacher':
-		# Work Period
-		subject = "??"
-		teacher = _setteacher()
-		students = _setstudent()
-		if studentfile == True:
-		    students = [studentname]		
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif recordtype == 'wp.nostudent.subject.noteacher':
-		# Humanities Work Period
-		subject = record.split(" ")[0]
-		teacher = _setteacher()
-		students = _setstudent()
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif recordtype == 'wp.student.subject.noteacher':
-		# Math WP: Jack
-		subject = record.split(" ")[0]
-		teacher = _setteacher()
-		students = self.extract_students(record.split(":")[1])
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif recordtype == 'wp.student.subject.teacher':
-		# Math WP: Jack (Stan)
-		subject = record.split(" ")[0]
-		teacher,_rest = self.extract_teacher(record.split(":")[1])
-		students = self.extract_students(_rest)
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif recordtype == 'wp.nostudent.nosubject.noteacher.with.and':
-		# Work Period with Alyssa and Paraic		
-		_teachers = record.split("with")[1]
-		teachers = _teachers.split("and")
-		
-		subject = "??"
-		students = _setstudent()
-		dow = _setdow()	    
-
-		for teacher in teachers:
+		if  recordtype == 'wp.student.nosubject.noteacher':
+		    # WP: Shane, Asher
+		    #subject = "??"
+		    teacher = _setteacher()
+		    students = self.extract_students(record.split(":")[1])
+		    dow = _setdow()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		elif  recordtype == 'wp.student.nosubject.teacher':
+		    # WP: Shane, Asher (Amelia)
+		    #subject = "??"
+		    teacher,_rest = self.extract_teacher(record.split(":")[1])
+		    students = self.extract_students(_rest)
+		    dow = _setdow()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		elif  recordtype == 'wp.nostudent.nosubject.noteacher':
+		    # Work Period
+		    #subject = "??"		    
+		    teacher = _setteacher()
+		    students = _setstudent()
+		    if studentfile == True:
+			students = [studentname]
+		    dow = _setdow()	
+		    subject = _setsubject()
+		    _addrecord(locals())
+		elif recordtype == 'wp.nostudent.subject.noteacher':
+		    # Humanities Work Period
+		    subject = record.split(" ")[0]
+		    teacher = _setteacher()
+		    students = _setstudent()
+		    dow = _setdow()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		elif recordtype == 'wp.student.subject.noteacher':
+		    # Math WP: Jack
+		    subject = record.split(" ")[0]
+		    teacher = _setteacher()
+		    students = self.extract_students(record.split(":")[1])
+		    dow = _setdow()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		elif recordtype == 'wp.student.subject.teacher':
+		    # Math WP: Jack (Stan)
+		    subject = record.split(" ")[0]
+		    teacher,_rest = self.extract_teacher(record.split(":")[1])
+		    students = self.extract_students(_rest)
+		    subject = _setsubject()
+		    dow = _setdow()	
+		    _addrecord(locals())
+		elif recordtype == 'wp.nostudent.nosubject.noteacher.with.and':
+		    # Work Period with Alyssa and Paraic		
+		    _teachers = record.split("with")[1]
+		    teachers = _teachers.split("and")
+		    
+		    #subject = "??"
+		    students = _setstudent()
+		    dow = _setdow()	    
+		    subject = _setsubject()
+		    
+		    for teacher in teachers:
+			teacher = teacher.lstrip()
+			teacher = teacher.strip()
+			_addrecord(locals())
+			
+		elif recordtype == 'wp.nostudent.nosubject.noteacher.with':
+		    # Work Period with Alyssa
+		    teacher = record.split("with")[1]
 		    teacher = teacher.lstrip()
-		    teacher = teacher.strip()
+		    #subject = "??"
+		    subject = _setsubject()
+		    students = _setstudent()
+		    dow = _setdow()	
 		    _addrecord(locals())
 		    
-	    elif recordtype == 'wp.nostudent.nosubject.noteacher.with':
-		# Work Period with Alyssa
-		teacher = record.split("with")[1]
-		teacher = teacher.lstrip()
-		subject = "??"
-		students = _setstudent()
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif recordtype == 'wp.nostudent.subject.noteacher.with':
-		# Humanities Work Period with Johnny
-		subject = record.split(" ")[0]
-		teacher = record.split("with")[1]
-		teacher = teacher.lstrip()
-		students = _setstudent()
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif recordtype == 'subject.nostudent.nosubject.noteacher':
-		# Humanities
-		subject = record
-		teacher = _setteacher()
-		students = _setstudent()
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif recordtype == 'subject.nostudent.nosubject.noteacher.with':
-		# ELA with Amelia
-		subject,teacher = record.split("with")
-		teacher = teacher.lstrip()
-		subject = subject.strip()
-		students = _setstudent()
-		dow = _setdow()	
-		_addrecord(locals())
-	    elif recordtype == 'subject.nostudent.nosubject.noteacher.with.and':
-		# ELA with Amelia and Paraic
-		subject,_teachers = record.split("with")
-		teachers = _teachers.split("and")
-		subject = subject.strip()
-		students = _setstudent()
-		dow = _setdow()		
-
-		for teacher in teachers:
+		    
+		elif recordtype == 'wp.nostudent.subject.teacher.with':
+		    # Humanities WP: with alyssa
+		    teacher = record.split("with")[1]
 		    teacher = teacher.lstrip()
-		    teacher = teacher.strip()
-
+		    subject = record.split(" ")[0]
+		    students = _setstudent()
+		    dow = _setdow()	
 		    _addrecord(locals())
-		
-	    elif recordtype == 'student.student.nosubject.noteacher':
-		teacher = _setteacher()
-		dow = _setdow()
-		subject = "??"
-		period = _period()
-		students = [record.lstrip().strip()]
-		_addrecord(locals())
-				
-	    elif recordtype[:6] == "ignore":
-		pass
-		
-	    elif recordtype == 'subject.student.subject.teacher':
-		# ELA: Nathaniel (Amelia)"
-		subject,_rest = self.extract_subject(record)
-		teacher,_rest = self.extract_teacher(_rest)
-		students = self.extract_students(_rest)
-		dow = _setdow()
-		period = _period()
-		_addrecord(locals())
-		
-	    elif recordtype == 'subject.student.subject.noteacher':
-		# Science: Oscar, Peter"
-		
-		subject,_rest = self.extract_subject(record)
-		teacher = _setteacher()
-		students = self.extract_students(_rest)
-		dow = _setdow()
-		period = _period()
-		_addrecord(locals())
-		
-	    elif  recordtype == 'ap.nostudent.nosubject.noteacher':
-		# Activity Period
-		subject = "Activity Period"
-		teacher = _setteacher()
-		students = _setstudent()
-		if studentfile == True:
-		    students = [studentname]		
-		dow = _setdow()	
-		_addrecord(locals())
-		
-	    elif recordtype == 'ap.student.subject.teacher':
-		# Activity Period: Nathaniel (Amelia)"
-		subject,_rest = self.extract_subject(record)
-		teacher,_rest = self.extract_teacher(_rest)
-		students = self.extract_students(_rest)
-		dow = _setdow()
-		period = _period()
-		_addrecord(locals())
-		
-	    elif recordtype == 'ap.student.subject.noteacher':
-		# Activity Period: Oscar, Peter"
-		
-		subject,_rest = self.extract_subject(record)
-		teacher = _setteacher()
-		students = self.extract_students(_rest)
-		dow = _setdow()
-		period = _period()
-		_addrecord(locals())
-
-	    # mode determination options
-	    # is it a student file, staff file or an academic file
-	    elif recordtype == 'studentname':
-		# this function actually extrats staff and students
-		studentname = self.extract_staff(record)
-		log.log(thisfuncname(),10,msg="this is a student file",studentname=studentname)
-		studentfile=True
-            elif recordtype == 'staffname':
-                staffname = self.extract_staff(record)
-                log.log(thisfuncname(),10,msg="this is a staff file",staffname=staffname)
-                staffrecordflag=True	
-	    elif recordtype == 'academicname':
-		academicname = self.extract_staff(record)
-		log.log(thisfuncname(),10,msg="this is an academic file",academicname=academicname)
-		academicrecordflag=True
-		
-	    # special use cases
-            elif recordtype == 'computertime':
-                if self.prep <> -1:
-		    students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
-		    students.sort()
-		    teacher = "??"
-		    subject = "Computer Time"
-		    dow = self.valid_values['dow'][dowidx]
-		    _record = [locals()[field] for field in self.fields]
-		    _records.append(_record)
-		    log.log(thisfuncname(),10,msg="record added",record=_record)
-		elif studentfile == True:
-		    students = [studentname]
-		    teacher = "??"
-		    subject = "Computer Time"
-		    dow = self.valid_values['dow'][dowidx]
-		    _record = [locals()[field] for field in self.fields]
-		    _records.append(_record)
-		    log.log(thisfuncname(),10,msg="record addede",record=_record)
+		    
+		    
+		elif recordtype == 'wp.nostudent.subject.noteacher.with':
+		    # Humanities Work Period with Johnny
+		    subject = record.split(" ")[0]
+		    teacher = record.split("with")[1]
+		    teacher = teacher.lstrip()
+		    students = _setstudent()
+		    dow = _setdow()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		elif recordtype == 'subject.nostudent.nosubject.noteacher':
+		    # Humanities
+		    subject = record
+		    teacher = _setteacher()
+		    students = _setstudent()
+		    dow = _setdow()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		elif recordtype == 'subject.nostudent.nosubject.noteacher.with':
+		    # ELA with Amelia
+		    subject,teacher = record.split("with")
+		    teacher = teacher.lstrip()
+		    subject = subject.strip()
+		    students = _setstudent()
+		    dow = _setdow()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		elif recordtype == 'subject.nostudent.nosubject.noteacher.with.and':
+		    # ELA with Amelia and Paraic
+		    subject,_teachers = record.split("with")
+		    teachers = _teachers.split("and")
+		    subject = subject.strip()
+		    students = _setstudent()
+		    dow = _setdow()	
+		    subject = _setsubject()
+    
+		    for teacher in teachers:
+			teacher = teacher.lstrip()
+			teacher = teacher.strip()
+    
+			_addrecord(locals())
+		    
+		elif recordtype == 'student.student.nosubject.noteacher':
+		    teacher = _setteacher()
+		    dow = _setdow()
+		    #subject = "??"
+		    period = _period()
+		    students = [record.lstrip().strip()]
+		    subject = _setsubject()
+		    _addrecord(locals())
+				    
+		elif recordtype[:6] == "ignore":
+		    pass
+		    
+		elif recordtype == 'subject.student.subject.teacher':
+		    # ELA: Nathaniel (Amelia)"
+		    subject,_rest = self.extract_subject(record)
+		    teacher,_rest = self.extract_teacher(_rest)
+		    students = self.extract_students(_rest)
+		    dow = _setdow()
+		    period = _period()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		    
+		elif recordtype == 'subject.student.subject.noteacher':
+		    # Science: Oscar, Peter"
+		    
+		    subject,_rest = self.extract_subject(record)
+		    teacher = _setteacher()
+		    students = self.extract_students(_rest)
+		    dow = _setdow()
+		    period = _period()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		    
+		elif recordtype == 'subject.student.subject.noteacher.and':
+		    # Chess: NAthaniel and Jake"
+		    
+		    subject,_rest = self.extract_subject(record)
+		    teacher = _setteacher()
+		    _rest = _rest.replace("and",",")
+		    students = self.extract_students(_rest)
+		    dow = _setdow()
+		    period = _period()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		    
+		elif  recordtype == 'ap.nostudent.nosubject.noteacher':
+		    # Activity Period
+		    subject = "Activity Period"
+		    teacher = _setteacher()
+		    students = _setstudent()
+		    if studentfile == True:
+			students = [studentname]		
+		    dow = _setdow()
+		    _addrecord(locals())
+		    
+		elif recordtype == 'ap.student.subject.teacher':
+		    # Activity Period: Nathaniel (Amelia)"
+		    subject,_rest = self.extract_subject(record)
+		    teacher,_rest = self.extract_teacher(_rest)
+		    students = self.extract_students(_rest)
+		    dow = _setdow()
+		    period = _period()
+		    subject = _setsubject()
+		    _addrecord(locals())
+		    
+		elif recordtype == 'ap.student.subject.noteacher':
+		    # Activity Period: Oscar, Peter"
+		    
+		    subject,_rest = self.extract_subject(record)
+		    teacher = _setteacher()
+		    students = self.extract_students(_rest)
+		    dow = _setdow()
+		    period = _period()
+		    subject = _setsubject()
+		    _addrecord(locals())
+    
+		# mode determination options
+		# is it a student file, staff file or an academic file
+		elif recordtype == 'studentname':
+		    # this function actually extrats staff and students
+		    studentname = self.extract_staff(record)
+		    log.log(thisfuncname(),10,msg="this is a student file",studentname=studentname)
+		    studentfile=True
+		elif recordtype == 'staffname':
+		    staffname = self.extract_staff(record)
+		    log.log(thisfuncname(),10,msg="this is a staff file",staffname=staffname)
+		    staffrecordflag=True	
+		elif recordtype == 'academicname':
+		    academicname = self.extract_staff(record)
+		    log.log(thisfuncname(),10,msg="this is an academic file",academicname=academicname)
+		    academicrecordflag=True
+		    
+		# special use cases
+		elif recordtype == 'computertime':
+		    if self.prep <> -1:
+			students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
+			students.sort()
+			teacher = "??"
+			subject = "Computer Time"
+			dow = self.valid_values['dow'][dowidx]
+			_record = [locals()[field] for field in self.fields]
+			_records.append(_record)
+			log.log(thisfuncname(),10,msg="record added",record=_record)
+		    elif studentfile == True:
+			students = [studentname]
+			teacher = "??"
+			subject = "Computer Time"
+			dow = self.valid_values['dow'][dowidx]
+			_record = [locals()[field] for field in self.fields]
+			_records.append(_record)
+			log.log(thisfuncname(),10,msg="record addede",record=_record)
+		    else:
+			subject = "Computer Time"
+    
+		    
+    
+		# file markers used to increment axes (period, dow, etc)
+		elif recordtype[:3] == 'dow':
+		    periodidx=-1
+		    dow = record
+		    log.log(thisfuncname(),10,msg="setting dow",dow=dow)
+		elif recordtype == 'date':
+		    pass
+		elif recordtype == '_CRETURN_':
+		    pass
+		elif recordtype == 'blankrow':
+		    pass
+		elif recordtype == 'period':
+		    if academicrecordflag==False:
+			period = self.extract_period(record)
+			dowidx=-1
+			log.log(thisfuncname(),10,msg="period set reset on period",period=period)
+		elif recordtype == '_ENDCELL_':
+		    
+		    if academicrecordflag==False:
+			old_dowidx = dowidx
+			# increment day each time we hit an end of cell marker; set to -1 at 4 so that
+			# period cell is missed on the next line.
+			if dowidx==4:dowidx=-1
+			dowidx+=1
+		    
+			log.log(thisfuncname(),10,msg="dow increment",old_dowidx=old_dowidx,dowidx=dowidx,lastrecordtype=lastrecordtype)
+		    else:
+			old_periodidx =periodidx
+			if periodidx==8:
+			    periodidx=-1
+			elif periodidx==3:
+			    periodidx=4
+			periodidx+=1
+			log.log(thisfuncname(),10,msg="period increment",old_periodidx=old_periodidx,periodidx=periodidx,lastrecordtype=lastrecordtype)
 		else:
-		    subject = "Computer Time"
-
+		    log.log(thisfuncname(),2,msg="could not identify record",recordtype=recordtype,record=record)
+		    #raise SSLoaderFatal
+		    continue
+	    except SSLoaderRecordDelimException,SSLoaderRecordEndException:
+		log.log(thisfuncname(),2,msg="exception thrown while identify record",recordtype=recordtype,record=record)
+		continue	    
 		
-
-	    # file markers used to increment axes (period, dow, etc)
-	    elif recordtype[:3] == 'dow':
-		periodidx=-1
-		dow = record
-		log.log(thisfuncname(),10,msg="setting dow",dow=dow)
-            elif recordtype == 'date':
-                pass
-            elif recordtype == '_CRETURN_':
-                pass
-            elif recordtype == 'blankrow':
-                pass
-            elif recordtype == 'period':
-		if academicrecordflag==False:
-		    period = self.extract_period(record)
-		    dowidx=-1
-		    log.log(thisfuncname(),10,msg="dow reset on period",dow=self.valid_values['dow'][dowidx])
-            elif recordtype == '_ENDCELL_':
-                
-                if academicrecordflag==False:
-		    old_dowidx = dowidx
-		    # increment day each time we hit an end of cell marker; set to -1 at 4 so that
-		    # period cell is missed on the next line.
-		    if dowidx==4:dowidx=-1
-		    dowidx+=1
-                
-		    log.log(thisfuncname(),10,msg="dow increment",old_dowidx=old_dowidx,dowidx=dowidx,lastrecordtype=lastrecordtype)
-		else:
-		    old_periodidx =periodidx
-		    if periodidx==8:
-			periodidx=-1
-		    elif periodidx==3:
-			periodidx=4
-		    periodidx+=1
-		    log.log(thisfuncname(),10,msg="period increment",old_periodidx=old_periodidx,periodidx=periodidx,lastrecordtype=lastrecordtype)
-            else:
-                log.log(thisfuncname(),1,msg="could not identify record",recordtype=recordtype,record=record)
-                #raise SSLoaderFatal
-		continue
-            
             lastrecordtype = recordtype
         
             log.log(thisfuncname(),10,msg="processed",recordtype=recordtype,record=record)
@@ -466,6 +518,17 @@ class SSLoader(object):
 	
         return rows
     
+    def loadsubjectmapper(self):
+        cols = ['name','subject']
+	
+	with self.database:
+	    _,rows,_ = tbl_rows_get(self.database,'adult',cols,[['subject','<>','\"None\"']])
+	
+	d = dict((row[0].lower(),row[1]) for row in rows)
+	
+	log.log(thisfuncname(),10,msg="loaded subject map",map=d)
+	return d
+	
     def loadprepmapper(self):
         cols = ['name','prep']
         
@@ -678,6 +741,20 @@ class SSLoader(object):
 		#raise SSLoaderRecordDelimException 
         else:
             students = record.split(",")
+	    newstudents = []
+	    for student in students:
+		student = student.lstrip()
+		student = student.strip()
+		
+		if len(student.split(" ")) >= 2 and student.split(" ")[1] not in ["A","B","a","b"]:
+		    
+		    newstudents = newstudents + student.split(" ")
+		else:
+		    newstudents.append(student)
+	
+	    students=newstudents    
+	    
+		       
             
         _students = []
         for student in students:
@@ -800,7 +877,9 @@ class SSLoader(object):
 			new_value = orig_value
 		    
             except SSLoaderNoMatchException:
-                log.log(thisfuncname(),2,msg="failed to validate record",record=record,file=self.inputfile)
+                log.log(thisfuncname(),2,msg="failed to validate field, skipping record",field=self.fields[i],
+		        record=record,file=self.inputfile)
+		raise SSLoaderBadTokenException
 
             if orig_value <> new_value:
                 record.remove(orig_value)
@@ -1020,7 +1099,11 @@ class SSLoader(object):
             self.validated_clean_records = []
 
             for clean_record in clean_records:
-                self.validated_clean_records.append(self.validate_tokens(clean_record))
+                try:
+		    self.validated_clean_records.append(self.validate_tokens(clean_record))
+		except SSLoaderBadTokenException:
+		    pass # logged in validate_tokens
+		    
 	    log.log(thisfuncname(),15,validated_clean_records=self.validated_clean_records)
 	    
 	    if dbloader == True:
@@ -1086,7 +1169,15 @@ if __name__ == "__main__":
 	databasename = "quad"
 	shutil.copyfile(databasename+".sqlite.backup",databasename+".sqlite")
 
-	files = [('prep56new.csv',-1,True)]
+	files = [("prep4student.csv",4,True),
+	         ("prep5student.csv",5,True),
+	         ("prep6student.csv",6,True),
+	         ("prep4data.csv",4,True),
+	         ("prep5data.csv",5,True),
+	         ("prep6data.csv",6,True),
+	         ("staff.csv",-1,True),
+	         ("academic.csv",-1,True),
+	         ('prep56new.csv',-1,True)]
 	
     else:
 	raise Exception("do not know how to run in this working dir",dir=os.getcwd())

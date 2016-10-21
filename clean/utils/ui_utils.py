@@ -5,6 +5,7 @@ from Tkinter import Entry as _tkentry
 from Tkinter import Frame as _tkframe
 from Tkinter import Canvas as _tkcanvas
 
+
 from ttk import *
 import tkFont
 from math import ceil,floor
@@ -262,8 +263,8 @@ class TkImageLabelGrid(Frame):
         for i in range(self.gridcolstart,self.maxcols):
             self.canvasframe.grid_columnconfigure(i, weight=1, uniform="foo")
             
-        for i in range(self.gridrowstart,self.maxrows):        
-            self.canvasframe.grid_rowconfigure(i, weight=1, uniform="foo")
+        #for i in range(self.gridrowstart,self.maxrows):        
+        #    self.canvasframe.grid_rowconfigure(i, weight=1, uniform="foo")
     
         if rowhdrcfg <> None: self.header_set(1,**rowhdrcfg)
         if colhdrcfg <> None: self.header_set(2,**colhdrcfg)   
@@ -761,6 +762,44 @@ class Tk3Label(_tkframe,TKBase):
         self.grid_rowconfigure(1,weight=1,uniform="foo")
         self.grid_rowconfigure(2,weight=1,uniform="foo")
         self.grid_columnconfigure(0,weight=1,uniform="foo")
+        
+class TkNLabel(_tkframe,TKBase):
+    
+    def __init__(self,master,var,**kwargs):
+        
+        self.labelcount = 0
+        
+        _tkframe.__init__(self,master,borderwidth=2,bg='blue')
+        
+        self.font = tkFont.Font(family="monospace", size=12) 
+        
+        #self.addlabel()
+        #self.addlabel()
+        #self.addlabel()
+                        
+        self.grid_columnconfigure(0,weight=1,uniform="foo")
+        
+    def addlabel(self,expand=False):
+        
+        lable_sv = StringVar()
+        lable = _tklabel(self,textvariable=lable_sv,font=self.font)
+        lable.grid(row=self.labelcount,sticky=NSEW)
+
+        if expand == True:
+            self.grid_rowconfigure(self.labelcount,weight=1,uniform="foo")
+        self.labelcount += 1
+        
+        return(lable,lable_sv)
+    
+    def addspacer(self,thickness=1,color='black'):
+        
+        frame = _tkframe(self,bg=color,height=thickness)
+        frame.grid(row=self.labelcount,sticky=NSEW)
+
+        #self.grid_rowconfigure(self.labelcount,weight=1,uniform="foo")
+        self.labelcount += 1
+        
+        return()
 
 class TkLabel(_tklabel,TKBase):
     def __init__(self,master,var,**kwargs):

@@ -11,7 +11,7 @@ import tkFont
 
 class FontPickerFrame(Frame):
     
-    def __init__(self,master,error_sv,text,family="Helvetica",pointsize="12",weight="normal"):
+    def __init__(self,master,error_sv,text,family="Helvetica",pointsize="12",weight="normal",group="subject",name=""):
         Frame.__init__(self,master)
         
         self.error_sv = error_sv
@@ -41,14 +41,31 @@ class FontPickerFrame(Frame):
         weight_entry.grid(row=3,column=1,sticky=W,padx=4)
         self.weight_entry_sv.set(weight)
         
+        group_label = Label(self,text="Group",anchor=E,justify=RIGHT)
+        group_label.grid(row=4,column=0,sticky=E,pady=6)
+        self.group_entry_sv = StringVar()
+    
+        group_entry = Combobox(self,width=13,textvariable=self.group_entry_sv,values=["subject","recordType","teacher","status"])
+        group_entry.grid(row=4,column=1,sticky=W,padx=4)
+        self.group_entry_sv.set(group)
+        
+        name_label = Label(self,text="Name",anchor=E,justify=RIGHT)
+        name_label.grid(row=5,column=0,sticky=E,pady=6)
+        self.name_entry_sv = StringVar()
+    
+        name_entry = Entry(self,textvariable=self.name_entry_sv,width=13)
+        name_entry.grid(row=5,column=1,sticky=W,padx=4)
+        self.name_entry_sv.set(name)
+        
         self.weight_entry_sv.trace("w",lambda name,index,mode,sv=self.weight_entry_sv:self.onchange())
         self.pointsize_entry_sv.trace("w",lambda name,index,mode,sv=self.pointsize_entry_sv:self.onchange())
         self.family_entry_sv.trace("w",lambda name,index,mode,sv=self.family_entry_sv:self.onchange())
+        #self.group_entry_sv.trace("w",lambda name,index,mode,sv=self.fgroup_entry_sv:self.onchange())
         
         self.grid_columnconfigure(0,weight=1,uniform="foo")
         self.grid_columnconfigure(1,weight=2,uniform="foo")
 
-        for i in range(4):
+        for i in range(5):
             self.grid_rowconfigure(i,weight=1,uniform="foo")
     
     @logger(log)
@@ -193,6 +210,10 @@ class ConfigPicker(Tk):
         self.set_pick()
 
     def set_pick(self):
+        
+        
+        _pickname = self.fontpkrframe.name_entry_sv.get()
+        
         pick = tkbutton(self.frame,text="Aa Bb Cc Dd Ee 123 %^&*#@", bd=3,command=self.set_pick)
         pick.grid(row=3+self.num_picks,column=0,columnspan=2,sticky=NSEW,pady=2)
         self.num_picks = self.num_picks + 1
@@ -201,7 +222,8 @@ class ConfigPicker(Tk):
         self.fgrgbframe.pick_widget = pick
         self.fontpkrframe.pick_widget = pick
                         
-    
+        
+        
         
 if __name__ == "__main__":
     

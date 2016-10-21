@@ -9,7 +9,7 @@ from misc_utils import nxnarraycreate, thisfuncname
 
 from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO
 from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get, TkGridCombobox, \
-     TkCombobox, Tk3Label, _tklabel
+     TkCombobox, Tk3Label, _tklabel, TkNLabel
 
 from misc_utils_objectfactory import ObjFactory
 
@@ -340,7 +340,7 @@ class WizardUI(Tk):
         return rows
 
     def viewer(self,ui=True,source_type=None,source_value=None,ztypes=None):
-
+        
         xaxis_type = self.viewxaxis_label_sv.get() # period
         yaxis_type = self.viewyaxis_label_sv.get() # dow
 
@@ -350,13 +350,22 @@ class WizardUI(Tk):
         if ztypes == None:
             ztypes = self.viewdata_label_sv.get().split(",")
         
-        source_obj = self.of.object_get(source_type,source_value)
-        
+        if source_value == "":
+            source_objs = self.of.query(source_type)
+        else:
+            source_objs = [self.of.object_get(source_type,source_value)]
+            
         xaxis_obj = self.of.query(xaxis_type)
         yaxis_obj = self.of.query(yaxis_type)
         
+        count=0
+        yaxis_enum = {}
+        for _yaxis_obj in yaxis_obj:
+            yaxis_enum[_yaxis_obj.name] = count
+            count+=1
+        
         xaxis_enum = self.enums[xaxis_type]['name2enum']
-        yaxis_enum = self.enums[yaxis_type]['code2enum']
+        #yaxis_enum = self.enums[yaxis_type]['code2enum']
         
         values = [] # contains the values displayed on the grid
         row=[''] # 
@@ -376,22 +385,36 @@ class WizardUI(Tk):
             for xval,x in xaxis_enum.iteritems():
                 celltext=[]
                 
-                for ztype in ztypes:
-                    try:
-                        _vals = source_obj.lessons[yval][xval]
-                        for _val in _vals:
-                            zval = getattr(_val,ztype)
-                            celltext.append(zval.name)
-
-                    except Exception, e:
-                        log.log(thisfuncname(),2,msg="attr not found on object",error=e,
-                                attr=ztype,xval=str(xval),yval=str(yval))
-                        celltext.append("")
+                #for ztype in ztypes:
+                for source_obj in source_objs:
+                    if source_obj.lessons.has_key(yval):
+                        if source_obj.lessons[yval].has_key(xval):
+                            _vals = source_obj.lessons[yval][xval]
+                            
+                            for _val in _vals:
+                                for ztype in ztypes:
+                                    if hasattr(_val,ztype) == True:
+                                        zval = getattr(_val,ztype)
+                                        celltext.append(zval.name)
+                                    else:
+                                        print "lesson",_val,"does not have attr",ztype
+                                celltext.append('spacer')
+                        else:
+                            print "source",source_obj.name,"yval=",yval," does not have key",xval
+                    else:
+                        print "source",source_obj.name," does not have key",yval
+                
+                if celltext == []:
+                    celltext.append("")
                 #values[x].append("\n".join(celltext))
                 
+                #values[x].append(",".join(celltext))
                 values[x].append(celltext)
                 
 
+        for row in values:
+            print row
+        
         if ui==True:
             self.bgmaxrows=len(values)
             self.bgmaxcols=len(values[0])
@@ -406,7 +429,7 @@ class WizardUI(Tk):
             except:
                 pass
             
-            mytextalphanum.widgettype = Tk3Label
+            mytextalphanum.widgettype = TkNLabel
             
             self.viewergrid = TkImageLabelGrid(self,'viewergrid',mytextalphanum,10,10,0,0,self.bgmaxrows,self.bgmaxcols,True,False,{},widgetcfg,1)
         
@@ -420,21 +443,32 @@ class WizardUI(Tk):
 
                     if isinstance(_value,list) == True:
 
-                        widget.toplable_sv.set(_value[0])
-                        widget.midlable_sv.set(_value[1])
-                        widget.botlable_sv.set(_value[2])
+                        for i in range(len(_value)):
+                            if _value[i] == "spacer":
+                                widget.addspacer()
+                            elif _value[i] <> "":
+                                _widget,_widget_sv = widget.addlabel()
+                                _widget_sv.set(_value[i])
+                        #widget.toplable_sv.set(_value[0])
+                        #widget.midlable_sv.set(_value[1])
+                        #widget.botlable_sv.set(_value[2])
                     else:
+                        expand=False
                         if x == 0 or y == 0:
-                            widget.midlable_sv.set(_value)
-                        else:
-                            widget.toplable_sv.set(_value)
+                            expand=True
+                            
+                        _widget,_widget_sv = widget.addlabel(expand)
+                        _widget_sv.set(_value)                    
+                            #widget.midlable_sv.set(_value)
+                        #else:
+                            #widget.toplable_sv.set(_value)
                     
-                    if x > 0 and y > 0:
+                    '''if x > 0 and y > 0:
                         key = [self.enums[xaxis_type]['enum2name'][x],self.enums[yaxis_type]['code'][y-1],source_value]                           
                         #widget.bind("<Button-1>",lambda e,key=key:self.dump(key))
                         widget.toplable.bind("<Button-1>",lambda e,key=key:self.dump(key))
                         widget.botlable.bind("<Button-1>",lambda e,key=key:self.dump(key))
-                        widget.midlable.bind("<Button-1>",lambda e,key=key:self.dump(key))
+                        widget.midlable.bind("<Button-1>",lambda e,key=key:self.dump(key))'''
                     
         else:
             results = []
@@ -548,22 +582,23 @@ class WizardUI(Tk):
         student = lesson.student.objid
         dow = lesson.dow.objid
         
-        # add the lesson to the teacher object
-        teacher = lesson.teacher
-        if hasattr(teacher,'lessons') == False:
-            setattr(teacher,'lessons',{})
-          
-        if teacher.lessons.has_key(dow) == False:
-            teacher.lessons[dow] = {} 
-
-        if teacher.lessons[dow].has_key(period) == False:
-            teacher.lessons[dow][period] = []
-            
-        teacher.lessons[dow][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to teacher",dow=str(dow),period=str(period),
-                 session=str(lesson.session.name),teacher=str(lesson.teacher.name))
         
-        # add the lesson to the student object
+        # add the lesson to the adult object
+        adult = lesson.adult
+        if hasattr(adult,'lessons') == False:
+            setattr(adult,'lessons',{})
+          
+        if adult.lessons.has_key(dow) == False:
+            adult.lessons[dow] = {} 
+
+        if adult.lessons[dow].has_key(period) == False:
+            adult.lessons[dow][period] = []
+            
+        adult.lessons[dow][period].append(lesson)
+        log.log(thisfuncname(),9,msg="lesson added to adult",dow=str(dow),period=str(period),
+                 session=str(lesson.session.name),adult=str(lesson.adult.name))
+        
+        # add the lesson to the student object (indexed by dow/period)
         student = lesson.student
         if hasattr(student,'lessons') == False:
             setattr(student,'lessons',{})
@@ -575,9 +610,25 @@ class WizardUI(Tk):
             student.lessons[dow][period] = []
             
         student.lessons[dow][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to student",dow=str(dow),period=str(period),
+        log.log(thisfuncname(),9,msg="lesson added to student (dow/period index)",dow=str(dow),period=str(period),
                 session=str(lesson.session.name),student=str(lesson.student.name))
+        
+        #adult = self.enums['adult']['name2code'][lesson.adult.objid]
+        
+        adult = lesson.adult.objid
+        
+        # add the lesson to the student object (indexed by adult/period)
+        if student.lessons.has_key(adult) == False:
+            student.lessons[adult] = {}
             
+        if student.lessons[adult].has_key(period) == False:
+            student.lessons[adult][period] = []
+            
+        student.lessons[adult][period].append(lesson)
+        log.log(thisfuncname(),9,msg="lesson added to student (adult/period index)",adult=str(adult),period=str(period),
+                session=str(lesson.session.name),student=str(lesson.student.name))
+        
+        
     @logger(log)
     def _clear_grid(self,gridname,firstrow,firstcol):
         grid = getattr(self,gridname)
@@ -688,9 +739,9 @@ class WizardUI(Tk):
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
             
-            print exec_str
-            
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
+        
+        cols = ['period','student','session','dow','adult','subject','userobjid','status','substatus','recordtype','source']
         
         # parse rows
         for row in rows:
@@ -701,7 +752,7 @@ class WizardUI(Tk):
             _,lessontype_code,_,_ = datamembers['session'].split(".")
             #lessontype = self.enums['lessontype']['code2name'][lessontype_code]      
             datamembers['objtype'] = 'lesson'                               
-            
+
             lesson = self.of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
                                  constructor='datamembers',database=self.database,
                                  of=self.of,modname=__name__,dm=datamembers)

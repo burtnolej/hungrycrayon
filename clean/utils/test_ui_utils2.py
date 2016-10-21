@@ -14,7 +14,7 @@ from type_utils import SetMemberPartial, DBSetMember, TextAlphaNumRO, TrueFalse
 
 from ui_utils import TkImageWidget, TkImageLabelGrid, geometry_get, font_scale, \
      tkwidgetfactory, geometry_get_dict, tkwidgetimage_set, fontscale, \
-     TkCombobox, TkButton, TkEntry, TkLabel, Tk3Label
+     TkCombobox, TkButton, TkEntry, TkLabel, Tk3Label, TkNLabel
 import tkFont
 import unittest
 
@@ -1382,6 +1382,69 @@ class TestUIScheduler(TestWidget):
         
         self.master.mainloop()
         
+        
+class TestUISchedulerNLabel(TestWidget):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry("400x200+0+0")
+   
+        self.maxrows=15 # rows in the grid
+        self.maxcols=5 # cols in the grid
+        self.maxwidgets=self.maxrows*self.maxcols
+        self.wwidth=48 # default button width with text of 3 chars
+        self.wheight=29 # default button height
+        self.wmheight=self.wheight*self.maxrows # master height
+        self.wmwidth=self.wwidth*self.maxcols # master width
+      
+        #font = tkFont.Font(family="monospace", size=12) 
+        self.style = Style()
+        self.style.theme_use("default")
+        
+        self.mytextalphanum = TextAlphaNum(name='textalphanum')
+        widget_args=dict(background='white',width=9)
+        widgetcfg = nxnarraycreate(self.maxrows,self.maxcols,widget_args)
+
+        self.mytextalphanum.widgettype = TkNLabel
+        self.tkilg = TkImageLabelGrid(self.master,'grid',self.mytextalphanum,
+                                      self.wmwidth,self.wmheight,
+                                      0,0,self.maxrows,self.maxcols
+                                      ,True,True,{},widgetcfg)
+
+        self.tkilg.grid(row=0,column=0,sticky=NSEW)
+        self.master.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.master.grid_columnconfigure(0, weight=1, uniform="foo") 
+        
+    def test_(self):
+        
+        self.master.mainloop()
+        
+        
+class TestUINLabel(TestWidget):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry("400x200+0+0")
+        self.tknlabel = TkNLabel(self.master,None)
+        self.tknlabel.grid(sticky=NSEW)
+        self.master.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.master.grid_columnconfigure(0, weight=1, uniform="foo") 
+        
+    def test_(self):
+    
+        for i in range(3):
+            _widget,_widget_sv = self.tknlabel.addlabel()
+            self.tknlabel.addspacer(1,'green')
+            _widget_sv.set(i)
+            
+        self.tknlabel.addspacer(5)
+        
+        for i in range(3):
+            _widget,_widget_sv = self.tknlabel.addlabel()
+            self.tknlabel.addspacer(1,'green')
+            _widget_sv.set(i)
+        
+        self.master.mainloop()
+    
+        
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
@@ -1392,7 +1455,7 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTk3Label))
     
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUIScheduler))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUINLabel))
     unittest.TextTestRunner(verbosity=2).run(suite)
     exit()
     

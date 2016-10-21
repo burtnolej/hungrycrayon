@@ -364,21 +364,21 @@ def _isenum(enums,objtype,value):
 	if value in enums[objtype]['enum2name'].keys(): 
 	    return value
     except KeyError:
-	log.log(thisfuncname(),2,msg="could not lookup enum2name",objtype=objtype,value=value)
+	log.log(thisfuncname(),2,msg="could not lookup enum2name",objtype=objtype,value=str(value))
 	return "??"
     
     try:
 	if value in enums[objtype]['name']:
 	    return enums[objtype]['name2enum'][value]
     except KeyError:
-	log.log(thisfuncname(),2,msg="could not lookup name2enum",objtype=objtype,value=value)
+	log.log(thisfuncname(),2,msg="could not lookup name2enum",objtype=objtype,value=str(value))
 	return "??"
     
     try:
 	if value in enums[objtype]['code2enum'].keys():
 	    return enums[objtype]['code2enum'][value]
     except KeyError:
-	log.log(thisfuncname(),2,msg="could not lookup code2enum",objtype=objtype,value=value)
+	log.log(thisfuncname(),2,msg="could not lookup code2enum",objtype=objtype,value=str(value))
 	return "??"
     
 def _isname(enums,objtype,value):    
@@ -388,21 +388,21 @@ def _isname(enums,objtype,value):
 	if value in enums[objtype]['name']: 
 	    return value
     except KeyError:
-	log.log(thisfuncname(),2,msg="could not lookup name",objtype=objtype,value=value)
+	log.log(thisfuncname(),2,msg="could not lookup name",objtype=objtype,value=str(value))
 	return "??"
     
     try:
 	if value in enums[objtype]['code2name'].keys():
 	    return enums[objtype]['code2name'][value]
     except KeyError:
-	log.log(thisfuncname(),2,msg="could not lookup code2name",objtype=objtype,value=value)
+	log.log(thisfuncname(),2,msg="could not lookup code2name",objtype=objtype,value=str(value))
 	return "??"
     
     try:
 	if value in enums[objtype]['enum2name'].keys():
 	    return enums[objtype]['enum2name'][value]
     except KeyError:
-	log.log(thisfuncname(),2,msg="could not lookup enum2name",objtype=objtype,value=value)
+	log.log(thisfuncname(),2,msg="could not lookup enum2name",objtype=objtype,value=str(value))
 	return "??"
     
 def _iscode(enums,objtype,value):    
@@ -411,14 +411,14 @@ def _iscode(enums,objtype,value):
 	if value in enums[objtype]['code2name'].keys():
 	    return value
     except KeyError:
-	log.log(thisfuncname(),2,msg="could not lookup code2name",objtype=objtype,value=value)
+	log.log(thisfuncname(),2,msg="could not lookup code2name",objtype=objtype,value=str(value))
 	return "??"
 	
     try:
 	if value in enums[objtype]['name']:
 	    return enums[objtype]['name2code'][value]
     except KeyError:
-	log.log(thisfuncname(),2,msg="could not lookup name2code",objtype=objtype,value=value)
+	log.log(thisfuncname(),2,msg="could not lookup name2code",objtype=objtype,value=str(value))
 	return "??"
 
 def _loadprepmapper(database):
