@@ -516,23 +516,13 @@ class WizardUI(Tk):
                                         zval = getattr(_val,ztype)
                                         
                                         celltext = _additem(celltext,zval.name)
-                                        #celltext.append(zval.name)
-                                    #else:
-                                        #print "lesson",_val,"does not have attr",ztype
                                 
                                 _valcount+=1
-                        #else:
-                            #print "source",source_obj.name,"yval=",yval," does not have key",xval
-                    #else:
-                        #print "source",source_obj.name," does not have key",yval
                 
                 if celltext == []:
                     celltext.append("")
                     
                 values[x].append(celltext)
-                
-        #for row in values:
-        #    print row
         
         if ui==True:
             self.bgmaxrows=len(values)
@@ -626,18 +616,7 @@ class WizardUI(Tk):
 
                     obj_id = ",".join(map(str,[period_enum,student_enum,session_enum]))
                     
-                    #obj_id = session
-
                     teacher_code,lessontype_code,subject_code,dow = session.split(".")
-                    
-                    # get the column and row headers associated with this cell
-                    #student = self.entrygrid.widgets[0][y].sv.get()
-                    #period = self.entrygrid.widgets[x][0].sv.get()
-
-                    '''teacher = self.enums['adult']['code2enum'][teacher_code]
-                    lessontype = self.enums['lessontype']['code2enum'][lessontype_code]
-                    subject = self.enums['subject']['code2enum'][subject_code]'''
-                    
 
                     teacher = self.enums['adult']['code2name'][teacher_code]
                     lessontype = self.enums['lessontype']['code2name'][lessontype_code]
@@ -667,13 +646,6 @@ class WizardUI(Tk):
                     setattr(self.entrygrid.widgets[x][y],"lesson",lesson)
                 
                     self.lesson_change(lesson)
-        
-        #$self.teacher_schedule_calc() 
-        #self.student_schedule_calc()
-            
-        #self.dbload_entry_sv.set(self.lastsaveversion)
-            
-        #self.lastsaveversion+=1
 
     def _lesson_change_event(self,event):
         
@@ -921,9 +893,8 @@ def dump2csv(results,conflicts_only):
         print ",".join(output_row)
         
 if __name__ == "__main__":
-    #master = Tk()
     
-    enableui = False
+    enableui = True
     
     if len(sys.argv) <= 1:
         raise Exception("provide a database name; no extension")
@@ -946,8 +917,7 @@ if __name__ == "__main__":
         app.mainloop()       
     else:
         app.load(saveversion=1,student="")
-        
-        
+
         for dow in ['MO','TU','WE','TH','FR']:
             results = app.viewer(ui=False,source_type="adult",ztypes=['adult','subject'],
                                  source_value="",yaxis_type="student",constraints=[('dow',dow)])

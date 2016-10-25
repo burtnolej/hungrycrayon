@@ -413,17 +413,8 @@ class SSLoader(object):
 		    
 		# special use cases
 		elif recordtype == 'computertime':
-		    if self.prep <> -1:
-			#students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
-			students = [studentname]
-			students.sort()
-			teacher = "??"
-			subject = "Computer Time"
-			dow = self.valid_values['dow'][dowidx]
-			_record = [locals()[field] for field in self.fields]
-			_records.append(_record)
-			log.log(thisfuncname(),10,msg="record added",record=_record)
-		    elif studentfile == True:
+		    if studentfile == True:
+			#studentname = self.extract_staff(record)
 			students = [studentname]
 			teacher = "??"
 			subject = "Computer Time"
@@ -431,6 +422,19 @@ class SSLoader(object):
 			_record = [locals()[field] for field in self.fields]
 			_records.append(_record)
 			log.log(thisfuncname(),10,msg="record addede",record=_record)
+
+		    
+		    elif self.prep <> -1:
+			
+			students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
+			#students = [studentname]
+			students.sort()
+			teacher = "??"
+			subject = "Computer Time"
+			dow = self.valid_values['dow'][dowidx]
+			_record = [locals()[field] for field in self.fields]
+			_records.append(_record)
+			log.log(thisfuncname(),10,msg="record added",record=_record)
 		    else:
 			subject = "Computer Time"
     
@@ -1081,7 +1085,15 @@ class SSLoader(object):
     	
     def ssloader(self,files,databasename="htmlparser"):
         
-        for _file,prep,dbloader,_source in files:
+        for file in files:
+	    
+	    if len(file) == 4:
+		_file,prep,dbloader,_source = file
+	    elif len(file) == 3:
+		_file,prep,dbloader = file
+		_source = _file
+	    else:
+		log.log(thisfuncname(),0,msg="only 3 or 4 args accepted in file tuple descriptor")
             
             log.log(thisfuncname(),3,msg="loading",file=_file,prep=prep,dbloaderflag=dbloader)
 	    

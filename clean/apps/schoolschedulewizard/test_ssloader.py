@@ -1511,7 +1511,8 @@ class Test_DBLoader(Test_Base):
         expected_results =  [['Thea.STEM.Tuesday.100-140', 'Tuesday',7,'Thea', 'STEM'], 
                              ['Jess.Humanities.Wednesday.1210-100', 'Wednesday',6, 'Jess','Humanities']]
             
-            
+        self.ssloader.sourcecode = "test" 
+        
         self.ssloader.dbloader(records)
         
         database = Database(self.databasename)
@@ -1529,7 +1530,7 @@ class Test_DBLoader(Test_Base):
         expected_results =  [['Simon A', 'TU','100-140','Thea', 'STEM','Thea.STEM.Tuesday.100-140'], 
                              ['Liam', 'WE','1210-100', 'Jess','Humanities','Jess.Humanities.Wednesday.1210-100']]
             
-            
+        self.ssloader.sourcecode = "test" 
         self.ssloader.dbloader(records)
         
         database = Database(self.databasename)
@@ -2141,13 +2142,45 @@ class Test_DBLoader_New(Test_Base):
         self.ssloader = SSLoader("test_ssloader")    
         self.ssloader.ssloader([('prep56new.csv',-1,True)],self.databasename)
         
+        expected_results = [['test', u'Peter', u'Coby', u'Clayton', u'Booker', u'Orig', u'Stephen', u'Oscar', u'OmerC', u'Yosef', u'Jack', u'Bruno', u'Simon A', u'Thomas', u'Tristan', u'Ashley', u'Jake', u'Nathaniel'],
+                            [u'ELA', 4, 4, 4, 1, 3, 2, 2, 2, 1, 2, 3, 3, 2, 3, 4, 2, 3],
+                            [u'Math', 4, 2, 2, 2, 4, 3, 4, 1, 4, 2, 1, 4, 4, 0, 4, 4, 4],
+                            [u'History', 4, 4, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 1, 3, 3, 4],
+                            [u'Engineering', 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Science', 2, 2, 3, 1, 3, 3, 2, 2, 4, 3, 4, 2, 4, 4, 4, 2, 4],
+                            [u'??', 2, 4, 2, 1, 1, 0, 0, 3, 1, 1, 0, 2, 1, 1, 0, 0, 0],
+                            [u'Student News', 1, 0, 0, 0, 2, 0, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+                            [u'Movement', 1, 2, 2, 0, 1, 0, 0, 1, 2, 0, 2, 2, 1, 2, 1, 1, 0],
+                            [u'Activity Period', 0, 4, 1, 0, 0, 2, 0, 1, 1, 0, 0, 0, 1, 2, 0, 3, 0],
+                            [u'Core', 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Biology', 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            [u'Math Activity Period', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                            [u'Psychology', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                            [u'Chess', 0, 2, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 2, 1],
+                            [u'Italian', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 3, 0, 0, 0],
+                            [u'Work Period', 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                            [u'Debate', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
+                            [u'Music', 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            ['test', 19, 24, 19, 8, 23, 17, 17, 17, 19, 13, 17, 20, 17, 17, 16, 17, 16]]
+
         results = _pivotexecfunc(self.ssloader.database,'test','student','subject','lesson',distinct=True,master=False)
         
-        for row in results:
-            print row
-        #self.assertListEqual(expected_results,results)
+
+        self.assertListEqual(expected_results,results)
         
     def test_lesson_records(self):
+
+        
+        expected_results = [[u'complete', u'MO', u'830-910', u'Amelia.ELA.Monday.830-910', u'Peter'],
+                            [u'complete', u'MO', u'830-910', u'Amelia.ELA.Monday.830-910', u'Coby'],
+                            [u'complete', u'MO', u'830-910', u'Stan.Math.Monday.830-910', u'Clayton'],
+                            [u'complete', u'MO', u'830-910', u'Samantha.History.Monday.830-910', u'Peter'],
+                            [u'complete', u'MO', u'830-910', u'Samantha.History.Monday.830-910', u'Booker'],
+                            [u'complete', u'MO', u'830-910', u'Paraic.Engineering.Monday.830-910', u'Orig'],
+                            [u'complete', u'MO', u'830-910', u'Paraic.Engineering.Monday.830-910', u'Stephen'],
+                            [u'complete', u'MO', u'830-910', u'Paraic.Engineering.Monday.830-910', u'Oscar'],
+                            [u'complete', u'MO', u'830-910', u'Paraic.Engineering.Monday.830-910', u'OmerC'],
+                            [u'complete', u'MO', u'830-910', u'Paraic.Science.Monday.830-910', u'Yosef']]
 
         cols = ['status','dow','period','session','student']
         
@@ -2155,6 +2188,12 @@ class Test_DBLoader_New(Test_Base):
     
         self.ssloader = SSLoader("test_ssloader")        
         self.ssloader.run("test_ssloader",files)
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['source','=',"\"" + "prep56new.csv" + "\""],['dow','=',"\"MO\""],['period','=',"\"830-910\""]])
+            
+        self.assertListEqual(expected_results,rows)
+            
         
 class Test_DBLoader_Academic_Stan(unittest.TestCase):
     
@@ -2708,7 +2747,7 @@ if __name__ == "__main__":
     
     
     # pre_process_records
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Primary_Set_Session))    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_New))    
     #unittest.TextTestRunner(verbosity=2).run(suite) 
     #exit()
     
