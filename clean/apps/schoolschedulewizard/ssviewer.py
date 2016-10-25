@@ -133,7 +133,7 @@ class WizardUI(Tk):
         
         self.geometry(str(screenwidth) + "x" + str(screenheight) +"+0+0")
         
-        wx = 12
+        wx = 8
         
         self.refdatabase = Database(refdbname)
         
@@ -145,7 +145,7 @@ class WizardUI(Tk):
         self.of = of
 
         
-        font = tkFont.Font(family="monospace", size=16) 
+        font = tkFont.Font(family="monospace", size=12) 
         self.font = font
         
         self.lastsaveversion=0
@@ -424,17 +424,28 @@ class WizardUI(Tk):
 
         
         
-    def viewer(self,ui=True,source_type=None,source_value=None,ztypes=None):
+    def viewer(self,ui=True,source_type=None,source_value=None,
+               ztypes=None,yaxis_type=None,xaxis_type=None,
+               conflicts_only=None,constraints=None):
         
-        xaxis_type = self.viewxaxis_label_sv.get() # period
-        yaxis_type = self.viewyaxis_label_sv.get() # dow
-
+        # constraint will be a list of tuples of the form
+        # objtype,objvalue i.e. ('dow','MO')
+        
+        if conflicts_only == None:
+            conflicts_only = self.conflict_checkbutton_sv.get() 
+            
+        if yaxis_type == None:
+            yaxis_type = self.viewyaxis_label_sv.get() # dow
+            
+        if xaxis_type == None:
+            xaxis_type = self.viewxaxis_label_sv.get() # period
+        
         if source_type == None or source_value == None:
             source_type,source_value = self.viewfocus_label_sv.get().split("=")
         
         if ztypes == None:
             ztypes = self.viewdata_label_sv.get().split(",")
-        
+            
         if source_value == "":
             source_objs = self.of.query(source_type)
         else:
@@ -488,6 +499,16 @@ class WizardUI(Tk):
                             _vals = source_obj.lessons[yval][xval]
                             _valcount=0
                             for _val in _vals:
+                                
+                                if constraints <> None:
+                                    flag=False
+                                    for objtype,objval in constraints:
+                                        
+                                        if getattr(_val,objtype).name <> objval:
+                                            flag=True
+                                    if flag == True:
+                                        continue
+                                            
                                 if _valcount >= 1:
                                     celltext.append('spacer')
                                 for ztype in ztypes:
@@ -496,23 +517,22 @@ class WizardUI(Tk):
                                         
                                         celltext = _additem(celltext,zval.name)
                                         #celltext.append(zval.name)
-                                    else:
-                                        print "lesson",_val,"does not have attr",ztype
+                                    #else:
+                                        #print "lesson",_val,"does not have attr",ztype
                                 
                                 _valcount+=1
-                        else:
-                            print "source",source_obj.name,"yval=",yval," does not have key",xval
-                    else:
-                        print "source",source_obj.name," does not have key",yval
+                        #else:
+                            #print "source",source_obj.name,"yval=",yval," does not have key",xval
+                    #else:
+                        #print "source",source_obj.name," does not have key",yval
                 
                 if celltext == []:
                     celltext.append("")
                     
                 values[x].append(celltext)
                 
-
-        for row in values:
-            print row
+        #for row in values:
+        #    print row
         
         if ui==True:
             self.bgmaxrows=len(values)
@@ -548,7 +568,7 @@ class WizardUI(Tk):
                             elif _value[i] <> "":
                                 _bg,_fg = self.color_get(_value[i])
                                 
-                                if self.conflict_checkbutton_sv.get() == "Y":
+                                if conflicts_only == "Y":
                                     if _bg <> 'red':
                                         continue
                                 
@@ -557,37 +577,15 @@ class WizardUI(Tk):
                                 
                                 _widget.config(background=_bg,foreground=_fg,height=self.wheight_label_sv.get())
                                 
-                                
-                                    
-                        #widget.toplable_sv.set(_value[0])
-                        #widget.midlable_sv.set(_value[1])
-                        #widget.botlable_sv.set(_value[2])
                     else:
                         expand=False
                         if x == 0 or y == 0:
                             expand=True
                             
                         _widget,_widget_sv = widget.addlabel(expand)
-                        _widget_sv.set(_value)                    
-                            #widget.midlable_sv.set(_value)
-                        #else:
-                            #widget.toplable_sv.set(_value)
-                    
-                    '''if x > 0 and y > 0:
-                        key = [self.enums[xaxis_type]['enum2name'][x],self.enums[yaxis_type]['code'][y-1],source_value]                           
-                        #widget.bind("<Button-1>",lambda e,key=key:self.dump(key))
-                        widget.toplable.bind("<Button-1>",lambda e,key=key:self.dump(key))
-                        widget.botlable.bind("<Button-1>",lambda e,key=key:self.dump(key))
-                        widget.midlable.bind("<Button-1>",lambda e,key=key:self.dump(key))'''
-                    
+                        _widget_sv.set(_value)                                       
         else:
-            results = []
-            for x in range(len(values)):
-                row=[]
-                for y in range(len(values[x])):
-                    row.append(values[x][y])
-                results.append(row)
-            return results
+            return values
             
         self.viewergrid.reset_framewidth()
         self.viewergrid.resize_canvasframe()
@@ -778,7 +776,7 @@ class WizardUI(Tk):
         self.of.store={}
 
     @logger(log)       
-    def load(self,saveversion=None,values=None, dow=None, prep=None, period=None, teacher=None, student=None, source=None):
+    def load(self,saveversion=None, dow=None, prep=None, period=None, teacher=None, student=None, source=None):
         
         self.of.reset()
         
@@ -863,8 +861,6 @@ class WizardUI(Tk):
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
             
-            print exec_str
-            
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
         
         cols = ['period','student','session','dow','adult','subject','userobjid','status','substatus','recordtype','source']
@@ -906,10 +902,28 @@ class WizardUI(Tk):
         except Exception:
             return(-1)
 
+def dump2csv(results,conflicts_only):
+
+    for row in results:
+        output_row = []
+        for item in row:
+            
+            if isinstance(item,list) == True:
+                output_cell = []
+                for _item in item:
+                    if conflicts_only == "Y":
+                        if _item.count("[") <> 1 or _item.count("]") <> 1:
+                            continue
+                    output_cell.append(_item.replace(",","/"))    
+                output_row.append(" ".join(output_cell))
+            else:
+                output_row.append(str(item))
+        print ",".join(output_row)
+        
 if __name__ == "__main__":
     #master = Tk()
     
-    enableui = True
+    enableui = False
     
     if len(sys.argv) <= 1:
         raise Exception("provide a database name; no extension")
@@ -925,12 +939,18 @@ if __name__ == "__main__":
         
     of = ObjFactory(True)
     app = WizardUI(sys.argv[1],of,sys.argv[1],maxentrycols=12,maxentryrows=20)
-        
+    
+    conflicts_only="Y"
+    
     if enableui == True:
         app.mainloop()       
     else:
-        app.load()
-        app.viewer(False)
+        app.load(saveversion=1,student="")
         
-    
+        
+        for dow in ['MO','TU','WE','TH','FR']:
+            results = app.viewer(ui=False,source_type="adult",ztypes=['adult','subject'],
+                                 source_value="",yaxis_type="student",constraints=[('dow',dow)])
+        
+            dump2csv(results,"Y")
     
