@@ -414,7 +414,8 @@ class SSLoader(object):
 		# special use cases
 		elif recordtype == 'computertime':
 		    if self.prep <> -1:
-			students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
+			#students = [name for name,prep in self.prepmap.iteritems() if prep == str(self.prep)]
+			students = [studentname]
 			students.sort()
 			teacher = "??"
 			subject = "Computer Time"
@@ -877,7 +878,7 @@ class SSLoader(object):
 			new_value = orig_value
 		    
             except SSLoaderNoMatchException:
-                log.log(thisfuncname(),2,msg="failed to validate field, skipping record",field=self.fields[i],
+                log.log(thisfuncname(),2,msg="failed to validate field, skipping record",value=str(record[i]),field=self.fields[i],
 		        record=record,file=self.inputfile)
 		raise SSLoaderBadTokenException
 
@@ -949,8 +950,8 @@ class SSLoader(object):
 		
 		dblessonrows.append(_record)
 		
-	dbinsert_direct(self.database,dbsessionrows,'session',self.inputfile,masterstatus=False)
-	dbinsert_direct(self.database,dblessonrows,'lesson',self.inputfile,masterstatus=False)    
+	dbinsert_direct(self.database,dbsessionrows,'session',self.sourcecode,masterstatus=False)
+	dbinsert_direct(self.database,dblessonrows,'lesson',self.sourcecode,masterstatus=False)    
 
     def primary_record_set_session(self):
 	
@@ -1080,12 +1081,13 @@ class SSLoader(object):
     	
     def ssloader(self,files,databasename="htmlparser"):
         
-        for _file,prep,dbloader in files:
+        for _file,prep,dbloader,_source in files:
             
             log.log(thisfuncname(),3,msg="loading",file=_file,prep=prep,dbloaderflag=dbloader)
 	    
             self.inputfile = _file
 	    self.prep = prep
+	    self.sourcecode = _source # shortname for source file
 	    
             fileasstring = self.file2string(_file)
 	    log.log(thisfuncname(),15,fileasstring=fileasstring)
@@ -1169,7 +1171,7 @@ if __name__ == "__main__":
 	databasename = "quad"
 	shutil.copyfile(databasename+".sqlite.backup",databasename+".sqlite")
 
-	files = [("prep4student.csv",4,True),
+	'''files = [("prep4student.csv",4,True),
 	         ("prep5student.csv",5,True),
 	         ("prep6student.csv",6,True),
 	         ("prep4data.csv",4,True),
@@ -1177,7 +1179,19 @@ if __name__ == "__main__":
 	         ("prep6data.csv",6,True),
 	         ("staff.csv",-1,True),
 	         ("academic.csv",-1,True),
-	         ('prep56new.csv',-1,True)]
+	         ('prep56new.csv',-1,True)]'''
+	
+	files = [("/mnt/bumblebee-burtnolej/googledrive/Prep6IndividualSchedules_new.csv",6,True,"6s"),
+	         ("/mnt/bumblebee-burtnolej/googledrive/Prep4IndividualSchedules_new.csv",4,True,"4s"),
+	         ("/mnt/bumblebee-burtnolej/googledrive/Prep5IndividualSchedules_new.csv",5,True,"5s"),
+	         ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",5,True,"56n"),
+	          ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep4schedulenewworkperiod.csv",5,True,"4n")]
+	
+	#files = [("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",-1,True),
+	#          ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep4schedulenewworkperiod.csv",-1,True)]
+	
+	#files = [("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",-1,True)]
+	                                          
 	
     else:
 	raise Exception("do not know how to run in this working dir",dir=os.getcwd())

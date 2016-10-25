@@ -771,7 +771,7 @@ class TkNLabel(_tkframe,TKBase):
         
         _tkframe.__init__(self,master,borderwidth=2,bg='blue')
         
-        self.font = tkFont.Font(family="monospace", size=8) 
+        self.font = tkFont.Font(family="monospace", size=16) 
         
         #self.addlabel()
         #self.addlabel()

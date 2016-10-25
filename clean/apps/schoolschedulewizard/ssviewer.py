@@ -23,6 +23,8 @@ from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 from Tkinter import *
 from ttk import *
 
+from Tkinter import Checkbutton as _checkbutton
+
 from collections import OrderedDict
 
 import tkFont
@@ -90,10 +92,6 @@ class schoolschedgeneric(dbtblgeneric):
             
         return(getattr(self,clsname))
     
-    #def __repr__(self):
-    #    
-    #    print "r=",self.recursion,"objid",self.objid,type(self.objid)
-    #    return(self.objid)
 
 class WizardUI(Tk):
     #def __init__(self,database,of):
@@ -108,7 +106,7 @@ class WizardUI(Tk):
         Tk.__init__(self)
         
         #self.colorpalette = dict(recordtype=dict(wp='green',subject='blue',ap='yellow'))
-        self.colorpalette = dict(wp='green',subject='blue',ap='yellow',
+        self.colorpalette = dict(wp='green',subject=lightblue,ap='yellow',
                                  Movement=pink,ELA=salmon,Humanities=lightyellow,
                                  Counseling=lightgreen,Math=lightturquoise, 
                                  Music=lightblue,STEM=lavender,Art=purple,History=pink,
@@ -126,20 +124,8 @@ class WizardUI(Tk):
                                 Samantha=lightgreen,Alexa='blue',Francisco=purple,
                                 Melissa=lightblue,Rahul=dirtyyellow,Dylan=dirtyyellow, 
                                 Moira=dirtyyellow,Issey=dirtyyellow, Daryl=dirtyyellow, 
-                                 Karolina=dirtyyellow)
-                                
-                                
-        ''',ap='yellow',ELA=salmon,Humanities=lightyellow,
-        Movement=pink
-        
-        ,History=pink,
-        Core=karky,Chess=burgundy,
-    computertime='darkgrey',Speech=darkburgundy,
-    Student_News=darkgrey,Computer_Time=brown,
-    Activity_Period=mauve)'''
-        
-        
-        
+                                Karolina=dirtyyellow,Chess=pink,Student_News=lightyellow,
+                                subject='blue')
         
         
         screenwidth = self.winfo_vrootwidth()
@@ -147,7 +133,7 @@ class WizardUI(Tk):
         
         self.geometry(str(screenwidth) + "x" + str(screenheight) +"+0+0")
         
-        wx = 8
+        wx = 12
         
         self.refdatabase = Database(refdbname)
         
@@ -159,7 +145,7 @@ class WizardUI(Tk):
         self.of = of
 
         
-        font = tkFont.Font(family="monospace", size=8) 
+        font = tkFont.Font(family="monospace", size=16) 
         self.font = font
         
         self.lastsaveversion=0
@@ -344,16 +330,21 @@ class WizardUI(Tk):
         self.viewdata_label.focus_get()
         self.viewdata_label_sv.set("subject,teacher,recordtype")
         
+        self.wheight_label = Label(self.viewcontrolpanel,text="data",width=wx,font=font,anchor=E)
+        self.wheight_label.grid(row=0,column=12,pady=5)
+        self.wheight_label.focus_get()
+        self.wheight_label_sv = StringVar()
+        self.wheight_label = Entry(self.viewcontrolpanel,textvariable=self.wheight_label_sv,width=wx,font=font)
+        self.wheight_label.grid(row=0,column=13,pady=5)
+        self.wheight_label.focus_get()
+        self.wheight_label_sv.set(1)
+                                  
+        self.conflict_checkbutton_sv = StringVar()
+        self.conflict_checkbutton = _checkbutton(self.viewcontrolpanel, text="conflicts only", variable=self.conflict_checkbutton_sv,
+                                                onvalue="Y", offvalue="N",width=wx*2,font=font)
+        self.conflict_checkbutton.grid(row=0,column=14,pady=5)
 
-
-
-        #self.recalc_button = Button(self.viewcontrolpanel,command=self.viewer,text="calc",name="vc")
-        #self.recalc_button.grid(row=0,column=10)
-        #self.recalc_button.focus_get()
         
-        #self.grid_rowconfigure(0, weight=1, uniform="foo")
-        #self.grid_rowconfigure(1, weight=1, uniform="foo")
-        #self.grid_rowconfigure(2, weight=1, uniform="foo")
         self.grid_columnconfigure(0, weight=1, uniform="foo")
             
     def dump(self,value):
@@ -473,19 +464,28 @@ class WizardUI(Tk):
 
         ymax = len(values[0])
         xmax = len(values)-1
-
+        
+        def _additem(celltext,item):
+            
+            if len(celltext) == 0:
+                celltext.append(item)
+            else:
+                try:
+                    celltext.index(item)
+                except:
+                    celltext.append(item)
+            return(celltext)
+                
+            
         for yval,y in yaxis_enum.iteritems():
 
             for xval,x in xaxis_enum.iteritems():
                 celltext=[]
                 
-                #for ztype in ztypes:
                 for source_obj in source_objs:
                     if source_obj.lessons.has_key(yval):
                         if source_obj.lessons[yval].has_key(xval):
                             _vals = source_obj.lessons[yval][xval]
-                            
-                            
                             _valcount=0
                             for _val in _vals:
                                 if _valcount >= 1:
@@ -493,7 +493,9 @@ class WizardUI(Tk):
                                 for ztype in ztypes:
                                     if hasattr(_val,ztype) == True:
                                         zval = getattr(_val,ztype)
-                                        celltext.append(zval.name)
+                                        
+                                        celltext = _additem(celltext,zval.name)
+                                        #celltext.append(zval.name)
                                     else:
                                         print "lesson",_val,"does not have attr",ztype
                                 
@@ -505,9 +507,7 @@ class WizardUI(Tk):
                 
                 if celltext == []:
                     celltext.append("")
-                #values[x].append("\n".join(celltext))
-                
-                #values[x].append(",".join(celltext))
+                    
                 values[x].append(celltext)
                 
 
@@ -546,12 +546,19 @@ class WizardUI(Tk):
                             if _value[i] == "spacer":
                                 widget.addspacer()
                             elif _value[i] <> "":
+                                _bg,_fg = self.color_get(_value[i])
+                                
+                                if self.conflict_checkbutton_sv.get() == "Y":
+                                    if _bg <> 'red':
+                                        continue
+                                
                                 _widget,_widget_sv = widget.addlabel()
                                 _widget_sv.set(_value[i])
                                 
-                                _bg,_fg = self.color_get(_value[i])
-                                _widget.config(background=_bg,foreground=_fg)
+                                _widget.config(background=_bg,foreground=_fg,height=self.wheight_label_sv.get())
                                 
+                                
+                                    
                         #widget.toplable_sv.set(_value[0])
                         #widget.midlable_sv.set(_value[1])
                         #widget.botlable_sv.set(_value[2])
@@ -731,6 +738,19 @@ class WizardUI(Tk):
         log.log(thisfuncname(),9,msg="lesson added to student (adult/period index)",adult=str(adult),period=str(period),
                 session=str(lesson.session.name),student=str(lesson.student.name))
         
+        adult = lesson.adult
+        student = lesson.student.objid
+        # add the lesson to the adult object (indexed by student)
+        if adult.lessons.has_key(student) == False:
+            adult.lessons[student] = {}
+            
+        if adult.lessons[student].has_key(period) == False:
+            adult.lessons[student][period] = []
+            
+        adult.lessons[student][period].append(lesson)
+        log.log(thisfuncname(),9,msg="lesson added to student (student/period index)",student=str(student),period=str(period),
+                session=str(lesson.session.name),adult=str(lesson.student.name))
+        
         
     @logger(log)
     def _clear_grid(self,gridname,firstrow,firstcol):
@@ -828,7 +848,8 @@ class WizardUI(Tk):
         if source == "":
             source = "dbinsert"
         else:
-            whereclause.append( ['source',"=","\""+source+"\""])
+            _sources = ["\"" + _source + "\"" for _source in source.split(",")]
+            whereclause.append( ['source',"in","("+",".join(_sources)+")"])
         log.log(thisfuncname(),3,msg="loading",source=str(source))
         
         #whereclause.append( ['status',"=","\"" + "master" + "\""])
@@ -841,6 +862,8 @@ class WizardUI(Tk):
         cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype','source']        
         with self.database:
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
+            
+            print exec_str
             
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
         

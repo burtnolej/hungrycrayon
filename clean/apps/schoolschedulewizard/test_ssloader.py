@@ -2692,9 +2692,6 @@ class Test_Primary_Set_Session(Test_Primary_Record_Base):
             
         rows.sort()
         
-        for row in rows:
-            print row
-
         self.assertListEqual(rows,expected_results)    
 
     def tearDown(self):
@@ -2711,9 +2708,9 @@ if __name__ == "__main__":
     
     
     # pre_process_records
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Primary_Set_Session))    
-    unittest.TextTestRunner(verbosity=2).run(suite) 
-    exit()
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Primary_Set_Session))    
+    #unittest.TextTestRunner(verbosity=2).run(suite) 
+    #exit()
     
     
     # loadrefobjects
