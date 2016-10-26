@@ -450,7 +450,58 @@ class Test_GridReduce(unittest.TestCase):
         
         gridreduce(self.grid,[[]])
         self.assertListEqual(self.grid,self.expected_results)
+        
+        
+    def test_1blankcol_1blankrow_space_list(self):
+        
+        self.grid = [['','A','B','C'],
+                     ['X',[],'',''],
+                     ['Y','foo',[],''],
+                     ['Z','','','bar']]    
 
+        self.expected_results = [['','A','C'],
+                                 ['Y','foo',''],
+                                 ['Z','','bar']]     
+        
+        gridreduce(self.grid,["",[]])
+        self.assertListEqual(self.grid,self.expected_results)
+        
+        
+    def test_1blankcol_1blankrow_space_rectangle(self):
+        
+        self.grid = [['','A','B','C','D'],
+                     ['X','','','',''],
+                     ['Y','foo','','','blah'],
+                     ['Z','','','bar','blah']]    
+
+        self.expected_results = [['','A','C','D'],
+                               ['Y','foo','','blah'],
+                               ['Z','','bar','blah']]     
+        
+        gridreduce(self.grid,[""])
+        self.assertListEqual(self.grid,self.expected_results)
+        
+        
+    def test_realexample(self):        
+        self.grid = [['', u'MO', u'TU', u'TH', u'WE', u'FR'], 
+                     [u'830-910', [(u'Amelia', u'ELA')], [], [], [], []], 
+                     [u'910-950', [], [], [], [], []], 
+                     [u'950-1030', [], [], [], [], []], 
+                     [u'1030-1110', [], [], [], [], []], 
+                     [u'1110-1210', [], [], [], [], []], 
+                     [u'1210-100', [], [], [], [], []], 
+                     [u'100-140', [], [], [], [], []], 
+                     [u'140-220', [], [], [], [], []], 
+                     [u'220-300', [], [], [], [], []], 
+                     [u'300-330', [], [], [], [], []]]
+        
+        self.expected_results = [['', u'MO'], [u'830-910', [(u'Amelia', u'ELA')]]]
+
+        
+        gridreduce(self.grid,["",[]])
+        self.assertListEqual(self.grid,self.expected_results)
+    
+    
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 

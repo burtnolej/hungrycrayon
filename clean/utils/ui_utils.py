@@ -768,33 +768,88 @@ class TkNLabel(_tkframe,TKBase):
     def __init__(self,master,var,**kwargs):
         
         self.labelcount = 0
+        self.colcount = 1
         
-        _tkframe.__init__(self,master,borderwidth=2,bg='blue')
+        _tkframe.__init__(self,master,borderwidth=2)
         
         self.font = tkFont.Font(family="monospace", size=16) 
         
-        #self.addlabel()
-        #self.addlabel()
-        #self.addlabel()
+        self.maxwidth=1
                         
         self.grid_columnconfigure(0,weight=1,uniform="foo")
         
-    def addlabel(self,expand=False):
+        self.widgets = []
         
-        lable_sv = StringVar()
-        lable = _tklabel(self,textvariable=lable_sv,font=self.font)
-        lable.grid(row=self.labelcount,sticky=NSEW)
+    def dumpcontents(self):
+        # return contents in a str of the form "(attr1,attr2),(attr1,sttr2)" for a 2 row, 2 attr grid
+        
+        s=""
+        # if its just one widget (line a header)
+        if len(self.widgets) == 1 and self.maxwidth == 1:
+            return self.widgets[0][0].sv.get()
+        
+        # if its more than just one widget do as described above
+        for row in self.widgets:
+            s=s+"("+",".join([w.sv.get() for w in row])+")"
+        return s
+                
+    def addlabel(self,width=1,expand=False,values=None,bgs=None,fgs=None):
+        
+        _labels = []
+        
+        if isinstance(values,list) == False and isinstance(values,tuple) == False:
+            values = [values]
+            
+        if isinstance(bgs,list) == False and isinstance(values,tuple) == False:
+            bgs = [bgs]
+
+        if isinstance(fgs,list) == False and isinstance(values,tuple) == False:
+            fgs = [fgs]
+            
+        # keep tracking of widest portion so spacer can reach across
+        if width > self.maxwidth:
+            self.maxwidth = width
+            
+        for i in range(width):
+            sv = StringVar()
+            lable = _tklabel(self,textvariable=sv,font=self.font)
+            lable.grid(row=self.labelcount,column=i,sticky=NSEW)
+            lable.sv = sv
+            
+            # if init values for text and colors has been provided, apply
+            try:
+                lable.sv.set(values[i])
+            except TypeError:
+                pass
+            
+            try:
+                lable.config(background=bgs[i])
+            except TypeError:
+                pass
+            
+            try:
+                lable.config(foreground=fgs[i])
+            except TypeError:
+                pass
+            
+            
+            if expand == True:
+                self.grid_columnconfigure(i,weight=1,uniform="foo")
+                
+            _labels.append(lable)
 
         if expand == True:
             self.grid_rowconfigure(self.labelcount,weight=1,uniform="foo")
         self.labelcount += 1
         
-        return(lable,lable_sv)
+        self.widgets.append(_labels)
+        
+        return(_labels)
     
     def addspacer(self,thickness=1,color='black'):
         
         frame = _tkframe(self,bg=color,height=thickness)
-        frame.grid(row=self.labelcount,sticky=NSEW)
+        frame.grid(row=self.labelcount,column=0,columnspan=self.maxwidth,sticky=NSEW)
 
         #self.grid_rowconfigure(self.labelcount,weight=1,uniform="foo")
         self.labelcount += 1

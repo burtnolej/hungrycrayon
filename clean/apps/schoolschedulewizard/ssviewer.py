@@ -398,11 +398,26 @@ class WizardUI(Tk):
         rows.sort()
         return rows
 
+    def _color_get_multi(self,values):
+        bgs=[]
+        fgs=[]
+        for value in values:
+            _bg,_fg = self.color_get(value)
+            bgs.append(_bg)
+            fgs.append(_fg)
+        return(bgs,fgs)
+    
     def color_get(self,value):
         
         bg = 'lightgrey'
         fg = 'black'
-             
+            
+        try:
+            int(value)
+            value = str(value)
+        except ValueError:
+            pass
+        
         if value.count(" ") > 0:
             value= value.replace(" ","_")
             
@@ -419,10 +434,7 @@ class WizardUI(Tk):
             fg = self.fontpalette[value]
             
             
-        return(bg,fg)
-
-
-        
+        return(bg,fg)        
         
     def viewer(self,ui=True,source_type=None,source_value=None,
                ztypes=None,yaxis_type=None,xaxis_type=None,
@@ -443,6 +455,8 @@ class WizardUI(Tk):
         if source_type == None or source_value == None:
             source_type,source_value = self.viewfocus_label_sv.get().split("=")
         
+        # what attributes of an object do we want to display
+        # if * is passed that means show the count of the number of records returned
         if ztypes == None:
             ztypes = self.viewdata_label_sv.get().split(",")
             
@@ -461,10 +475,8 @@ class WizardUI(Tk):
             count+=1
         
         xaxis_enum = self.enums[xaxis_type]['name2enum']
-        yaxis_enum = self.enums[yaxis_type]['code2enum']
         
         values = [] # contains the values displayed on the grid
-        #row=[''] # 
 
         values = [['']]    
         for yval in yaxis_enum.keys():
@@ -475,7 +487,6 @@ class WizardUI(Tk):
 
         ymax = len(values[0])
         xmax = len(values)-1
-        #xmax = len(xaxis_enum.keys())-1
         
         def _additem(celltext,item):
             
@@ -488,7 +499,6 @@ class WizardUI(Tk):
                     celltext.append(item)
             return(celltext)
                 
-            
         for yval,y in yaxis_enum.iteritems():
             
             for xval,x in xaxis_enum.iteritems():
@@ -497,8 +507,9 @@ class WizardUI(Tk):
                 for source_obj in source_objs:
                     if source_obj.lessons.has_key(yval):
                         if source_obj.lessons[yval].has_key(xval):
+   
                             _vals = source_obj.lessons[yval][xval]
-                            _valcount=0
+
                             for _val in _vals:
                                 
                                 if constraints <> None:
@@ -509,11 +520,16 @@ class WizardUI(Tk):
                                             flag=True
                                     if flag == True:
                                         continue
-                                            
-                                if _valcount >= 1:
-                                    celltext.append('spacer')
                                     
+                                if ztypes == ['*']:
+                                    if celltext == []:
+                                        celltext.append(0)
+                                    else:
+                                        celltext[0] = celltext[0] + 1
+                                    continue
+
                                 _celltext = []
+                                
                                 for ztype in ztypes:
                                     if hasattr(_val,ztype) == True:
                                         zval = getattr(_val,ztype)
@@ -521,15 +537,10 @@ class WizardUI(Tk):
                                         _celltext = _additem(_celltext,zval.name)
                                         
                                 celltext.append(tuple(_celltext))
-                                
-                                _valcount+=1
-                
+
                 values[x].append(celltext)
-                    
-                #if celltext <> []:
-                #    emptyrowflag = False
-                #    _row = [xval,celltext]
-                #    values[x].append(_row)
+        
+        sswizard_utils.gridreduce(values,[[]])
         
         if ui==True:
             self.bgmaxrows=len(values)
@@ -558,35 +569,48 @@ class WizardUI(Tk):
                     _value = values[x][y]
 
                     if isinstance(_value,list) == True:
+                        if _value <> []:
+                            if len(_value) == 1:
+                                if isinstance(_value[0],tuple) == True:
+                                    # 1 item, multi attributes
+                                    bgs,fgs = self._color_get_multi(_value[0])
+                                    _widgets = widget.addlabel(len(_value[0]),True,_value[0],bgs,fgs)
+                                elif isinstance(_value[0],list) == False:
+                                    # 1 item, single value
+                                    bg,fg = self.color_get(_value[0])
+                                    _widgets = widget.addlabel(1,True,_value[0],bg,fg)
+                            else:
+                                # multiple items
+                                for __value in _value:
+                                    bgs,fgs = self._color_get_multi(__value)
+                                    _widgets = widget.addlabel(len(__value),True,__value,bgs,fgs)
 
-                        for i in range(len(_value)):
-                            if _value[i] == "spacer":
-                                widget.addspacer()
-                            elif _value[i] <> "":
-                                _bg,_fg = self.color_get(_value[i])
-                                
-                                if conflicts_only == "Y":
-                                    if _bg <> 'red':
-                                        continue
-                                
-                                _widget,_widget_sv = widget.addlabel()
-                                _widget_sv.set(_value[i])
-                                
-                                _widget.config(background=_bg,foreground=_fg,height=self.wheight_label_sv.get())
-                                
                     else:
                         expand=False
                         if x == 0 or y == 0:
                             expand=True
                             
-                        _widget,_widget_sv = widget.addlabel(expand)
-                        _widget_sv.set(_value)                                       
+                        _widgets = widget.addlabel(expand)
+                        _widgets[0].sv.set(_value)                                       
         else:
             return values
             
         self.viewergrid.reset_framewidth()
         self.viewergrid.resize_canvasframe()
         
+    def _dumpviewergrid(self):
+        
+        w = self.viewergrid.widgets
+        _grid = []
+        for x in range(len(w)):
+            _row = []
+            for y in range(len(w[0])):
+                if hasattr(w[x][y],"widgets"):
+                    _row.append(w[x][y].dumpcontents())
+                else:
+                    _row.append("")
+            _grid.append(_row)
+        return(_grid)
         
     @logger(log)    
     def save(self,saveversion=None):
@@ -841,8 +865,6 @@ class WizardUI(Tk):
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
             
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
-            
-            print exec_str
         
         cols = ['period','student','session','dow','adult','subject','userobjid','status','substatus','recordtype','source']
         
