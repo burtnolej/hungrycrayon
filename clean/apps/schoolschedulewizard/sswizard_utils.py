@@ -591,6 +591,38 @@ def updatelessoncount():
     for that session '''
     pass
     
+def gridreduce(grid,blanks,headeroffset=1):
+    # remove any all blank rows or columns
+    # where blank is a list of things that mean blank
+    # assumes the grid is a list of rows
+    # headeroffset indicates to not include header row or column in determination
+    
+    gridw = len(grid)
+    gridh = len(grid[0])
+    
+    notblankcols = []
+    for y in range(headeroffset,gridw):
+	if len([x for x in range(headeroffset,gridh) if grid[x][y] not in blanks]) == 0:
+	    notblankcols.append(y)
+    
+    notblankrows = []
+    for x in range(headeroffset,gridh):
+	if len([y for y in range(headeroffset,gridw) if grid[x][y] not in blanks]) == 0:
+	    notblankrows.append(x)
+    
+    # need to start with biggest index first otherwise indexes change
+    notblankrows.reverse()
+    
+    for rowidx in notblankrows:
+	grid.pop(rowidx)
+
+    notblankcols.reverse()
+    
+    for row in grid:
+	for colidx in notblankcols:
+	    row.pop(colidx)
+
+		    
 if __name__ == "__main__":
     
     session_code_gen('quadref',False)

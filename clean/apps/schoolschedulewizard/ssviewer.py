@@ -461,10 +461,10 @@ class WizardUI(Tk):
             count+=1
         
         xaxis_enum = self.enums[xaxis_type]['name2enum']
-        #yaxis_enum = self.enums[yaxis_type]['code2enum']
+        yaxis_enum = self.enums[yaxis_type]['code2enum']
         
         values = [] # contains the values displayed on the grid
-        row=[''] # 
+        #row=[''] # 
 
         values = [['']]    
         for yval in yaxis_enum.keys():
@@ -475,6 +475,7 @@ class WizardUI(Tk):
 
         ymax = len(values[0])
         xmax = len(values)-1
+        #xmax = len(xaxis_enum.keys())-1
         
         def _additem(celltext,item):
             
@@ -489,7 +490,7 @@ class WizardUI(Tk):
                 
             
         for yval,y in yaxis_enum.iteritems():
-
+            
             for xval,x in xaxis_enum.iteritems():
                 celltext=[]
                 
@@ -511,18 +512,24 @@ class WizardUI(Tk):
                                             
                                 if _valcount >= 1:
                                     celltext.append('spacer')
+                                    
+                                _celltext = []
                                 for ztype in ztypes:
                                     if hasattr(_val,ztype) == True:
                                         zval = getattr(_val,ztype)
                                         
-                                        celltext = _additem(celltext,zval.name)
+                                        _celltext = _additem(_celltext,zval.name)
+                                        
+                                celltext.append(tuple(_celltext))
                                 
                                 _valcount+=1
                 
-                if celltext == []:
-                    celltext.append("")
-                    
                 values[x].append(celltext)
+                    
+                #if celltext <> []:
+                #    emptyrowflag = False
+                #    _row = [xval,celltext]
+                #    values[x].append(_row)
         
         if ui==True:
             self.bgmaxrows=len(values)
@@ -834,6 +841,8 @@ class WizardUI(Tk):
             colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
             
             log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
+            
+            print exec_str
         
         cols = ['period','student','session','dow','adult','subject','userobjid','status','substatus','recordtype','source']
         

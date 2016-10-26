@@ -18,7 +18,7 @@ from sswizard_query_utils import *
 from database_util import Database
 from database_table_util import tbl_rows_get, tbl_query, tbl_remove
 
-from sswizard_utils import dropdown_build, setenums, session_code_gen, dbinsert, dbinsert_direct
+from sswizard_utils import dropdown_build, setenums, session_code_gen, dbinsert, dbinsert_direct, gridreduce
             
 '''def _execfunc(database,value,prep):
     
@@ -390,19 +390,82 @@ class Test_DBInsert_Direct_Convert_Input_Types(unittest.TestCase):
         
     def tearDown(self):
         copyfile(self.databasename+".sqlite.backup",self.databasename+".sqlite")
+    
+
+class Test_GridReduce(unittest.TestCase):
+    def setUp(self):
+        pass
+    
+    def test_1blankcol_1blankrow_space(self):
         
+        self.grid = [['','A','B','C'],
+                     ['X','','',''],
+                     ['Y','foo','',''],
+                     ['Z','','','bar']]    
+
+        self.expected_results = [['','A','C'],
+                               ['Y','foo',''],
+                               ['Z','','bar']]     
+        
+        gridreduce(self.grid,[""])
+        self.assertListEqual(self.grid,self.expected_results)
+        
+    def test_1blankcol_1blankrow_list(self):
+        
+        self.grid = [['','A','B','C'],
+                     ['X',[],[],[]],
+                     ['Y','foo',[],[]],
+                     ['Z',[],[],'bar']]    
+
+        self.expected_results = [['','A','C'],
+                                 ['Y','foo',[]],
+                                 ['Z',[],'bar']]     
+        
+        gridreduce(self.grid,[[]])
+        self.assertListEqual(self.grid,self.expected_results)
+        
+    def test_allblank_list(self):
+        
+        self.grid = [['','A','B','C'],
+                     ['X',[],[],[]],
+                     ['Y',[],[],[]],
+                     ['Z',[],[],[]]
+                     ]
+
+        self.expected_results = [['']]
+        
+        gridreduce(self.grid,[[]])
+        self.assertListEqual(self.grid,self.expected_results)
+        
+    def test_noblank_list(self):
+        
+        import copy
+        
+        self.grid = [['','A','B','C'],
+                     ['X',['blah'],['blah'],['blah']],
+                     ['Y',['foo'],['blah'],['blah']],
+                     ['Z',['blah'],['blah'],['bar']]]
+        
+        self.expected_results = copy.deepcopy(self.grid)
+        
+        gridreduce(self.grid,[[]])
+        self.assertListEqual(self.grid,self.expected_results)
+
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GridReduce))
+    
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dropdown))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GetEnums))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
     
     # dbinsert_direct
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Convert_Input_Types))
     
-    unittest.TextTestRunner(verbosity=2).run(suite) 
+unittest.TextTestRunner(verbosity=2).run(suite) 
 
 

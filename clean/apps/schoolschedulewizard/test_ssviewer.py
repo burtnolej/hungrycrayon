@@ -12,157 +12,123 @@ from database_util import Database
 from database_table_util import tbl_rows_get
 from misc_utils_objectfactory import ObjFactory
 
-from shutil import copyfile
-from os import remove, path
-        
-class Test_Viewer_Student_TeacherSubject(unittest.TestCase):
+def create_test_db(dbname,filename,prep):
+    database = Database(dbname)
+    files = [(filename,prep,True)]
+    ssloader = SSLoader(dbname)
+    ssloader.run(dbname,files)
     
-    # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
+class Test_Viewer_Base(unittest.TestCase):
+    
+    def setUp(self,dbname,filename=None,prep=None,createdb=False):
+        
+        self.dbname = dbname
+        
+        if createdb == True:
+            create_test_db(self.dbname,filename)
+        self.database = Database(self.dbname)
+        
+        of = ObjFactory(True)
+        self.app = WizardUI(self.dbname,of,self.dbname,maxentrycols=12,maxentryrows=20)
+        
+class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
     
     def setUp(self):
-        self.databasename = "test_ssloader_all"
-    
-        of = ObjFactory(True)
-        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
-        self.app.load(saveversion=1,student="Nathaniel")
+        Test_Viewer_Base.setUp(self,"test_ssloader","prep5student",5)
         
-          
     def test_(self):
-
-        results = self.app.viewer(False,'student','Nathaniel',["subject","teacher"])
-        
-        expected_results = [['', u'MO', u'TU', u'TH', u'WE', u'FR'], 
-                            [u'830-910', u'Movement,Amelia', u'Movement,Stan', u'Movement,Stan', u'Movement,Amelia', u'Humanities,A'], 
-                            [u'910-950', u'Core,??', u'[Activity Period,Work Period],Dylan', u'Core,??', u'[Work Period,Activity Period],[Amelia,Moira,Issey]', u'Music,??'], 
-                            [u'950-1030', u'[Activity Period,Work Period],Karolina', u'[Math,Activity Period],[Stan,Aaron]', u'[Math,Work Period],[Stan,Issey]', u'OT,Melissa', u'STEM,??'], 
-                            [u'1030-1110', u'[ELA,Activity Period],[Amelia,Dylan]', u'[Chess,Work Period],[Stan,Rahul]', u'[Chess,Work Period],[Stan,Rahul]', u'[ELA,Activity Period,Work Period],[Amelia,Issey]', u'Art,??'], 
-                            [u'1110-1210', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??'], 
-                            [u'1210-100', u'Science,Paraic', u'History,Samantha', u'History,Samantha', u'Science,Paraic', '??,??'],
-                            [u'100-140', u'[Chess,Work Period],[SONJA,Rahul]', u'Work Period,[Sam,Karolina,Samantha]', u'Work Period,[Sam,Aaron,Issey,Samantha]', u'Chess,Rahul', '??,??'],
-                            [u'140-220', u'Work Period,[Paraic,Issey]', u'Movement,??', u'Movement,??', u'Work Period,Issey', '??,??'],
-                            [u'220-300', u'Speech,??', u'Student News,Karolina', u'Student News,??', u'Counseling,Alexa', '??,??'], 
-                            [u'300-330', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', u'Computer Time,??', '??,??']]
-
-        self.assertListEqual(expected_results,results)
-        
-        #print expected_results,results
-
-    def tearDown(self):
-        pass
-
-        
-class Test_Viewer_Student_TeacherSubject_Version(unittest.TestCase):
-    
-    # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
-    
-    def setUp(self):
-        self.databasename = "test_ssloader_all"
-    
-        of = ObjFactory(True)
-        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
-        self.app.load(saveversion=1,student="Nathaniel")
-        
-          
-    def test_(self):
-
-        expected_results = [[u'lesson', u'TU', u'830-910', u'Movement', u'??', u'prep5data.csv', u'??.Movement.Tuesday.830-910'], 
-                            [u'lesson', u'TU', u'830-910', u'Movement', u'??', u'prep5student.csv', u'??.Movement.Tuesday.830-910'], 
-                            [u'lesson', u'TU', u'830-910', u'??', u'Stan', u'academic.csv', u'Stan.??.Tuesday.830-910'], 
-                            [u'lesson', u'TU', u'830-910', u'Movement', u'Stan', u'dbinsert', u'Stan.Movement.Tuesday.830-910']]
-
-        results = self.app.viewer(True,'student','Nathaniel',["subject","teacher"])
-        
-        print self.app.dump(['830-910','WE','Nathaniel'])
-
-
-    def tearDown(self):
         pass
     
-class Test_Johnny(unittest.TestCase):
+    def test_Mo_830_910_Peter_adult_subject(self):
+        
+        expected_results = [['', u'MO'], [u'830-910', [(u'Amelia', u'ELA')]]]
+        
+        self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
+
+        results = self.app.viewer(ui=False,ztypes=['adult','subject'],source_type="student",source_value="Peter")
     
-    # example of a multiple student in one session
+        print results
+        #self.assertListEqual(results,expected_results)
+        
+    '''def test_Mo_Peter_adult_subject(self):
+        
+        expected_results = [['', u'MO'], [u'830-910', [(u'Amelia', u'ELA')]], [u'910-950', [(u'??', u'Core')]],
+                            [u'950-1030', [(u'Paraic', u'Science')]],[u'1030-1110', [(u'Issey', u'History')]], 
+                            [u'1110-1210', [(u'??', u'Computer Time')]], [u'1210-100', [(u'[Paraic,Rahul]', u'??')]], 
+                            [u'100-140', [(u'Amelia', u'ELA')]], [u'140-220', [(u'Karolina', u'Counseling')]], 
+                            [u'220-300', [(u'??', u'Movement')]], [u'300-330', [(u'??', u'Computer Time')]]]
+
+        self.app.load(saveversion=1,student="Peter",dow="MO")
+
+        results = self.app.viewer(ui=False,ztypes=['adult','subject'],source_type="student",source_value="Peter")
+        
+        self.assertListEqual(results,expected_results)
     
-    # uses a db copied from prod with all teachers, students in it
+    def test_Mo_830_910_Peter_adult_recordtype(self):
+        
+        expected_results = [['', u'MO'], [u'1030-1110', [(u'Issey', u'wp')]]]
+        
+        self.app.load(saveversion=1,student="Peter",dow="MO",period="1030-1110")
+
+        results = self.app.viewer(ui=False,ztypes=['adult','recordtype'],source_type="student",source_value="Peter")
+
+        self.assertListEqual(results,expected_results)
+        
+    def test_Mo_830_910_adult_subject(self):
+        
+        expected_results = [['', u'MO'], [u'1030-1110', [(u'Jake', u'Aaron'), (u'Peter', u'Issey'), (u'Orig', u'??'), (u'Bruno', u'Dylan'), (u'Oscar', u'Paraic'), 
+                                                         (u'Clayton', u'Dylan'), (u'Jack', u'Paraic'), (u'Nathaniel', u'Amelia'), (u'Stephen', u'??')]]]
+
+        self.app.load(saveversion=1,student="",dow="MO",period="1030-1110")
+
+        results = self.app.viewer(ui=False,ztypes=['student','adult'],source_type="student",source_value="")
+        
+        self.assertListEqual(results,expected_results)'''
+        
+class Test_Viewer_X_Period_Y_Adult(Test_Viewer_Base):
     
     def setUp(self):
-        self.databasename = "test_ssloader_all"
-    
-        of = ObjFactory(True)
-        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
-        self.app.load(saveversion=1,teacher="Johnny")
-          
-    def test_(self):
-
-        results = self.app.viewer(False,'teacher','Johnny',["student"])
+        Test_Viewer_Base.setUp(self,"test_ssloader")
         
-        expected_results = [['', u'MO', u'TU', u'TH', u'WE', u'FR'], 
-                            [u'830-910', '??', u'Bruno,Orig,Oscar', u'Mackenzie', '??', '??'], 
-                            [u'910-950', u'Clayton,Oscar,Stephen', u'Clayton', u'Asher,Shane', u'Lucy,Mackenzie,Nick', '??'],
-                            [u'950-1030', u'Bruno', u'Jack,Peter', u'Luke,Simon B', u'Asher,Shane', '??'],
-                            [u'1030-1110', u'Asher,Shane', u'Clayton,Stephen', u'Luke', '??', '??'],
-                            [u'1110-1210', '??', '??', '??', '??', '??'],
-                            [u'1210-100', u'Stephen', '??', '??', '??', '??'], 
-                            [u'100-140', u'Oscar,Stephen', u'Liam,Oscar,Stephen', u'Asher,Shane', u'Nick,Shane', '??'], 
-                            [u'140-220', u'Simon B', u'Clayton', u'Simon B', u'Shane', '??'],
-                            [u'220-300', u'Bruno,Clayton,Orig,Peter', u'Bruno,Clayton,Jake,Orig', u'Luke,Simon B', u'Lucy', '??'],
-                            [u'300-330', '??', '??', '??', '??', '??']]
-
-        self.assertListEqual(expected_results,results)
-
-    def tearDown(self):
-        pass
-    
-    
-class Test_Nathaniel_Conflict(unittest.TestCase):
-    
-    # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
-    
-    def setUp(self):
-        self.databasename = "test_ssloader"
+    def test_Karolina_Peter_adult_subject(self):
         
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.run(self.databasename, [('prep5data_test1period1Monday.csv',5,True),
-                           ('prep5studentNathanielPeriod1.csv',-1,True)])  
-    
-
-        of = ObjFactory(True)
-        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
-        self.app.load(saveversion=1,student="Nathaniel")
-
-    def test_(self):    
+        expected_results = [['', u'Karolina'], [u'140-220', [(u'Peter', u'Counseling')]]]
         
-        results = self.app.viewer(False,'student','Nathaniel',["subject","teacher"])
+        self.app.load(saveversion=1,student="Peter",teacher="Karolina")
+
+        results = self.app.viewer(ui=False,ztypes=['student','subject'],source_type="student",source_value="Peter",yaxis_type="adult")
+
+        self.assertListEqual(results,expected_results)
+        
+    def test_830_910_Peter_adult_subject(self):
+        
+        expected_results = [['', u'??', u'Karolina', u'Paraic', u'Issey', u'[Paraic,Rahul]', u'Amelia'], 
+                            [u'910-950', [(u'Peter', u'Core')]], 
+                            [u'1110-1210', [(u'Peter', u'Computer Time')]], 
+                            [u'220-300', [(u'Peter', u'Movement')]], 
+                            [u'300-330', [(u'Peter', u'Computer Time')]], 
+                            [u'140-220', [(u'Peter', u'Counseling')]], 
+                            [u'950-1030', [(u'Peter', u'Science')]], 
+                            [u'1030-1110', [(u'Peter', u'History')]], 
+                            [u'1210-100', [(u'Peter', u'??')]], 
+                            [u'830-910', [(u'Peter', u'ELA')]], 
+                            [u'100-140', [(u'Peter', u'ELA')]]]
+
+        
+        self.app.load(saveversion=1,student="Peter",dow="MO")
+
+        results = self.app.viewer(ui=False,ztypes=['student','subject'],source_type="student",source_value="Peter",yaxis_type="adult")
 
         print results
         
-class Test_Get_Details(unittest.TestCase):
-    
-    # uses a database loaded (via ssloader.run) from files prep4/5/6data.csv, staffdata.csv, academic.csv
-    
-    def setUp(self):
-        self.databasename = "test_ssloader"
         
-        self.ssloader = SSLoader("test_ssloader")
-        self.ssloader.run(self.databasename, [('prep5data_test1period1Monday.csv',5,True),
-                           ('prep5studentNathanielPeriod1.csv',-1,True)])  
-    
-
-        of = ObjFactory(True)
-        self.app = WizardUI(self.databasename,of,self.databasename,maxentrycols=12,maxentryrows=20)
-        self.app.load(saveversion=1,student="Nathaniel")
-
-    def test_(self):    
-        
-        self.app.viewer(True,'student','Nathaniel',["subject","teacher"])
-        
-        self.app.mainloop()
-
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    # functional tests
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Student_TeacherSubject))    
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Student_TeacherSubject_Version))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
+    
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

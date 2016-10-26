@@ -146,7 +146,7 @@ class SSLoader(object):
             try:
                 recordtype = self.identify_record(record)
             except Exception, e:
-		log.log(thisfuncname(),1,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
+		log.log(thisfuncname(),2,msg="could not match record to a rule,skipping",record=record,source=self.inputfile)
 		continue		
 
 	    def _addrecord(_locals):

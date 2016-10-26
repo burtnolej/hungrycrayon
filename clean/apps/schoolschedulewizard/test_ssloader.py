@@ -813,7 +813,16 @@ class Test_RecordIdentifcation(Test_Base):
         recordtype = self.ssloader.identify_record(self.inputstr)
         
         self.assertEquals(recordtype, 'wp.nostudent.nosubject.noteacher.with')
+       
+    def test_teacher_with_edge(self):
+        self.inputstr = "Science with (Paraic)"
         
+        
+        with self.assertRaises(SSLoaderNoRulesMatchException):
+            recordtype = self.ssloader.identify_record(self.inputstr)
+     
+     
+     
     # with and
     def test_teacher_WP_With_And(self):
         self.inputstr = "Work Period with Paraic and Rahul"
@@ -2747,9 +2756,9 @@ if __name__ == "__main__":
     
     
     # pre_process_records
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_New))    
-    #unittest.TextTestRunner(verbosity=2).run(suite) 
-    #exit()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))    
+    unittest.TextTestRunner(verbosity=2).run(suite) 
+    exit()
     
     
     # loadrefobjects
