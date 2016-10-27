@@ -251,7 +251,8 @@ def setenums(dow,prep,database):
         arg = dict(dow="\""+dow_name+"\"")
         
     getdbenum(enums,database,'code','session',**arg)
-    getdbenum(enums,database,'name','lessontype')
+    getdbenum(enums,database,'name','recordtype')
+    #getdbenum(enums,database,'name','lessontype')
     getdbenum(enums,database,'name','subject')
     
   

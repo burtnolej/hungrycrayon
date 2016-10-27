@@ -1455,11 +1455,13 @@ class TestUINLabelMultiColumns(TestWidget):
         
         self.fgs = ['yellow','white','red','black']
         self.bgs = ['red','blue','green','yellow']
+        self.weights = [1,2,3,4]
         
     def test_(self):
     
+        
         for i in range(3):
-            _widgets = self.tknlabel.addlabel(4,True,['a','b','c','d'],self.bgs,self.fgs)
+            _widgets = self.tknlabel.addlabel(4,True,['a','b','c','d'],self.bgs,self.fgs,self.weights)
             self.tknlabel.addspacer(5)
         
         self.master.mainloop()

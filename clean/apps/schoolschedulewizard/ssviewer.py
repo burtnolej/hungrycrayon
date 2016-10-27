@@ -330,7 +330,7 @@ class WizardUI(Tk):
         self.viewdata_label.focus_get()
         self.viewdata_label_sv.set("subject,teacher,recordtype")
         
-        self.wheight_label = Label(self.viewcontrolpanel,text="data",width=wx,font=font,anchor=E)
+        self.wheight_label = Label(self.viewcontrolpanel,text="wheight",width=wx,font=font,anchor=E)
         self.wheight_label.grid(row=0,column=12,pady=5)
         self.wheight_label.focus_get()
         self.wheight_label_sv = StringVar()
@@ -343,6 +343,15 @@ class WizardUI(Tk):
         self.conflict_checkbutton = _checkbutton(self.viewcontrolpanel, text="conflicts only", variable=self.conflict_checkbutton_sv,
                                                 onvalue="Y", offvalue="N",width=wx*2,font=font)
         self.conflict_checkbutton.grid(row=0,column=14,pady=5)
+        
+        self.wratio_label = Label(self.viewcontrolpanel,text="wratio",width=wx,font=font,anchor=E)
+        self.wratio_label.grid(row=0,column=15,pady=5)
+        self.wratio_label.focus_get()
+        self.wratio_label_sv = StringVar()
+        self.wratio_label = Entry(self.viewcontrolpanel,textvariable=self.wratio_label_sv,width=wx,font=font)
+        self.wratio_label.grid(row=0,column=16,pady=5)
+        self.wratio_label.focus_get()
+        self.wratio_label_sv.set("1,1,1")
 
         
         self.grid_columnconfigure(0, weight=1, uniform="foo")
@@ -438,7 +447,7 @@ class WizardUI(Tk):
         
     def viewer(self,ui=True,source_type=None,source_value=None,
                ztypes=None,yaxis_type=None,xaxis_type=None,
-               conflicts_only=None,constraints=None):
+               conflicts_only=None,constraints=None,wratio=None):
         
         # constraint will be a list of tuples of the form
         # objtype,objvalue i.e. ('dow','MO')
@@ -454,6 +463,9 @@ class WizardUI(Tk):
         
         if source_type == None or source_value == None:
             source_type,source_value = self.viewfocus_label_sv.get().split("=")
+        
+        if wratio == None:
+            wratio = self.wratio_label_sv.get().split(",")
         
         # what attributes of an object do we want to display
         # if * is passed that means show the count of the number of records returned
@@ -574,7 +586,7 @@ class WizardUI(Tk):
                                 if isinstance(_value[0],tuple) == True:
                                     # 1 item, multi attributes
                                     bgs,fgs = self._color_get_multi(_value[0])
-                                    _widgets = widget.addlabel(len(_value[0]),True,_value[0],bgs,fgs)
+                                    _widgets = widget.addlabel(len(_value[0]),True,_value[0],bgs,fgs,wratio)
                                 elif isinstance(_value[0],list) == False:
                                     # 1 item, single value
                                     bg,fg = self.color_get(_value[0])
@@ -583,7 +595,7 @@ class WizardUI(Tk):
                                 # multiple items
                                 for __value in _value:
                                     bgs,fgs = self._color_get_multi(__value)
-                                    _widgets = widget.addlabel(len(__value),True,__value,bgs,fgs)
+                                    _widgets = widget.addlabel(len(__value),True,__value,bgs,fgs,wratio)
 
                     else:
                         expand=False
@@ -689,69 +701,40 @@ class WizardUI(Tk):
         
     def lesson_change(self,lesson):
 
-        period = lesson.period.objid
-        student = lesson.student.objid
-        dow = lesson.dow.objid
+        def _add(obj,xtype,ytype,lesson):
+            
+            xtype_id = getattr(lesson,xtype).objid
+            ytype_id = getattr(lesson,ytype).objid
+            
+            # indexed by dow/period
+            if obj.lessons.has_key(xtype_id) == False:
+                obj.lessons[xtype_id] = {} 
+    
+            if obj.lessons[xtype_id].has_key(ytype_id) == False:
+                obj.lessons[xtype_id][ytype_id] = []
+                
+            obj.lessons[xtype_id][ytype_id].append(lesson)
         
+        '''['period','dow','student','adult','subject']'''
         
-        # add the lesson to the adult object
         adult = lesson.adult
+        student = lesson.student
+
+        # add the lesson to the adult object        
         if hasattr(adult,'lessons') == False:
             setattr(adult,'lessons',{})
-          
-        if adult.lessons.has_key(dow) == False:
-            adult.lessons[dow] = {} 
-
-        if adult.lessons[dow].has_key(period) == False:
-            adult.lessons[dow][period] = []
             
-        adult.lessons[dow][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to adult",dow=str(dow),period=str(period),
-                 session=str(lesson.session.name),adult=str(lesson.adult.name))
-        
-        # add the lesson to the student object (indexed by dow/period)
-        student = lesson.student
+        _add(adult,'dow','period',lesson) # indexed by dow/period
+        _add(adult,'student','period',lesson) # indexed by student/period
+
+        # add the lesson to the student object
         if hasattr(student,'lessons') == False:
             setattr(student,'lessons',{})
             
-        if student.lessons.has_key(dow) == False:
-            student.lessons[dow] = {}
-            
-        if student.lessons[dow].has_key(period) == False:
-            student.lessons[dow][period] = []
-            
-        student.lessons[dow][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to student (dow/period index)",dow=str(dow),period=str(period),
-                session=str(lesson.session.name),student=str(lesson.student.name))
-        
-        #adult = self.enums['adult']['name2code'][lesson.adult.objid]
-        
-        adult = lesson.adult.objid
-        
-        # add the lesson to the student object (indexed by adult/period)
-        if student.lessons.has_key(adult) == False:
-            student.lessons[adult] = {}
-            
-        if student.lessons[adult].has_key(period) == False:
-            student.lessons[adult][period] = []
-            
-        student.lessons[adult][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to student (adult/period index)",adult=str(adult),period=str(period),
-                session=str(lesson.session.name),student=str(lesson.student.name))
-        
-        adult = lesson.adult
-        student = lesson.student.objid
-        # add the lesson to the adult object (indexed by student)
-        if adult.lessons.has_key(student) == False:
-            adult.lessons[student] = {}
-            
-        if adult.lessons[student].has_key(period) == False:
-            adult.lessons[student][period] = []
-            
-        adult.lessons[student][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to student (student/period index)",student=str(student),period=str(period),
-                session=str(lesson.session.name),adult=str(lesson.student.name))
-        
+        _add(student,'dow','period',lesson) # indexed by dow/period
+        _add(student,'adult','period',lesson) # indexed by adult/period
+        _add(student,'period','recordtype',lesson) # indexed by adult/period
+        _add(student,'student','recordtype',lesson) # indexed by adult/period
         
     @logger(log)
     def _clear_grid(self,gridname,firstrow,firstcol):

@@ -793,7 +793,7 @@ class TkNLabel(_tkframe,TKBase):
             s=s+"("+",".join([w.sv.get() for w in row])+")"
         return s
                 
-    def addlabel(self,width=1,expand=False,values=None,bgs=None,fgs=None):
+    def addlabel(self,width=1,expand=False,values=None,bgs=None,fgs=None,weights=None):
         
         _labels = []
         
@@ -834,7 +834,11 @@ class TkNLabel(_tkframe,TKBase):
             
             
             if expand == True:
-                self.grid_columnconfigure(i,weight=1,uniform="foo")
+                if weights == None:
+                    weight=1
+                else:
+                    weight = weights[i]
+                self.grid_columnconfigure(i,weight=weight,uniform="foo")
                 
             _labels.append(lable)
 
