@@ -1443,6 +1443,28 @@ class TestUINLabel(TestWidget):
             _widget_sv.set(i)
         
         self.master.mainloop()
+        
+class TestUINLabelMultiColumns(TestWidget):
+    def setUp(self):
+        self.master = Tk()
+        self.master.geometry("400x200+0+0")
+        self.tknlabel = TkNLabel(self.master,None)
+        self.tknlabel.grid(sticky=NSEW)
+        self.master.grid_rowconfigure(0, weight=1, uniform="foo")
+        self.master.grid_columnconfigure(0, weight=1, uniform="foo") 
+        
+        self.fgs = ['yellow','white','red','black']
+        self.bgs = ['red','blue','green','yellow']
+        self.weights = [1,2,3,4]
+        
+    def test_(self):
+    
+        
+        for i in range(3):
+            _widgets = self.tknlabel.addlabel(4,True,['a','b','c','d'],self.bgs,self.fgs,self.weights)
+            self.tknlabel.addspacer(5)
+        
+        self.master.mainloop()
     
         
 if __name__ == "__main__":
@@ -1455,7 +1477,7 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTk3Label))
     
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUINLabel))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestUINLabelMultiColumns))
     unittest.TextTestRunner(verbosity=2).run(suite)
     exit()
     

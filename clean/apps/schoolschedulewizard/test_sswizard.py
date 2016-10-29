@@ -390,7 +390,23 @@ class Test_Dropdowns(Test_Base):
         for x in range(1,3): # test grid only 3 high
             self.ui.entrygrid.widgets[x][0]['values'] = self.students
             
+        
+class Test_GridReduce(unittest.TestCase):
+    def setUp(self):
+        
+        self.grid = [['','A','B','C'],
+                     ['X','','',''],
+                     ['Y','foo','',''],
+                     ['Z','','','bar']]                     
+                     
+    def test_(self):
+        
+        for y in range(1,3): # test grid only 3 wide
+            self.ui.entrygrid.widgets[0][y]['values'] = self.periods
             
+        for x in range(1,3): # test grid only 3 high
+            self.ui.entrygrid.widgets[x][0]['values'] = self.students
+             
                 
 if __name__ == "__main__":
     suite = unittest.TestSuite()

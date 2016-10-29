@@ -330,7 +330,7 @@ class WizardUI(Tk):
         self.viewdata_label.focus_get()
         self.viewdata_label_sv.set("subject,teacher,recordtype")
         
-        self.wheight_label = Label(self.viewcontrolpanel,text="data",width=wx,font=font,anchor=E)
+        self.wheight_label = Label(self.viewcontrolpanel,text="wheight",width=wx,font=font,anchor=E)
         self.wheight_label.grid(row=0,column=12,pady=5)
         self.wheight_label.focus_get()
         self.wheight_label_sv = StringVar()
@@ -343,6 +343,15 @@ class WizardUI(Tk):
         self.conflict_checkbutton = _checkbutton(self.viewcontrolpanel, text="conflicts only", variable=self.conflict_checkbutton_sv,
                                                 onvalue="Y", offvalue="N",width=wx*2,font=font)
         self.conflict_checkbutton.grid(row=0,column=14,pady=5)
+        
+        self.wratio_label = Label(self.viewcontrolpanel,text="wratio",width=wx,font=font,anchor=E)
+        self.wratio_label.grid(row=0,column=15,pady=5)
+        self.wratio_label.focus_get()
+        self.wratio_label_sv = StringVar()
+        self.wratio_label = Entry(self.viewcontrolpanel,textvariable=self.wratio_label_sv,width=wx,font=font)
+        self.wratio_label.grid(row=0,column=16,pady=5)
+        self.wratio_label.focus_get()
+        self.wratio_label_sv.set("1,1,1")
 
         
         self.grid_columnconfigure(0, weight=1, uniform="foo")
@@ -398,11 +407,26 @@ class WizardUI(Tk):
         rows.sort()
         return rows
 
+    def _color_get_multi(self,values):
+        bgs=[]
+        fgs=[]
+        for value in values:
+            _bg,_fg = self.color_get(value)
+            bgs.append(_bg)
+            fgs.append(_fg)
+        return(bgs,fgs)
+    
     def color_get(self,value):
         
         bg = 'lightgrey'
         fg = 'black'
-             
+            
+        try:
+            int(value)
+            value = str(value)
+        except ValueError:
+            pass
+        
         if value.count(" ") > 0:
             value= value.replace(" ","_")
             
@@ -419,14 +443,11 @@ class WizardUI(Tk):
             fg = self.fontpalette[value]
             
             
-        return(bg,fg)
-
-
-        
+        return(bg,fg)        
         
     def viewer(self,ui=True,source_type=None,source_value=None,
                ztypes=None,yaxis_type=None,xaxis_type=None,
-               conflicts_only=None,constraints=None):
+               conflicts_only=None,constraints=None,wratio=None):
         
         # constraint will be a list of tuples of the form
         # objtype,objvalue i.e. ('dow','MO')
@@ -443,6 +464,11 @@ class WizardUI(Tk):
         if source_type == None or source_value == None:
             source_type,source_value = self.viewfocus_label_sv.get().split("=")
         
+        if wratio == None:
+            wratio = self.wratio_label_sv.get().split(",")
+        
+        # what attributes of an object do we want to display
+        # if * is passed that means show the count of the number of records returned
         if ztypes == None:
             ztypes = self.viewdata_label_sv.get().split(",")
             
@@ -461,10 +487,8 @@ class WizardUI(Tk):
             count+=1
         
         xaxis_enum = self.enums[xaxis_type]['name2enum']
-        #yaxis_enum = self.enums[yaxis_type]['code2enum']
         
         values = [] # contains the values displayed on the grid
-        row=[''] # 
 
         values = [['']]    
         for yval in yaxis_enum.keys():
@@ -487,17 +511,17 @@ class WizardUI(Tk):
                     celltext.append(item)
             return(celltext)
                 
-            
         for yval,y in yaxis_enum.iteritems():
-
+            
             for xval,x in xaxis_enum.iteritems():
                 celltext=[]
                 
                 for source_obj in source_objs:
                     if source_obj.lessons.has_key(yval):
                         if source_obj.lessons[yval].has_key(xval):
+   
                             _vals = source_obj.lessons[yval][xval]
-                            _valcount=0
+
                             for _val in _vals:
                                 
                                 if constraints <> None:
@@ -508,31 +532,27 @@ class WizardUI(Tk):
                                             flag=True
                                     if flag == True:
                                         continue
-                                            
-                                if _valcount >= 1:
-                                    celltext.append('spacer')
+                                    
+                                if ztypes == ['*']:
+                                    if celltext == []:
+                                        celltext.append(0)
+                                    else:
+                                        celltext[0] = celltext[0] + 1
+                                    continue
+
+                                _celltext = []
+                                
                                 for ztype in ztypes:
                                     if hasattr(_val,ztype) == True:
                                         zval = getattr(_val,ztype)
                                         
-                                        celltext = _additem(celltext,zval.name)
-                                        #celltext.append(zval.name)
-                                    #else:
-                                        #print "lesson",_val,"does not have attr",ztype
-                                
-                                _valcount+=1
-                        #else:
-                            #print "source",source_obj.name,"yval=",yval," does not have key",xval
-                    #else:
-                        #print "source",source_obj.name," does not have key",yval
-                
-                if celltext == []:
-                    celltext.append("")
-                    
+                                        _celltext = _additem(_celltext,zval.name)
+                                        
+                                celltext.append(tuple(_celltext))
+
                 values[x].append(celltext)
-                
-        #for row in values:
-        #    print row
+        
+        sswizard_utils.gridreduce(values,[[]])
         
         if ui==True:
             self.bgmaxrows=len(values)
@@ -561,35 +581,48 @@ class WizardUI(Tk):
                     _value = values[x][y]
 
                     if isinstance(_value,list) == True:
+                        if _value <> []:
+                            if len(_value) == 1:
+                                if isinstance(_value[0],tuple) == True:
+                                    # 1 item, multi attributes
+                                    bgs,fgs = self._color_get_multi(_value[0])
+                                    _widgets = widget.addlabel(len(_value[0]),True,_value[0],bgs,fgs,wratio)
+                                elif isinstance(_value[0],list) == False:
+                                    # 1 item, single value
+                                    bg,fg = self.color_get(_value[0])
+                                    _widgets = widget.addlabel(1,True,_value[0],bg,fg)
+                            else:
+                                # multiple items
+                                for __value in _value:
+                                    bgs,fgs = self._color_get_multi(__value)
+                                    _widgets = widget.addlabel(len(__value),True,__value,bgs,fgs,wratio)
 
-                        for i in range(len(_value)):
-                            if _value[i] == "spacer":
-                                widget.addspacer()
-                            elif _value[i] <> "":
-                                _bg,_fg = self.color_get(_value[i])
-                                
-                                if conflicts_only == "Y":
-                                    if _bg <> 'red':
-                                        continue
-                                
-                                _widget,_widget_sv = widget.addlabel()
-                                _widget_sv.set(_value[i])
-                                
-                                _widget.config(background=_bg,foreground=_fg,height=self.wheight_label_sv.get())
-                                
                     else:
                         expand=False
                         if x == 0 or y == 0:
                             expand=True
                             
-                        _widget,_widget_sv = widget.addlabel(expand)
-                        _widget_sv.set(_value)                                       
+                        _widgets = widget.addlabel(expand)
+                        _widgets[0].sv.set(_value)                                       
         else:
             return values
             
         self.viewergrid.reset_framewidth()
         self.viewergrid.resize_canvasframe()
         
+    def _dumpviewergrid(self):
+        
+        w = self.viewergrid.widgets
+        _grid = []
+        for x in range(len(w)):
+            _row = []
+            for y in range(len(w[0])):
+                if hasattr(w[x][y],"widgets"):
+                    _row.append(w[x][y].dumpcontents())
+                else:
+                    _row.append("")
+            _grid.append(_row)
+        return(_grid)
         
     @logger(log)    
     def save(self,saveversion=None):
@@ -626,18 +659,7 @@ class WizardUI(Tk):
 
                     obj_id = ",".join(map(str,[period_enum,student_enum,session_enum]))
                     
-                    #obj_id = session
-
                     teacher_code,lessontype_code,subject_code,dow = session.split(".")
-                    
-                    # get the column and row headers associated with this cell
-                    #student = self.entrygrid.widgets[0][y].sv.get()
-                    #period = self.entrygrid.widgets[x][0].sv.get()
-
-                    '''teacher = self.enums['adult']['code2enum'][teacher_code]
-                    lessontype = self.enums['lessontype']['code2enum'][lessontype_code]
-                    subject = self.enums['subject']['code2enum'][subject_code]'''
-                    
 
                     teacher = self.enums['adult']['code2name'][teacher_code]
                     lessontype = self.enums['lessontype']['code2name'][lessontype_code]
@@ -667,13 +689,6 @@ class WizardUI(Tk):
                     setattr(self.entrygrid.widgets[x][y],"lesson",lesson)
                 
                     self.lesson_change(lesson)
-        
-        #$self.teacher_schedule_calc() 
-        #self.student_schedule_calc()
-            
-        #self.dbload_entry_sv.set(self.lastsaveversion)
-            
-        #self.lastsaveversion+=1
 
     def _lesson_change_event(self,event):
         
@@ -686,69 +701,40 @@ class WizardUI(Tk):
         
     def lesson_change(self,lesson):
 
-        period = lesson.period.objid
-        student = lesson.student.objid
-        dow = lesson.dow.objid
+        def _add(obj,xtype,ytype,lesson):
+            
+            xtype_id = getattr(lesson,xtype).objid
+            ytype_id = getattr(lesson,ytype).objid
+            
+            # indexed by dow/period
+            if obj.lessons.has_key(xtype_id) == False:
+                obj.lessons[xtype_id] = {} 
+    
+            if obj.lessons[xtype_id].has_key(ytype_id) == False:
+                obj.lessons[xtype_id][ytype_id] = []
+                
+            obj.lessons[xtype_id][ytype_id].append(lesson)
         
+        '''['period','dow','student','adult','subject']'''
         
-        # add the lesson to the adult object
         adult = lesson.adult
+        student = lesson.student
+
+        # add the lesson to the adult object        
         if hasattr(adult,'lessons') == False:
             setattr(adult,'lessons',{})
-          
-        if adult.lessons.has_key(dow) == False:
-            adult.lessons[dow] = {} 
-
-        if adult.lessons[dow].has_key(period) == False:
-            adult.lessons[dow][period] = []
             
-        adult.lessons[dow][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to adult",dow=str(dow),period=str(period),
-                 session=str(lesson.session.name),adult=str(lesson.adult.name))
-        
-        # add the lesson to the student object (indexed by dow/period)
-        student = lesson.student
+        _add(adult,'dow','period',lesson) # indexed by dow/period
+        _add(adult,'student','period',lesson) # indexed by student/period
+
+        # add the lesson to the student object
         if hasattr(student,'lessons') == False:
             setattr(student,'lessons',{})
             
-        if student.lessons.has_key(dow) == False:
-            student.lessons[dow] = {}
-            
-        if student.lessons[dow].has_key(period) == False:
-            student.lessons[dow][period] = []
-            
-        student.lessons[dow][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to student (dow/period index)",dow=str(dow),period=str(period),
-                session=str(lesson.session.name),student=str(lesson.student.name))
-        
-        #adult = self.enums['adult']['name2code'][lesson.adult.objid]
-        
-        adult = lesson.adult.objid
-        
-        # add the lesson to the student object (indexed by adult/period)
-        if student.lessons.has_key(adult) == False:
-            student.lessons[adult] = {}
-            
-        if student.lessons[adult].has_key(period) == False:
-            student.lessons[adult][period] = []
-            
-        student.lessons[adult][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to student (adult/period index)",adult=str(adult),period=str(period),
-                session=str(lesson.session.name),student=str(lesson.student.name))
-        
-        adult = lesson.adult
-        student = lesson.student.objid
-        # add the lesson to the adult object (indexed by student)
-        if adult.lessons.has_key(student) == False:
-            adult.lessons[student] = {}
-            
-        if adult.lessons[student].has_key(period) == False:
-            adult.lessons[student][period] = []
-            
-        adult.lessons[student][period].append(lesson)
-        log.log(thisfuncname(),9,msg="lesson added to student (student/period index)",student=str(student),period=str(period),
-                session=str(lesson.session.name),adult=str(lesson.student.name))
-        
+        _add(student,'dow','period',lesson) # indexed by dow/period
+        _add(student,'adult','period',lesson) # indexed by adult/period
+        _add(student,'period','recordtype',lesson) # indexed by adult/period
+        _add(student,'student','recordtype',lesson) # indexed by adult/period
         
     @logger(log)
     def _clear_grid(self,gridname,firstrow,firstcol):
@@ -921,9 +907,8 @@ def dump2csv(results,conflicts_only):
         print ",".join(output_row)
         
 if __name__ == "__main__":
-    #master = Tk()
     
-    enableui = False
+    enableui = True
     
     if len(sys.argv) <= 1:
         raise Exception("provide a database name; no extension")
@@ -946,8 +931,7 @@ if __name__ == "__main__":
         app.mainloop()       
     else:
         app.load(saveversion=1,student="")
-        
-        
+
         for dow in ['MO','TU','WE','TH','FR']:
             results = app.viewer(ui=False,source_type="adult",ztypes=['adult','subject'],
                                  source_value="",yaxis_type="student",constraints=[('dow',dow)])

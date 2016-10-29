@@ -251,7 +251,8 @@ def setenums(dow,prep,database):
         arg = dict(dow="\""+dow_name+"\"")
         
     getdbenum(enums,database,'code','session',**arg)
-    getdbenum(enums,database,'name','lessontype')
+    getdbenum(enums,database,'name','recordtype')
+    #getdbenum(enums,database,'name','lessontype')
     getdbenum(enums,database,'name','subject')
     
   
@@ -518,7 +519,7 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    d['period'] = _isname(enums,'period',d['period'])
 	    d['session'] = ".".join([d['adult'],d['subject'],_isname(enums,'dow',d['dow']),d['period']])
 	    d['prep'] = int(prepmap[d['student']])
-	    d['userobjid'] = _getuserobjid(enums,['period','dow','student','adult'],d)
+	    d['userobjid'] = _getuserobjid(enums,['period','dow','student','adult','subject'],d)
 
 	    d['saveversion'] = 1
 	   
@@ -591,6 +592,38 @@ def updatelessoncount():
     for that session '''
     pass
     
+def gridreduce(grid,blanks,headeroffset=1):
+    # remove any all blank rows or columns
+    # where blank is a list of things that mean blank
+    # assumes the grid is a list of rows
+    # headeroffset indicates to not include header row or column in determination
+    
+    gridh = len(grid)
+    gridw = len(grid[0])
+    
+    notblankcols = []
+    for y in range(headeroffset,gridw):
+	if len([x for x in range(headeroffset,gridh) if grid[x][y] not in blanks]) == 0:
+	    notblankcols.append(y)
+    
+    notblankrows = []
+    for x in range(headeroffset,gridh):
+	if len([y for y in range(headeroffset,gridw) if grid[x][y] not in blanks]) == 0:
+	    notblankrows.append(x)
+    
+    # need to start with biggest index first otherwise indexes change
+    notblankrows.reverse()
+    
+    for rowidx in notblankrows:
+	grid.pop(rowidx)
+
+    notblankcols.reverse()
+    
+    for row in grid:
+	for colidx in notblankcols:
+	    row.pop(colidx)
+
+		    
 if __name__ == "__main__":
     
     session_code_gen('quadref',False)
