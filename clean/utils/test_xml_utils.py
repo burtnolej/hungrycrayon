@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as xmltree
 import unittest
 from xml_utils import element_find_by_attrib_value, element_move, element_fuse, \
-     element_parent_get, element_find_tags,element_find_children
+     element_parent_get, element_find_tags,element_find_children, grid2xml, xml2string
     
 class Test_XML(unittest.TestCase):
 
@@ -215,10 +215,55 @@ class Test_XML_xpath(unittest.TestCase):
         # from a non root tag get its children using xpath
         self.assertEqual(len(self.root.findall('.//table[@name=\"a\"]/tr/*')),6)
 
+class Test_Grid_to_XML(unittest.TestCase):
+    
+    def setUp(self):
+        pass
+        
+    
+    def test_allstring_content(self):
+        
+        grid = [["A","B","C","D"],["E","F","G","H"]]
+        
+        expected_results = "<root><row><cell>A</cell><cell>B</cell><cell>C</cell><cell>D</cell></row><row><cell>E</cell><cell>F</cell><cell>G</cell><cell>H</cell></row></root>"
+        
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_allint_content(self):
+        
+        grid = [[1,2,3,4],[5,6,7,8]]
+        
+        expected_results = "<root><row><cell>1</cell><cell>2</cell><cell>3</cell><cell>4</cell></row><row><cell>5</cell><cell>6</cell><cell>7</cell><cell>8</cell></row></root>"
+        
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_alllist_content(self):
+        
+        grid = [[["A",1],["B",2]],[["C",3],["D",4]]]
+        
+        expected_results = "<root><row><cell><subcell>A</subcell><subcell>1</subcell></cell><cell><subcell>B</subcell><subcell>2</subcell></cell></row><row><cell><subcell>C</subcell><subcell>3</subcell></cell><cell><subcell>D</subcell><subcell>4</subcell></cell></row></root>"
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+
+    def test_alldict_content(self):
+        
+        expected_results = "<root><row><cell><A>1</A><B>2</B></cell></row><row><cell><C>3</C><D>4</D></cell></row></root>"
+        
+        grid = [[dict(A=1,B=2)],[dict(C=3,D=4)]]
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xml2string(xml),expected_results)
         
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML_xpath))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML_xpath))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML))
+    
     unittest.TextTestRunner(verbosity=2).run(suite)

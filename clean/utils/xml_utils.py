@@ -72,6 +72,41 @@ def element_parent_get(root,element):
     parent_map = dict((c, p) for p in root.getiterator() for c in p)    
     return(parent_map[element])
         
+def grid2xml(grid):
+    # take a 2d array and return an XML string
+    # nodes are called root, row and cell
+    # if cell content is a string it will be mapped to text
+    # if its a list it will be mapped to subcells
+    # if its a dict it will be mapped to sub elements with node names mapped to keys
+    
+    from types import StringType, ListType, IntType, DictType
+    
+    root = xmltree.Element('root')
+    
+    for row in grid:
+        rowelement = xmltree.SubElement(root,"row")
+        for cell in row:
+            cellelement = xmltree.SubElement(rowelement,"cell")
+            if isinstance(cell,StringType):
+                cellelement.text = cell
+            elif isinstance(cell,IntType):
+                cellelement.text = str(cell)
+            elif isinstance(cell,ListType):
+                for _cell in cell:
+                    subcellelement = xmltree.SubElement(cellelement,"subcell")
+                    subcellelement.text = str(_cell)
+            elif isinstance(cell,DictType):
+                for k,v in cell.iteritems():
+                    subcellelement = xmltree.SubElement(cellelement,k)
+                    subcellelement.text = str(v)    
+    
+    return(root)
+
+
+def xml2string(root):
+    
+    return(xmltree.tostring(root))
+
 if __name__ == "__main__":
     pass
 
