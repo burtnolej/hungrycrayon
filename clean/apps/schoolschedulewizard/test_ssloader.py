@@ -771,7 +771,7 @@ class Test_RecordIdentifcation(Test_Base):
         self.assertEquals(recordtype, 'subject.student.subject.teacher')   
         
     def test_teacher_edgecase2(self):
-        self.inputstr = "Movement: Shane, Asher, Simon B"
+        self.inputstr = "Movement: Shane, Simon B, Asher"
         recordtype = self.ssloader.identify_record(self.inputstr)
         
         self.assertEquals(recordtype, 'subject.student.subject.noteacher')
@@ -821,8 +821,24 @@ class Test_RecordIdentifcation(Test_Base):
         with self.assertRaises(SSLoaderNoRulesMatchException):
             recordtype = self.ssloader.identify_record(self.inputstr)
      
-     
-     
+    def test_nowith(self):
+        self.inputstr = "History Samantha"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'student.student.subject.teacher.nowith')
+        
+    def test_nowith2(self):
+        self.inputstr = "ELA Aaron"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'student.student.subject.teacher.nowith')
+        
+    def test_nowith_colon(self):
+        self.inputstr = "ELA: Aaron"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'student.student.subject.teacher.nowith.colon')     
+            
     # with and
     def test_teacher_WP_With_And(self):
         self.inputstr = "Work Period with Paraic and Rahul"
@@ -999,6 +1015,7 @@ class Test_PreProcessRecordsWith(Test_Base):
                           ['830-910','Tuesday','Engineering','Paraic',[],'subject.nostudent.nosubject.noteacher.with']]
         
         self.assertListEqual(clean_records,expected_results)
+
 
 class Test_PreProcessRecordsWithAnd(Test_Base):
     def setUp(self):
@@ -1363,7 +1380,38 @@ class Test_PreProcessRecordsStudentSubject(Test_Base):
     def test_(self):
         pass
         
+     
+     
+class Test_PreProcessRecordsNotWith(Test_Base):
+    
+    # checking out an edge case where <subject> newline<adult> does not match to the notwith subject rule
+    # and checking out an edge case where <subject>: newline<adult> does not match to the notwith subject rule
+    # and checking out an edge case where <subject>newline<adult> does not match to the notwith subject rule
+    
+    def setUp(self):
+        Test_Base.setUp(self)
+
+        fileasstring = self.ssloader.file2string("Prep6_Omer_1period.csv")
         
+        
+        print fileasstring
+        self.records = self.ssloader.string2records(fileasstring)
+        self.ssloader.inputfile="Prep6_Omer_1period.csv"
+        
+        print  self.records
+        self.clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+    def test_(self):
+
+        expected_records = [['830-910', 'Monday', 'Engineering', 'Paraic', ['Omer'], 'student.student.subject.teacher.nowith'], 
+                            ['830-910', 'Tuesday', 'ELA', 'Aaron', ['Omer'], 'student.student.subject.teacher.nowith'],
+                            ['830-910', 'Wednesday', 'Engineering', 'Paraic', ['Omer'], 'student.student.subject.teacher.nowith.colon'], 
+                            ['830-910', 'Thursday', 'ELA', 'Aaron', ['Omer'], 'subject.nostudent.nosubject.noteacher.with'], 
+                            ['830-910', 'Friday', 'STEM', '??', ['Omer'], 'subject.nostudent.nosubject.noteacher']]
+
+        self.assertListEqual(self.clean_records,expected_records)
+
+    
 class Test_PreProcessRecordsPrep4100(Test_Base):
     
     def setUp(self):
@@ -2635,6 +2683,9 @@ class Test_DBLoader_Primary_Record_Set_Nathaniel(Test_Primary_Record_Base):
 
         expected_results.sort()
         
+        #for row in self.filter_results(4,'Orig'):
+        #    print row
+        
         self.assertListEqual(self.filter_results(4,'Orig'),expected_results)
 
 
@@ -2756,9 +2807,12 @@ if __name__ == "__main__":
     
     
     # pre_process_records
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))    
-    unittest.TextTestRunner(verbosity=2).run(suite) 
-    exit()
+    
+    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))   
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_3Student_1period))    
+    #unittest.TextTestRunner(verbosity=2).run(suite) 
+    #exit()
     
     
     # loadrefobjects

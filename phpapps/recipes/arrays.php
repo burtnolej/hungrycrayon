@@ -1,5 +1,22 @@
-
 <?php
+function myarrays() {
+	$array = [
+           	[1,2],
+		[3,4],
+	];
+
+	// and iterating over it
+	foreach ($array as $subarray) {
+		foreach ($subarray as $el) {
+			echo $el;
+		}
+	}
+}
+
+myarrays()
+?>
+
+
 class recipe_arrays
 {
     public function dump_array($array)

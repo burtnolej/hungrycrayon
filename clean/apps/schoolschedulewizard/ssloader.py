@@ -588,6 +588,10 @@ class SSLoader(object):
 		    continue
 		elif fileasstring[i-5:i] == "with ":
 		    continue
+		elif fileasstring[i-1:i] == ":":
+		    continue
+		elif fileasstring[i-1:i] == "/":
+		    continue
                 
                 records.append(record.strip())
                 record=""
@@ -1193,16 +1197,16 @@ if __name__ == "__main__":
 	         ("academic.csv",-1,True),
 	         ('prep56new.csv',-1,True)]'''
 	
-	files = [("/mnt/bumblebee-burtnolej/googledrive/Prep6IndividualSchedules_new.csv",6,True,"6s"),
-	         ("/mnt/bumblebee-burtnolej/googledrive/Prep4IndividualSchedules_new.csv",4,True,"4s"),
-	         ("/mnt/bumblebee-burtnolej/googledrive/Prep5IndividualSchedules_new.csv",5,True,"5s"),
-	         ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",5,True,"56n"),
-	          ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep4schedulenewworkperiod.csv",5,True,"4n")]
+	files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep6IndividualSchedules_new.csv",6,True,"6s"),
+	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4IndividualSchedules_new.csv",4,True,"4s"),
+	         ("/mnt/bumblebee-burtnolej/googledrive/current/CopyofPrep5IndividualSchedules_new.csv",5,True,"5s"),
+	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5and6schedulenewworkperiod.csv",-1,True,"56n"),
+	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4schedulenewworkperiod.csv",5,True,"4n")]
 	
 	#files = [("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",-1,True),
 	#          ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep4schedulenewworkperiod.csv",-1,True)]
 	
-	#files = [("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",-1,True)]
+	#files = [("/mnt/bumblebee-burtnolej/googledrive/current/CopyofPrep5IndividualSchedules_new.csv",6,True)]
 	                                          
 	
     else:

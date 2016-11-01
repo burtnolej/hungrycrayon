@@ -337,7 +337,6 @@ def session_code_gen(dbname,dryrun=False):
 @logger(log)
 def dbbulkloader(database,dbrecords,tblname,cols,maxsize=300):
     with database:
-
 	dbcoldefn = _gencoldefn(dbrecords[0],cols)
 
 	if not tbl_exists(database,tblname) ==True:
@@ -350,7 +349,7 @@ def dbbulkloader(database,dbrecords,tblname,cols,maxsize=300):
 		if starti+maxsize > len(dbrecords):
 		    endi = len(dbrecords)
 		else:
-		    endi = starti + (maxsize-1)
+		    endi = starti + maxsize
 
 		tbl_rows_insert(database,tblname,cols,dbrecords[starti:endi])
 		log.log(thisfuncname(),10,msg="loaded rows to "+tblname,numrow=endi-starti)
@@ -361,35 +360,66 @@ def dbbulkloader(database,dbrecords,tblname,cols,maxsize=300):
 def _isenum(enums,objtype,value):
     
     ''' ensures that value is an enum by converting from name if required ''' 
-    if value in enums[objtype]['enum2name'].keys(): 
-	return value
+    try:
+	if value in enums[objtype]['enum2name'].keys(): 
+	    return value
+    except KeyError:
+	log.log(thisfuncname(),2,msg="could not lookup enum2name",objtype=objtype,value=str(value))
+	return "??"
     
-    if value in enums[objtype]['name']:
-	return enums[objtype]['name2enum'][value]
+    try:
+	if value in enums[objtype]['name']:
+	    return enums[objtype]['name2enum'][value]
+    except KeyError:
+	log.log(thisfuncname(),2,msg="could not lookup name2enum",objtype=objtype,value=str(value))
+	return "??"
     
-    if value in enums[objtype]['code2enum'].keys():
-	return enums[objtype]['code2enum'][value]
+    try:
+	if value in enums[objtype]['code2enum'].keys():
+	    return enums[objtype]['code2enum'][value]
+    except KeyError:
+	log.log(thisfuncname(),2,msg="could not lookup code2enum",objtype=objtype,value=str(value))
+	return "??"
     
 def _isname(enums,objtype,value):    
     ''' ensures that value is a name by converting from code if required ''' 
     
-    if value in enums[objtype]['name']: 
-	return value
+    try:
+	if value in enums[objtype]['name']: 
+	    return value
+    except KeyError:
+	log.log(thisfuncname(),2,msg="could not lookup name",objtype=objtype,value=str(value))
+	return "??"
     
-    elif value in enums[objtype]['code2name'].keys():
-	return enums[objtype]['code2name'][value]
+    try:
+	if value in enums[objtype]['code2name'].keys():
+	    return enums[objtype]['code2name'][value]
+    except KeyError:
+	log.log(thisfuncname(),2,msg="could not lookup code2name",objtype=objtype,value=str(value))
+	return "??"
     
-    elif value in enums[objtype]['enum2name'].keys():
-	return enums[objtype]['enum2name'][value]
+    try:
+	if value in enums[objtype]['enum2name'].keys():
+	    return enums[objtype]['enum2name'][value]
+    except KeyError:
+	log.log(thisfuncname(),2,msg="could not lookup enum2name",objtype=objtype,value=str(value))
+	return "??"
     
 def _iscode(enums,objtype,value):    
     ''' ensures that value is a code by converting from code if required ''' 
-    
-    if value in enums[objtype]['code2name'].keys():
-	return value
-    
-    if value in enums[objtype]['name']:
-	return enums[objtype]['name2code'][value]
+    try:
+	if value in enums[objtype]['code2name'].keys():
+	    return value
+    except KeyError:
+	log.log(thisfuncname(),2,msg="could not lookup code2name",objtype=objtype,value=str(value))
+	return "??"
+	
+    try:
+	if value in enums[objtype]['name']:
+	    return enums[objtype]['name2code'][value]
+    except KeyError:
+	log.log(thisfuncname(),2,msg="could not lookup name2code",objtype=objtype,value=str(value))
+	return "??"
 
 def _loadprepmapper(database):
     cols = ['name','prep']
@@ -488,7 +518,7 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    d['period'] = _isname(enums,'period',d['period'])
 	    d['session'] = ".".join([d['adult'],d['subject'],_isname(enums,'dow',d['dow']),d['period']])
 	    d['prep'] = int(prepmap[d['student']])
-	    d['userobjid'] = _getuserobjid(enums,['period','dow','student'],d)
+	    d['userobjid'] = _getuserobjid(enums,['period','dow','student','adult'],d)
 
 	    d['saveversion'] = 1
 	   
@@ -561,6 +591,38 @@ def updatelessoncount():
     for that session '''
     pass
     
+def gridreduce(grid,blanks,headeroffset=1):
+    # remove any all blank rows or columns
+    # where blank is a list of things that mean blank
+    # assumes the grid is a list of rows
+    # headeroffset indicates to not include header row or column in determination
+    
+    gridw = len(grid)
+    gridh = len(grid[0])
+    
+    notblankcols = []
+    for y in range(headeroffset,gridw):
+	if len([x for x in range(headeroffset,gridh) if grid[x][y] not in blanks]) == 0:
+	    notblankcols.append(y)
+    
+    notblankrows = []
+    for x in range(headeroffset,gridh):
+	if len([y for y in range(headeroffset,gridw) if grid[x][y] not in blanks]) == 0:
+	    notblankrows.append(x)
+    
+    # need to start with biggest index first otherwise indexes change
+    notblankrows.reverse()
+    
+    for rowidx in notblankrows:
+	grid.pop(rowidx)
+
+    notblankcols.reverse()
+    
+    for row in grid:
+	for colidx in notblankcols:
+	    row.pop(colidx)
+
+		    
 if __name__ == "__main__":
     
     session_code_gen('quadref',False)
