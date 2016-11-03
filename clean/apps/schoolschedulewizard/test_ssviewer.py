@@ -31,7 +31,20 @@ class Test_Viewer_Base(unittest.TestCase):
         
         of = ObjFactory(True)
         self.app = WizardUI(self.dbname,of,self.dbname,maxentrycols=12,maxentryrows=20)
-        
+    
+'''
+if the tests fail and in the logs in says cannot find table "recordtype", this is because
+some of the test databasese still use lesson_type (static table manually created)
+the quad.sqlite in ../schoolscheduler will have a table called recordtype so 
+cp ../schoolscheduler/quad.sqlite test_ssloader.sqlite and then un comment the line
+with a files argument and then just uncomment the test_ function to regenerate the correct
+test data
+
+also the tests may expect the old periods, so 1210-100,100-140,140-220,220-300,300-330
+
+same goes for Test_Viewer_Conflicts_master_record;  same instruxx as above
+'''
+
 class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
     
     def setUp(self):
@@ -51,6 +64,7 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
     
         self.assertListEqual(results,expected_results)
         
+    
     def test_Mo_Peter_adult_subject(self):
         
         expected_results = [['', u'MO'], [u'830-910', [(u'Amelia', u'ELA')]], [u'910-950', [(u'??', u'Core')]],
@@ -77,8 +91,7 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
         
     def test_Mo_830_910_adult_subject(self):
         
-        expected_results = [['', u'MO'], [u'1030-1110', [(u'Jake', u'Aaron'), (u'Peter', u'Issey'), (u'Orig', u'??'), (u'Bruno', u'Dylan'), (u'Oscar', u'Paraic'), 
-                                                         (u'Clayton', u'Dylan'), (u'Jack', u'Paraic'), (u'Nathaniel', u'Amelia'), (u'Stephen', u'??')]]]
+        expected_results = [['', u'MO'],[u'1030-1110',[(u'Jake', u'Aaron'), (u'Peter', u'Issey'), (u'Orig', u'??'), (u'Bruno', u'Dylan'), (u'Oscar', u'Paraic'), (u'Clayton', u'Dylan'), (u'Jack', u'Paraic'), (u'Nathaniel', u'Amelia'), (u'Stephen', u'??')]]]
 
         self.app.load(saveversion=1,student="",dow="MO",period="1030-1110")
 
@@ -95,6 +108,7 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
         results = self.app.viewer(ui=False,ztypes=['*'],source_type="student",source_value="")
 
         self.assertListEqual(results,expected_results)
+
         
 class Test_Viewer_X_Period_Y_Adult(Test_Viewer_Base):
     
@@ -138,9 +152,9 @@ class Test_Viewer_Conflicts_master_record(Test_Viewer_Base):
 
         files = [("prep5studentPeterPeriod1.csv",5,True),("prep56new_Amelia_1period.csv",-1,True)]
         
-        Test_Viewer_Base.setUp(self,"test_ssloader_conflicts",files)
-        #Test_Viewer_Base.setUp(self,"test_ssloader_conflicts")
-    
+        #Test_Viewer_Base.setUp(self,"test_ssloader_conflicts",files)
+        Test_Viewer_Base.setUp(self,"test_ssloader_conflicts")
+
     def test_(self):
         
         self.app.load(saveversion=1,student="Peter")
