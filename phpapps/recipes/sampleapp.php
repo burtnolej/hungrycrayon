@@ -1,6 +1,5 @@
 <?php
 
-<<<<<<< HEAD
 include_once '../utils/utils_xml.php';
 include_once '../utils/utils_error.php';
 
@@ -33,14 +32,9 @@ class RESTComms
 		$http_status = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
 		$stats = curl_getinfo($this->curl);
 
-		$utilsxml = simplexml_load_string($token, 'utils_xml');	
-		
-		
-		//echo '{ "token": "'.$token.'" }';
-		
-		//foreach ($stats as $key => $value) {
-   	// 	echo $key, $value;
-		//}
+
+		// display xml as html		
+		xml2html($token);
 	}
 	
 	function __destruct() {
@@ -49,8 +43,38 @@ class RESTComms
 	}
 }
 
-=======
->>>>>>> 4dfacb1ce734b49792b8a8c7da5c110732203b3a
+function xml2html($xmlstr)
+{
+	// load xml string into XML Utils
+	$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');		
+
+	// get a list of all rows
+	$_rows = $utilsxml->xpath("//row");
+
+	echo "<table border='1' style=width:100%>";
+
+	foreach ($_rows as $_row) {
+	
+		echo "<tr>";
+	
+		// get a list of the cells (children) of this row
+		$_cells = $_row->xpath("child::*");
+	
+		foreach ($_cells as $_cell) {
+
+			echo "<td";
+			echo " bgcolor=#".$_cell->bgcolor;
+			echo " fgcolor=#".$_cell->fgcolor;
+			echo ">";
+			echo $_cell->value;
+			echo "</td>";
+		}
+		echo "</tr>";
+	}
+	
+	echo "</table> ";	
+}
+
 class LogFile
 {
 
@@ -157,7 +181,6 @@ class MultiDArray extends BaseClass
 	}
 }
 
-<<<<<<< HEAD
 set_error_handler('\\UtilsError::error_handler');
 
 //$mdarray = new MultiDArray(10,10);
@@ -180,6 +203,5 @@ $htmltbl = new HTMLTableBuilder($mdarray->arr);
 $logfile = new LogFile("foobar.txt");
 
 fwrite($logfile->fh,"foobar")
->>>>>>> 4dfacb1ce734b49792b8a8c7da5c110732203b3a
 
 ?>
