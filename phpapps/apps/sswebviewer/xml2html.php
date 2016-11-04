@@ -40,24 +40,9 @@ table {
 
 <?php
 
-include_once '../utils/utils_xml.php';
-include_once '../utils/utils_error.php';
-include_once '../utils/utils_test.php';
-include_once 'test_xml2.php';
+include_once '../../utils/utils_xml.php';
 
-set_error_handler('\\UtilsError::error_handler');
-
-//$gridarr = Array(); // declare resulting array
-
-// load xml string into XML Utils
-$utilsxml = simplexml_load_string($xmlstr_rowhdr, 'utils_xml');		
-
-// get a list of all rows
-$_rows = $utilsxml->xpath("//row");
-
-echo "<table id=table >";
-
-function _drawcell($cell) {
+function drawcell($cell) {
 	
 	if (isset($cell->type)) {
 		echo "<td id=".$cell->type;
@@ -66,39 +51,56 @@ function _drawcell($cell) {
 		echo "<td id=cell";
 	}
 	
-	echo " bgcolor=#".$cell->bgcolor;
-	echo " fgcolor=#".$cell->fgcolor;
+	if (isset($cell->bgcolor)) {
+		echo " bgcolor=#".$cell->bgcolor;
+	}
+	
+	if (isset($cell->fgcolor)) {	
+		echo " fgcolor=#".$cell->fgcolor;
+	}
+	
 	echo ">";
 	echo $cell->value;
 	echo "</td>";
 } 
 
-foreach ($_rows as $_row) {
+function drawgrid($xmlstr) {
 	
-	echo "<tr>"; // start an html row
-	$_cells = $_row->xpath("child::*"); // get a list of the cells (children) of this row
+	echo "<table id=table >";
 	
-	foreach ($_cells as $_cell) {
+	// load xml string into XML Utils
+	$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');	
+
+	// get a list of all rows
+	$_rows = $utilsxml->xpath("//row");
+
+	foreach ($_rows as $_row) {
+	
+		echo "<tr>"; // start an html row
+		$_cells = $_row->xpath("child::*"); // get a list of the cells (children) of this row
+	
+		foreach ($_cells as $_cell) {
 		
-		$_subcells = $_cell->xpath("child::subcell"); // see if any subcells exist
+			$_subcells = $_cell->xpath("child::subcell"); // see if any subcells exist
 	
-		if (sizeof($_subcells) <> 0) {
+			if (sizeof($_subcells) <> 0) {
 			
-				echo "<td>";
-				echo "<table id=table>"; // start a new table
-				echo "<tr>"; // all subcells go on one row
+					echo "<td>";
+					echo "<table id=table>"; // start a new table
+					echo "<tr>"; // all subcells go on one row
 				
-				foreach ($_subcells as $_subcell) {
-						drawcell($_subcell);
-				}
-				echo "</tr>";
-				echo "</table>";
-				echo "</td>";
+					foreach ($_subcells as $_subcell) {
+							drawcell($_subcell);
+					}
+					echo "</tr>";
+					echo "</table>";
+					echo "</td>";
+			}
+			else { // create a regular cell
+				drawcell($_cell);
+			}
 		}
-		else { // create a regular cell
-			drawcell($_cell);
-		}
+		echo "</tr>";
 	}
-	echo "</tr>";
+	echo "</table> ";
 }
-echo "</table> ";
