@@ -255,8 +255,13 @@ class WizardUI(Tk):
         self.source_label.focus_get()
         self.source_label_sv.set('dbinsert')
         
+        self.unknown_checkbutton_sv = StringVar()
+        self.unknown_checkbutton = _checkbutton(controlpanel, text="unknowns", variable=self.unknown_checkbutton_sv,
+                                                onvalue="Y", offvalue="N",width=wx*2,font=font)
+        self.unknown_checkbutton.grid(row=0,column=17,pady=5)
+        
         buttonpanel = Frame(controlpanel,style='ControlPanel.TFrame')
-        buttonpanel.grid(row=0,column=17,sticky=NSEW)
+        buttonpanel.grid(row=0,column=18,sticky=NSEW)
     
         self.dbload_button = _tkbutton(buttonpanel,font=font,command=lambda: self.load(self.dbload_entry_sv.get()),
                                     text="dbload",name="dbl")
@@ -546,10 +551,17 @@ class WizardUI(Tk):
                                     if hasattr(_val,ztype) == True:
                                         zval = getattr(_val,ztype)
                                         
-                                        _celltext = _additem(_celltext,zval.name)
-                                        
-                                celltext.append(tuple(_celltext))
-
+                                        try:
+                                            _celltext.index(zval.name)
+                                        except:
+                                            _celltext = _additem(_celltext,zval.name)
+                                            pass
+                                            
+                                try:      
+                                    celltext.index(tuple(_celltext))
+                                except:
+                                    celltext.append(tuple(_celltext))
+                                    
                 values[x].append(celltext)
         
         sswizard_utils.gridreduce(values,[[]])
@@ -574,6 +586,7 @@ class WizardUI(Tk):
         
             self.viewergrid.grid(row=3,column=0,sticky=NSEW)
             self.grid_rowconfigure(3, weight=10, uniform="foo")
+
             
             for x in range(len(values)):
                 for y in range(len(values[x])):
@@ -582,7 +595,7 @@ class WizardUI(Tk):
 
                     if isinstance(_value,list) == True:
                         if _value <> []:
-                            if len(_value) == 1:
+                            if len(_value) == 1 and conflicts_only <> "Y":
                                 if isinstance(_value[0],tuple) == True:
                                     # 1 item, multi attributes
                                     bgs,fgs = self._color_get_multi(_value[0])
@@ -591,8 +604,9 @@ class WizardUI(Tk):
                                     # 1 item, single value
                                     bg,fg = self.color_get(_value[0])
                                     _widgets = widget.addlabel(1,True,_value[0],bg,fg)
-                            else:
-                                # multiple items
+                                    
+                            # multiple items
+                            if len(_value) > 1 and conflicts_only == "Y":
                                 for __value in _value:
                                     bgs,fgs = self._color_get_multi(__value)
                                     _widgets = widget.addlabel(len(__value),True,__value,bgs,fgs,wratio)
@@ -762,7 +776,8 @@ class WizardUI(Tk):
         self.of.store={}
 
     @logger(log)       
-    def load(self,saveversion=None, dow=None, prep=None, period=None, teacher=None, student=None, source=None):
+    def load(self,saveversion=None, dow=None, prep=None, period=None, teacher=None, student=None, source=None,
+             unknown=None):
         
         self.of.reset()
         
@@ -785,6 +800,15 @@ class WizardUI(Tk):
             log.log(thisfuncname(),3,msg="loading",saveversion=str(saveversion))
             whereclause.append(['saveversion',"=",saveversion])
         
+        # unknown
+        if unknown==None:
+            unknown = self.unknown_checkbutton_sv.get()
+        if unknown=='N':
+            whereclause.append(['student',"<>","\"??\""])
+            whereclause.append(['subject',"<>","\"??\""])
+            whereclause.append(['teacher',"<>","\"??\""])
+        log.log(thisfuncname(),3,msg="loading",unknown=str(unknown))
+            
         # prep
         if prep==None: prep=self.prep_entry_sv.get()
         if  prep == "":
@@ -890,6 +914,7 @@ class WizardUI(Tk):
 
 def dump2csv(results,conflicts_only):
 
+    outputstr = ""
     for row in results:
         output_row = []
         for item in row:
@@ -904,11 +929,13 @@ def dump2csv(results,conflicts_only):
                 output_row.append(" ".join(output_cell))
             else:
                 output_row.append(str(item))
-        print ",".join(output_row)
+        
+        outputstr += "^".join(output_row) + "\n"
+    return outputstr
         
 if __name__ == "__main__":
     
-    enableui = True
+    enableui = False
     
     if len(sys.argv) <= 1:
         raise Exception("provide a database name; no extension")
@@ -926,15 +953,19 @@ if __name__ == "__main__":
     app = WizardUI(sys.argv[1],of,sys.argv[1],maxentrycols=12,maxentryrows=20)
     
     conflicts_only="Y"
+    unknowns="N"
     
     if enableui == True:
         app.mainloop()       
     else:
-        app.load(saveversion=1,student="")
+        app.load(saveversion=1,student="",source="56n,4n,4s,5s,6s",unknown=unknowns)
 
         for dow in ['MO','TU','WE','TH','FR']:
-            results = app.viewer(ui=False,source_type="adult",ztypes=['adult','subject'],
-                                 source_value="",yaxis_type="student",constraints=[('dow',dow)])
+            app.viewer(ui=True,source_type="adult",ztypes=['adult','subject'],
+                       source_value="",yaxis_type="student",constraints=[('dow',dow)],
+                       conflicts_only=conflicts_only)
+            
+            results = app._dumpviewergrid()
         
-            dump2csv(results,"Y")
+            print dump2csv(results,conflicts_only)
     

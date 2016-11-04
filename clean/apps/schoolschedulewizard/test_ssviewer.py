@@ -7,7 +7,7 @@ from ttk import *
 
 import unittest
 from ssloader import SSLoader
-from ssviewer import WizardUI
+from ssviewer import WizardUI, dump2csv
 from database_util import Database
 from database_table_util import tbl_rows_get
 from misc_utils_objectfactory import ObjFactory
@@ -108,8 +108,18 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
         results = self.app.viewer(ui=False,ztypes=['*'],source_type="student",source_value="")
 
         self.assertListEqual(results,expected_results)
-
         
+        
+    def test_Mo_830_910_adult_subject_no_unknowns(self):
+        
+        expected_results = [['', u'MO'],[u'1030-1110',[(u'Jake', u'Aaron'), (u'Peter', u'Issey'), (u'Bruno', u'Dylan'), (u'Oscar', u'Paraic'), (u'Clayton', u'Dylan'), (u'Jack', u'Paraic'), (u'Nathaniel', u'Amelia')]]]
+
+        self.app.load(saveversion=1,student="",dow="MO",period="1030-1110",unknown='N')
+
+        results = self.app.viewer(ui=False,ztypes=['student','adult'],source_type="student",source_value="")
+        
+        self.assertListEqual(results,expected_results)
+
 class Test_Viewer_X_Period_Y_Adult(Test_Viewer_Base):
     
     def setUp(self):
@@ -173,9 +183,10 @@ class Test_Viewer_Conflicts(Test_Viewer_Base):
 
         files = [("prep5studentPeterPeriod1.csv",5,True,"5s"),("prep56new_Amelia_1period.csv",-1,True,"56n")]
         
-        Test_Viewer_Base.setUp(self,"test_ssloader_conflicts",files)
+        #Test_Viewer_Base.setUp(self,"test_ssloader_conflicts",files)
+        Test_Viewer_Base.setUp(self,"test_ssloader_conflicts")
 
-    def test_(self):
+    '''def test_(self):
         
         self.app.load(saveversion=1,student="Peter",source="56n,5s")
 
@@ -185,8 +196,68 @@ class Test_Viewer_Conflicts(Test_Viewer_Base):
 
         
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="Peter")
-        self.assertListEqual(results,expected_results)
+        self.assertListEqual(results,expected_results)'''
         
+    def test_conflicts_only(self):
+        
+        self.app.load(saveversion=1,student="Peter",source="56n,5s")
+
+        expected_results = [['', u'FR', u'MO', u'TU', u'WE', u'TH'], 
+                            [u'830-910', [(u'Humanities',)], [(u'Math',)], [(u'Activity Period',), (u'ELA',)], 
+                             [(u'Math',)], [(u'Student News',)]]]
+
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="Peter",conflicts_only="Y")
+        
+        for row in results:
+            print row
+            
+        #self.assertListEqual(results,expected_results)
+      
+class Test_Viewer_UI_Conflicts(Test_Viewer_Base):
+    def setUp(self):
+
+        files = [("prep5studentPeterPeriod1.csv",5,True,"5s"),("prep56new_Amelia_1period.csv",-1,True,"56n")]
+        
+        #Test_Viewer_Base.setUp(self,"test_ssloader_conflicts",files)
+        Test_Viewer_Base.setUp(self,"test_ssloader_conflicts")
+        
+    def test_conflicts_only(self):
+        
+        self.app.load(saveversion=1,student="Peter",source="56n,5s")
+
+        expected_results = [['', u'FR', u'MO', u'TU', u'WE', u'TH'], 
+                            [u'830-910', '', '', u'(Activity Period)(ELA)', '', '']]
+
+
+        self.app.viewer(ui=True,ztypes=['subject'],source_type="student",source_value="Peter",conflicts_only="Y")
+        
+        results = self.app._dumpviewergrid()
+    
+        self.assertListEqual(results,expected_results)
+   
+class Test_Viewer_UI_Conflicts_Report(Test_Viewer_Base):
+    def setUp(self):
+
+        files = [("prep5studentPeterPeriod1.csv",5,True,"5s"),("prep56new_Amelia_1period.csv",-1,True,"56n")]
+        
+        Test_Viewer_Base.setUp(self,"test_ssloader_conflicts",files)
+        #est_Viewer_Base.setUp(self,"quad")
+        
+    def test_(self):
+        
+        self.app.load(saveversion=1,student="",source="56n,5s",unknown='N')
+
+        expected_results = "^Peter^Jack\n830-910^(Amelia,Activity Period)(Amelia,ELA)^\n"
+        
+        for dow in ['TU']:
+            self.app.viewer(ui=True,ztypes=['adult','subject'],source_type="adult",source_value="",yaxis_type="student",
+                            constraints=[('dow',dow)],conflicts_only="Y")
+        
+            results = self.app._dumpviewergrid()
+            
+        self.assertEqual(dump2csv(results,"Y"),expected_results)     
+    
 class Test_Viewer_UI(Test_Viewer_Base):
     
     def setUp(self):
@@ -254,14 +325,22 @@ class Test_Viewer_UI(Test_Viewer_Base):
     def tearDown(self):
         self.app.destroy()
         
+        
+
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts_master_record))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts_master_record))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts_Report))
+    
+    
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
