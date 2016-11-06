@@ -220,12 +220,51 @@ class Test_Grid_to_XML(unittest.TestCase):
     def setUp(self):
         pass
         
-    
+    def test_allstring_content_basic(self):
+        
+        grid = [["A"]]
+        
+        expected_results = "<root><row><cell>A</cell></row></root>"
+        
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
     def test_allstring_content(self):
         
         grid = [["A","B","C","D"],["E","F","G","H"]]
         
         expected_results = "<root><row><cell>A</cell><cell>B</cell><cell>C</cell><cell>D</cell></row><row><cell>E</cell><cell>F</cell><cell>G</cell><cell>H</cell></row></root>"
+        
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_allstring_content_with_ids_basic(self):
+        
+        grid = [["A"]]
+        
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\">A</cell></row></root>"
+        
+        xml = grid2xml(grid,ids=True)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_allstring_content_with_ids(self):
+        
+        grid = [["A","B","C","D"],["E","F","G","H"]]
+        
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\">A</cell><cell id=\"1.2\">B</cell><cell id=\"1.3\">C</cell><cell id=\"1.4\">D</cell></row><row id=\"2\"><cell id=\"2.1\">E</cell><cell id=\"2.2\">F</cell><cell id=\"2.3\">G</cell><cell id=\"2.4\">H</cell></row></root>"
+        
+        xml = grid2xml(grid,ids=True)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+
+    def test_allint_content_basic(self):
+        
+        grid = [[1]]
+        
+        expected_results = "<root><row><cell>1</cell></row></root>"
         
         xml = grid2xml(grid)
          
@@ -241,6 +280,42 @@ class Test_Grid_to_XML(unittest.TestCase):
          
         self.assertEqual(xmltree.tostring(xml),expected_results)
         
+    def test_alllist_content_basic(self):
+        
+        grid = [[["A",1]]]
+        
+        expected_results = "<root><row><cell><subcell>A</subcell><subcell>1</subcell></cell></row></root>"
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_alllistofdicts_content_basic(self):
+        
+        grid = [[[dict(A=1)]]]
+        
+        expected_results = "<root><row><cell><subcell><A>1</A></subcell></cell></row></root>"
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_alllistofdicts_content_basic_with_ids(self):
+        
+        grid = [[[dict(A=1)]]]
+        
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\"><subcell id=\"1.1.1\"><A>1</A></subcell></cell></row></root>"
+        xml = grid2xml(grid,ids=True)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+
+    def test_alllistofdicts_content_basic_uneven(self):
+        
+        grid = [[[dict(A=1),dict(B=2,C=3)]]]
+        
+        expected_results = "<root><row><cell><subcell><A>1</A></subcell><subcell><C>3</C><B>2</B></subcell></cell></row></root>"
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
     def test_alllist_content(self):
         
         grid = [[["A",1],["B",2]],[["C",3],["D",4]]]
@@ -249,7 +324,35 @@ class Test_Grid_to_XML(unittest.TestCase):
         xml = grid2xml(grid)
          
         self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_alllist_content_with_ids_basic(self):
+        
+        grid = [[["A",1]]]
+        
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\"><subcell id=\"1.1.1\">A</subcell><subcell id=\"1.1.2\">1</subcell></cell></row></root>"
+        
+        xml = grid2xml(grid,ids=True)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_alllist_content_with_ids(self):
+        
+        grid = [[["A",1],["B",2]],[["C",3],["D",4]]]
+        
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\"><subcell id=\"1.1.1\">A</subcell><subcell id=\"1.1.2\">1</subcell></cell><cell id=\"1.2\"><subcell id=\"1.2.1\">B</subcell><subcell id=\"1.2.2\">2</subcell></cell></row><row id=\"2\"><cell id=\"2.1\"><subcell id=\"2.1.1\">C</subcell><subcell id=\"2.1.2\">3</subcell></cell><cell id=\"2.2\"><subcell id=\"2.2.1\">D</subcell><subcell id=\"2.2.2\">4</subcell></cell></row></root>"
+        xml = grid2xml(grid,ids=True)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
 
+    def test_alldict_content_basic(self):
+        
+        expected_results = "<root><row><cell><A>1</A></cell></row></root>"
+        
+        grid = [[dict(A=1)]]
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xml2string(xml),expected_results)
+        
     def test_alldict_content(self):
         
         expected_results = "<root><row><cell><A>1</A><B>2</B></cell></row><row><cell><C>3</C><D>4</D></cell></row></root>"
@@ -258,6 +361,50 @@ class Test_Grid_to_XML(unittest.TestCase):
         xml = grid2xml(grid)
          
         self.assertEqual(xml2string(xml),expected_results)
+        
+    def test_alllist_content_added_tags_basic(self):
+        
+        grid = [[(1,'red')]]
+        
+        tags = ["value","fgcolor"]
+        
+        expected_results = "<root><row><cell><value>1</value><fgcolor>red</fgcolor></cell></row></root>"
+        xml = grid2xml(grid,tags)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_alllist_content_added_tags(self):
+        
+        grid = [[(1,'red','yellow'),(5,'blue','green')]]
+        
+        tags = ["value","fgcolor","bgcolor"]
+        
+        expected_results = "<root><row><cell><value>1</value><fgcolor>red</fgcolor><bgcolor>yellow</bgcolor></cell><cell><value>5</value><fgcolor>blue</fgcolor><bgcolor>green</bgcolor></cell></row></root>"
+        xml = grid2xml(grid,tags)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_alldict_content_actualexample(self):
+        
+        expected_results = "<root><row><cell><bgcolor>FAFF33</bgcolor><fgcolor>251151</fgcolor><Value>row1cell1</Value></cell></row></root>"
+        
+        grid = [[dict(Value='row1cell1',bgcolor='FAFF33',fgcolor='251151')]]
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xml2string(xml),expected_results)
+        
+    def test_alllist_content_added_tags_basic_with_ids(self):
+        
+        grid = [[(1,'red')]]
+        
+        tags = ["value","fgcolor"]
+        
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\"><value>1</value><fgcolor>red</fgcolor></cell></row></root>"
+        xml = grid2xml(grid,tags=tags,ids=True)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+
+        
         
 if __name__ == "__main__":
 
