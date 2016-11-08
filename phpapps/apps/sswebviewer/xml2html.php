@@ -4,7 +4,7 @@
 #cell {
     padding:0px;
     line-height:30px;
-    background-color:#eeeeee;
+    //background-color:#eeeeee;
     //<!height:2000px;>
     float:left;
     text-align:center;;
@@ -25,7 +25,7 @@
 
 #table {
 	width:100%;
-   background-color:#eeeeee;
+   //background-color:#eeeeee;
    	<!height:2000px;>
    float:left;
    text-align:center;;
@@ -40,7 +40,13 @@ table {
 
 <?php
 
-include_once '../../utils/utils_xml.php';
+//include once '/home/burtnolej/Development/pythonapps3/phpapps/utils/utils_xml.php';
+
+set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
+
+//include_once '../../utils/utils_xml.php';
+include_once 'utils_xml.php';
+
 
 function drawcell($cell) {
 	
@@ -52,11 +58,11 @@ function drawcell($cell) {
 	}
 	
 	if (isset($cell->bgcolor)) {
-		echo " bgcolor=#".$cell->bgcolor;
+		echo " bgcolor=".$cell->bgcolor;
 	}
 	
 	if (isset($cell->fgcolor)) {	
-		echo " fgcolor=#".$cell->fgcolor;
+		echo " fgcolor=".$cell->fgcolor;
 	}
 	
 	echo ">";
@@ -81,9 +87,33 @@ function drawgrid($xmlstr) {
 	
 		foreach ($_cells as $_cell) {
 		
-			$_subcells = $_cell->xpath("child::subcell"); // see if any subcells exist
+			$_subrows = $_cell->xpath("child::subrow"); // see if any subrows exist
+			
+			if (sizeof($_subrows) <> 0) {
+				
+				echo "<td>";
+				echo "<table id=table>"; // start a new table
+				foreach ($_subrows as $_subrow) {
+					echo "<tr>"; // start a sub row
+				
+					$_subcells = $_subrow->xpath("child::subcell"); // see if any subcells exist
 	
-			if (sizeof($_subcells) <> 0) {
+					if (sizeof($_subcells) <> 0) {
+				
+						foreach ($_subcells as $_subcell) {
+								drawcell($_subcell);
+						}
+						echo "</tr>";
+					}
+				}
+				echo "</table>";
+				echo "</td>";
+			}
+			else {
+	
+				$_subcells = $_cell->xpath("child::subcell"); // see if any subcells exist
+	
+				if (sizeof($_subcells) <> 0) {
 			
 					echo "<td>";
 					echo "<table id=table>"; // start a new table
@@ -95,12 +125,17 @@ function drawgrid($xmlstr) {
 					echo "</tr>";
 					echo "</table>";
 					echo "</td>";
-			}
-			else { // create a regular cell
-				drawcell($_cell);
-			}
+				}
+				else { // create a regular cell
+					drawcell($_cell);
+				}
+			}	
 		}
 		echo "</tr>";
 	}
 	echo "</table> ";
+}
+
+if (!debug_backtrace()) {
+	drawgrid($argv[1]);
 }

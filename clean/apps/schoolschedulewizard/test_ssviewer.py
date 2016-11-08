@@ -97,6 +97,8 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
 
         results = self.app.viewer(ui=False,ztypes=['student','adult'],source_type="student",source_value="")
         
+        #self.app.mainloop()
+        
         self.assertListEqual(results,expected_results)
         
     def test_Mo_830_910_count_groupby(self):
@@ -214,6 +216,46 @@ class Test_Viewer_Conflicts(Test_Viewer_Base):
             
         #self.assertListEqual(results,expected_results)
       
+class Test_Viewer_X_Period_Y_DOW_Formats(Test_Viewer_Base):
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"test_ssloader")
+
+    def test_Mo_830_910_Peter_adult_1attr(self):
+                
+        expected_results = [[dict(value='',bgcolor='#ffffff',fgcolor='#000000'), dict(value=u'MO',bgcolor='#ffffff',fgcolor='#000000')], 
+                            [dict(value=u'830-910',bgcolor='#ffffff',fgcolor='#000000'), [(dict(value='ELA',bgcolor='#ffcc99',fgcolor='#ffffff'),)]]]
+                            
+        self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
+
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="Peter",formatson=True)
+        
+        #print results
+        
+        self.assertListEqual(results,expected_results)
+        
+    '''def test_Mo_830_910_Peter_adult_2attr(self):
+                
+        expected_results = [['', u'MO'], 
+                            [u'830-910', [(dict(value='ELA',bgcolor='#ffcc99',fgcolor='black'),dict(value='Amelia',bgcolor='#006600',fgcolor='green'))]]]
+                            
+        self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
+
+        results = self.app.viewer(ui=False,ztypes=['subject','adult'],source_type="student",source_value="Peter",formatson=True)
+        
+        self.assertListEqual(results,expected_results)
+        
+    def test_Mo_830_910_Peter_adult_1attr_multi_items(self):
+                
+        expected_results = [['', u'MO'], 
+                            [u'830-910', [(dict(value='ELA',bgcolor='#ffcc99',fgcolor='black'),dict(value='Amelia',bgcolor='#006600',fgcolor='green'))]]]
+                            
+        self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
+
+        results = self.app.viewer(ui=False,ztypes=['subject','adult'],source_type="student",source_value="Peter",formatson=True)
+        
+        self.assertListEqual(results,expected_results)'''
+        
 class Test_Viewer_UI_Conflicts(Test_Viewer_Base):
     def setUp(self):
 
@@ -322,22 +364,196 @@ class Test_Viewer_UI(Test_Viewer_Base):
         
         self.assertListEqual(results,expected_results)
         
+
     def tearDown(self):
         self.app.destroy()
+    
+class Test_1row_1col_1subrow_1subcol(Test_Viewer_Base):
+    
+    # 1 attribute displayed for each record ('subject')
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"1subrow_1subcol")
+       
+    def test_(self):
         
-        
+        expected_results = [['', u'MO'], [u'830-910', [(u'ELA',)]]]
 
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
+        
+        self.assertListEqual(expected_results,results)
+        
+    def test_formats(self):
+
+        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},)]]]
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True)
+        
+        self.assertListEqual(expected_results,results)
+        
+class Test_1row_1col_2subrow_1subcol(Test_Viewer_Base):
+    
+    # 1 attribute displayed for each record ('subject')
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"2subrow_1subcol")
+       
+    def test_(self):
+        
+        expected_results = [['', u'MO'],[u'830-910', [(u'ELA',), (u'Math',)]]]
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
+        
+        self.assertListEqual(expected_results,results)
+        
+    def test_formats(self):
+
+        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]]]
+
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True)
+        
+        self.assertListEqual(expected_results,results)
+        
+class Test_2row_1col_2subrow_1subcol(Test_Viewer_Base):
+    
+    # 1 attribute displayed for each record ('subject')
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"2subrow_1subcol")
+       
+    def test_(self):
+        
+        expected_results = [['', u'MO'], [u'830-910', [(u'ELA',), (u'Math',)]], [u'910-950', [(u'ELA',), (u'Math',)]]]
+
+
+        self.app.load(saveversion=1,student="",dow="MO")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
+
+        self.assertListEqual(expected_results,results)
+        
+    def test_formats(self):
+
+        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'910-950'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]]]
+
+        self.app.load(saveversion=1,student="",dow="MO")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True)
+
+        self.assertListEqual(expected_results,results)
+        
+class Test_2row_2col_2subrow_1subcol(Test_Viewer_Base):
+    
+    # 1 attribute displayed for each record ('subject')
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"2subrow_1subcol")
+       
+    def test_(self):
+
+        expected_results = [['', u'MO', u'TU'], 
+                            [u'830-910', [(u'ELA',), (u'Math',)], [(u'ELA',), (u'Math',)]], 
+                            [u'910-950', [(u'ELA',), (u'Math',)], [(u'ELA',), (u'Math',)]]]
+
+
+        self.app.load(saveversion=1,student="")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
+
+        self.assertListEqual(expected_results,results)
+        
+    def test_formats(self):
+
+        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'TU'}], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)], [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                                                                                                  ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'910-950'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)], [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                                                                                                  ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]]]
+        self.app.load(saveversion=1,student="")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True)
+        
+        self.assertListEqual(expected_results,results)
+                
+class Test_nrow_ncol_2subrow_1subcol(Test_Viewer_Base):
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"test_ssloader")
+        
+    def test_formats(self):
+    
+        self.app.load(saveversion=1,student="Peter",dow="MO")
+    
+        results = self.app.viewer(ui=False,ztypes=['student','subject'],source_type="student",source_value="Peter",yaxis_type="adult",formatson=True)
+    
+        print results
+            
+            
+class Test_1row_1col_2subrow_2subcol(Test_Viewer_Base):
+    
+    # 2 attribute displayed for each record ('subject','adult')
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"2subrow_1subcol")
+       
+    def test_(self):
+        
+        expected_results = [['', u'MO'], [u'830-910', [(u'ELA', u'Amelia'), (u'Math', u'Aaron')]]]
+        
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject','adult'],source_type="student",source_value="")
+        
+        self.assertListEqual(expected_results,results)
+        
+    def test_formats(self):
+
+        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'}, {'bgcolor': '#006600', 'fgcolor': '#00ff00', 'value': u'Amelia'}), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'}, {'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Aaron'})]]]
+
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject','adult'],source_type="student",source_value="",formatson=True)
+                
+        self.assertListEqual(expected_results,results)
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_2subcol))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_1col_2subrow_1subcol))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_2col_2subrow_1subcol))
     
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nrow_ncol_2subrow_1subcol))
+    
+    
+    
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW_Formats))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts_master_record))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts_Report))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts_Report))
     
     
     

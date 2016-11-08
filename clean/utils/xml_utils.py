@@ -99,12 +99,89 @@ def grid2xml(grid,tags=None,ids=False):
                 cellelement.text = str(cell)
             elif isinstance(cell,ListType):
                 subcellidx=1
+                subrowidx=0
+                for _cell in cell:
+                    if isinstance(_cell,dict):
+                        subcellelement = xmltree.SubElement(cellelement,"subcell")
+                        for k,v in _cell.iteritems():
+                            subsubcellelement = xmltree.SubElement(subcellelement,k)
+                            subsubcellelement.text = str(v)
+                        if ids==True: subcellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subcellidx)])
+                    elif isinstance(_cell,tuple):
+                        # only create a subrow if theres going to be more than 1 row
+                        subrowelement = xmltree.SubElement(cellelement,"subrow")
+                        subrowidx+=1
+                        subcellidx=1
+                        for __cell in _cell:
+                            subcellelement = xmltree.SubElement(subrowelement,"subcell")
+                            for k,v in __cell.iteritems():
+                                subsubcellelement = xmltree.SubElement(subcellelement,k)
+                                subsubcellelement.text = str(v)
+                                
+                            if ids==True: subcellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subrowidx),str(subcellidx)])
+                            subcellidx+=1
+                        if ids==True: subrowelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subrowidx)])   
+                    else:
+                        subcellelement = xmltree.SubElement(cellelement,"subcell")
+                        subcellelement.text = str(_cell)
+                        if ids==True: subcellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subcellidx)])
+                    subcellidx+=1
+            elif isinstance(cell,DictType):
+                for k,v in cell.iteritems():
+                    subcellelement = xmltree.SubElement(cellelement,k)
+                    subcellelement.text = str(v)
+            elif isinstance(cell,TupleType):
+                if tags == None:
+                    raise Exception("tags need to be set to a list")
+                for i in range(len(cell)):
+                    if len(tags) <> len(cell):
+                        raise Exception("tags need ro be same len as tuple")
+                    
+                    subcellelement = xmltree.SubElement(cellelement,tags[i])
+                    subcellelement.text = str(cell[i])
+            cellidx+=1
+        rowidx+=1
+    
+    return(root)
+
+def ORIG_grid2xml(grid,tags=None,ids=False):
+    # take a 2d array and return an XML string
+    # nodes are called root, row and cell
+    # if cell content is a string it will be mapped to text
+    # if its a list it will be mapped to subcells
+    # if its a dict it will be mapped to sub elements with node names mapped to keys
+    # if its a tuple it will be mapped to tags within cells, where tags is a list
+    # if ids=True, then row/cell/subcell tags will have ids of the form row#.cell#.subcell#
+    
+    from types import StringType, ListType, IntType, DictType, TupleType
+    
+    root = xmltree.Element('root')
+    
+    rowidx=1
+    for row in grid:
+        rowelement = xmltree.SubElement(root,"row")
+        if ids==True: rowelement.attrib['id'] = str(rowidx)
+        cellidx=1
+        for cell in row:
+            cellelement = xmltree.SubElement(rowelement,"cell")
+            if ids==True: cellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx)])
+            if isinstance(cell,StringType):
+                cellelement.text = cell
+            elif isinstance(cell,IntType):
+                cellelement.text = str(cell)
+            elif isinstance(cell,ListType):
+                subcellidx=1
                 for _cell in cell:
                     subcellelement = xmltree.SubElement(cellelement,"subcell")
                     if isinstance(_cell,dict):
                         for k,v in _cell.iteritems():
                             subsubcellelement = xmltree.SubElement(subcellelement,k)
                             subsubcellelement.text = str(v)
+                    elif isinstance(_cell,tuple):
+                        for __cell in _cell:
+                            for k,v in __cell.iteritems():
+                                subsubcellelement = xmltree.SubElement(subcellelement,k)
+                                subsubcellelement.text = str(v)
                     else:
                         subcellelement.text = str(_cell)
                     if ids==True: subcellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subcellidx)])
@@ -126,7 +203,6 @@ def grid2xml(grid,tags=None,ids=False):
         rowidx+=1
     
     return(root)
-
 
 def xml2string(root):
     

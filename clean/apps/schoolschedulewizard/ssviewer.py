@@ -51,6 +51,12 @@ darkyellow = '#%02x%02x%02x' % (155,140,6)
 paleblue = '#%02x%02x%02x' %(173,217,222)
 palegreen = '#%02x%02x%02x' %(183,229,183)
 cerise = '#%02x%02x%02x' %(212, 7, 253)
+red = '#%02x%02x%02x' %(255, 0, 0)
+black = '#%02x%02x%02x' %(255, 255, 255)
+white = '#%02x%02x%02x' %(0, 0, 0)
+green = '#%02x%02x%02x' %(0, 255, 0)
+blue = '#%02x%02x%02x' %(0, 0, 255)
+lightgrey = '#%02x%02x%02x' % (211, 211, 211)
 
 verydarkgrey = '#%02x%02x%02x' %(54, 46, 55)
 dirtyyellow = '#%02x%02x%02x' %(242, 232, 19)
@@ -106,7 +112,7 @@ class WizardUI(Tk):
         Tk.__init__(self)
         
         #self.colorpalette = dict(recordtype=dict(wp='green',subject='blue',ap='yellow'))
-        self.colorpalette = dict(wp='green',subject=lightblue,ap='yellow',
+        self.colorpalette = dict(wp=green,subject=lightblue,ap='yellow',
                                  Movement=pink,ELA=salmon,Humanities=lightyellow,
                                  Counseling=lightgreen,Math=lightturquoise, 
                                  Music=lightblue,STEM=lavender,Art=purple,History=pink,
@@ -120,12 +126,12 @@ class WizardUI(Tk):
                                  Karolina=verydarkgrey)
         
 
-        self.fontpalette = dict(Amelia='green',Paraic=darkgreen,Stan=lavender,
-                                Samantha=lightgreen,Alexa='blue',Francisco=purple,
+        self.fontpalette = dict(Amelia=green,Paraic=darkgreen,Stan=lavender,
+                                Samantha=lightgreen,Alexa=blue,Francisco=purple,
                                 Melissa=lightblue,Rahul=dirtyyellow,Dylan=dirtyyellow, 
                                 Moira=dirtyyellow,Issey=dirtyyellow, Daryl=dirtyyellow, 
                                 Karolina=dirtyyellow,Chess=pink,Student_News=lightyellow,
-                                subject='blue')
+                                subject=blue)
         
         
         screenwidth = self.winfo_vrootwidth()
@@ -423,8 +429,8 @@ class WizardUI(Tk):
     
     def color_get(self,value):
         
-        bg = 'lightgrey'
-        fg = 'black'
+        bg = lightgrey
+        fg = black
             
         try:
             int(value)
@@ -436,7 +442,7 @@ class WizardUI(Tk):
             value= value.replace(" ","_")
             
         if value.count("[") == 1 and value.count("]") == 1:
-            bg = 'red'
+            bg = red
         
         if value.count(".") > 0:
             value = value.split(".")[0]
@@ -452,7 +458,7 @@ class WizardUI(Tk):
         
     def viewer(self,ui=True,source_type=None,source_value=None,
                ztypes=None,yaxis_type=None,xaxis_type=None,
-               conflicts_only=None,constraints=None,wratio=None):
+               conflicts_only=None,constraints=None,wratio=None,formatson=False):
         
         # constraint will be a list of tuples of the form
         # objtype,objvalue i.e. ('dow','MO')
@@ -619,6 +625,46 @@ class WizardUI(Tk):
                         _widgets = widget.addlabel(expand)
                         _widgets[0].sv.set(_value)                                       
         else:
+            if formatson==True:                
+                for x in range(len(values)):
+                    for y in range(len(values[x])):
+                        _value = values[x][y]
+
+                        if isinstance(_value,list) == True:
+                            if _value <> []:
+                                values[x][y] = []
+                                ''' uncomment if want to generate conflicts report'''
+                                #if len(_value) == 1 and conflicts_only <> "Y":
+                                if len(_value) == 1:
+                                    if isinstance(_value[0],tuple) == True:
+                                        # 1 item, multi attributes
+                                        bgs,fgs = self._color_get_multi(_value[0])
+                                        _formats = []
+                                        for i in range(len(_value[0])):
+                                            _formats.append(dict(value=_value[0][i],bgcolor=bgs[i],fgcolor=fgs[i]))
+                                            
+                                        values[x][y].append(tuple(_formats))
+                                    elif isinstance(_value[0],list) == False:
+                                        # 1 item, single value
+                                        bg,fg = self.color_get(_value[0])
+
+                                        print "1,1 attr",_value[0],bgs,fgs
+                                # multiple items
+                                ''' uncomment if want to generate conflicts report'''
+                                #if len(_value) > 1 and conflicts_only == "Y":
+                                if len(_value) > 1:
+                                    for __value in _value:
+                                        bgs,fgs = self._color_get_multi(__value)
+                                        _formats = []
+                                        for i in range(len(__value)):
+                                            _formats.append(dict(value=__value[i],bgcolor=bgs[i],fgcolor=fgs[i]))
+                                            
+                                        values[x][y].append(tuple(_formats))
+                        else:
+                            if x == 0 or y == 0:
+                                values[x][y] = dict(value=_value,bgcolor=black,fgcolor=white)
+                                
+            
             return values
             
         self.viewergrid.reset_framewidth()
@@ -935,7 +981,7 @@ def dump2csv(results,conflicts_only):
         
 if __name__ == "__main__":
     
-    enableui = False
+    enableui = True
     
     if len(sys.argv) <= 1:
         raise Exception("provide a database name; no extension")

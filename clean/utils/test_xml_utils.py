@@ -316,6 +316,16 @@ class Test_Grid_to_XML(unittest.TestCase):
          
         self.assertEqual(xmltree.tostring(xml),expected_results)
         
+    def test_alllistofdicts_content_2subrows_2subcells(self):
+        
+        grid = [[[(dict(A=1),dict(B=2)),(dict(C=3),dict(D=4))]]]
+        
+        expected_results = "<root><row><cell><subrow><subcell><A>1</A></subcell><subcell><B>2</B></subcell></subrow><subrow><subcell><C>3</C></subcell><subcell><D>4</D></subcell></subrow></cell></row></root>"
+        
+        xml = grid2xml(grid)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+
     def test_alllist_content(self):
         
         grid = [[["A",1],["B",2]],[["C",3],["D",4]]]
@@ -404,13 +414,212 @@ class Test_Grid_to_XML(unittest.TestCase):
          
         self.assertEqual(xmltree.tostring(xml),expected_results)
 
+class Test_Grid_to_XML_function(unittest.TestCase):
+                
+    def test_1row_1col_2subrow_1subcol_formats(self):
+    
+        '''
+        <root>
+          <row id="1">
+            <cell id="1.1">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value />
+            </cell>
+            <cell id="1.2">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value>MO</value>
+            </cell>
+          </row>
+          <row id="2">
+            <cell id="2.1">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value>830-910</value>
+            </cell>
+            <cell id="2.2">
+              <subrow id="2.2.1">
+                <subcell id="2.2.1.1">
+                  <bgcolor>#ffcc99</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>ELA</value>
+                </subcell>
+              </subrow>
+              <subrow id="2.2.2">
+                <subcell id="2.2.2.1">
+                  <bgcolor>#99ffcc</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>Math</value>
+                </subcell>
+              </subrow>
+            </cell>
+          </row>
+        </root>
+        '''
         
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value /></cell><cell id=\"1.2\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>MO</value></cell></row><row id=\"2\"><cell id=\"2.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>830-910</value></cell><cell id=\"2.2\"><subrow id=\"2.2.1\"><subcell id=\"2.2.1.1\"><bgcolor>#ffcc99</bgcolor><fgcolor>#ffffff</fgcolor><value>ELA</value></subcell></subrow><subrow id=\"2.2.2\"><subcell id=\"2.2.2.1\"><bgcolor>#99ffcc</bgcolor><fgcolor>#ffffff</fgcolor><value>Math</value></subcell></subrow></cell></row></root>"
+        
+        grid = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]]]
+        
+        xml = grid2xml(grid,ids=True)
+        
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_2row_1col_2subrow_1subcol_formats(self):
+        
+        '''
+        <root>
+          <row id="1">
+            <cell id="1.1">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value />
+            </cell>
+            <cell id="1.2">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value>MO</value>
+            </cell>
+          </row>
+          <row id="2">
+            <cell id="2.1">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value>830-910</value>
+            </cell>
+            <cell id="2.2">
+              <subrow id="2.2.1">
+                <subcell id="2.2.1.1">
+                  <bgcolor>#ffcc99</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>ELA</value>
+                </subcell>
+              </subrow>
+              <subrow id="2.2.2">
+                <subcell id="2.2.2.1">
+                  <bgcolor>#99ffcc</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>Math</value>
+                </subcell>
+              </subrow>
+            </cell>
+          </row>
+          <row id="3">
+            <cell id="3.1">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value>910-950</value>
+            </cell>
+            <cell id="3.2">
+              <subrow id="3.2.1">
+                <subcell id="3.2.1.1">
+                  <bgcolor>#ffcc99</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>ELA</value>
+                </subcell>
+              </subrow>
+              <subrow id="3.2.2">
+                <subcell id="3.2.2.1">
+                  <bgcolor>#99ffcc</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>Math</value>
+                </subcell>
+              </subrow>
+            </cell>
+          </row>
+        </root>
+
+        '''
+        
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value /></cell><cell id=\"1.2\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>MO</value></cell></row><row id=\"2\"><cell id=\"2.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>830-910</value></cell><cell id=\"2.2\"><subrow id=\"2.2.1\"><subcell id=\"2.2.1.1\"><bgcolor>#ffcc99</bgcolor><fgcolor>#ffffff</fgcolor><value>ELA</value></subcell></subrow><subrow id=\"2.2.2\"><subcell id=\"2.2.2.1\"><bgcolor>#99ffcc</bgcolor><fgcolor>#ffffff</fgcolor><value>Math</value></subcell></subrow></cell></row><row id=\"3\"><cell id=\"3.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>910-950</value></cell><cell id=\"3.2\"><subrow id=\"3.2.1\"><subcell id=\"3.2.1.1\"><bgcolor>#ffcc99</bgcolor><fgcolor>#ffffff</fgcolor><value>ELA</value></subcell></subrow><subrow id=\"3.2.2\"><subcell id=\"3.2.2.1\"><bgcolor>#99ffcc</bgcolor><fgcolor>#ffffff</fgcolor><value>Math</value></subcell></subrow></cell></row></root>"
+        
+        grid = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'910-950'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]]]
+        
+        xml = grid2xml(grid,ids=True)
+    
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_1row_1col_2subrow_2subcol_formats(self):
+        
+        '''
+        <root>
+          <row id="1">
+            <cell id="1.1">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value />
+            </cell>
+            <cell id="1.2">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value>MO</value>
+            </cell>
+          </row>
+          <row id="2">
+            <cell id="2.1">
+              <bgcolor>#ffffff</bgcolor>
+              <fgcolor>#000000</fgcolor>
+              <value>830-910</value>
+            </cell><cell id="2.2">
+              <subrow id="2.2.1">
+                <subcell id="2.2.1.1">
+                  <bgcolor>#ffcc99</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>ELA</value>
+                </subcell>
+                <subcell id="2.2.1.2">
+                  <bgcolor>#006600</bgcolor>
+                  <fgcolor>#00ff00</fgcolor>
+                  <value>Amelia</value>
+                </subcell>
+              </subrow>
+              <subrow id="2.2.2">
+                <subcell id="2.2.2.1">
+                  <bgcolor>#99ffcc</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>Math</value>
+                </subcell>
+                <subcell id="2.2.2.2">
+                  <bgcolor>#d3d3d3</bgcolor>
+                  <fgcolor>#ffffff</fgcolor>
+                  <value>Aaron</value>
+                </subcell>
+              </subrow>
+            </cell>
+          </row>
+        </root>
+        '''
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value /></cell><cell id=\"1.2\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>MO</value></cell></row><row id=\"2\"><cell id=\"2.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>830-910</value></cell><cell id=\"2.2\"><subrow id=\"2.2.1\"><subcell id=\"2.2.1.1\"><bgcolor>#ffcc99</bgcolor><fgcolor>#ffffff</fgcolor><value>ELA</value></subcell><subcell id=\"2.2.1.2\"><bgcolor>#006600</bgcolor><fgcolor>#00ff00</fgcolor><value>Amelia</value></subcell></subrow><subrow id=\"2.2.2\"><subcell id=\"2.2.2.1\"><bgcolor>#99ffcc</bgcolor><fgcolor>#ffffff</fgcolor><value>Math</value></subcell><subcell id=\"2.2.2.2\"><bgcolor>#d3d3d3</bgcolor><fgcolor>#ffffff</fgcolor><value>Aaron</value></subcell></subrow></cell></row></root>";
+        
+        grid = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'}, {'bgcolor': '#006600', 'fgcolor': '#00ff00', 'value': u'Amelia'}), 
+                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'}, {'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Aaron'})]]]
+        
+        xml = grid2xml(grid,ids=True)
+        
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+    def test_nrow_ncol_1subrow_2subcol_formats(self):
+        grid = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'??'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Karolina'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Paraic'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Issey'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'[Paraic,Rahul]'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Amelia'}], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [], [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'})]], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'910-950'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#666600', 'fgcolor': '#ffffff', 'value': u'Core'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'950-1030'}, [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#006600', 'fgcolor': '#ffffff', 'value': u'Science'})], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1030-1110'}, [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ff99cc', 'fgcolor': '#ffffff', 'value': u'History'})], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1110-1210'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#663300', 'fgcolor': '#ffffff', 'value': u'Computer Time'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1210-100'}, [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'??'})], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'100-140'}, [], [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'})]], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'140-220'}, [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ccff99', 'fgcolor': '#ffffff', 'value': u'Counseling'})], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'220-300'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ff99cc', 'fgcolor': '#ffffff', 'value': u'Movement'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'300-330'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#663300', 'fgcolor': '#ffffff', 'value': u'Computer Time'})], [], [], [], [], []]]  
+        
+        xml = grid2xml(grid,ids=True)
+    
+        print xmltree.tostring(xml)
         
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML_xpath))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML_xpath))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML))
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_function))
     
     unittest.TextTestRunner(verbosity=2).run(suite)

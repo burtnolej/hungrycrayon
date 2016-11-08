@@ -1,6 +1,5 @@
 
 <?php
-
 include_once 'utils_utils.php';
 
 class UtilsError {
