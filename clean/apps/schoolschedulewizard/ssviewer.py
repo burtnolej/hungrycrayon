@@ -97,10 +97,13 @@ class schoolschedgeneric(dbtblgeneric):
 
             
         return(getattr(self,clsname))
-    
 
 class WizardUI(Tk):
     #def __init__(self,database,of):
+    
+    
+    @classmethod
+    def noui*
     def __init__(self,dbname,of,refdbname,maxentrycols=3,maxentryrows=4,
                  maxnewrowcols=3,maxnewrowrows=3):
         
@@ -981,7 +984,7 @@ def dump2csv(results,conflicts_only):
         
 if __name__ == "__main__":
     
-    enableui = True
+    enableui = False
     
     if len(sys.argv) <= 1:
         raise Exception("provide a database name; no extension")

@@ -40,13 +40,9 @@ table {
 
 <?php
 
-//include once '/home/burtnolej/Development/pythonapps3/phpapps/utils/utils_xml.php';
-
 set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 
-//include_once '../../utils/utils_xml.php';
 include_once 'utils_xml.php';
-
 
 function drawcell($cell) {
 	
@@ -136,6 +132,43 @@ function drawgrid($xmlstr) {
 	echo "</table> ";
 }
 
-if (!debug_backtrace()) {
-	drawgrid($argv[1]);
+if (!isset($_POST['xaxis'])) {
+	echo "need to set xaxis";
 }
+else {
+	$xaxis=$_POST['xaxis'];
+}
+
+if (!isset($_POST['yaxis'])) {
+	echo "need to set yaxis";
+}
+else {
+	$yaxis=$_POST['yaxis'];
+}
+
+$url = 'http://blackbear:8080/page?';
+
+foreach ($_POST as $key => $value){
+	$url = $url.$key."=".$value."&";
+}
+
+echo $url;
+
+//$url='http://blackbear:8080/';
+//$url='http://blackbear:8080/page?param=a&id=b';
+$curl = curl_init($url);
+
+	curl_setopt($curl, CURLOPT_VERBOSE,1);
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+	curl_setopt($curl, CURLOPT_HTTPHEADER, array("User-Agent: Test"));
+	curl_setopt($curl, CURLOPT_HEADER,false);
+
+	$token = curl_exec($curl);
+	$http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+	$stats = curl_getinfo($curl);
+	curl_close($curl);
+
+	drawgrid($token);
+	
+//if (!debug_backtrace()) {
+//}
