@@ -1,4 +1,14 @@
 
+<html>
+<style>
+label {
+	display: inline-block;
+	width:70px;
+	text-alight=right;
+}
+</style>
+</html>
+
 <?php
 $formdefn = <<<XML
 <root>
@@ -10,12 +20,16 @@ $formdefn = <<<XML
 	<dropdown id='2'>
 		<field>Adult</field>
 		<query>SELECT name FROM adult</query>
-		<value>Peter</value>
+		<value>Amelia</value>
 	</dropdown>
 </root>
 XML;
 
-set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
+
+
+//set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
+set_include_path('/Users/burtnolej/Development/pythonapps/phpapps/utils');
+
 include_once 'utils_xml.php';
 
 function get_htmldbdropdown($dbname,$xmlformdefn) {
@@ -28,21 +42,19 @@ function get_htmldbdropdown($dbname,$xmlformdefn) {
 
 	foreach ($_dropdowns as $_dropdown) {
 
-		echo "<label for=\".$field.\">".$_dropdown->field."</label>";
-		echo "<input type=\"text\" id=\"".$_dropdown->field."\" list=\"mySuggestion\" />";
-		echo "<datalist id=\"mySuggestion\">";
+		echo "<div>";
+		echo "<label for=\"".$_dropdown->field."\" >".$_dropdown->field."</label>";
+		echo "<input type=\"text\" value=\"".$_dropdown->value."\" id=\"".$_dropdown->field."\" list=\"".$_dropdown->field."\" />";
+		echo "<datalist id=\"".$_dropdown->field."\">";
 
 		$results = $db->query($_dropdown->query);
 		while ($row = $results->fetchArray()) {
 			foreach ($row as $value) {
-				echo "<option ";
-  				if ($value == $_dropdown->value) {
-  					echo "selected=\"selected\"";
-  				}
-  				echo ">".$value."</option>";
+				echo "<option>".$value."</option>";
 			}
 		}
 		echo "</datalist>";
+		echo "</div>";
 	}
 }
 get_htmldbdropdown("test.sqlite",$formdefn);
