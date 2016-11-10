@@ -1,6 +1,10 @@
 <html>
 <style>
 
+a {
+text-decoration: none
+}
+
 #cell {
     padding:0px;
     line-height:30px;
@@ -32,6 +36,7 @@
     border-bottom: 1px solid #000000;
     border-top: 1px solid #000000;
     border-left: 1px solid #000000;
+    min-width: 50px;
 }
 
 #subcellright {
@@ -44,6 +49,7 @@
     border-bottom: 1px solid #000000;
     border-top: 1px solid #000000;
     border-right: 1px solid #000000;
+    min-width: 50px;
 }
 
 #rowhdrcell {
@@ -93,13 +99,25 @@ subtable {
 
 <table id=table >
 	<tr>
-		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=50px></td>
-		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>??</td>
-		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>Karolina</td>
-		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>Paraic</td>
-		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>Issey</td>
-		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>[Paraic,Rahul]</td>
-		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>Amelia</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#ffffff width=50px></td>
+		<td id=cell bgcolor=#ffffff fgcolor=#ffffff width=100px>
+			<a style = "color:#f00000;"href="test.html">??</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">Karolina</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">Paraic</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">Issey</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">[Paraic,Rahul]</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">Amelia</a>
+		</td>
 	</tr>
 	<tr>
 		<td id=cell bgcolor=#ffffff fgcolor=#000000>830-910</td>
@@ -110,7 +128,9 @@ subtable {
 		<td>
 			<table id=subtable>
 				<tr>
-					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>P</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>
+							<a style = "color:#ffffff;"href="test.html">P</a>
+					</td>
 					<td id=subcellright bgcolor=#ffcc99 fgcolor=#ffffff width=50px>CTime</td>
 					<td><input type="checkbox" name="foobar" value="checked" /></td>
 				</tr>
@@ -126,10 +146,12 @@ subtable {
 				<tr>
 					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>P</td>
 					<td id=subcellright bgcolor=#ffcc99 fgcolor=#ffffff width=50px>CTime</td>
+					<td><input type="checkbox" name="foobar" value="checked" /></td>
 				</tr>
 				<tr>
 					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>P</td>
 					<td id=subcellright bgcolor=#ffcc99 fgcolor=#ffffff width=50px>CTime</td>
+					<td><input type="checkbox" name="foobar" value="checked" /></td>
 				</tr>
 			</table>
 		</td>
@@ -139,8 +161,8 @@ subtable {
 		<td>
 			<table id=table>
 				<tr>
-					<td id=subcell bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
-					<td id=subcell bgcolor=#666600 fgcolor=#ffffff>Core</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#666600 fgcolor=#ffffff>Core</td>
 				</tr>
 			</table>
 		</td>
@@ -157,8 +179,8 @@ subtable {
 		<td>
 			<table id=table>
 				<tr>
-					<td id=subcell bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
-					<td id=subcell bgcolor=#006600 fgcolor=#ffffff>Science</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#006600 fgcolor=#000000>Science</td>
 				</tr>
 			</table>
 		</td>
@@ -174,8 +196,8 @@ subtable {
 		<td>
 			<table id=subtable>
 				<tr>
-					<td id=cell bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
-					<td id=cell bgcolor=#ff99cc fgcolor=#ffffff>History</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#ff99cc fgcolor=#ffffff>History</td>
 				</tr>
 			</table>
 		</td>
@@ -187,8 +209,8 @@ subtable {
 		<td>
 			<table id=table>
 				<tr>
-					<td id=cell bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
-					<td id=cell bgcolor=#663300 fgcolor=#ffffff>CTime</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#663300 fgcolor=#ffffff>CTime</td>
 				</tr>
 			</table>
 		</td>
@@ -207,8 +229,8 @@ subtable {
 		<td>
 			<table id=table>
 				<tr>
-					<td id=cell bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>Peter</td>
-					<td id=cell bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>??</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>Peter</td>
+					<td id=subcellright bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>??</td>
 				</tr>
 			</table>
 		</td>
@@ -224,8 +246,8 @@ subtable {
 		<td>
 			<table id=table>
 				<tr>
-					<td id=cell bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
-					<td id=cell bgcolor=#ffcc99 fgcolor=#ffffff>ELA</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#ffcc99 fgcolor=#ffffff>ELA</td>
 				</tr>
 			</table>
 		</td>
@@ -235,8 +257,8 @@ subtable {
 		<td id=cell></td><td>
 			<table id=table>
 				<tr>
-					<td id=cell bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
-					<td id=cell bgcolor=#ccff99 fgcolor=#ffffff>Couns</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#ccff99 fgcolor=#ffffff>Couns</td>
 				</tr>
 			</table>
 		</td>
@@ -250,8 +272,8 @@ subtable {
 		<td>
 			<table id=table>
 				<tr>
-					<td id=cell bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
-					<td id=cell bgcolor=#ff99cc fgcolor=#ffffff>Mvmnt</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#ff99cc fgcolor=#ffffff>Mvmnt</td>
 				</tr>
 			</table>
 		</td>
@@ -266,8 +288,8 @@ subtable {
 		<td>
 			<table id=table>
 				<tr>
-					<td id=cell bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
-					<td id=cell bgcolor=#663300 fgcolor=#ffffff>CTime</td>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#663300 fgcolor=#ffffff>CTime</td>
 				</tr>
 			</table>
 		</td>
