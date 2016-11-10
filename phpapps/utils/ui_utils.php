@@ -24,20 +24,20 @@ function gethtmldbdropdown($dbname,$tablename){
 	$columns = gettablecolumns($dbname,$tablename);
 		
 	$widgetcount=0;
-	
-	echo "<div class=\"container\">	";
 
 	foreach ($columns as $column) {
 	
-			
+		echo "<div class=\"container\">	";
+		
 		$values = getcolumndistinctvalues($dbname,$tablename,$column);
 
 		gethtmldropdown($column,$values,$widgetcount);
 	
 		$widgetcount = $widgetcount+1;
 	
+		echo "</div>";
 	}
-	echo "</div>";
+
 
 }
 
