@@ -10,13 +10,13 @@ function gethtmldropdown($column,$values,$widgetcount) {
 
 	echo "<label for=\"".$column."\" >".$column."</label>";
 	echo "<input type=\"text\" id=\"".$column."\" list=\"".$datalistname."\" />";
-	//echo "<datalist id=\"".$datalistname."\">";
+	echo "<datalist id=\"".$datalistname."\">";
 	
-	//foreach ($values as $value) {
-	//		echo "<option>".$value."</option>";
-	//	}
+	foreach ($values as $value) {
+			echo "<option>".$value."</option>";
+		}
 		
-	//echo "</datalist>";
+	echo "</datalist>";
 }
 
 function gethtmldbdropdown($dbname,$tablename){
@@ -25,18 +25,20 @@ function gethtmldbdropdown($dbname,$tablename){
 		
 	$widgetcount=0;
 	
+	echo "<div class=\"container\">	";
+
 	foreach ($columns as $column) {
 	
-		echo "<div class=\"container\">	";
-	
+			
 		$values = getcolumndistinctvalues($dbname,$tablename,$column);
 
 		gethtmldropdown($column,$values,$widgetcount);
 	
 		$widgetcount = $widgetcount+1;
 	
-		echo "</div>";
 	}
+	echo "</div>";
+
 }
 
 function gethtmlbutton($type,$label) {
