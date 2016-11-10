@@ -1,5 +1,6 @@
 <?php
 
+
 require_once __DIR__ . '/composer/vendor/autoload.php';
 
 set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
@@ -20,7 +21,7 @@ class test_gethtmldropdown extends PHPUnit_Framework_TestCase
 		
 		ob_start(); 
 		
-		$this->expected_result = '<label for="foobar" >foobar</label><input type="text" id="foobar" list="suggestions0" /><datalist id="suggestions0"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></datalist>';
+		$this->expected_result = '<label for="foobar" >foobar</label><input type="text" name="foobar" id="foobar" list="suggestions0" /><datalist id="suggestions0"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></datalist>';
 				
 		$_result = gethtmldropdown($column,$values,$widgetcount);
 					
@@ -41,7 +42,7 @@ class test_gethtmldbdropdown extends PHPUnit_Framework_TestCase
 
 		ob_start(); 
 		
-		$this->expected_result = '<div class="container">	<label for="subject" >subject</label><input type="text" id="subject" list="suggestions0" /><datalist id="suggestions0"><option>Math</option><option>ELA</option><option>Engineering</option></datalist></div>';
+		$this->expected_result = '<div class="container">	<label for="subject" >subject</label><input type="text" name="subject" id="subject" list="suggestions0" /><datalist id="suggestions0"><option>Math</option><option>ELA</option><option>Engineering</option></datalist></div>';
 						
 		gethtmldbdropdown($dbname,$tablename);
 					
@@ -76,6 +77,50 @@ class test_gethtmlbutton extends PHPUnit_Framework_TestCase
 $stf = new test_gethtmlbutton();
 $stf->test_();
 
+class test_gethtmlxmldropdown extends PHPUnit_Framework_TestCase
+{
+	public function test_()
+	{
+		$xml = "<root><dropdown id='1'><field>xaxis</field><values><value>period</value><value>dow</value><value>adult</value><value>subject</value></values></dropdown><dropdown id='2'><field>yaxis</field><values><value>period</value><value>dow</value><value>adult</value><value>subject</value></values></dropdown></root>";
 
+		ob_start(); 
+		
+		$this->expected_result = '<div class="container">	<label for="xaxis" >xaxis</label><input type="text" name="xaxis" id="xaxis" list="suggestions0" /><datalist id="suggestions0"><option>period</option><option>dow</option><option>adult</option><option>subject</option></datalist></div><div class="container">	<label for="yaxis" >yaxis</label><input type="text" name="yaxis" id="yaxis" list="suggestions1" /><datalist id="suggestions1"><option>period</option><option>dow</option><option>adult</option><option>subject</option></datalist></div>';
+										
+		gethtmlxmldropdown($xml);
+					
+		$result = ob_get_contents();
+		ob_end_clean();
+	
+		$this->assertEquals($result,$this->expected_result);
+	}
+}
+
+$stf = new test_gethtmlxmldropdown();
+$stf->test_();
+
+class test_gethtmlmultiselect extends PHPUnit_Framework_TestCase
+{
+	public function test_()
+	{
+		$dbname = "test_gethtmlmultiselect.sqlite";
+		$query = "select name from sqlite_master";
+		$name = "ingredients";
+
+		//ob_start(); 
+		
+		$this->expected_result = '<div class="container">	<label for="xaxis" >xaxis</label><input type="text" name="xaxis" id="xaxis" list="suggestions0" /><datalist id="suggestions0"><option>period</option><option>dow</option><option>adult</option><option>subject</option></datalist></div><div class="container">	<label for="yaxis" >yaxis</label><input type="text" name="yaxis" id="yaxis" list="suggestions1" /><datalist id="suggestions1"><option>period</option><option>dow</option><option>adult</option><option>subject</option></datalist></div>';
+										
+		gethtmlmultiselect($dbname,$query,$name);
+					
+		//$result = ob_get_contents();
+		//ob_end_clean();
+	
+		//$this->assertEquals($result,$this->expected_result);
+	}
+}
+
+$stf = new test_gethtmlmultiselect();
+$stf->test_();
 
 ?>
