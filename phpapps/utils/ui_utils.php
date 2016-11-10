@@ -9,7 +9,7 @@ function gethtmldropdown($column,$values,$widgetcount) {
 	$datalistname = "suggestions".$widgetcount;
 
 	echo "<label for=\"".$column."\" >".$column."</label>";
-	echo "<input type=\"text\" id=\"".$column."\" list=\"".$datalistname."\" />";
+	echo "<input type=\"text\" name=\"".$column."\" id=\"".$column."\" list=\"".$datalistname."\" />";
 	echo "<datalist id=\"".$datalistname."\">";
 	
 	foreach ($values as $value) {
