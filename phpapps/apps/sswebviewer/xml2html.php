@@ -1,7 +1,11 @@
 <html>
 <style>
 
-#cell {
+a {
+	text-decoration: none;
+}
+
+cell {
     padding:0px;
     line-height:30px;
     //background-color:#eeeeee;
@@ -11,28 +15,41 @@
     border: 1px solid #73AD21;
 }
 
-#rowhdrcell {
-    padding:0px;
-    line-height:30px;
+.subcell {
+    border-bottom: 1px solid #00000;
+    border-top: 1px solid #00000;
+    width: 50px;
+}
+
+.subcellright {
+    border-right: 1px solid #00000;
+}
+
+.subcellleft {
+    border-left: 1px solid #00000;
+}
+
+.rowhdrcell {
     foreground-color:#D0C978;
     background-color:#98969B;
-    <!height:2000px;>
-    float:left;
-    text-align:center;;
-    width: 50px;
     border: 1px solid #73AD21;
 }
 
-#table {
+table {
 	width:100%;
    //background-color:#eeeeee;
-   	<!height:2000px;>
+   <!height:2000px;>
    float:left;
-   text-align:center;;
+   text-align:center;
+   border-collapse: collapse;
+   white-space:nowrap;
+   min-width:100px;
+   max-width:150px;
 }
 
-table {
-    border-collapse: collapse;
+.subtable {
+   min-width:10px;
+   max-width:10px;
 }
 
 </style>
@@ -95,7 +112,7 @@ function drawgrid($xmlstr) {
 					$_subcells = $_subrow->xpath("child::subcell"); // see if any subcells exist
 	
 					if (sizeof($_subcells) <> 0) {
-				
+						
 						foreach ($_subcells as $_subcell) {
 								drawcell($_subcell);
 						}
@@ -132,43 +149,42 @@ function drawgrid($xmlstr) {
 	echo "</table> ";
 }
 
-if (!isset($_POST['xaxis'])) {
-	echo "need to set xaxis";
-}
-else {
-	$xaxis=$_POST['xaxis'];
-}
-
-if (!isset($_POST['yaxis'])) {
-	echo "need to set yaxis";
-}
-else {
-	$yaxis=$_POST['yaxis'];
-}
+/*
 
 $url = 'http://blackbear:8080/page?';
 
 foreach ($_POST as $key => $value){
-	$url = $url.$key."=".$value."&";
+	if ($value <> "") {
+		if (is_array($value)) {
+			$url = $url.$key."=".implode(",",$value)."&";
+			
+		}
+		else {
+			$url = $url.$key."=".$value."&";
+		}
+	}
+	if ($value == "All") {
+		$url = $url.$key."=&";
+	}
 }
 
 echo $url;
 
-//$url='http://blackbear:8080/';
-//$url='http://blackbear:8080/page?param=a&id=b';
 $curl = curl_init($url);
 
-	curl_setopt($curl, CURLOPT_VERBOSE,1);
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
-	curl_setopt($curl, CURLOPT_HTTPHEADER, array("User-Agent: Test"));
-	curl_setopt($curl, CURLOPT_HEADER,false);
+curl_setopt($curl, CURLOPT_VERBOSE,1);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+curl_setopt($curl, CURLOPT_HTTPHEADER, array("User-Agent: Test"));
+curl_setopt($curl, CURLOPT_HEADER,false);
 
-	$token = curl_exec($curl);
-	$http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-	$stats = curl_getinfo($curl);
-	curl_close($curl);
+$token = curl_exec($curl);
+$http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+$stats = curl_getinfo($curl);
+curl_close($curl);
 
-	drawgrid($token);
+drawgrid($token);
+	
+*/
 	
 //if (!debug_backtrace()) {
 //}
