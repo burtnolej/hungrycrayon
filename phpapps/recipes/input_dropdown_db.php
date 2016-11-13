@@ -3,7 +3,7 @@
 <style>
 label {
 	display: inline-block;
-	width:70px;
+	width:120px;
 	text-alight=right;
 }
 </style>
@@ -13,14 +13,23 @@ label {
 $formdefn = <<<XML
 <root>
 	<dropdown id='1'>
-		<field>Student</field>
-		<query>SELECT name FROM student</query>
-		<value>Peter</value>
+		<field>Prep</field>
+		<dbfield>prep</dbfield>
+		<query>SELECT distinct(prep) FROM lesson</query>
+		<value>5</value>
 		<name>mySuggestion</name>
 	</dropdown>
-	
 	<dropdown id='2'>
+		<field>Student</field>
+		<dbfield>name</dbfield>
+		<query>SELECT name FROM student</query>
+		<value>Peter</value>
+		<name>mySuggestion1</name>
+	</dropdown>
+	
+	<dropdown id='3'>
 		<field>Adult</field>
+		<dbfield>name</dbfield>
 		<query>SELECT name FROM adult</query>
 		<value>Amelia</value>
 		<name>mySuggestion2</name>
@@ -30,44 +39,73 @@ $formdefn = <<<XML
 XML;
 
 
-
 set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 //set_include_path('/Users/burtnolej/Development/pythonapps/phpapps/utils');
 
 include_once 'utils_xml.php';
 
-function get_htmldbdropdown($dbname,$xmlformdefn) {
+function gettablecolumns($dbname,$tablename){
+
+	$columns = array();
 	
 	$db = new SQLite3($dbname);
 	
-	$utilsxml = simplexml_load_string($xmlformdefn, 'utils_xml');	
-
-	$_dropdowns = $utilsxml->xpath("//dropdown");
-
-	foreach ($_dropdowns as $_dropdown) {
-
-		echo "<div>";
-		echo "<label for=\"".$_dropdown->field."\" >".$_dropdown->field."</label>";
-		echo "<input type=\"text\" value=\"".$_dropdown->value."\" id=\"".$_dropdown->field."\" list=\"".$_dropdown->name."\" />";
-		echo "<datalist id=\"".$_dropdown->name."\">";
-		
-		//echo "<div>";
-		//echo "<label for=\"".$_dropdown->field."\" >".$_dropdown->field."</label>";
-		//echo "<input type=\"text\" value=\"".$_dropdown->value."\" id=\"".$_dropdown->field."\" list=\"mySuggestion\" />";
-		//echo "<datalist id=\"mySuggestion\">";
-		
-
-		$results = $db->query($_dropdown->query);
-		while ($row = $results->fetchArray()) {
-			foreach ($row as $value) {
-				echo "<option>".$value."</option>";
-			}
+	$results = $db->query("pragma table_info(".$tablename.")");
+	
+	while ($row = $results->fetchArray()) {
+		if (substr($row[1],0,2) <> "__") {
+			$columns[] = $row[1];
 		}
-		echo "</datalist>";
-		echo "</div>";
 	}
+	
+	return($columns);
 }
-get_htmldbdropdown("test.sqlite",$formdefn);
+function get_htmldbdropdown($column,$values,$widgetcount) {
+
+	$datalistname = "suggestions".$widgetcount;
+
+	echo "<label for=\"".$column."\" >".$column."</label>";
+	echo "<input type=\"text\" id=\"".$column."\" list=\"".$datalistname."\" />";
+	echo "<datalist id=\"".$datalistname."\">";
+	
+	foreach ($values as $value) {
+			echo "<option>".$value."</option>";
+		}
+		
+	echo "</datalist>";
+}
+
+function getcolumndistinctvalues($dbname,$tablename,$colname) {
+		
+	$values = array();
+	
+	$db = new SQLite3($dbname);
+	
+	$results = $db->query("select distinct(".$colname.") from ".$tablename);
+	
+	while ($row = $results->fetchArray()) {
+		$values[] = $row[0];
+	}
+	
+	return $values;
+}
+
+$columns = gettablecolumns("test.sqlite","lesson");
+
+$widgetcount=0;
+foreach ($columns as $column) {
+	
+	echo "<div class=\"container\">	";
+	
+	$values = getcolumndistinctvalues("test.sqlite","lesson",$column);
+
+	get_htmldbdropdown($column,$values,$widgetcount);
+	
+	$widgetcount = $widgetcount+1;
+	
+
+	echo "</div>";
+}
 
 ?>
 

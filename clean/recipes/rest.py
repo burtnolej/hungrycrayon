@@ -42,7 +42,7 @@ render_json = lambda **args: json.dumps(args)
 render_html = lambda message: '<html><body>%s</body></html>'%message
 render_txt = lambda message: message
 urls = (
-    '/(.*)', 'greet'
+    '/(.*)', 'page'
 )
 app = web.application(urls, globals())
 
@@ -68,11 +68,24 @@ xmlstr= "<root><row id='1'><cell id='1.1'><bgcolor>#ffffff</bgcolor><fgcolor>#00
         
         return {'message': grid }'''
 
-class greet:
+'''class greet:
     def GET(self,name):
         return xmlstr
-        #return {'message': xmlstr }
+        #return {'message': xmlstr }'''
         
+class page(object):
+    def GET(self,name):
+        
+        print name
+        
+        data = web.input(id='')
+        
+        #id = int(data.id)   # all the inputs are now strings. Cast it to int, to get integer.
+        #action = data.action
+        
+        #print data,action
+        return web.input()
+        #return xmlstr
         
 if __name__ == "__main__":
     import os

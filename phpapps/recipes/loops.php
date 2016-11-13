@@ -8,8 +8,15 @@ $assoc_array = array(
     
 foreach ($assoc_array as $key => $value)
 {
-    printf().':'.$value;
+    print($value);
 }
+
+$array = array(1,2,3,4,5,6,7);
+for ($i=0;$i<=sizeof($array);$i++) {
+	print($array[$i]).PHP_EOL;
+	
+}
+/*
 
 Arrayphp > 
 php > 
@@ -22,4 +29,6 @@ var_dump($a["a"]);
 
 $i=1;
 while ($i < 10) { echo $i++;}
+*/
+
 ?>

@@ -121,7 +121,7 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
         results = self.app.viewer(ui=False,ztypes=['student','adult'],source_type="student",source_value="")
         
         self.assertListEqual(results,expected_results)
-
+    
 class Test_Viewer_X_Period_Y_Adult(Test_Viewer_Base):
     
     def setUp(self):
@@ -354,16 +354,13 @@ class Test_Viewer_UI(Test_Viewer_Base):
         
     def test_Mo_830_910_groupby(self):
         
-        expected_results = [['', u'MO'], [u'1030-1110', u'(ELA,Aaron)(History,Issey)(Core,??)(Game Period,Dylan)(Science,Paraic)(Game Period,Dylan)(Science,Paraic)(ELA,Amelia)(Core,??)']]
-
+        expected_results = [['', u'MO'], [u'1030-1110', u'(ELA,Aaron)(History,Issey)(Core,??)(Game Period,Dylan)(Science,Paraic)(ELA,Amelia)']]
         self.app.load(saveversion=1,student="",dow="MO",period="1030-1110")
 
-        self.app.viewer(ui=True,ztypes=['subject','adult'],source_type="student",source_value="")
+        self.app.viewer(ui=True,ztypes=['subject','adult'],source_type="student",source_value="",conflicts_only='Y')
 
         results = self.app._dumpviewergrid()
-        
         self.assertListEqual(results,expected_results)
-        
 
     def tearDown(self):
         self.app.destroy()
@@ -499,11 +496,12 @@ class Test_nrow_ncol_2subrow_1subcol(Test_Viewer_Base):
     
         self.app.load(saveversion=1,student="Peter",dow="MO")
     
+        self.expected_result = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'??'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Karolina'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Paraic'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Issey'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'[Paraic,Rahul]'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Amelia'}], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [], [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'})]], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'910-950'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#666600', 'fgcolor': '#ffffff', 'value': u'Core'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'950-1030'}, [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#006600', 'fgcolor': '#ffffff', 'value': u'Science'})], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1030-1110'}, [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ff9999', 'fgcolor': '#ffffff', 'value': u'History'})], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1110-1210'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#663300', 'fgcolor': '#ffffff', 'value': u'Computer Time'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1210-100'}, [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'??'})], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'100-140'}, [], [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'})]], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'140-220'}, [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ccff99', 'fgcolor': '#ffffff', 'value': u'Counseling'})], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'220-300'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ff9999', 'fgcolor': '#ffffff', 'value': u'Movement'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'300-330'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#663300', 'fgcolor': '#ffffff', 'value': u'Computer Time'})], [], [], [], [], []]]
+        
         results = self.app.viewer(ui=False,ztypes=['student','subject'],source_type="student",source_value="Peter",yaxis_type="adult",formatson=True)
-    
-        print results
             
-            
+        self.assertListEqual(self.expected_result,results)
+        
 class Test_1row_1col_2subrow_2subcol(Test_Viewer_Base):
     
     # 2 attribute displayed for each record ('subject','adult')
@@ -540,23 +538,17 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_2subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_1col_2subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_2col_2subrow_1subcol))
-    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nrow_ncol_2subrow_1subcol))
-    
-    
-    
-    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW_Formats))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts_master_record))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
+    
+    ''' only need these if conflicts code is uncommented in viewer '''
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts_Report))
-    
-    
-    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts_master_record))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Conflicts))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

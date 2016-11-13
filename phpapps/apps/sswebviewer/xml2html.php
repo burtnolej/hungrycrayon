@@ -5,51 +5,40 @@ a {
 	text-decoration: none;
 }
 
-cell {
-    padding:0px;
-    line-height:30px;
-    //background-color:#eeeeee;
-    //<!height:2000px;>
-    float:left;
-    text-align:center;;
-    border: 1px solid #73AD21;
+table {
+  background-color: #eeeeee;
+  border-collapse: collapse;
+  white-space: nowrap;
 }
 
-.subcell {
-    border-bottom: 1px solid #00000;
-    border-top: 1px solid #00000;
-    width: 50px;
+.cell {
+  text-align: center;
 }
 
-.subcellright {
-    border-right: 1px solid #00000;
+.cell.sub {
+	width: 100px;
+}
+.middle {
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;  
 }
 
-.subcellleft {
-    border-left: 1px solid #00000;
+.left {
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;  
+  border-left: 1px solid #000000;
 }
 
-.rowhdrcell {
+.right {
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;  
+  border-right: 1px solid #000000;
+}
+
+.cell.rowhdr {
     foreground-color:#D0C978;
     background-color:#98969B;
     border: 1px solid #73AD21;
-}
-
-table {
-	width:100%;
-   //background-color:#eeeeee;
-   <!height:2000px;>
-   float:left;
-   text-align:center;
-   border-collapse: collapse;
-   white-space:nowrap;
-   min-width:100px;
-   max-width:150px;
-}
-
-.subtable {
-   min-width:10px;
-   max-width:10px;
 }
 
 </style>
@@ -61,14 +50,30 @@ set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 
 include_once 'utils_xml.php';
 
-function drawcell($cell) {
-	
+function drawcell($cell,$class,$size=1,$index=1) {
+	// size describes how many cells there are on this row
+	// index describes which cell this is, so correct class can be assigned
+
 	if (isset($cell->type)) {
-		echo "<td id=".$cell->type;
+		$class = $class." ".$cell->type;
 	}
 	else {
-		echo "<td id=cell";
+		if ($class == "cell sub") {
+			switch($index){
+				case 0:
+					$class = $class." left";
+					break;
+				case $size:
+					$class = $class." right";
+					break;
+				default:
+					$class = $class." middle";
+					break;
+			}
+		}	
 	}
+	
+	echo "<td class=\"".$class."\"";
 	
 	if (isset($cell->bgcolor)) {
 		echo " bgcolor=".$cell->bgcolor;
@@ -78,12 +83,32 @@ function drawcell($cell) {
 		echo " fgcolor=".$cell->fgcolor;
 	}
 	
+	if (isset($cell->shrinkfont)) {
+		if (strlen($cell->value) > $cell->shrinkfont) {
+			$zoom= round((6 / strlen($cell->value)) * 100);
+			echo " style=\"font-size: ".$zoom."%;\"";
+		}
+	}
+	
 	echo ">";
 	echo $cell->value;
 	echo "</td>";
 } 
 
-function drawgrid($xmlstr) {
+function drawrow($row) {
+	echo "<tr>"; // start a sub row
+				
+	$_subcells = $row->xpath("child::subcell"); // see if any subcells exist
+	
+	if (sizeof($_subcells) <> 0) {
+		for ($i=0;$i<sizeof($_subcells);$i++) {
+			drawcell($_subcells[$i],"cell sub",sizeof($_subcells)-1,$i);
+		}
+		echo "</tr>";
+	}
+}
+
+function drawgrid($xmlstr,$formats=False) {
 	
 	echo "<table id=table >";
 	
@@ -104,43 +129,23 @@ function drawgrid($xmlstr) {
 			
 			if (sizeof($_subrows) <> 0) {
 				
-				echo "<td>";
-				echo "<table id=table>"; // start a new table
-				foreach ($_subrows as $_subrow) {
-					echo "<tr>"; // start a sub row
-				
-					$_subcells = $_subrow->xpath("child::subcell"); // see if any subcells exist
-	
-					if (sizeof($_subcells) <> 0) {
-						
-						foreach ($_subcells as $_subcell) {
-								drawcell($_subcell);
-						}
-						echo "</tr>";
-					}
+				echo "<td><table id=table>"; // start a new table
+				foreach ($_subrows as $_subrow) {					
+					drawrow($_subrow);
 				}
-				echo "</table>";
-				echo "</td>";
+				echo "</table></td>";
 			}
 			else {
 	
 				$_subcells = $_cell->xpath("child::subcell"); // see if any subcells exist
 	
 				if (sizeof($_subcells) <> 0) {
-			
-					echo "<td>";
-					echo "<table id=table>"; // start a new table
-					echo "<tr>"; // all subcells go on one row
-				
-					foreach ($_subcells as $_subcell) {
-							drawcell($_subcell);
-					}
-					echo "</tr>";
-					echo "</table>";
-					echo "</td>";
+					echo "<td><table id=table>"; // start a new table
+					drawrow($_cell);
+					echo "</table></td>";
 				}
 				else { // create a regular cell
-					drawcell($_cell);
+					drawcell($_cell,"cell");
 				}
 			}	
 		}
@@ -148,8 +153,6 @@ function drawgrid($xmlstr) {
 	}
 	echo "</table> ";
 }
-
-/*
 
 $url = 'http://blackbear:8080/page?';
 
@@ -184,7 +187,7 @@ curl_close($curl);
 
 drawgrid($token);
 	
-*/
+
 	
 //if (!debug_backtrace()) {
 //}

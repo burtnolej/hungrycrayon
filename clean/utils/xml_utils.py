@@ -72,7 +72,7 @@ def element_parent_get(root,element):
     parent_map = dict((c, p) for p in root.getiterator() for c in p)   
     return(parent_map[element])
         
-def grid2xml(grid,tags=None,ids=False):
+def grid2xml(grid,schema=None,tags=None,ids=False):
     # take a 2d array and return an XML string
     # nodes are called root, row and cell
     # if cell content is a string it will be mapped to text
@@ -81,6 +81,8 @@ def grid2xml(grid,tags=None,ids=False):
     # if its a tuple it will be mapped to tags within cells, where tags is a list
     # if ids=True, then row/cell/subcell tags will have ids of the form row#.cell#.subcell#
     
+    # schema gives the field types for the data in the grid; format i.e xaxis='dow',yaxis='period',ztypes='subject,adult'
+    # these get added as a <valuetype></valuetype> onto the cell
     from types import StringType, ListType, IntType, DictType, TupleType
     
     root = xmltree.Element('root')

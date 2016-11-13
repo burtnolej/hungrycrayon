@@ -14,8 +14,11 @@ from ui_utils import TkImageLabelGrid, geometry_get_dict, geometry_get, TkGridCo
 from misc_utils_objectfactory import ObjFactory
 
 import sswizard_utils
+import ssviewer_utils
+
 from sswizard_query_utils import *
 from sswizard_config_utils import *
+from ssviewer_utils_palette import *
 
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
@@ -30,80 +33,12 @@ from collections import OrderedDict
 import tkFont
 import unittest
 
-pink = '#%02x%02x%02x' % (255, 153, 153)
-salmon = '#%02x%02x%02x' % (255, 204, 153)
-lightyellow = '#%02x%02x%02x' % (255, 255, 153)
-lightgreen = '#%02x%02x%02x' % (204, 255, 153)
-lightturquoise = '#%02x%02x%02x' % (153, 255, 204)
-lightblue = '#%02x%02x%02x' % (153, 255, 255)
-lavender = '#%02x%02x%02x' % (153, 153, 255)
-purple = '#%02x%02x%02x' % (204, 153, 255)
-pink = '#%02x%02x%02x' % (255, 153, 204)
-darkgreen = '#%02x%02x%02x' % (0, 102, 0)
-burgundy = '#%02x%02x%02x' % (102, 0, 51)
-karky = '#%02x%02x%02x' % (102, 102, 0)
-darkburgundy = '#%02x%02x%02x' % (102, 0, 51)
-darkgrey = '#%02x%02x%02x' % (0, 51, 51)
-brown = '#%02x%02x%02x' % (102, 51, 0)
-mauve = '#%02x%02x%02x' % (204, 204, 0)
-navyblue = '#%02x%02x%02x' % (0, 0, 51)
-darkyellow = '#%02x%02x%02x' % (155,140,6)
-paleblue = '#%02x%02x%02x' %(173,217,222)
-palegreen = '#%02x%02x%02x' %(183,229,183)
-cerise = '#%02x%02x%02x' %(212, 7, 253)
-red = '#%02x%02x%02x' %(255, 0, 0)
-black = '#%02x%02x%02x' %(255, 255, 255)
-white = '#%02x%02x%02x' %(0, 0, 0)
-green = '#%02x%02x%02x' %(0, 255, 0)
-blue = '#%02x%02x%02x' %(0, 0, 255)
-lightgrey = '#%02x%02x%02x' % (211, 211, 211)
-
-verydarkgrey = '#%02x%02x%02x' %(54, 46, 55)
-dirtyyellow = '#%02x%02x%02x' %(242, 232, 19)
-
-
 controlpanelconfig = dict(height=300,width=200,x=100,y=100)
-
-class schoolschedgeneric(dbtblgeneric):
-
-    def __init__(self,of,database,recursion=True,**kwargs):
-        self.recursion = recursion
-        super(schoolschedgeneric,self).__init__(database=database,
-                                                **kwargs)
-        
-        self.of = of
-        self.database = database
-        
-        for k,v in kwargs['dm'].iteritems():
-            if v <> 'None':
-                if recursion == True:
-                    # create objects for all member attributes
-                    self.attr_set(v,k)
-                                   
-    def attr_set(self,name,clsname):        
-        datamembers = dict(objtype=clsname,
-                           userobjid=name,
-                           name=name)
-        
-        setattr(self,clsname,self.of.new(schoolschedgeneric,
-                                         clsname,
-                                         objid=name, # unique key to store obj in of
-                                         constructor='datamembers',
-                                         database=self.database,
-                                         of=self.of,
-                                         modname=__name__,
-                                         recursion=False,
-                                         dm=datamembers))
-
-            
-        return(getattr(self,clsname))
 
 class WizardUI(Tk):
     #def __init__(self,database,of):
     
     
-    @classmethod
-    def noui*
     def __init__(self,dbname,of,refdbname,maxentrycols=3,maxentryrows=4,
                  maxnewrowcols=3,maxnewrowrows=3):
         
@@ -114,27 +49,9 @@ class WizardUI(Tk):
         #self.clipboard_selection=-1
         Tk.__init__(self)
         
-        #self.colorpalette = dict(recordtype=dict(wp='green',subject='blue',ap='yellow'))
-        self.colorpalette = dict(wp=green,subject=lightblue,ap='yellow',
-                                 Movement=pink,ELA=salmon,Humanities=lightyellow,
-                                 Counseling=lightgreen,Math=lightturquoise, 
-                                 Music=lightblue,STEM=lavender,Art=purple,History=pink,
-                                 Science=darkgreen,Core=karky,Chess=burgundy,
-                                 computertime='darkgrey',Speech=darkburgundy,
-                                 Student_News=darkgrey,Computer_Time=brown,
-                                 Activity_Period=mauve,Melissa=navyblue,Amelia=darkgreen,
-                                 Samantha=darkyellow, Alexa=paleblue, Paraic=palegreen, 
-                                 Francisco=cerise,Rahul=verydarkgrey,Dylan=verydarkgrey,
-                                 Moira=verydarkgrey,Issey=verydarkgrey, Daryl=verydarkgrey, 
-                                 Karolina=verydarkgrey)
         
-
-        self.fontpalette = dict(Amelia=green,Paraic=darkgreen,Stan=lavender,
-                                Samantha=lightgreen,Alexa=blue,Francisco=purple,
-                                Melissa=lightblue,Rahul=dirtyyellow,Dylan=dirtyyellow, 
-                                Moira=dirtyyellow,Issey=dirtyyellow, Daryl=dirtyyellow, 
-                                Karolina=dirtyyellow,Chess=pink,Student_News=lightyellow,
-                                subject=blue)
+        self.colorpalette = colorpalette
+        self.fontpalette = fontpalette
         
         
         screenwidth = self.winfo_vrootwidth()
@@ -367,97 +284,7 @@ class WizardUI(Tk):
         self.wratio_label.focus_get()
         self.wratio_label_sv.set("1,1,1")
 
-        
         self.grid_columnconfigure(0, weight=1, uniform="foo")
-            
-    def dump(self,value):
-        
-        with self.database:
-            cols,rows,_ = _versions(self.database,*value)
-            _,subjects,_ = _versions_subjects(self.database,*value)
-        
-        for subject in subjects:
-            
-            if subject[0] <> "??":
-                _period = sswizard_utils._isenum(self.enums,'period',value[0])
-                _dow = sswizard_utils._isname(self.enums,'dow',value[1])
-                
-                value = [_period,_dow,subject[0]]
-            
-                with self.database: 
-                    cols,sessionrows,_ = _sessionversions(self.database,*value)
-        
-        rows = rows + sessionrows
-        
-        if len(rows) <> 0:
-            self.bgmaxrows=len(rows)
-            self.bgmaxcols=len(rows[0])
-        
-            widget_args=dict(background='white',width=1,height=1,highlightbackground='black',highlightthickness=1,values=self.enums['dow'])
-            widgetcfg = nxnarraycreate(self.bgmaxrows,self.bgmaxcols,widget_args)
-            mytextalphanum = TextAlphaNumRO(name='textalphanum')
-        
-            try:
-                self.versionsgrid.destroy()
-            except:
-                pass
-        
-            self.versionsgrid = TkImageLabelGrid(self,'versionsgrid',mytextalphanum,10,10,0,0,self.bgmaxrows,self.bgmaxcols,True,False,{},widgetcfg)
-        
-            self.versionsgrid.grid(row=4,column=0,sticky=NSEW)
-            self.grid_rowconfigure(4, weight=3, uniform="foo")
-            
-            for x in range(len(rows)):
-                for y in range(len(rows[x])):
-                    widget = self.versionsgrid.widgets[x][y]
-                    widget.sv.set(rows[x][y])
-
-        else:
-            try:
-                self.versionsgrid.destroy()
-            except AttributeError:
-                pass
-        
-        rows.sort()
-        return rows
-
-    def _color_get_multi(self,values):
-        bgs=[]
-        fgs=[]
-        for value in values:
-            _bg,_fg = self.color_get(value)
-            bgs.append(_bg)
-            fgs.append(_fg)
-        return(bgs,fgs)
-    
-    def color_get(self,value):
-        
-        bg = lightgrey
-        fg = black
-            
-        try:
-            int(value)
-            value = str(value)
-        except ValueError:
-            pass
-        
-        if value.count(" ") > 0:
-            value= value.replace(" ","_")
-            
-        if value.count("[") == 1 and value.count("]") == 1:
-            bg = red
-        
-        if value.count(".") > 0:
-            value = value.split(".")[0]
-            
-        if self.colorpalette.has_key(value):
-            bg = self.colorpalette[value]
-            
-        if self.fontpalette.has_key(value):
-            fg = self.fontpalette[value]
-            
-            
-        return(bg,fg)        
         
     def viewer(self,ui=True,source_type=None,source_value=None,
                ztypes=None,yaxis_type=None,xaxis_type=None,
@@ -486,94 +313,8 @@ class WizardUI(Tk):
         if ztypes == None:
             ztypes = self.viewdata_label_sv.get().split(",")
             
-        if source_value == "":
-            source_objs = self.of.query(source_type)
-        else:
-            source_objs = [self.of.object_get(source_type,source_value)]
-            
-        xaxis_obj = self.of.query(xaxis_type)
-        yaxis_obj = self.of.query(yaxis_type)
-        
-        count=0
-        yaxis_enum = {}
-        for _yaxis_obj in yaxis_obj:
-            yaxis_enum[_yaxis_obj.name] = count
-            count+=1
-        
-        xaxis_enum = self.enums[xaxis_type]['name2enum']
-        
-        values = [] # contains the values displayed on the grid
-
-        values = [['']]    
-        for yval in yaxis_enum.keys():
-            values[0].append(yval)
-            
-        for xval in xaxis_enum.keys():
-            values.append([xval])
-
-        ymax = len(values[0])
-        xmax = len(values)-1
-        
-        def _additem(celltext,item):
-            
-            if len(celltext) == 0:
-                celltext.append(item)
-            else:
-                try:
-                    celltext.index(item)
-                except:
-                    celltext.append(item)
-            return(celltext)
-                
-        for yval,y in yaxis_enum.iteritems():
-            
-            for xval,x in xaxis_enum.iteritems():
-                celltext=[]
-                
-                for source_obj in source_objs:
-                    if source_obj.lessons.has_key(yval):
-                        if source_obj.lessons[yval].has_key(xval):
-   
-                            _vals = source_obj.lessons[yval][xval]
-
-                            for _val in _vals:
-                                
-                                if constraints <> None:
-                                    flag=False
-                                    for objtype,objval in constraints:
-                                        
-                                        if getattr(_val,objtype).name <> objval:
-                                            flag=True
-                                    if flag == True:
-                                        continue
-                                    
-                                if ztypes == ['*']:
-                                    if celltext == []:
-                                        celltext.append(0)
-                                    else:
-                                        celltext[0] = celltext[0] + 1
-                                    continue
-
-                                _celltext = []
-                                
-                                for ztype in ztypes:
-                                    if hasattr(_val,ztype) == True:
-                                        zval = getattr(_val,ztype)
-                                        
-                                        try:
-                                            _celltext.index(zval.name)
-                                        except:
-                                            _celltext = _additem(_celltext,zval.name)
-                                            pass
-                                            
-                                try:      
-                                    celltext.index(tuple(_celltext))
-                                except:
-                                    celltext.append(tuple(_celltext))
-                                    
-                values[x].append(celltext)
-        
-        sswizard_utils.gridreduce(values,[[]])
+        values = ssviewer_utils.dataset_pivot(self.of,self.enums,yaxis_type,xaxis_type,ztypes, source_type,source_value,
+                                            conflicts_only,constraints,wratio,formatson)
         
         if ui==True:
             self.bgmaxrows=len(values)
@@ -607,17 +348,17 @@ class WizardUI(Tk):
                             if len(_value) == 1 and conflicts_only <> "Y":
                                 if isinstance(_value[0],tuple) == True:
                                     # 1 item, multi attributes
-                                    bgs,fgs = self._color_get_multi(_value[0])
+                                    bgs,fgs = _color_get_multi(_value[0])
                                     _widgets = widget.addlabel(len(_value[0]),True,_value[0],bgs,fgs,wratio)
                                 elif isinstance(_value[0],list) == False:
                                     # 1 item, single value
-                                    bg,fg = self.color_get(_value[0])
+                                    bg,fg = color_get(_value[0])
                                     _widgets = widget.addlabel(1,True,_value[0],bg,fg)
                                     
                             # multiple items
                             if len(_value) > 1 and conflicts_only == "Y":
                                 for __value in _value:
-                                    bgs,fgs = self._color_get_multi(__value)
+                                    bgs,fgs = _color_get_multi(__value)
                                     _widgets = widget.addlabel(len(__value),True,__value,bgs,fgs,wratio)
 
                     else:
@@ -628,47 +369,10 @@ class WizardUI(Tk):
                         _widgets = widget.addlabel(expand)
                         _widgets[0].sv.set(_value)                                       
         else:
-            if formatson==True:                
-                for x in range(len(values)):
-                    for y in range(len(values[x])):
-                        _value = values[x][y]
-
-                        if isinstance(_value,list) == True:
-                            if _value <> []:
-                                values[x][y] = []
-                                ''' uncomment if want to generate conflicts report'''
-                                #if len(_value) == 1 and conflicts_only <> "Y":
-                                if len(_value) == 1:
-                                    if isinstance(_value[0],tuple) == True:
-                                        # 1 item, multi attributes
-                                        bgs,fgs = self._color_get_multi(_value[0])
-                                        _formats = []
-                                        for i in range(len(_value[0])):
-                                            _formats.append(dict(value=_value[0][i],bgcolor=bgs[i],fgcolor=fgs[i]))
-                                            
-                                        values[x][y].append(tuple(_formats))
-                                    elif isinstance(_value[0],list) == False:
-                                        # 1 item, single value
-                                        bg,fg = self.color_get(_value[0])
-
-                                        print "1,1 attr",_value[0],bgs,fgs
-                                # multiple items
-                                ''' uncomment if want to generate conflicts report'''
-                                #if len(_value) > 1 and conflicts_only == "Y":
-                                if len(_value) > 1:
-                                    for __value in _value:
-                                        bgs,fgs = self._color_get_multi(__value)
-                                        _formats = []
-                                        for i in range(len(__value)):
-                                            _formats.append(dict(value=__value[i],bgcolor=bgs[i],fgcolor=fgs[i]))
-                                            
-                                        values[x][y].append(tuple(_formats))
-                        else:
-                            if x == 0 or y == 0:
-                                values[x][y] = dict(value=_value,bgcolor=black,fgcolor=white)
-                                
-            
+            values = ssviewer_utils.dataset_serialize(values,formatson)
+                                   
             return values
+            
             
         self.viewergrid.reset_framewidth()
         self.viewergrid.resize_canvasframe()
@@ -686,119 +390,7 @@ class WizardUI(Tk):
                     _row.append("")
             _grid.append(_row)
         return(_grid)
-        
-    @logger(log)    
-    def save(self,saveversion=None):
 
-        self.of.reset()
-        
-        if self.dbname <> self.dbname_entry_sv.get():
-            log.log(thisfuncname(),3,msg="dbname changed",oldname=self.dbname,newname=self.dbname_entry_sv.get())
-            self.database = Database(self.dbname_entry_sv.get())
-            self.dbname = self.dbname_entry_sv.get()
-        
-        if saveversion==None or saveversion == "":
-            
-            if self.dbload_entry_sv.get()==None or self.dbload_entry_sv.get() == "":
-                log.log(thisfuncname(),1,msg="no saveversion set for save; exception")
-                raise Exception("attempting to save without a saveversion set")  
-                
-            else:
-                saveversion = self.dbload_entry_sv.get()
-        
-        log.log(thisfuncname(),3,msg="saving save version=",saveversion=str(saveversion))
-            
-        for x in range(1,self.maxrows):
-            for y in range(1,self.maxcols):
-                period=self.entrygrid.widgets[0][y].sv.get()
-                student=self.entrygrid.widgets[x][0].sv.get()
-                session =  self.entrygrid.widgets[x][y].sv.get()
-                
-                if session <> "":
-                    
-                    period_enum = x
-                    student_enum = y
-                    session_enum = self.enums['session']['name2enum'][session]
-
-                    obj_id = ",".join(map(str,[period_enum,student_enum,session_enum]))
-                    
-                    teacher_code,lessontype_code,subject_code,dow = session.split(".")
-
-                    teacher = self.enums['adult']['code2name'][teacher_code]
-                    lessontype = self.enums['lessontype']['code2name'][lessontype_code]
-                    subject = self.enums['subject']['code2name'][subject_code]
-                                                               
-                    datamembers = dict(schedule = '1',
-                                       dow=dow, 
-                                       subject=subject,
-                                       lessontype=lessontype,
-                                       objtype='lesson',
-                                       userobjid=obj_id, # unique key to store obj in of
-                                       period=period,
-                                       student=student,
-                                       teacher=teacher,
-                                       saveversion=saveversion,
-                                       session=session)
-                    
-                    lesson = self.of.new(schoolschedgeneric,
-                                         'lesson',
-                                         objid=obj_id,
-                                         constructor='datamembers',
-                                         database=self.database,
-                                         of=self.of,
-                                         modname=__name__,
-                                         dm=datamembers)
-                    
-                    setattr(self.entrygrid.widgets[x][y],"lesson",lesson)
-                
-                    self.lesson_change(lesson)
-
-    def _lesson_change_event(self,event):
-        
-        olesson = event.widget.lesson
-        #olesson = self.of.store['lesson'][lessonobjid]
-        
-        self.lesson_change(olesson)
-        self.student_schedule_calc()
-        self.teacher_schedule_calc()
-        
-    def lesson_change(self,lesson):
-
-        def _add(obj,xtype,ytype,lesson):
-            
-            xtype_id = getattr(lesson,xtype).objid
-            ytype_id = getattr(lesson,ytype).objid
-            
-            # indexed by dow/period
-            if obj.lessons.has_key(xtype_id) == False:
-                obj.lessons[xtype_id] = {} 
-    
-            if obj.lessons[xtype_id].has_key(ytype_id) == False:
-                obj.lessons[xtype_id][ytype_id] = []
-                
-            obj.lessons[xtype_id][ytype_id].append(lesson)
-        
-        '''['period','dow','student','adult','subject']'''
-        
-        adult = lesson.adult
-        student = lesson.student
-
-        # add the lesson to the adult object        
-        if hasattr(adult,'lessons') == False:
-            setattr(adult,'lessons',{})
-            
-        _add(adult,'dow','period',lesson) # indexed by dow/period
-        _add(adult,'student','period',lesson) # indexed by student/period
-
-        # add the lesson to the student object
-        if hasattr(student,'lessons') == False:
-            setattr(student,'lessons',{})
-            
-        _add(student,'dow','period',lesson) # indexed by dow/period
-        _add(student,'adult','period',lesson) # indexed by adult/period
-        _add(student,'period','recordtype',lesson) # indexed by adult/period
-        _add(student,'student','recordtype',lesson) # indexed by adult/period
-        
     @logger(log)
     def _clear_grid(self,gridname,firstrow,firstcol):
         grid = getattr(self,gridname)
@@ -837,115 +429,55 @@ class WizardUI(Tk):
             self.database = Database(newdb)
             self.dbname = newdb
             
-        whereclause = []
-    
         # saveversion
         if saveversion==None or saveversion== "":
             saveversion = self.dbload_entry_sv.get()
         if saveversion == "":
             log.log(thisfuncname(),1,msg="no saveversion set for load; exception")
             raise Exception("attempting to load without a saveversion set")
-        else:
-            log.log(thisfuncname(),3,msg="loading",saveversion=str(saveversion))
-            whereclause.append(['saveversion',"=",saveversion])
         
         # unknown
         if unknown==None:
             unknown = self.unknown_checkbutton_sv.get()
-        if unknown=='N':
-            whereclause.append(['student',"<>","\"??\""])
-            whereclause.append(['subject',"<>","\"??\""])
-            whereclause.append(['teacher',"<>","\"??\""])
-        log.log(thisfuncname(),3,msg="loading",unknown=str(unknown))
             
         # prep
         if prep==None: prep=self.prep_entry_sv.get()
         if  prep == "":
             prep = -1
-        else:
-            whereclause.append(['prep',"=",prep])
-        log.log(thisfuncname(),3,msg="loading",prep=str(prep))
         
         # period
         if period==None: period=self.period_entry_sv.get()
         if period == "":
-            prep = -1
-        else:
-            whereclause.append(['period',"=","\""+period+"\""])            
-        log.log(thisfuncname(),3,msg="loading",prep=str(prep))
+            period = "all"
 
         # dow
         if dow==None: dow = self.dow_entry_sv.get()
         if dow == "":
             dow = "all"
-        else:
-            whereclause.append( ['dow',"=","\""+dow+"\""])
-        log.log(thisfuncname(),3,msg="loading",dow=str(dow))
-        
         
         # teacher
         if teacher==None: teacher = self.teacher_label_sv.get()
         if teacher == "":
-            teacher = "all"
-        else:
-            whereclause.append( ['teacher',"=","\""+teacher+"\""])
-        log.log(thisfuncname(),3,msg="loading",teacher=str(teacher))      
-        
+            teacher = "all"    
         
         # student
         if student==None: student = self.student_label_sv.get()
         if student == "":
             student = "all"
-        else:
-            whereclause.append( ['student',"=","\""+student+"\""])
-        log.log(thisfuncname(),3,msg="loading",student=str(student))
         
         # source
         if source==None: source = self.source_label_sv.get()
         if source == "":
-            source = "dbinsert"
-        else:
-            _sources = ["\"" + _source + "\"" for _source in source.split(",")]
-            whereclause.append( ['source',"in","("+",".join(_sources)+")"])
-        log.log(thisfuncname(),3,msg="loading",source=str(source))
-        
-        #whereclause.append( ['status',"=","\"" + "master" + "\""])
-        #whereclause.append( ['source',"=","\"" + "prep56new.csv" + "\""])
-        
+            source = "dbinsert"       
+
         # get enums
         self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
 
-        # load from database
-        cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype','source']        
-        with self.database:
-            colndefn,rows,exec_str = tbl_rows_get(self.database,'lesson',cols,whereclause)
-            
-            log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
+        ssviewer_utils.dataset_load(self.database,self.refdatabase,self.of,self.enums,saveversion,unknown,prep,period,
+                                    dow,teacher,student,source)
         
-        cols = ['period','student','session','dow','adult','subject','userobjid','status','substatus','recordtype','source']
-        
-        # parse rows
-        for row in rows:
-            datamembers = {}
-            for i in range(len(cols)):
-                datamembers[cols[i]] = row[i]
-            
-            _,lessontype_code,_,_ = datamembers['session'].split(".")
-            #lessontype = self.enums['lessontype']['code2name'][lessontype_code]      
-            datamembers['objtype'] = 'lesson'                               
-
-            lesson = self.of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
-                                 constructor='datamembers',database=self.database,
-                                 of=self.of,modname=__name__,dm=datamembers)
-            
-            self.lesson_change(lesson)
-                            
-            log.log(thisfuncname(),3,msg="loading row",dm=datamembers)
-
-        # post log with results
-        log.log(thisfuncname(),3,msg="db rows loaded",num=len(rows))        
-        for i in range(len(cols)):
-            log.log(thisfuncname(),3,msg="lesson obj created",num=len(self.of.store[cols[i]]))
+        # get enums
+        self.enums = sswizard_utils.setenums(dow,prep,self.refdatabase)
 
     def updates_get(self,gridname,ignoreaxes=False):
         
@@ -984,7 +516,7 @@ def dump2csv(results,conflicts_only):
         
 if __name__ == "__main__":
     
-    enableui = False
+    enableui = True
     
     if len(sys.argv) <= 1:
         raise Exception("provide a database name; no extension")
