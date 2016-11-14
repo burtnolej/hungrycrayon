@@ -415,7 +415,51 @@ class Test_Grid_to_XML(unittest.TestCase):
         self.assertEqual(xmltree.tostring(xml),expected_results)
 
 class Test_Grid_to_XML_function(unittest.TestCase):
-                
+       
+    def test_1row_1col_1subrow_1subcol_formats(self):
+     
+        '''
+        <root>
+          <row id="1">
+            <cell id="1.1">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value />
+             </cell>
+             <cell id="1.2">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value>MO</value>
+             </cell>
+           </row>
+           <row id="2">
+             <cell id="2.1">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value>830-910</value>
+             </cell>
+             <cell id="2.2">
+               <subrow id="2.2.1">
+                 <subcell id="2.2.1.1">
+                   <bgcolor>#ffcc99</bgcolor>
+                   <fgcolor>#ffffff</fgcolor>
+                   <value>ELA</value>
+                 </subcell>
+               </subrow>
+             </cell>
+           </row>
+         </root>
+         '''
+         
+        expected_results = "<root><row id=\"1\"><cell id=\"1.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value /></cell><cell id=\"1.2\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>MO</value></cell></row><row id=\"2\"><cell id=\"2.1\"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>830-910</value></cell><cell id=\"2.2\"><subrow id=\"2.2.1\"><subcell id=\"2.2.1.1\"><bgcolor>#ffcc99</bgcolor><fgcolor>#ffffff</fgcolor><value>ELA</value></subcell></subrow></cell></row></root>"
+         
+        grid = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                             [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},)]]]
+         
+        xml = grid2xml(grid,ids=True)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)         
+
     def test_1row_1col_2subrow_1subcol_formats(self):
     
         '''
@@ -611,7 +655,106 @@ class Test_Grid_to_XML_function(unittest.TestCase):
         
         xml = grid2xml(grid,ids=True)
     
-        print xmltree.tostring(xml)
+        #print xmltree.tostring(xml)
+        
+class Test_Grid_to_XML_resize(unittest.TestCase):
+       
+    def test_1row_1col_1subrow_1subcol_formats(self):
+     
+        '''
+        <root>
+          <row id="1">
+            <cell id="1.1">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value />
+             </cell>
+             <cell id="1.2">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value>MO</value>
+             </cell>
+           </row>
+           <row id="2">
+             <cell id="2.1">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value>830-910</value>
+             </cell>
+             <cell id="2.2">
+               <subrow id="2.2.1">
+                 <subcell id="2.2.1.1">
+                   <shrinkfont>5</shrinkfont>
+                   <bgcolor>#ffcc99</bgcolor>
+                   <fgcolor>#ffffff</fgcolor>
+                   <value>ELA</value>
+                 </subcell>
+               </subrow>
+             </cell>
+           </row>
+         </root>
+         '''
+         
+        expected_results = '<root><row id="1"><cell id="1.1"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value /></cell><cell id="1.2"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>MO</value></cell></row><row id="2"><cell id="2.1"><bgcolor>#ffffff</bgcolor><fgcolor>#000000</fgcolor><value>830-910</value></cell><cell id="2.2"><subrow id="2.2.1"><subcell id="2.2.1.1"><shrinkfont>5</shrinkfont><bgcolor>#ffcc99</bgcolor><fgcolor>#ffffff</fgcolor><value>ELA</value></subcell></subrow></cell></row></root>';
+         
+        grid = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
+                             [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},)]]]
+         
+        xml = grid2xml(grid,ids=True,shrinkfont=5)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
+class Test_Grid_to_XML_valuetype(unittest.TestCase):
+       
+    def test_1row_1col_1subrow_1subcol_formats(self):
+     
+        '''
+        <root>
+          <row id="1">
+            <cell id="1.1">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value />
+             </cell>
+             <cell id="1.2">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value>MO</value>
+               <valuetype>dow</valuetype>
+             </cell>
+           </row>
+           <row id="2">
+             <cell id="2.1">
+               <bgcolor>#ffffff</bgcolor>
+               <fgcolor>#000000</fgcolor>
+               <value>830-910</value>
+               <valuetype>period</valuetype>
+             </cell>
+             <cell id="2.2">
+               <subrow id="2.2.1">
+                 <subcell id="2.2.1.1">
+                   <shrinkfont>5</shrinkfont>
+                   <bgcolor>#ffcc99</bgcolor>
+                   <fgcolor>#ffffff</fgcolor>
+                   <value>ELA</value>
+                   <valuetype>subject</valuetype>
+                 </subcell>
+               </subrow>
+             </cell>
+           </row>
+         </root>
+         '''
+         
+        schema = dict(xaxis='period',yaxis='dow',ztypes='subject')
+        
+        expected_results = '<root><row id="1"><cell id="1.1"><bgcolor>#ffffff</bgcolor><valuetype>dow</valuetype><fgcolor>#000000</fgcolor><value /></cell><cell id="1.2"><bgcolor>#ffffff</bgcolor><valuetype>dow</valuetype><fgcolor>#000000</fgcolor><value>MO</value></cell></row><row id="2"><cell id="2.1"><bgcolor>#ffffff</bgcolor><valuetype>period</valuetype><fgcolor>#000000</fgcolor><value>830-910</value></cell><cell id="2.2"><subrow id="2.2.1"><subcell id="2.2.1.1"><bgcolor>#ffcc99</bgcolor><valuetype>subject</valuetype><fgcolor>#ffffff</fgcolor><value>ELA</value></subcell></subrow></cell></row></root>'
+         
+        grid = [[{'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': u'MO'}], [{'bgcolor': '#ffffff', 'valuetype': 'period', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'valuetype': 'subject', 'fgcolor': '#ffffff', 'value': u'ELA'},)]]]
+         
+        xml = grid2xml(grid,ids=True,schema=schema)
+        
+        self.assertEqual(xmltree.tostring(xml),expected_results)
+        
         
 if __name__ == "__main__":
 
@@ -621,5 +764,10 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML))
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_function))
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_resize))
+    
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_valuetype))
     
     unittest.TextTestRunner(verbosity=2).run(suite)

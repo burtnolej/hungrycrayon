@@ -531,8 +531,38 @@ class Test_1row_1col_2subrow_2subcol(Test_Viewer_Base):
                 
         self.assertListEqual(expected_results,results)
         
+class Test_valuetype(Test_Viewer_Base):
+    
+    # 1 attribute displayed for each record ('subject')
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"1subrow_1subcol")
+        
+    def test_formats(self):
+
+        expected_results = [[{'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': u'MO'}], [{'bgcolor': '#ffffff', 'valuetype': 'period', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'valuetype': 'subject', 'fgcolor': '#ffffff', 'value': u'ELA'},)]]]
+        
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True,valuetype=True)
+        
+        print results
+        
+        self.assertListEqual(expected_results,results)
+        
+    def test_formats_3attr(self):
+
+        expected_results = [[{'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': u'MO'}], [{'bgcolor': '#ffffff', 'valuetype': 'period', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'valuetype': 'subject', 'fgcolor': '#ffffff', 'value': u'ELA'}, {'bgcolor': '#006600', 'valuetype': 'adult', 'fgcolor': '#00ff00', 'value': u'Amelia'}, {'bgcolor': '#d3d3d3', 'valuetype': 'period', 'fgcolor': '#ffffff', 'value': u'830-910'})]]]
+                
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+        
+        results = self.app.viewer(ui=False,ztypes=['subject','adult','period'],source_type="student",source_value="",formatson=True,valuetype=True)
+        
+        self.assertListEqual(expected_results,results)
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
+    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_2subcol))
@@ -543,6 +573,9 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW_Formats))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
+    
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_valuetype))
     
     ''' only need these if conflicts code is uncommented in viewer '''
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts))

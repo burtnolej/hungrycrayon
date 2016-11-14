@@ -288,7 +288,8 @@ class WizardUI(Tk):
         
     def viewer(self,ui=True,source_type=None,source_value=None,
                ztypes=None,yaxis_type=None,xaxis_type=None,
-               conflicts_only=None,constraints=None,wratio=None,formatson=False):
+               conflicts_only=None,constraints=None,wratio=None,formatson=False,
+               valuetype=False):
         
         # constraint will be a list of tuples of the form
         # objtype,objvalue i.e. ('dow','MO')
@@ -369,7 +370,10 @@ class WizardUI(Tk):
                         _widgets = widget.addlabel(expand)
                         _widgets[0].sv.set(_value)                                       
         else:
-            values = ssviewer_utils.dataset_serialize(values,formatson)
+            schema=None
+            if valuetype == True:
+                schema = dict(xaxis=xaxis_type,yaxis=yaxis_type,ztypes=ztypes)
+            values = ssviewer_utils.dataset_serialize(values,formatson,schema=schema)
                                    
             return values
             

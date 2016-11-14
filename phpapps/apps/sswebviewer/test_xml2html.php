@@ -495,7 +495,50 @@ class Test_xml2html_extra extends PHPUnit_Framework_TestCase
 		ob_end_clean();		
 		$this->assertEquals($result,$this->expected_result);
 	}
+
+	public function test_addlinks()
+	{
+
+		$this->xmlstr = '<root>
+		                   <row id="1">
+		                     <cell id="1.1">
+		                       <bgcolor>#ffffff</bgcolor>
+		                       <valuetype>dow</valuetype>
+		                       <fgcolor>#000000</fgcolor>
+		                       <value />
+		                     </cell>
+		                     <cell id="1.2">
+		                       <bgcolor>#ffffff</bgcolor>
+		                       <valuetype>dow</valuetype>
+		                       <fgcolor>#000000</fgcolor>
+		                       <value>MO</value>
+		                     </cell>
+		                   </row>
+		                   <row id="2">
+		                     <cell id="2.1">
+		                       <bgcolor>#ffffff</bgcolor>
+		                       <valuetype>period</valuetype>
+		                       <fgcolor>#000000</fgcolor>
+		                       <value>830-910</value>
+		                     </cell>
+		                     <cell id="2.2">
+		                       <subrow id="2.2.1">
+		                         <subcell id="2.2.1.1">
+		                           <bgcolor>#ffcc99</bgcolor>
+		                           <valuetype>subject</valuetype>
+		                           <fgcolor>#ffffff</fgcolor>
+		                           <value>ELA</value>
+		                         </subcell>
+		                       </subrow>
+		                     </cell>
+		                    </row>
+		                  </root>';
+		              
+		drawgrid($this->xmlstr);
+	}
 }
+
+/*
 
 $st = new Test_xml2html();
 $st->test_1row1cell1value();
@@ -513,8 +556,11 @@ $stf->test_2row_1col_2subrow_1subcol();
 $stf->test_1row_1col_2subrow_2subcol();
 $stf->test_nrow_ncol_2subrow_1subcol();
 
+*/
+
 $stf = new Test_xml2html_extra();
 $stf->test_shrinkfont();
+$stf->test_addlinks();
 
 /*
 $stf = new Test_xml2html_function();

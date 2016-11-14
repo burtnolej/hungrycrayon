@@ -143,7 +143,7 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
     
     return values
 
-def dataset_serialize(values,formatson):
+def dataset_serialize(values,formatson,schema=None):
 
     if formatson==True:                
         for x in range(len(values)):
@@ -158,17 +158,18 @@ def dataset_serialize(values,formatson):
                         if len(_value) == 1:
                             if isinstance(_value[0],tuple) == True:
                                 # 1 item, multi attributes
-                                #bgs,fgs = self._color_get_multi(_value[0])
                                 bgs,fgs = _color_get_multi(_value[0])
                                 
                                 _formats = []
                                 for i in range(len(_value[0])):
-                                    _formats.append(dict(value=_value[0][i],bgcolor=bgs[i],fgcolor=fgs[i]))
+                                    args = dict(value=_value[0][i],bgcolor=bgs[i],fgcolor=fgs[i])
+                                    if schema<>None: args['valuetype'] = schema['ztypes'][i]
+                                    _formats.append(args)
+                                    
                                     
                                 values[x][y].append(tuple(_formats))
                             elif isinstance(_value[0],list) == False:
                                 # 1 item, single value
-                                #bg,fg = self.color_get(_value[0])
                                 bg,fg = color_get(_value[0])
 
                                 print "1,1 attr",_value[0],bgs,fgs
@@ -177,16 +178,25 @@ def dataset_serialize(values,formatson):
                         #if len(_value) > 1 and conflicts_only == "Y":
                         if len(_value) > 1:
                             for __value in _value:
-                                #bgs,fgs = self._color_get_multi(__value)
                                 bgs,fgs = _color_get_multi(__value)
                                 _formats = []
                                 for i in range(len(__value)):
-                                    _formats.append(dict(value=__value[i],bgcolor=bgs[i],fgcolor=fgs[i]))
+                                    args = dict(value=__value[i],bgcolor=bgs[i],fgcolor=fgs[i])
+                                    if schema<>None: args['valuetype'] = schema['ztypes'][i]
+                                    _formats.append(args)
+
                                     
                                 values[x][y].append(tuple(_formats))
                 else:
-                    if x == 0 or y == 0:
-                        values[x][y] = dict(value=_value,bgcolor=colors.black,fgcolor=colors.white)
+                    #if x == 0 or y == 0:
+                    if x == 0:
+                        args = dict(value=_value,bgcolor=colors.black,fgcolor=colors.white)
+                        if schema<>None: args['valuetype'] = schema['yaxis']
+                        values[x][y] = args
+                    elif y == 0:
+                        args = dict(value=_value,bgcolor=colors.black,fgcolor=colors.white)
+                        if schema<>None: args['valuetype'] = schema['xaxis']
+                        values[x][y] = args
                             
     return values
     
@@ -225,8 +235,8 @@ def _lesson_change(lesson):
     _add(student,'period','recordtype',lesson) # indexed by adult/period
     _add(student,'student','recordtype',lesson) # indexed by adult/period
 
-def dataset_load(database,refdatabase,of,enums,saveversion,unknown='N',prep=-1,period="all",dow="all",teacher="all",
-                 student="all",source="dbinsert"):
+def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1,period="all",
+                 dow="all",teacher="all",student="all",source="dbinsert"):
     
     of.reset()
     

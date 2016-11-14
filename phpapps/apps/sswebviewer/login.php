@@ -109,6 +109,6 @@ function draw_login($dbname,$tablename,$submitpage) {
 <?php
 }
 
-draw_login('test.sqlite','lesson','sswebviewer-xml2html.php?dummyfunc');
+draw_login('test.sqlite','lesson','getlink.php');
 
 ?>

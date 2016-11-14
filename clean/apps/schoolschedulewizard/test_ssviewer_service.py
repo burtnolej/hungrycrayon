@@ -37,15 +37,11 @@ class Test_(Test_Viewer_Base):
     
         # dow=MO,period=830-910,student=Peter,ztype=adult
                             
-        self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
-
-        results = self.app.viewer(ui=False,ztypes=['subject','adult'],source_type="student",source_value="Peter",formatson=True)
-        
-        print results
+        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
+            
+        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
         
         xml = grid2xml(results,ids=True)
-        
-        print xml2string(xml)
         
         phpexec = "/home/burtnolej/Development/pythonapps3/phpapps/apps/sswebviewer/xml2html.php"
 
