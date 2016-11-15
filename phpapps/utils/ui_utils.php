@@ -46,13 +46,13 @@ function gethtmldbdropdown($dbname,$tablename){
 	}
 }
 
-function gethtmltablecoldropdown($dbname,$tablename,$column,$default,$widgetcount){
+function gethtmltablecoldropdown($dbname,$tablename,$column,$widgetcount,$default=NULL){
 	
 	echo "<div class=\"container\">	";
 		
 	$values = getcolumndistinctvalues($dbname,$tablename,$column);
 
-	gethtmldropdown($column,$values,$default,$widgetcount);
+	gethtmldropdown($column,$values,$widgetcount,$default);
 	
 	$widgetcount = $widgetcount+1;
 	
@@ -73,7 +73,6 @@ function gethtmlxmldropdown($xml) {
 		echo "<div class=\"container\">	";
 
 		$values = $_dropdown->values->xpath("child::value");
-
 
 		gethtmldropdown($_dropdown->field,$values,$widgetcount);
 	
