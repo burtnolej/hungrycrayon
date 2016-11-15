@@ -5,12 +5,18 @@ set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 include_once 'db_utils.php';
 include_once 'utils_xml.php';
 
-function gethtmldropdown($column,$values,$widgetcount) {
+function gethtmldropdown($column,$values,$widgetcount,$default=NULL) {
 
 	$datalistname = "suggestions".$widgetcount;
 
 	echo "<label for=\"".$column."\" >".$column."</label>";
-	echo "<input type=\"text\" name=\"".$column."\" id=\"".$column."\" list=\"".$datalistname."\" />";
+	echo "<input type=\"text\" name=\"".$column."\" id=\"".$column."\" list=\"".$datalistname."\""; 
+
+	if ($default <> NULL) {
+		echo " value=\"".$default."\"";
+	}	
+	
+	echo ">";
 	echo "<datalist id=\"".$datalistname."\">";
 	
 	foreach ($values as $value) {
@@ -38,6 +44,20 @@ function gethtmldbdropdown($dbname,$tablename){
 	
 		echo "</div>";
 	}
+}
+
+function gethtmltablecoldropdown($dbname,$tablename,$column,$default,$widgetcount){
+	
+	echo "<div class=\"container\">	";
+		
+	$values = getcolumndistinctvalues($dbname,$tablename,$column);
+
+	gethtmldropdown($column,$values,$default,$widgetcount);
+	
+	$widgetcount = $widgetcount+1;
+	
+	echo "</div>";
+
 }
 
 function gethtmlxmldropdown($xml) {

@@ -14,6 +14,7 @@ urls = (
     '/student/(\w+)', 'Student',
     '/subject/(\w+)', 'Subject',
     '/adult/(\w+)', 'Adult'
+    '/list/(\w+)/', 'List'
 )
     
 app = web.application(urls, globals())
@@ -76,6 +77,20 @@ class Adult:
         grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
         xml = xml_utils.grid2xml(grid,shrinkfont=5)
         return xmltree.tostring(xml)
+    
+class List:
+    def GET(self,objtype):
+        data = web.input(id='')
+
+        pagenum=data.pagenum
+        pagelen=data.pagelen
+        
+        values,colnames = ssviewer_utils.dataset_list(of,enums,pagelen=pagelen,pagenum=pagenum)
+        
+        schema = dict(xaxis='row',yaxis='col',colnames=list(colnames))
+        
+        _values = ssviewer_utils.dataset_serialize(values,formatson=True,schema = schema)
+        xml = xml_utils.grid2xml(_values)
     
 if __name__ == "__main__":
     import os
