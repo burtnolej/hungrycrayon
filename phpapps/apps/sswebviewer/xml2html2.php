@@ -95,13 +95,17 @@ function drawcell($cell,$class,$args,$size=1,$index=1) {
 	if (isset($cell->valuetype)) {
 		
 		$url = "getlink.php?source_type=".$cell->valuetype."&source_value=".$cell->value;
-		$url = $url."&xaxis=".$args['xaxis']."&yaxis=".$args['yaxis'];
 		
-		if (is_array($args['ztypes']) == True) {
-			$url = $url."&ztypes=".implode(",",$args['ztypes']);
-		}
-		else {
-			$url = $url."&ztypes=".$args['ztypes'];
+		if ($args<>NULL) {
+		
+			$url = $url."&xaxis=".$args['xaxis']."&yaxis=".$args['yaxis'];
+		
+			if (is_array($args['ztypes']) == True) {
+				$url = $url."&ztypes=".implode(",",$args['ztypes']);
+			}
+			else {
+				$url = $url."&ztypes=".$args['ztypes'];
+			}
 		}
 	
 /*
@@ -132,7 +136,7 @@ function drawrow($row,$args) {
 	}
 }
 
-function drawgrid($xmlstr,$args,$formats=False) {
+function drawgrid($xmlstr,$args=NULL,$formats=False) {
 	
 	echo "<table id=table >";
 	

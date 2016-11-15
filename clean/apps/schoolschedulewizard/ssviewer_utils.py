@@ -47,6 +47,45 @@ class schoolschedgeneric(dbtblgeneric):
             
         return(getattr(self,clsname))
     
+
+def _getpage(grid,pagelen,pagenum):
+    
+    numrows = len(grid)
+     
+    startrow = 0
+    if pagenum <> 1:
+        startrow = ((pagenum-1)*pagelen)
+     
+    endrow=pagelen
+    if numrows > pagelen:
+        endrow =  (pagenum*pagelen)-1
+        
+    if endrow > numrows:
+        endrow = numrows-1
+         
+    if startrow > numrows:
+        startrow = numrows-pagelen
+        endrow = numrows-1
+    return(startrow,endrow)
+
+
+def dataset_list(of,enums,pagelen=30,pagenum=1):
+    
+    source_objs = of.query('lesson')
+        
+    grid = []
+    colnames = list(source_objs[0].dm.keys())
+
+    grid.append(colnames)
+    
+    startrow,endrow = _getpage(source_objs,pagelen,pagenum)
+
+    for i in range(startrow,endrow+1):        
+        grid.append(source_objs[i].dm.values())
+          
+    return grid,colnames
+
+    
 def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_value,
            conflicts_only='N',constraints=None,wratio=None,formatson=False):
     
@@ -191,11 +230,20 @@ def dataset_serialize(values,formatson,schema=None):
                     #if x == 0 or y == 0:
                     if x == 0:
                         args = dict(value=_value,bgcolor=colors.black,fgcolor=colors.white)
-                        if schema<>None: args['valuetype'] = schema['yaxis']
+                        if schema<>None: 
+                            if isinstance(schema['yaxis'],list):
+                                args['valuetype'] = schema['yaxis']
                         values[x][y] = args
                     elif y == 0:
                         args = dict(value=_value,bgcolor=colors.black,fgcolor=colors.white)
                         if schema<>None: args['valuetype'] = schema['xaxis']
+                        values[x][y] = args
+                    else:
+                        
+                        bg,fg = color_get(_value)
+                        #bgs,fgs = _color_get_multi(_value)
+                        args = dict(value=_value,bgcolor=bg,fgcolor=fg)
+                        if schema<>None: args['valuetype'] = schema['colnames'][y]
                         values[x][y] = args
                             
     return values
