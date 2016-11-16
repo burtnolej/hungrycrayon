@@ -88,7 +88,6 @@ function gethtmlbutton($type,$label) {
 
 }
 
-
 function gethtmlmultiselect($dbname,$query,$name) {
 	
 		echo "<div class=\"container\">";

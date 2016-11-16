@@ -47,7 +47,7 @@ def element_move(root,element,new_parent):
     old_parent.remove(element)
   
 
-def element_fuse(root,element_tag,new_parent):
+def element_fuse(root,element_tag,new_parent=None):
     
     from copy import deepcopy
 
@@ -71,7 +71,36 @@ def element_fuse(root,element_tag,new_parent):
 def element_parent_get(root,element):
     parent_map = dict((c, p) for p in root.getiterator() for c in p)   
     return(parent_map[element])
+
+def record2xml(page,header=None):
+    
+    root = xmltree.Element('root')
+    
+    if header <> None:
         
+        header = xmltree.fromstring(header)
+        
+        for child in header:
+            childelement = xmltree.SubElement(root,child.tag)
+            childelement.text = child.text
+            
+            for gchild in child._children:
+                gchildelement = xmltree.SubElement(childelement,gchild.tag)
+                gchildelement.text = gchild.text        
+    
+    itemidx=1
+    for k,v in page.iteritems():
+        itemelement = xmltree.SubElement(root,"item")
+        itemelement.attrib['id'] = str(itemidx)
+        valueelement = xmltree.SubElement(itemelement,"value")
+        valueelement.text = v
+        valuetypeelement = xmltree.SubElement(itemelement,"valuetype")
+        valuetypeelement.text = k
+        itemidx+=1
+        
+    return(root)
+                        
+    
 def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None):
     # take a 2d array and return an XML string
     # nodes are called root, row and cell

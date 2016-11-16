@@ -41,6 +41,12 @@ table {
     border: 1px solid #73AD21;
 }
 
+label {
+	display: inline-block;
+	width:120px;
+	text-alight=right;
+}
+
 </style>
 </html>
 
@@ -49,6 +55,7 @@ table {
 set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 
 include_once 'utils_xml.php';
+include_once 'ui_utils.php';
 
 function drawcell($cell,$class,$args,$size=1,$index=1) {
 	// size describes how many cells there are on this row
@@ -136,14 +143,15 @@ function drawrow($row,$args) {
 	}
 }
 
-function drawgrid($xmlstr,$args=NULL,$formats=False) {
+//function drawgrid($xmlstr,$args=NULL,$formats=False) {
+function drawgrid($utilsxml,$args=NULL,$formats=False) {
 	
 	echo "<table id=table >";
 	
 	// load xml string into XML Utils
-	$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');	
+	//$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');	
 
-	// get a list of all rows
+	// determine what type of parser we need to use
 	$_rows = $utilsxml->xpath("//row");
 
 	foreach ($_rows as $_row) {
@@ -181,3 +189,65 @@ function drawgrid($xmlstr,$args=NULL,$formats=False) {
 	}
 	echo "</table> ";
 }
+
+function drawform($utilsxml,$args=NULL) {
+//function drawform($xmlstr,$args=NULL) {
+
+   echo "<html><body>";
+   echo '<form action="update.php" method="post" accept-charset="UTF-8">';
+   echo "<fieldset>";
+   
+  	// load xml string into XML Utils
+	//$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');	
+
+	// get a list of all rows
+	$_items = $utilsxml->xpath("//item");
+   
+   $widgetcount=0;
+	foreach ($_items as $_item) {
+	
+		if ($_item->valuetype == 'adult') {
+    		$valuetype='teacher';
+    	}
+    	elseif ($_item->valuetype == 'id') {
+	 		$valuetype='__id';
+	 	}
+    	elseif ($_item->valuetype == 'objtype') {
+	 		continue;
+	 	}
+      else {
+        	$valuetype=$_item->valuetype;
+		}
+
+   	gethtmltablecoldropdown('test.sqlite','lesson',$valuetype,$widgetcount,$_item->value);
+   	$widgetcount=$widgetcount+1;
+	}
+	
+   echo "</fieldset>";
+   echo "</form>";
+   echo "</body></html>";
+}
+
+function draw($xmlstr,$args=NULL) {
+	
+	// load xml string into XML Utils
+	$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');	
+	
+	// get parser
+	$_parser = $utilsxml->xpath("//parser");
+	
+	
+	if (sizeof($_parser) <> 0) {
+	//if (isset($_parser)) {
+		$_item =$_parser[0]; 
+		$funcname = $_item->value;
+		
+	}
+	else {
+		$funcname = 'drawgrid';
+	}
+	
+	call_user_func((string)$funcname,$utilsxml,$args);
+	
+}	
+	

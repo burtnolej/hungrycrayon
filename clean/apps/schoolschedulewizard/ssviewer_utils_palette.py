@@ -108,7 +108,7 @@ def color_get(value):
         value= value.replace(" ","_")
         
     if value.count("[") == 1 and value.count("]") == 1:
-        bg = red
+        bg = colors.red
     
     if value.count(".") > 0:
         value = value.split(".")[0]

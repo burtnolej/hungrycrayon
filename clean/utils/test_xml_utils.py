@@ -1,8 +1,10 @@
 import xml.etree.ElementTree as xmltree
 import unittest
 from xml_utils import element_find_by_attrib_value, element_move, element_fuse, \
-     element_parent_get, element_find_tags,element_find_children, grid2xml, xml2string
+     element_parent_get, element_find_tags,element_find_children, grid2xml, xml2string, record2xml
     
+from collections import OrderedDict
+
 class Test_XML(unittest.TestCase):
 
     def setUp(self):
@@ -797,6 +799,25 @@ class Test_Grid_to_XML_nopivot(unittest.TestCase):
         xml = grid2xml(grid,ids=True)
         
         self.assertEqual(xmltree.tostring(xml),expected_results)
+                
+        
+class Test_Pageto_XML(unittest.TestCase):
+       
+    def test_1lesson(self):
+
+        '''<root><parser><value>drawform</value></parser><item id="1"><value>master</value><valuetype>status</valuetype></item><item id="2"><value>830-910</value><valuetype>period</valuetype></item><item id="3"><value>Issey.Student News.Thursday.830-910</value><valuetype>session</valuetype></item><item id="4"><value>Issey</value><valuetype>adult</valuetype></item><item id="5"><value>Stephen</value><valuetype>student</valuetype></item><item id="6"><value>00A49216</value><valuetype>id</valuetype></item><item id="7"><value>Student News</value><valuetype>subject</valuetype></item><item id="8"><value>subject</value><valuetype>recordtype</valuetype></item><item id="9"><value>complete</value><valuetype>substatus</valuetype></item><item id="10"><value>dbinsert</value><valuetype>source</valuetype></item><item id="11"><value>lesson</value><valuetype>objtype</valuetype></item><item id="12"><value>TH</value><valuetype>dow</valuetype></item><item id="13"><value>1.3.5.20.5</value><valuetype>userobjid</valuetype></item></root>'''
+        
+        expected_result = '<root><parser><value>drawform</value></parser><item id="1"><value>master</value><valuetype>status</valuetype></item><item id="2"><value>830-910</value><valuetype>period</valuetype></item><item id="3"><value>Issey.Student News.Thursday.830-910</value><valuetype>session</valuetype></item><item id="4"><value>Issey</value><valuetype>adult</valuetype></item><item id="5"><value>Stephen</value><valuetype>student</valuetype></item><item id="6"><value>00A49216</value><valuetype>id</valuetype></item><item id="7"><value>Student News</value><valuetype>subject</valuetype></item><item id="8"><value>subject</value><valuetype>recordtype</valuetype></item><item id="9"><value>complete</value><valuetype>substatus</valuetype></item><item id="10"><value>dbinsert</value><valuetype>source</valuetype></item><item id="11"><value>lesson</value><valuetype>objtype</valuetype></item><item id="12"><value>TH</value><valuetype>dow</valuetype></item><item id="13"><value>1.3.5.20.5</value><valuetype>userobjid</valuetype></item></root>'
+        
+        header = "<root><parser><value>drawform</value></parser></root>"    
+
+        page = {'status': u'master', 'recordtype': u'subject', 'period': u'830-910', 'substatus': u'complete', 'source': u'dbinsert', 'session': u'Issey.Student News.Thursday.830-910', 'adult': u'Issey', 'student': u'Stephen', 'id': u'00A49216', 'objtype': 'lesson', 'dow': u'TH', 'userobjid': u'1.3.5.20.5', 'subject': u'Student News'}
+
+        xml = record2xml(page,header=header)
+        
+        self.assertEqual(xmltree.tostring(xml),expected_result)
+        
+         
         
 if __name__ == "__main__":
 
@@ -810,6 +831,9 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_valuetype))
     '''
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_nopivot))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_nopivot))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pageto_XML))
                   
+    
+    
     unittest.TextTestRunner(verbosity=2).run(suite)

@@ -8,8 +8,16 @@ if (sizeof(array_keys($_POST)) == 0){
 	$args = $_GET;
 }
 
+//$funcname='drawgrid';
+
+//if (isset($args['parser'])) {
+//	$funcname=$args['parser'];
+//}
+
 $url = buildurl('http://blackbear:8080/',$args);
 $token = getcurl($url);
-drawgrid($token,$args);
+
+draw($token,$args);
+//call_user_func($funcname,$token,$args);
 
 ?>

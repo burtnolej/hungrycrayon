@@ -85,6 +85,13 @@ def dataset_list(of,enums,pagelen=30,pagenum=1):
           
     return grid,colnames
 
+def dataset_record(of,clsname,objid):
+    
+    if of.object_exists(clsname,objid) == True:    
+        obj = of.object_get(clsname,objid)
+        return(obj.dm)
+
+    return({})
     
 def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_value,
            conflicts_only='N',constraints=None,wratio=None,formatson=False):
@@ -333,13 +340,13 @@ def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1
     log.log(thisfuncname(),3,msg="loading",source=str(source))
 
     # load from database
-    cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype','source']        
+    cols = ['period','student','session','dow','teacher','subject','userobjid','status','substatus','recordtype','source','__id']        
     with database:
         colndefn,rows,exec_str = tbl_rows_get(database,'lesson',cols,whereclause)
 
         log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
     
-    cols = ['period','student','session','dow','adult','subject','userobjid','status','substatus','recordtype','source']
+    cols = ['period','student','session','dow','adult','subject','userobjid','status','substatus','recordtype','source','id']
     
     # parse rows
     for row in rows:
