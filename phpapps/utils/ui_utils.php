@@ -34,7 +34,7 @@ function gethtmldbdropdown($dbname,$tablename){
 
 	foreach ($columns as $column) {
 	
-		echo "<div class=\"container\">	";
+		echo "<div class=\"container\">";
 		
 		$values = getcolumndistinctvalues($dbname,$tablename,$column);
 
@@ -48,7 +48,7 @@ function gethtmldbdropdown($dbname,$tablename){
 
 function gethtmltablecoldropdown($dbname,$tablename,$column,$widgetcount,$default=NULL){
 	
-	echo "<div class=\"container\">	";
+	echo "<div class=\"container\">";
 		
 	$values = getcolumndistinctvalues($dbname,$tablename,$column);
 
@@ -70,7 +70,7 @@ function gethtmlxmldropdown($xml) {
 	
 	foreach ($_dropdowns as $_dropdown) {
 			
-		echo "<div class=\"container\">	";
+		echo "<div class=\"container\">";
 
 		$values = $_dropdown->values->xpath("child::value");
 
@@ -91,7 +91,7 @@ function gethtmlbutton($type,$label) {
 
 function gethtmlmultiselect($dbname,$query,$name) {
 	
-		echo "<div class=\"container\">	";
+		echo "<div class=\"container\">";
 		echo "<div style=\"width: 12em; float: bottom;\">";
 		
 		$db = new SQLite3($dbname);
