@@ -346,7 +346,9 @@ class WizardUI(Tk):
 
                     if isinstance(_value,list) == True:
                         if _value <> []:
-                            if len(_value) == 1 and conflicts_only <> "Y":
+                            #if len(_value) == 1 and conflicts_only <> "Y": # replace with line below if want to switch on conflicts
+                            if len(_value) == 1:
+                                                            
                                 if isinstance(_value[0],tuple) == True:
                                     # 1 item, multi attributes
                                     bgs,fgs = _color_get_multi(_value[0])
@@ -357,7 +359,8 @@ class WizardUI(Tk):
                                     _widgets = widget.addlabel(1,True,_value[0],bg,fg)
                                     
                             # multiple items
-                            if len(_value) > 1 and conflicts_only == "Y":
+                            #if len(_value) > 1 and conflicts_only == "Y": # replace with line below if want to switch on conflicts
+                            if len(_value) > 1:
                                 for __value in _value:
                                     bgs,fgs = _color_get_multi(__value)
                                     _widgets = widget.addlabel(len(__value),True,__value,bgs,fgs,wratio)

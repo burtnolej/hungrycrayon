@@ -1199,7 +1199,7 @@ if __name__ == "__main__":
 	
 	files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep6IndividualSchedules_new.csv",6,True,"6s"),
 	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4IndividualSchedules_new.csv",4,True,"4s"),
-	         ("/mnt/bumblebee-burtnolej/googledrive/current/CopyofPrep5IndividualSchedules_new.csv",5,True,"5s"),
+	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5IndividualSchedules_new.csv",5,True,"5s"),
 	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5and6schedulenewworkperiod.csv",-1,True,"56n"),
 	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4schedulenewworkperiod.csv",5,True,"4n")]
 	

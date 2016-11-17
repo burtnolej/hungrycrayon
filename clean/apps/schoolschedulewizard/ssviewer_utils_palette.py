@@ -124,3 +124,18 @@ def color_get(value):
         fg = fontpalette[value]
         
     return(bg,fg)   
+
+
+def color_db_load():
+    
+    from inspect import getmembers
+    
+    for key,value in getmembers(colors):
+        if key.startswith("_") == False:
+            print key,value
+        
+    
+    
+if __name__ == "__main__":
+    
+    color_db_load()

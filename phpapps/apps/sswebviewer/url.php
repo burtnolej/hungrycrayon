@@ -7,10 +7,13 @@ function pop(&$array,$key) {
 	return $value;
 }
 
-function buildurl($rooturl,$args) {
+function buildurl($rooturl,$args,$viewer=False) {
 	
-	$url = $rooturl.$args['source_type']."/";
-	$url = $url.$args['source_value']."?";
+	// only the viewer pages/service calls rely on get args source_type/value to build the url
+	if ($viewer==False) {
+		$url = $rooturl.$args['source_type']."/";
+		$url = $url.$args['source_value']."?";
+	}
 	
 	foreach ($args as $key => $value){
 		if ($value <> "") {

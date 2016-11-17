@@ -1,3 +1,7 @@
+import sys
+from misc_utils_log import Log, logger
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
+          pidlogname=True,proclogname=False)
 
 import web
 import xml_utils
@@ -16,20 +20,24 @@ urls = (
     '/subject/(\w+)', 'Subject',
     '/adult/(\w+)', 'Adult',
     '/list/(\w+)', 'List',
-    '/id/(\w+)', 'RefID'
+    '/id/(\w+)', 'RefID',
+    '/new/', 'New'
 )
     
 app = web.application(urls, globals())
 
-dbname='test_ssloader'
-refdbname='test_ssloader'
+#dbname='test_ssloader'
+#refdbname='test_ssloader'
+
+dbname='quad'
+refdbname='quad'
 
 database = Database(dbname)
 refdatabase = Database(refdbname)
 of = ObjFactory(True)
 enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
 
-args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums)
+args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums,source='56n,4n,4s,5s,6s')
 
 ssviewer_utils.dataset_load(**args)
 
@@ -57,6 +65,11 @@ class Student:
         xml = xml_utils.grid2xml(grid,shrinkfont=5)
         
         return xmltree.tostring(xml)
+    
+class New:
+    def GET(self):
+        
+        print web.input(id='')
     
 class Subject:
     #def GET(self,id):

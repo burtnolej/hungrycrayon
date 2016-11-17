@@ -10,6 +10,7 @@ function gethtmldropdown($column,$values,$widgetcount,$default=NULL) {
 	$datalistname = "suggestions".$widgetcount;
 
 	echo "<label for=\"".$column."\" >".$column."</label>";
+	//echo "<input type=\"text\" name=\"".$column."\" id=\"".$column."\" list=\"".$datalistname."\" autocomplete=\"off\" ";
 	echo "<input type=\"text\" name=\"".$column."\" id=\"".$column."\" list=\"".$datalistname."\""; 
 
 	if ($default <> NULL) {
@@ -90,17 +91,18 @@ function gethtmlbutton($type,$label) {
 
 function gethtmlmultiselect($dbname,$query,$name) {
 	
-		echo "<div class=\"container\">";
-		echo "<div style=\"width: 12em; float: bottom;\">";
+		//echo "<div class=\"container\">";
+		//echo "<div style=\"width: 12em; float: bottom;\">";
 		
 		$db = new SQLite3($dbname);
 
 		$results = $db->query($query);
 		while ($row = $results->fetchArray()) {
 				echo "<input id=\"".$row['name']."\" type=\"checkbox\" name=\"".$name."[]\" value=\"".$row['name']."\"/>";
-				echo "<label for=\"".$row['name']."\">".$row['name']."</label>";
+				echo "<label for=\"".$row['name']."\" >".$row['name']."</label>";
+				echo "<br>";
 		}
-		echo "</datalist>";
-		echo "</div>";
+		//echo "</datalist>";
+		//echo "</div></div>";
 }
 ?>

@@ -8,16 +8,20 @@ if (sizeof(array_keys($_POST)) == 0){
 	$args = $_GET;
 }
 
-//$funcname='drawgrid';
+if (isset($args['trantype']) == True) {
+	switch ($args['trantype']) {
+    case 'new':
+      $url = buildurl('http://blackbear:8080/new',$args);
+      break;
+    default:
+    	$url = buildurl('http://blackbear:8080/',$args);
+	}
+}
+else {
+	$url = buildurl('http://blackbear:8080/',$args);
+}
 
-//if (isset($args['parser'])) {
-//	$funcname=$args['parser'];
-//}
-
-$url = buildurl('http://blackbear:8080/',$args);
 $token = getcurl($url);
-
 draw($token,$args);
-//call_user_func($funcname,$token,$args);
 
 ?>

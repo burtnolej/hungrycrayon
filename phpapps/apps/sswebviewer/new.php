@@ -34,7 +34,7 @@ set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 include_once 'ui_utils.php';
 include_once 'db_utils.php';
 
-function draw_login($dbname,$tablename,$submitpage) {
+function draw_new($dbname,$tablename,$submitpage) {
 ?>
 
 <html>
@@ -43,74 +43,18 @@ function draw_login($dbname,$tablename,$submitpage) {
 	
 			<fieldset >
 				<input type='hidden' name='submitted' id='submitted' value='1'/>
+				<input type="hidden" name="trantype" value="new" />
 				<div>
 				<?php
 				
-					$xml = "<root>
-									<dropdown id='1'>
-										<field>xaxis</field>
-										<values>
-											<value>period</value>
-											<value>dow</value>
-											<value>adult</value>
-											<value>subject</value>
-										</values>
-										<default>dow</default>
-									</dropdown>
-									<dropdown id='2'>
-										<field>yaxis</field>
-										<values>
-											<value>period</value>
-											<value>dow</value>
-											<value>adult</value>
-											<value>subject</value>
-										</values>
-										<default>period</default>
-									</dropdown>
-									<dropdown id='3'>
-										<field>source_type</field>
-										<values>
-											<value>student</value>
-											<value>adult</value>
-										</values>
-										<default>student</default>
-									</dropdown>
-									<dropdown id='4'>
-										<field>source_value</field>
-										<values>
-											<value>Peter</value>
-										</values>
-										<default>Peter</default>
-									</dropdown>
-									<dropdown id='5'>
-										<field>source</field>
-										<values>
-											<value>dbinsert</value>
-											<value>56n</value>
-											<value>4n</value>
-											<value>4s</value>
-											<value>5s</value>
-											<value>6s</value>
-											<value>56n,4n,4s,5s,6s</value>
-										</values>
-										<default>56n</default>
-									</dropdown>
-								</root>";
-					
 					echo "<div id='one'>";
 
-					//('test.sqlite','lesson');
-					gethtmlxmldropdown($xml);
+					gethtmldbdropdown('test.sqlite','lesson');
 					
-					echo "</div>";
-				
-					echo "<div id='two'>";
 
-					gethtmlmultiselect('test.sqlite',"select name from sqlite_master","ztypes");
-					
 					echo "</div>";
 
-					gethtmlbutton('submit','go');
+					gethtmlbutton('submit','new');
 					
 				?>
 				</div>
@@ -121,6 +65,6 @@ function draw_login($dbname,$tablename,$submitpage) {
 <?php
 }
 
-draw_login('test.sqlite','lesson','getlink.php');
+draw_new('test.sqlite','lesson','getlink.php');
 
 ?>
