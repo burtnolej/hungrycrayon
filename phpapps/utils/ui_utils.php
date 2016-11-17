@@ -1,7 +1,10 @@
 
 <?php
 
-set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
+$PHPLIBPATH = getenv("PHPLIBPATH");
+set_include_path($PHPLIBPATH);
+
+//set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 include_once 'db_utils.php';
 include_once 'utils_xml.php';
 
