@@ -30,9 +30,20 @@ div#two {
 
 <?php
 
-set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
+$PHPLIBPATH = getenv("PHPLIBPATH");
+	
+if ($PHPLIBPATH == "") {
+	trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);
+}
+
+set_include_path($PHPLIBPATH);
+
 include_once 'ui_utils.php';
 include_once 'db_utils.php';
+
+//set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
+//include_once 'ui_utils.php';
+//include_once 'db_utils.php';
 
 function draw_login($dbname,$tablename,$submitpage) {
 ?>
