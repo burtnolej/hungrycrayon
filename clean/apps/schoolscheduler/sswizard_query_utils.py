@@ -9,7 +9,10 @@ from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 from sqlite3 import OperationalError
 
 __all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfunc', '_versions', '_sessionversions', \
-           '_versions_subjects']
+           '_versions_subjects','_dbid2userdefid','_asdict']
+
+def _asdict(values):
+    return(dict((value[0],value[1]) for value in values))
 
 def _dowexecfunc(database,value,prep,*args):
     exec_str = "select code from dow "
@@ -22,6 +25,15 @@ def _colorexecfunc(database,value):
 def _rowcount(database,table):
     exec_str = "select count(*) from {0} ".format(table)
     return(tbl_query(database,exec_str))
+
+def _dbid2userdefid(database,asdict=False):
+    exec_str = "select __id,userobjid from lesson"
+    
+    _,values,_ = tbl_query(database,exec_str)
+    
+    if asdict==True:
+        return(_asdict(values))
+    return(values)
 
 def _sessionenum(database,code,period,prep):
     exec_str = "select enum from session where code = {0} ".format(code)
@@ -72,7 +84,10 @@ def _maxsessionenum(database):
         return [None,[[0]],None]
 
 def _distinct(database,value,table):
-    exec_str = "select distinct({1}) from {0} order by prep".format(table,value)
+    exec_str = "select distinct({1}) from {0}".format(table,value) 
+    #if orderby <> False:
+    #    exec_str += " order by prep"
+        
     return tbl_query(database,exec_str)
 
 def _execfunc(database,value,prep,dow):

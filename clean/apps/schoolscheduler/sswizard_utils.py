@@ -251,7 +251,8 @@ def setenums(dow,prep,database):
         arg = dict(dow="\""+dow_name+"\"")
         
     getdbenum(enums,database,'code','session',**arg)
-    getdbenum(enums,database,'name','lessontype')
+    getdbenum(enums,database,'name','recordtype')
+    #getdbenum(enums,database,'name','lessontype')
     getdbenum(enums,database,'name','subject')
     
   
@@ -518,7 +519,7 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    d['period'] = _isname(enums,'period',d['period'])
 	    d['session'] = ".".join([d['adult'],d['subject'],_isname(enums,'dow',d['dow']),d['period']])
 	    d['prep'] = int(prepmap[d['student']])
-	    d['userobjid'] = _getuserobjid(enums,['period','dow','student','adult'],d)
+	    d['userobjid'] = _getuserobjid(enums,['period','dow','student','adult','subject'],d)
 
 	    d['saveversion'] = 1
 	   
@@ -597,8 +598,8 @@ def gridreduce(grid,blanks,headeroffset=1):
     # assumes the grid is a list of rows
     # headeroffset indicates to not include header row or column in determination
     
-    gridw = len(grid)
-    gridh = len(grid[0])
+    gridh = len(grid)
+    gridw = len(grid[0])
     
     notblankcols = []
     for y in range(headeroffset,gridw):
