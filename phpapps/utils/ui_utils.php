@@ -2,6 +2,7 @@
 <?php
 
 $PHPLIBPATH = getenv("PHPLIBPATH");
+$SSDBPATH = getenv("SSDBPATH");
 set_include_path($PHPLIBPATH);
 
 //set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');

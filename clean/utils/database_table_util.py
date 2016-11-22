@@ -173,7 +173,11 @@ def tbl_query(database,exec_str):
     
     results = database.execute(exec_str)
     
-    keys = [description[0] for description in database.description()]
+    try:
+	keys = [description[0] for description in database.description()]
+    except TypeError:
+	# could be an update
+	keys =[]
     
     return(keys,results,exec_str)    
 

@@ -84,7 +84,10 @@ def _maxsessionenum(database):
         return [None,[[0]],None]
 
 def _distinct(database,value,table):
-    exec_str = "select distinct({1}) from {0} order by prep".format(table,value)
+    exec_str = "select distinct({1}) from {0}".format(table,value) 
+    #if orderby <> False:
+    #    exec_str += " order by prep"
+        
     return tbl_query(database,exec_str)
 
 def _execfunc(database,value,prep,dow):

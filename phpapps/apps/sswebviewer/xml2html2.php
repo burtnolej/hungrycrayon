@@ -52,6 +52,8 @@ label {
 
 <?php
 
+$PHPLIBPATH = getenv("PHPLIBPATH");
+
 if ($PHPLIBPATH == "") {
 	trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);
 }

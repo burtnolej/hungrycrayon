@@ -1,0 +1,2 @@
+put /tmp/install.tar.gz
+bye

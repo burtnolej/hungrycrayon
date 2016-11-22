@@ -31,6 +31,8 @@ div#two {
 <?php
 
 $PHPLIBPATH = getenv("PHPLIBPATH");
+$SSDBPATH = getenv("SSDBPATH");
+$SSDBNAME = getenv("SSDBNAME");
 
 if ($PHPLIBPATH == "") {
 	trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);
@@ -117,7 +119,7 @@ function draw_login($dbname,$tablename,$submitpage) {
 				
 					echo "<div id='two'>";
 
-					gethtmlmultiselect('test.sqlite',"select name from sqlite_master","ztypes");
+					gethtmlmultiselect($dbname,"select name from sqlite_master","ztypes");
 					
 					echo "</div>";
 
@@ -132,6 +134,23 @@ function draw_login($dbname,$tablename,$submitpage) {
 <?php
 }
 
-draw_login('test.sqlite','lesson','getlink.php');
+$api = php_sapi_name();
 
+if ($api=='cli') {
+	$SSDBNAME = $argv[1];
+	$SSDB = $SSDBPATH."/".$SSDBNAME;
+}
+else {
+	$SSDB = $SSDBPATH."/".$SSDBNAME;
+}
+
+echo $SSDB;
+
+if ($SSDBNAME <> "" and (file_exists($SSDB) == True)) {
+	
+	draw_login($SSDB,'lesson','getlink.php');
+}
+else {
+	echo "a valid database name must be passed in as an argument";
+}
 ?>

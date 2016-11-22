@@ -13,39 +13,9 @@ import ssviewer_utils
 import sswizard_utils
 import sswizard_query_utils
 
-urls = (
-    #'/(.*)', 'student','subject','adult','period','dow'
-    '/(\w+)', 'Student',
-    '/student/(\w+)', 'Student',
-    '/subject/(\w+)', 'Subject',
-    '/adult/(\w+)', 'Adult',
-    '/list/(\w+)', 'List',
-    '/id/(\w+)', 'RefID',
-    '/new/', 'New'
-)
-    
-app = web.application(urls, globals())
-
-#dbname='test_ssloader'
-#refdbname='test_ssloader'
-
-dbname='quad'
-refdbname='quad'
-
-database = Database(dbname)
-refdatabase = Database(refdbname)
-of = ObjFactory(True)
-enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
-
-args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums,source='56n,4n,4s,5s,6s')
-
-ssviewer_utils.dataset_load(**args)
-
-# get a mapping of userobjid to db refid (__id) as of uses the former to index but the web page
-# uses __id as they are easier to pass in URL
-with database:
-    dbidlookup = sswizard_query_utils._dbid2userdefid(database,asdict=True)
-
+import os
+import os.path
+ 
 class Student:
     def GET(self,id):
         
@@ -138,5 +108,42 @@ class RefID:
         #return(xml)
         
 if __name__ == "__main__":
-    import os
+    
+    
+    DBPATH = os.environ['DBPATH']
+    
+    if len(sys.argv) <= 1:
+        raise Exception("provide a database name; no extension")
+    else:
+        dbname=os.path.join(DBPATH,sys.argv[1])
+        refdbname=os.path.join(DBPATH,sys.argv[1])
+        sys.argv.pop(1)
+        
+    urls = (
+        #'/(.*)', 'student','subject','adult','period','dow'
+        '/(\w+)', 'Student',
+        '/student/(\w+)', 'Student',
+        '/subject/(\w+)', 'Subject',
+        '/adult/(\w+)', 'Adult',
+        '/list/(\w+)', 'List',
+        '/id/(\w+)', 'RefID',
+        '/new/', 'New'
+    )
+    
+    print "using database", dbname
+    database = Database(dbname)
+    refdatabase = Database(refdbname)
+    of = ObjFactory(True)
+    enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
+    
+    args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums,source='56n,4n,4s,5s,6s')
+    
+    ssviewer_utils.dataset_load(**args)
+
+    # get a mapping of userobjid to db refid (__id) as of uses the former to index but the web page
+    # uses __id as they are easier to pass in URL
+    with database:
+        dbidlookup = sswizard_query_utils._dbid2userdefid(database,asdict=True)
+
+    app = web.application(urls, locals())
     app.run()

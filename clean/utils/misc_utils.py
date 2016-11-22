@@ -81,11 +81,15 @@ def os_file_to_string(filename,remove=None):
     fh.close()
     return s
 
-def os_file_to_list(filename,remove=None):
+def os_file_to_list(filename,remove=None,strip=False):
     
     fh = open(filename, 'r+')
 
-    l = [line for line in fh]       
+    if strip==True:
+        l = [line.strip() for line in fh] 
+    else:
+        l = [line for line in fh] 
+        
     fh.close()
     return l
 
