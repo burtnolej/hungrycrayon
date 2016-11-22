@@ -18,8 +18,15 @@ def _dowexecfunc(database,value,prep,*args):
     exec_str = "select code from dow "
     return(tbl_query(database,exec_str))
 
-def _colorexecfunc(database,value):
-    exec_str = "select rgb from {0} ".format(value)
+def _colorexecfunc(database):
+    exec_str = "select name,hex from colors "
+    return(tbl_query(database,exec_str))
+
+def _formatsexecfunc(database,colortype):
+    exec_str =  "select f.name,c.hex "
+    exec_str += "from formats as f, colors as c "
+    exec_str += "where c.name = f.{0}".format(colortype)
+
     return(tbl_query(database,exec_str))
 
 def _rowcount(database,table):

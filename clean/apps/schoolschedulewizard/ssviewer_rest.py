@@ -12,10 +12,11 @@ from database_util import Database, tbl_create
 import ssviewer_utils
 import sswizard_utils
 import sswizard_query_utils
+from ssviewer_utils_palette import *
 
 import os
 import os.path
- 
+
 class Student:
     def GET(self,id):
         
@@ -135,6 +136,8 @@ if __name__ == "__main__":
     refdatabase = Database(refdbname)
     of = ObjFactory(True)
     enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
+    
+
     
     args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums,source='56n,4n,4s,5s,6s')
     

@@ -1,9 +1,14 @@
 
+import os
 
 from misc_utils_enum import enum
+from database_util import Database, tbl_remove, tbl_exists, tbl_create
+from database_table_util import tbl_rows_insert
+from sswizard_query_utils import _colorexecfunc, _formatsexecfunc
 
 __all__ = ['colors','_color_get_multi','color_get','colorpalette','fontpalette']
 
+'''
 colors = enum(pink = '#%02x%02x%02x' % (255, 153, 153),
               salmon = '#%02x%02x%02x' % (255, 204, 153),
               lightyellow = '#%02x%02x%02x' % (255, 255, 153),
@@ -32,6 +37,8 @@ colors = enum(pink = '#%02x%02x%02x' % (255, 153, 153),
               lightgrey = '#%02x%02x%02x' % (211, 211, 211),              
               verydarkgrey = '#%02x%02x%02x' %(54, 46, 55),
               dirtyyellow = '#%02x%02x%02x' %(242, 232, 19))
+
+
 
 colorpalette =  dict(wp=colors.green,
                      subject=colors.lightblue,
@@ -82,6 +89,14 @@ fontpalette = dict(Amelia=colors.green,
                    Chess=colors.pink,
                    Student_News=colors.lightyellow,
                    subject=colors.blue)
+'''
+
+def init_formats(dbname,_globals):
+    
+    _globals['colorpalette'] = dbformats_get(dbname,'bgcolor')
+    _globals['fontpalette'] = dbformats_get(dbname,'fgcolor')
+    _globals['colors'] = dbcolors_get(dbname)
+    
 
 def _color_get_multi(values):
     bgs=[]
@@ -125,17 +140,101 @@ def color_get(value):
         
     return(bg,fg)   
 
+def hex2rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    rgb = tuple(int(value[i:i+lv//3],16) for i in range(0,lv,lv//3))
+    return rgb
 
-def color_db_load():
+def color_db_load(dbname="test_ssloader"):
     
-    from inspect import getmembers
+    tblname = "colors"
     
-    for key,value in getmembers(colors):
-        if key.startswith("_") == False:
-            print key,value
+    colors_col_defn = [('name','text'),('hex','text'),('rgb','text')]
+    colors_col_names = [row[0] for row in colors_col_defn]
+    
+    dbrows=[]
+    for key,value in colors.attr_get_keyval(include_callable=False,include_baseattr=False):
+        rgb = hex2rgb(value)
+        rgbstr = ",".join(map(str,rgb))
+        dbrows.append(["\""+key+"\"","\""+value+"\"","\""+rgbstr+"\""])   
+    
+    database = Database(dbname)
+    
+    with database:
+        if tbl_exists(database,tblname) == True:
+            tbl_remove(database,tblname)
+            
+        tbl_create(database,tblname, colors_col_defn)
+        exec_str, result = tbl_rows_insert(database,tblname,colors_col_names,dbrows)
+
+def dbformats_get(dbname,colortype):
+
+    results={}
+    database = Database(dbname)
+    with database:
+        _,colors,_ = _formatsexecfunc(database,colortype)
+
+    for color in colors:
+        results[color[0]] = color[1]
         
+    return(results)
+
+def dbcolors_get(dbname):
+
+    results = {}
+    database = Database(dbname)
+    with database:
+        _,colors,_ = _colorexecfunc(database)
+
+    for color in colors:
+        results[color[0]] = color[1]
+        
+    return(enum(**results))
     
+def formats_db_load(dbname="test_ssloader"):
+
+    tblname = "formats"
+    hex2name = {}    
+    for key,value in colors.attr_get_keyval(include_callable=False,include_baseattr=False):
+        hex2name[value] = key
+
+    formats_col_defn = [('name','text'),('fgcolor','text'), ('bgcolor','text')]
     
+    formats_col_names = [row[0] for row in formats_col_defn]
+    
+    dbrows=[]
+    for name,bg in colorpalette.iteritems():
+        if fontpalette.has_key(name):
+            fg = fontpalette[name]
+        else:
+            fg = '#000000'
+            
+        dbrows.append(["\""+name+"\"",
+                       "\""+hex2name[fg]+"\"",
+                       "\""+hex2name[bg]+"\""])
+    
+    database = Database(dbname)
+    with database:
+        if tbl_exists(database,tblname) == True:
+            tbl_remove(database,tblname)
+        
+        tbl_create(database,tblname, formats_col_defn)
+        exec_str, result = tbl_rows_insert(database,tblname,formats_col_names,dbrows)
+            
+colorpalette = dbformats_get(os.environ['DBNAME'],'bgcolor')
+fontpalette = dbformats_get(os.environ['DBNAME'],'fgcolor')
+colors = dbcolors_get(os.environ['DBNAME'])
+
 if __name__ == "__main__":
     
-    color_db_load()
+    color_db_load("fucia")
+    formats_db_load('fucia')
+    
+    #globals()['colorpalette'] = dbformats_get('test_ssloader','bgcolor')
+    #globals()['fontpalette'] = dbformats_get('test_ssloader','fgcolor')
+    #globals()['colors'] = dbcolors_get('test_ssloader')
+    
+    #for k,v in dict(globals()).iteritems():
+    #    print k,v
+        

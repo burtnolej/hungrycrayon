@@ -61,7 +61,11 @@ class Database():
     def open(self):
         '''purpose: if filename does not exist it creates it; but at least one table needs to be 
             added for the db to persist'''
-        self.connection = sqlite3.connect(self.name+".sqlite")
+        
+        if self.name.endswith("sqlite") == False:
+            self.name = self.name+".sqlite"
+            
+        self.connection = sqlite3.connect(self.name)
         self.cursor = self.connection.cursor()
 
     def remove(self):

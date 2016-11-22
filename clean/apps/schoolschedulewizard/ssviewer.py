@@ -49,10 +49,12 @@ class WizardUI(Tk):
         #self.clipboard_selection=-1
         Tk.__init__(self)
         
+        globals()['colors'] = dbcolors_get(dbname)
+        self.colorpalette = dbformats_get(dbname,'bgcolor')
+        self.fontpalette = dbformats_get(dbname,'fgcolor')
         
-        self.colorpalette = colorpalette
-        self.fontpalette = fontpalette
-        
+        #self.colorpalette = colorpalette
+        #self.fontpalette = fontpalette
         
         screenwidth = self.winfo_vrootwidth()
         screenheight = self.winfo_vrootheight()

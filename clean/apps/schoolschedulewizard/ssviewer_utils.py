@@ -1,4 +1,6 @@
 import sys
+import os
+
 from misc_utils_log import Log, logger
 log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
           pidlogname=True,proclogname=False)
@@ -7,11 +9,16 @@ from misc_utils import nxnarraycreate, thisfuncname
 from misc_utils_objectfactory import ObjFactory
 import sswizard_utils
 from ssviewer_utils_palette import *
+#from ssviewer_utils_palette import init_formats
 
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 
-#import ssviewer_utils_palette
+from ssviewer_utils_palette import dbformats_get, dbcolors_get
+
+colorpalette = dbformats_get(os.environ['DBNAME'],'bgcolor')
+fontpalette = dbformats_get(os.environ['DBNAME'],'fgcolor')
+colors = dbcolors_get(os.environ['DBNAME'])
 
 class schoolschedgeneric(dbtblgeneric):
 
