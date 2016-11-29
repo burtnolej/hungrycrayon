@@ -16,9 +16,11 @@ from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
 
 from ssviewer_utils_palette import dbformats_get, dbcolors_get
 
-colorpalette = dbformats_get(os.environ['DBNAME'],'bgcolor')
-fontpalette = dbformats_get(os.environ['DBNAME'],'fgcolor')
-colors = dbcolors_get(os.environ['DBNAME'])
+dbname,_ = sswizard_utils.getdatabase()
+
+colorpalette = dbformats_get(dbname,'bgcolor')
+fontpalette = dbformats_get(dbname,'fgcolor')
+colors = dbcolors_get(dbname)
 
 class schoolschedgeneric(dbtblgeneric):
 

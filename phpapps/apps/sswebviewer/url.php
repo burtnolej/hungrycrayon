@@ -9,7 +9,7 @@ function pop(&$array,$key) {
 
 function buildurl($rooturl,$args,$viewer=False) {
 	
-	// only the viewer pages/service calls rely on get args source_type/value to build the url
+	// only the viewer pages/service calls rely on get HTML GET args source_type/value to build the url
 	if ($viewer==False) {
 		$url = $rooturl.$args['source_type']."/";
 		$url = $url.$args['source_value']."?";

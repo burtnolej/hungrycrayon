@@ -18,7 +18,7 @@ import ssviewer_utils
 
 from sswizard_query_utils import *
 from sswizard_config_utils import *
-from ssviewer_utils_palette import *
+from ssviewer_utils_palette import dbformats_get, dbcolors_get
 
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
@@ -34,6 +34,12 @@ import tkFont
 import unittest
 
 controlpanelconfig = dict(height=300,width=200,x=100,y=100)
+
+dbname,_ = sswizard_utils.getdatabase()
+
+colorpalette = dbformats_get(dbname,'bgcolor')
+fontpalette = dbformats_get(dbname,'fgcolor')
+colors = dbcolors_get(dbname)
 
 class WizardUI(Tk):
     #def __init__(self,database,of):

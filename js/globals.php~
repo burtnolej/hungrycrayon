@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<script src="globals.js"></script>
+<script>
+var Globals = 
+<?php 
+	echo json_encode(array('script_name' => 'sfdsdsfd')); 
+?>;
+</script>
+
+
+<input type="button" name="go" id="go"/>
+
+</html>

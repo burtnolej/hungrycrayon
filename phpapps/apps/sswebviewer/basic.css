@@ -1,0 +1,45 @@
+a {
+	text-decoration: none;
+}
+
+table {
+  background-color: #eeeeee;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.cell {
+  text-align: center;
+}
+
+.cell.sub {
+	width: 100px;
+}
+.middle {
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;  
+}
+
+.left {
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;  
+  border-left: 1px solid #000000;
+}
+
+.right {
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;  
+  border-right: 1px solid #000000;
+}
+
+.cell.rowhdr {
+    foreground-color:#D0C978;
+    background-color:#98969B;
+    border: 1px solid #73AD21;
+}
+
+label {
+	display: inline-block;
+	width:120px;
+	text-alight=right;
+}

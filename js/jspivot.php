@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<?php
+
+$PHPLIBPATH = getenv("PHPLIBPATH");
+$SSDBPATH = getenv("SSDBPATH");
+$SSDBNAME = getenv("SSDBNAME");
+
+if ($PHPLIBPATH == "") {
+	trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);
+}
+
+set_include_path($PHPLIBPATH);
+
+include_once 'ui_utils.php';
+include_once 'db_utils.php';
+include_once 'xml2html2.php';
+include_once 'url.php';
+
+
+function draw_login() {
+?>
+	
+<html>
+	<body>
+		<form>
+		
+			<?php
+					
+					if (isset($_GET['source_value'])) { 
+						$sourcevaldefault=$_GET['source_value'];
+					}
+					else {
+						$sourcevaldefault="Donny";
+					}
+					
+					if (isset($_GET['xaxis'])) { 
+						$xaxisdefault=$_GET['xaxis'];
+					}
+					else {
+						$xaxisdefault="period";
+					} 
+
+					$xml = "<root>
+									<dropdown id='1'>
+										<field>xaxis</field>
+										<values>
+											<value>period</value>
+											<value>dow</value>
+											<value>adult</value>
+											<value>subject</value>
+										</values>
+										<default>".$xaxisdefault."</default>
+									</dropdown>
+									<dropdown id='2'>
+										<field>yaxis</field>
+										<values>
+											<value>period</value>
+											<value>dow</value>
+											<value>adult</value>
+											<value>subject</value>
+										</values>
+										<default>dow</default>
+									</dropdown>
+									<dropdown id='3'>
+										<field>source_type</field>
+										<values>
+											<value>student</value>
+											<value>adult</value>
+										</values>
+										<default>student</default>
+									</dropdown>
+									<dropdown id='4'>
+										<field>source_value</field>
+										<values>
+											<value>Donny</value>
+										</values>
+										<default>".$sourcevaldefault."</default>
+									</dropdown>
+									<dropdown id='5'>
+										<field>source</field>
+										<values>
+											<value>dbinsert</value>
+											<value>56n</value>
+											<value>4n</value>
+											<value>4s</value>
+											<value>5s</value>
+											<value>6s</value>
+											<value>56n,4n,4s,5s,6s</value>
+										</values>
+									</dropdown>
+								</root>";
+					
+					echo "<div id='one'>";
+
+					gethtmlxmldropdown($xml);
+					
+					echo "</div>";
+				
+					echo "<div id='two'>";
+
+					getdbhtmlmultiselect($dbname,"select name from sqlite_master","ztypes",4,$_GET['ztypes']);
+					
+					echo "</div>";
+
+					gethtmlbutton('submit','go');
+					?>
+		</form>
+		<p id="demo"></p>
+		<script>
+
+		function get() {
+    		var s = document.getElementById("mySelect").value;
+    		var c = document.getElementById("myCheck").checked;
+    
+	    	window.location = "http://192.168.1.154/jsgethttp.php/student/"+s+"?foo="+c;
+		}
+
+		function reqListener () {
+  			console.log(this.responseText);
+		}
+		</script>
+	</body>
+</html>
+<?php
+}
+
+draw_login();
+
+if(isset($_GET['foo'])) {
+	echo $_GET['foo'];
+	//$args = $_POST;
+	//$SSRESTURL = getenv("SSRESTURL");
+	//$url = buildurl($SSRESTURL,$args);
+	//$token = getcurl($url);
+	//draw($token,$args);
+}
+
+?>

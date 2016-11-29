@@ -1,53 +1,5 @@
 <html>
-<style>
-
-a {
-	text-decoration: none;
-}
-
-table {
-  background-color: #eeeeee;
-  border-collapse: collapse;
-  white-space: nowrap;
-}
-
-.cell {
-  text-align: center;
-}
-
-.cell.sub {
-	width: 100px;
-}
-.middle {
-  border-top: 1px solid #000000;
-  border-bottom: 1px solid #000000;  
-}
-
-.left {
-  border-top: 1px solid #000000;
-  border-bottom: 1px solid #000000;  
-  border-left: 1px solid #000000;
-}
-
-.right {
-  border-top: 1px solid #000000;
-  border-bottom: 1px solid #000000;  
-  border-right: 1px solid #000000;
-}
-
-.cell.rowhdr {
-    foreground-color:#D0C978;
-    background-color:#98969B;
-    border: 1px solid #73AD21;
-}
-
-label {
-	display: inline-block;
-	width:120px;
-	text-alight=right;
-}
-
-</style>
+<link rel="stylesheet" type="text/css" href="default.css" />
 </html>
 
 <?php
@@ -59,8 +11,6 @@ if ($PHPLIBPATH == "") {
 }
 
 set_include_path($PHPLIBPATH);
-
-//set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 
 include_once 'utils_xml.php';
 include_once 'ui_utils.php';
@@ -109,7 +59,7 @@ function drawcell($cell,$class,$args,$size=1,$index=1) {
 
 	if (isset($cell->valuetype)) {
 		
-		$url = "getlink.php?source_type=".$cell->valuetype."&source_value=".$cell->value;
+		$url = "dpivot.php?source_type=".$cell->valuetype."&source_value=".$cell->value;
 		
 		if ($args<>NULL) {
 		
@@ -122,13 +72,6 @@ function drawcell($cell,$class,$args,$size=1,$index=1) {
 				$url = $url."&ztypes=".$args['ztypes'];
 			}
 		}
-	
-/*
-		$url = "getlink.php?source_type=".$cell->valuetype."&source_value=".$cell->value;
-		$url = $url."&xaxis=".$_POST['xaxis']."&yaxis=".$_POST['yaxis'];
-		$url = $url."&ztypes=".implode(",",$_POST['ztypes']);
-
-*/
 
 		echo '<a href="'.$url.'">'.$cell->value.'</a>';
 	}
@@ -151,16 +94,11 @@ function drawrow($row,$args) {
 	}
 }
 
-//function drawgrid($xmlstr,$args=NULL,$formats=False) {
 function drawgrid($utilsxml,$args=NULL,$formats=False) {
 	
 	echo "<table id=table >";
-	
-	// load xml string into XML Utils
-	//$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');	
 
-	// determine what type of parser we need to use
-	$_rows = $utilsxml->xpath("//row");
+	$_rows = $utilsxml->xpath("//row"); // get a list of all rows
 
 	foreach ($_rows as $_row) {
 	
@@ -172,23 +110,23 @@ function drawgrid($utilsxml,$args=NULL,$formats=False) {
 			$_subrows = $_cell->xpath("child::subrow"); // see if any subrows exist
 			
 			if (sizeof($_subrows) <> 0) {
-				
-				echo "<td><table id=table>"; // start a new table
+
+				echo '<td><table class="table sub">'; // start a new table
+
 				foreach ($_subrows as $_subrow) {					
 					drawrow($_subrow,$args);
 				}
 				echo "</table></td>";
 			}
 			else {
-	
 				$_subcells = $_cell->xpath("child::subcell"); // see if any subcells exist
 	
-				if (sizeof($_subcells) <> 0) {
-					echo "<td><table id=table>"; // start a new table
+				if (sizeof($_subcells) <> 0) { // subcells no subrows
+					echo '<td><table class="table sub">'; // start a new table
 					drawrow($_cell,$args);
 					echo "</table></td>";
 				}
-				else { // create a regular cell
+				else { // no subcells or subrows so create a regular cell
 					drawcell($_cell,"cell",$args);
 				}
 			}	
@@ -199,17 +137,12 @@ function drawgrid($utilsxml,$args=NULL,$formats=False) {
 }
 
 function drawform($utilsxml,$args=NULL) {
-//function drawform($xmlstr,$args=NULL) {
 
    echo "<html><body>";
    echo '<form action="update.php" method="post" accept-charset="UTF-8">';
    echo "<fieldset>";
-   
-  	// load xml string into XML Utils
-	//$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');	
 
-	// get a list of all rows
-	$_items = $utilsxml->xpath("//item");
+	$_items = $utilsxml->xpath("//item"); // get a list of all rows
    
    $widgetcount=0;
 	foreach ($_items as $_item) {
@@ -241,12 +174,9 @@ function draw($xmlstr,$args=NULL) {
 	// load xml string into XML Utils
 	$utilsxml = simplexml_load_string($xmlstr, 'utils_xml');	
 	
-	// get parser
-	$_parser = $utilsxml->xpath("//parser");
-	
+	$_parser = $utilsxml->xpath("//parser"); // get parser
 	
 	if (sizeof($_parser) <> 0) {
-	//if (isset($_parser)) {
 		$_item =$_parser[0]; 
 		$funcname = $_item->value;
 		

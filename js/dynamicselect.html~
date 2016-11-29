@@ -1,0 +1,16 @@
+<select name="aa" onchange="report(this.value)"> 
+<option value="">Please select</option>
+<option value="daily">daily</option>
+<option value="monthly">monthly</option>
+</select>
+<script type="text/javascript">
+function report(period) {
+  if (period=="") return; // please select - possibly you want something else here
+
+  var report = "script/"+((period == "daily")?"d":"m")+"_report.php";
+  loadXMLDoc(report,'responseTag');
+  document.getElementById('responseTag').style.visibility='visible';
+  document.getElementById('list_report').style.visibility='hidden';
+  document.getElementById('formTag').style.visibility='hidden'; 
+}
+</script>

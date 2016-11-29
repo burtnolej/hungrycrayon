@@ -1,0 +1,18 @@
+
+
+
+<html>
+<?php
+	$script_name = "foobar.php";
+?>
+
+<script>
+var Globals = <?php echo json_encode(array(
+    'script_name' => $script_name;
+)); ?>;
+</script>
+<script src="globals.js"></script>
+
+
+<button name="go" id="go"/>
+</html>

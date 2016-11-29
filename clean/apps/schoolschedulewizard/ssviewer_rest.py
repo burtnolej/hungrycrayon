@@ -33,7 +33,8 @@ class Student:
         
         values = ssviewer_utils.dataset_pivot(of,enums,yaxis,xaxis,ztypes, source_type,source_value,formatson=True)
         grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
-        xml = xml_utils.grid2xml(grid,shrinkfont=5)
+        #xml = xml_utils.grid2xml(grid,shrinkfont=12)
+        xml = xml_utils.grid2xml(grid)
         
         return xmltree.tostring(xml)
     
@@ -68,7 +69,9 @@ class Adult:
         
         values = ssviewer_utils.dataset_pivot(of,enums,yaxis,xaxis,ztypes, source_type,source_value,formatson=True)
         grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
-        xml = xml_utils.grid2xml(grid,shrinkfont=5)
+        #xml = xml_utils.grid2xml(grid,shrinkfont=5)
+        xml = xml_utils.grid2xml(grid)
+        
         return xmltree.tostring(xml)
     
 class List:
@@ -109,17 +112,25 @@ class RefID:
         #return(xml)
         
 if __name__ == "__main__":
+        
+    dbname,refdbname = sswizard_utils.getdatabase()
     
-    
+    '''
     DBPATH = os.environ['DBPATH']
-    
-    if len(sys.argv) <= 1:
-        raise Exception("provide a database name; no extension")
-    else:
+    DBNAME = os.environ['DBNAME']
+
+    if DBNAME <> "":
+        dbname=os.path.join(DBPATH,DBNAME)
+        refdbname=os.path.join(DBPATH,DBNAME)
+    elif len(sys.argv) == 2:
         dbname=os.path.join(DBPATH,sys.argv[1])
         refdbname=os.path.join(DBPATH,sys.argv[1])
         sys.argv.pop(1)
+    else:
+        raise Exception("provide a database name on cndline or set $DBNAME/$DBPATH")
         
+    '''
+
     urls = (
         #'/(.*)', 'student','subject','adult','period','dow'
         '/(\w+)', 'Student',
@@ -131,13 +142,11 @@ if __name__ == "__main__":
         '/new/', 'New'
     )
     
-    print "using database", dbname
+    
     database = Database(dbname)
     refdatabase = Database(refdbname)
     of = ObjFactory(True)
     enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
-    
-
     
     args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums,source='56n,4n,4s,5s,6s')
     

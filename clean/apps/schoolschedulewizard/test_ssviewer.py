@@ -681,8 +681,8 @@ class Test_Service_nopivot_17lessons(Test_Viewer_Base):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_2subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_1col_2subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_2col_2subrow_1subcol))
@@ -691,10 +691,10 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW_Formats))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_valuetype))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_valuetype))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_1lesson))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_2lessons))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_17lessons))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_17lessons))'''
     
     
     ''' only need these if conflicts code is uncommented in viewer '''

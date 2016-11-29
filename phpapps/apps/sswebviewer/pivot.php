@@ -13,8 +13,8 @@
 
 <style>
 label {
-	display: inline-block;
-	width:120px;
+	!display: inline-block;
+	width:60px;
 	text-alight=right;
 }
 
@@ -22,7 +22,7 @@ div#one {
     float: left;
 }
 div#two {
-    float: right;
+    float: left;
 }
 
 </style>
@@ -42,7 +42,8 @@ set_include_path($PHPLIBPATH);
 
 include_once 'ui_utils.php';
 include_once 'db_utils.php';
-
+include_once 'xml2html2.php';
+include_once 'url.php';
 
 //set_include_path('/home/burtnolej/Development/pythonapps3/phpapps/utils/');
 //include_once 'ui_utils.php';
@@ -53,13 +54,27 @@ function draw_login($dbname,$tablename,$submitpage) {
 
 <html>
 	<body>
-		<?php echo "<form action='".$submitpage."' method='post' accept-charset='UTF-8'>";?>
+		<?php echo "<form method='post' action='".$_SERVER['PHP_SELF']."' accept-charset='UTF-8'>";?>
 	
 			<fieldset >
 				<input type='hidden' name='submitted' id='submitted' value='1'/>
 				<div>
 				<?php
-				
+					
+					if (isset($_POST['source_value'])) { 
+						$sourcevaldefault=$_POST['source_value'];
+					}
+					else {
+						$sourcevaldefault="Donny";
+					}
+					
+					if (isset($_POST['xaxis'])) { 
+						$xaxisdefault=$_POST['xaxis'];
+					}
+					else {
+						$xaxisdefault="period";
+					} 
+
 					$xml = "<root>
 									<dropdown id='1'>
 										<field>xaxis</field>
@@ -69,7 +84,7 @@ function draw_login($dbname,$tablename,$submitpage) {
 											<value>adult</value>
 											<value>subject</value>
 										</values>
-										<default>dow</default>
+										<default>".$xaxisdefault."</default>
 									</dropdown>
 									<dropdown id='2'>
 										<field>yaxis</field>
@@ -79,7 +94,7 @@ function draw_login($dbname,$tablename,$submitpage) {
 											<value>adult</value>
 											<value>subject</value>
 										</values>
-										<default>period</default>
+										<default>dow</default>
 									</dropdown>
 									<dropdown id='3'>
 										<field>source_type</field>
@@ -92,9 +107,9 @@ function draw_login($dbname,$tablename,$submitpage) {
 									<dropdown id='4'>
 										<field>source_value</field>
 										<values>
-											<value>Peter</value>
+											<value>Donny</value>
 										</values>
-										<default>Peter</default>
+										<default>".$sourcevaldefault."</default>
 									</dropdown>
 									<dropdown id='5'>
 										<field>source</field>
@@ -107,7 +122,6 @@ function draw_login($dbname,$tablename,$submitpage) {
 											<value>6s</value>
 											<value>56n,4n,4s,5s,6s</value>
 										</values>
-										<default>56n</default>
 									</dropdown>
 								</root>";
 					
@@ -120,7 +134,7 @@ function draw_login($dbname,$tablename,$submitpage) {
 				
 					echo "<div id='two'>";
 
-					gethtmlmultiselect($dbname,"select name from sqlite_master","ztypes");
+					getdbhtmlmultiselect($dbname,"select name from sqlite_master","ztypes",4,$_POST['ztypes']);
 					
 					echo "</div>";
 
@@ -135,6 +149,7 @@ function draw_login($dbname,$tablename,$submitpage) {
 <?php
 }
 
+    
 $api = php_sapi_name();
 
 if ($api=='cli') {
@@ -145,13 +160,19 @@ else {
 	$SSDB = $SSDBPATH."/".$SSDBNAME;
 }
 
-echo $SSDB;
-
 if ($SSDBNAME <> "" and (file_exists($SSDB) == True)) {
 	
 	draw_login($SSDB,'lesson','getlink.php');
 }
 else {
 	echo "a valid database name must be passed in as an argument";
+}
+
+if(isset($_POST['submitted'])) {
+	$args = $_POST;
+	$SSRESTURL = getenv("SSRESTURL");
+	$url = buildurl($SSRESTURL,$args);
+	$token = getcurl($url);
+	draw($token,$args);
 }
 ?>

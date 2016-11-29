@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html>
+<div id="fsf">
+			<select id="mySelect" name="mySelect"> 
+				<option value="">Please select</option>
+				<option value="Adelia">Adelia</option>
+				<option value="Donny">Donny</option>
+			</select>
+
+			<select id="mySelect2" name="mySelect2"> 
+				<option value="">Please select</option>
+				<option value="sfd">sfd</option>
+				<option value="zxxzxz">zxxzxz</option>
+			</select>
+			
+			<input id="subject" type=checkbox>subject</input>
+			<input id="adult" type=checkbox>adult</input>
+			<input id="student" type=checkbox>student</input>
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="test.js">
+
+/*
+
+var ztypes = new Array();
+var url = "";
+
+$(document).ready(function(){
+   $("select, input").on('change',function(){
+   	url = "https://192.168.1.154/jnq-each.html?";
+   	ztypes = new Array();
+   		
+   	$('select').each(function (index, value) {
+   		url = url + this.id + "=" + this.value + "&";
+    	});
+    		
+      $('input').each(function (index, value) {    			
+  			if (this.checked == true) {
+  				ztypes.push(this.id);	
+  			}	
+    	});
+    		
+    	url = url + "ztypes=" + ztypes.join();
+    	//console.log(url);
+    	get(url);
+   });
+});
+
+function get(url) {
+	console.log(url);
+	//window.location =
+}
+*/
+
+</script>
+</html>

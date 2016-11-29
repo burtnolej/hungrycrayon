@@ -622,8 +622,25 @@ def gridreduce(grid,blanks,headeroffset=1):
     for row in grid:
 	for colidx in notblankcols:
 	    row.pop(colidx)
+    
+def getdatabase():
 
-		    
+    DBPATH = os.environ['DBPATH']
+    DBNAME = os.environ['DBNAME']
+
+    if DBNAME <> "":
+	dbname=os.path.join(DBPATH,DBNAME)
+	refdbname=os.path.join(DBPATH,DBNAME)
+    elif len(sys.argv) == 2:
+	dbname=os.path.join(DBPATH,sys.argv[1])
+	refdbname=os.path.join(DBPATH,sys.argv[1])
+	sys.argv.pop(1)
+    else:
+	raise Exception("provide a database name on cndline or set $DBNAME/$DBPATH")    
+    
+    print "using database", dbname
+    return(dbname,refdbname)
+    
 if __name__ == "__main__":
     
     session_code_gen('quadref',False)

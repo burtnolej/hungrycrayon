@@ -5,10 +5,14 @@ from misc_utils_enum import enum
 from database_util import Database, tbl_remove, tbl_exists, tbl_create
 from database_table_util import tbl_rows_insert
 from sswizard_query_utils import _colorexecfunc, _formatsexecfunc
+import sswizard_utils
+from misc_utils import IDGenerator
+from datetime import datetime
 
 __all__ = ['colors','_color_get_multi','color_get','colorpalette','fontpalette']
 
 '''
+
 colors = enum(pink = '#%02x%02x%02x' % (255, 153, 153),
               salmon = '#%02x%02x%02x' % (255, 204, 153),
               lightyellow = '#%02x%02x%02x' % (255, 255, 153),
@@ -89,6 +93,7 @@ fontpalette = dict(Amelia=colors.green,
                    Chess=colors.pink,
                    Student_News=colors.lightyellow,
                    subject=colors.blue)
+
 '''
 
 def init_formats(dbname,_globals):
@@ -150,15 +155,19 @@ def color_db_load(dbname="test_ssloader"):
     
     tblname = "colors"
     
-    colors_col_defn = [('name','text'),('hex','text'),('rgb','text')]
+    colors_col_defn = [('name','text'),('hex','text'),('rgb','text'),('__id','text'),('__timestamp','text')]
     colors_col_names = [row[0] for row in colors_col_defn]
     
     dbrows=[]
     for key,value in colors.attr_get_keyval(include_callable=False,include_baseattr=False):
         rgb = hex2rgb(value)
         rgbstr = ",".join(map(str,rgb))
-        dbrows.append(["\""+key+"\"","\""+value+"\"","\""+rgbstr+"\""])   
-    
+        __id = IDGenerator().getid()
+        __timestamp = datetime.now().strftime("%H:%M:%S")  
+
+        dbrows.append(["\""+key+"\"","\""+value+"\"","\""+rgbstr+"\"",
+                       "\""+__id+"\"","\""+__timestamp+"\""])   
+  
     database = Database(dbname)
     
     with database:
@@ -199,7 +208,8 @@ def formats_db_load(dbname="test_ssloader"):
     for key,value in colors.attr_get_keyval(include_callable=False,include_baseattr=False):
         hex2name[value] = key
 
-    formats_col_defn = [('name','text'),('fgcolor','text'), ('bgcolor','text')]
+    formats_col_defn = [('name','text'),('fgcolor','text'), ('bgcolor','text'),
+                        ('__id','text'),('__timestamp','text')]
     
     formats_col_names = [row[0] for row in formats_col_defn]
     
@@ -209,10 +219,14 @@ def formats_db_load(dbname="test_ssloader"):
             fg = fontpalette[name]
         else:
             fg = '#000000'
-            
+
+        __id = IDGenerator().getid()
+        __timestamp = datetime.now().strftime("%H:%M:%S") 
+
         dbrows.append(["\""+name+"\"",
                        "\""+hex2name[fg]+"\"",
-                       "\""+hex2name[bg]+"\""])
+                       "\""+hex2name[bg]+"\"",
+                       "\""+__id+"\"","\""+__timestamp+"\""]) 
     
     database = Database(dbname)
     with database:
@@ -222,14 +236,20 @@ def formats_db_load(dbname="test_ssloader"):
         tbl_create(database,tblname, formats_col_defn)
         exec_str, result = tbl_rows_insert(database,tblname,formats_col_names,dbrows)
             
-colorpalette = dbformats_get(os.environ['DBNAME'],'bgcolor')
-fontpalette = dbformats_get(os.environ['DBNAME'],'fgcolor')
-colors = dbcolors_get(os.environ['DBNAME'])
+if __name__ <> "__main__":
+    
+    dbname,_ = sswizard_utils.getdatabase()
+    
+    colorpalette = dbformats_get(dbname,'bgcolor')
+    fontpalette = dbformats_get(dbname,'fgcolor')
+    colors = dbcolors_get(dbname)
 
 if __name__ == "__main__":
     
-    color_db_load("fucia")
-    formats_db_load('fucia')
+    dbname,_ = sswizard_utils.getdatabase()
+    
+    color_db_load(dbname)
+    formats_db_load(dbname)
     
     #globals()['colorpalette'] = dbformats_get('test_ssloader','bgcolor')
     #globals()['fontpalette'] = dbformats_get('test_ssloader','fgcolor')

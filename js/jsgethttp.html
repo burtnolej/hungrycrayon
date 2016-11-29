@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<body>
+<form>
+<select id="mySelect" onchange="get()"> 
+	<option value="">Please select</option>
+	<option value="Adelia">Adelia</option>
+	<option value="Donny">Donny</option>
+</select>
+
+<input id="myCheck" type=checkbox  value="c1" onchange="get()">blah</input>
+
+</form>
+<p id="demo"></p>
+
+<script>
+//function reqListener () {
+//  console.log(this.responseText);
+//}
+
+//document.getElementById("selection").innerHTML = "dssdsd"
+
+this needs to be put into pivot.php
+
+function get() {
+    var s = document.getElementById("mySelect").value;
+    var c = document.getElementById("myCheck").checked;
+    //document.getElementById("demo").innerHTML= ${'myCheck'}.attr('checked','checked')
+    document.getElementById("demo").innerHTML = "s="+s+","+"c="+c;
+    
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", reqListener);
+    oReq.open("GET", "http://0.0.0.0:8080/student/"+s);
+    oReq.send();
+}
+
+function reqListener () {
+  console.log(this.responseText);
+}
+
+
+
+</script>
+</body>
+</html>
