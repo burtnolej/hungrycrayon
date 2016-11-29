@@ -1,75 +1,12 @@
 
 <html>
-<input type="text">
-
-<select>
-  <option>Banana</option>
-  <option>Cherry</option>
-  <option>Lemon</option>
-</select>
-
-<select multiple>	
-	<option value="volvo">Volvo</option>
-	<option value="saab">Saab</option>
-</select>
-
-<select>
-  <optgroup label="fruits">
-    <option>Banana</option>
-    <option selected>Cherry</option>
-    <option>Lemon</option>
-  </optgroup>
-  <optgroup label="vegetables">
-    <option>Carrot</option>
-    <option>Eggplant</option>
-    <option>Potatoe</option>
-  </optgroup>
-</select>
-
-<label for="myFruit">What's your favorite fruit?</label>
-<input type="text" id="myFruit" list="mySuggestion" value="Blackberry"/>
-<datalist id="mySuggestion">
-  <option>Apple</option>
-  <option>Banana</option>
-  <option>Blackberry</option>
-  <option>Blueberry</option>
-  <option>Lemon</option>
-  <option>Lychee</option>
-  <option>Peach</option>
-  <option>Pear</option>
-</datalist>
-
-<button type="reset">
-    This a <br><strong>reset button</strong>
-</button>
-
-<input type="reset" value="This is a reset button">
-
-<input type="number" min="1" max="10" step="2">
-
-<input type="range" min="1" max="5" step="1">
-
-<input type="date">
-
-<input type="color">
-
-<input type="file" accept="image/*" multiple>
-
-
-<div class="container">	
-	<div style="width: 12em; float: bottom;">
-		<input id="cheese" type="checkbox" name="ingredients[]" value="Cheese" />
-		<label for="cheese">Cheese</label>
-		<input id="tomato" type="checkbox" name="ingredients[]" value="Tomato" />
-		<label for="tomato">Tomato</label>
-	</div>
-	
-	<div style="width: 12em; float: bottom;">
-		<input id="cheese" type="checkbox" name="ingredients[]" value="Cheese" />
-		<label for="cheese">Cheese</label>
-		<input id="tomato" type="checkbox" name="ingredients[]" value="Tomato" />
-		<label for="tomato">Tomato</label>
-	</div>
-
-</div>
+<style>
+label {
+	display: inline-block;
+	width:70px;
+	text-alight=right;
+}
+</style>
 </html>
+
+<div><label for="Prep" >Prep</label><input type="text" value="5" id="Prep" list="mySuggestion" /><datalist id="mySuggestion"></datalist></div><div><label for="Student" >Student</label><input type="text" value="Peter" id="Student" list="mySuggestion1" /><datalist id="mySuggestion1"><option>Nathaniel</option><option>Clayton</option><option>Bruno</option><option>Orig</option><option>Stephen</option><option>Oscar</option><option>Peter</option><option>Jack</option><option>Jake</option><option>Coby</option><option>Thomas</option><option>Yosef</option><option>Tristan</option><option>Ashley</option><option>Simon A</option><option>Booker</option><option>OmerC</option><option>Asher</option><option>Shane</option><option>Simon B</option><option>Mackenzie</option><option>Nick</option><option>Lucy</option><option>Liam</option><option>Donovan</option><option>Luke</option><option>Tris</option><option>Prep 4</option></datalist></div><div><label for="Adult" >Adult</label><input type="text" value="Amelia" id="Adult" list="mySuggestion2" /><datalist id="mySuggestion2"><option>Aaron</option><option>Stan</option><option>Rahul</option><option>Alexa</option><option>Paraic</option><option>Amelia</option><option>Issey</option><option>??</option><option>Karolina</option><option>John</option><option>Galina</option><option>Sam</option><option>Izzy</option><option>Melissa</option><option>Thea</option><option>Jess</option><option>Samantha</option><option>Nicole</option><option>Issey</option><option>A</option><option>B</option><option>C</option><option>D</option><option>Moira</option><option>Patti</option><option>Dylan</option><option>Johnny</option><option>Alyssa</option><option>Jacki</option><option>Karolina</option><option>SONJA</option><option>Eric</option><option>Daryl</option><option>Francisco</option><option>Alberto</option><option>Profeshor</option><option>John Zink</option><option>Bari</option></datalist></div>

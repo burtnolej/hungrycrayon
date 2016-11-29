@@ -117,7 +117,26 @@ class TestTableInsert(unittest.TestCase):
             col_name,tbl_rows_1row = tbl_rows_get(database,test_db.tbl_name)        
             self.assertListEqual(col_name,test_db.col_name)
             self.assertListEqual(tbl_rows_1row,test_db.tbl_rows_1row)
-            
+
+    def test_tbl_rows_insert_dupe_key(self):
+
+        database = Database(test_db.name, True)
+
+        with database:
+            tbl_create(database,test_db.tbl_name,test_db.col_defn, test_db.tbl_pk_defn)
+
+            with self.assertRaises(S3IntegrityError):
+                tbl_rows_insert(database,test_db.tbl_name,
+                                test_db.col_name,
+                                test_db.tbl_rows_dupe_key)
+        
+
+class TestTableInsert2(unittest.TestCase):
+    
+    def setUp(self):
+        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
+
+
     def test_tbl_rows_insert_str_1col(self):
 
         database = Database(test_db_str_1col.name)
@@ -144,19 +163,7 @@ class TestTableInsert(unittest.TestCase):
         database = Database(test_db_str.name,True)
         with database:
             self.assertEquals([['foobar','barfoo']],database.execute("select col_name1,col_name2 from tbl_name_test"))
-            
-    def test_tbl_rows_insert_dupe_key(self):
 
-        database = Database(test_db.name, True)
-        
-        with database:
-            tbl_create(database,test_db.tbl_name,test_db.col_defn, test_db.tbl_pk_defn)
-            
-            with self.assertRaises(S3IntegrityError):
-                tbl_rows_insert(database,test_db.tbl_name,
-                                test_db.col_name,
-                                test_db.tbl_rows_dupe_key)
-                
     def test_tbl_rows_insert_from_schema(self):
         
         schema_execute(self.schema_file)
@@ -526,7 +533,8 @@ if __name__ == "__main__":
 
     suite = unittest.TestSuite()
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableRowsGet))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert2))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableRowsGet))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableColumnAdd))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_int))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_str))
@@ -538,6 +546,7 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesDblQuotedStr))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesSingleQuotedStr))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsert2RowsSameTable))
+    '''
 
     
 

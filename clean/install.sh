@@ -15,6 +15,7 @@ DBPATH=$APPROOT/clean/db
 SCRIPTPATH=$APPROOT/clean/scripts
 
 PHPFILEPATH=$PHPAPPROOT/apps/sswebviewer
+CSSFILEPATH=$PHPAPPROOT/apps/sswebviewer
 PHPUTILPATH=$PHPAPPROOT/utils
 
 PYFILEPATH=$APPROOT/clean/apps/schoolschedulewizard
@@ -25,6 +26,7 @@ DBNAME=fucia.sqlite
 phpfiles=( "login" "getlink" "url" "xml2html2" "new" "edit" "search")
 scriptfiles=( "killit" )
 phputilfiles=( "ui_utils" "db_utils" "utils_xml")
+cssfiles=( "fancytable" )
 
 pyfiles=( "ssviewer" "ssviewer_rest" "ssviewer_utils_palette" "ssviewer_utils" "sswizard" "sswizard_utils" "dbtableviewer" "sswizard_query_utils" )
 
@@ -65,6 +67,14 @@ do
 	tarfiles="$tarfiles $SCRIPTPATH/$scriptfile.sh"
 done
 
+# css files ###############################################
+
+for cssfile in "${cssfiles[@]}"
+do
+	tarfiles="$tarfiles $CSSFILEPATH/$cssfile.css"
+	echo "ln -s $RHOME/$CSSFILEPATH/$cssfile.css $HTMLDOCROOT/default.css" >> $linkscript
+done
+
 for pyfile in "${pyfiles[@]}"
 do
 	tarfiles="$tarfiles $PYFILEPATH/$pyfile.py"
@@ -82,14 +92,15 @@ tarfiles="$tarfiles $DBPATH/$DBNAME"
 tarfiles="$tarfiles $linkscript"
 
 # add on rest service restart
-python ./ssviewer_rest.py fucia
+#python ./ssviewer_rest.py fucia
 
 
 echo "rm $RHOME/install.tar" >> $linkscript
-echo "rm -rf $RHOME/tmp" >> $linkscript
 
 echo "export PATH=$PATH:$RHOME/$SCRIPTPATH" >> $linkscript
 echo "killit.sh ssviewer_rest" >> $linkscript
+echo "nohup python $RHOME/$PYFILEPATH/ssviewer_rest.py fucia &" >> $linkscript
+#echo "rm -rf $RHOME/tmp" >> $linkscript
 
 chmod +x $linkscript
 
@@ -102,4 +113,3 @@ sshpass -p G0ldm@n1 ssh -o StrictHostkeyChecking=no burtnolejusa@www.hungrycrayo
 
 sshpass -p G0ldm@n1 ssh -o StrictHostkeyChecking=no burtnolejusa@www.hungrycrayon.com .$linkscript
 
-#echo "python $RHOME/$PYFILEPATH/ssviewer_rest.py fucia &" >> $linkscript

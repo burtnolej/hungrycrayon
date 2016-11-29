@@ -314,10 +314,7 @@ def tbl_col_update(database,tbl_name,old_col_name,new_col_name):
     except:
 	pass
     
-    tbl_create(database,
-               tbl_name+"_new",
-               new_col_defn)
-    
+    tbl_create(database,tbl_name+"_new",new_col_defn)
     
     colnames,rows,exec_str = tbl_rows_get(database,tbl_name)
     colindex = colnames.index(old_col_name)
@@ -327,14 +324,27 @@ def tbl_col_update(database,tbl_name,old_col_name,new_col_name):
 
     rows = _quotestrs(rows)
     
-    tbl_rows_insert(database,
-                        tbl_name+"_new",
-                        colnames,
-                        rows)
-    
+    tbl_rows_insert(database,tbl_name+"_new",colnames,rows)
     tbl_remove(database,tbl_name)
-    
     tbl_rename(database,tbl_name+"_new",tbl_name)
+
+def tbl_move(database,database_new,tbl_name,overwrite=False):
+    
+    # get old table details
+    col_defn = tbl_cols_get(database,tbl_name)    
+    colnames,rows,exec_str = tbl_rows_get(database,tbl_name)
+    
+    # create new table details
+    if overwrite == True:
+	try:
+	    tbl_remove(database_new,tbl_name+"_new")
+	except:
+	    pass
+    tbl_create(database_new,tbl_name,col_defn)
+    
+    # insert new data
+    rows = _quotestrs(rows)
+    tbl_rows_insert(database_new,tbl_name,colnames,rows)
 
 if __name__ == "__main__":
     pass
