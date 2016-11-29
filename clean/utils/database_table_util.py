@@ -145,8 +145,6 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
     exec_str = "INSERT INTO {table} ({keys}) VALUES {rows}".format(table=tbl_name, \
                                                                        keys=col_name_str,\
                                                                        rows=tbl_rows_str)
-    print exec_str
-    
     result = database.execute(exec_str)
 
     return(exec_str,result) 

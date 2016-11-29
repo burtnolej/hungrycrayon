@@ -32,9 +32,15 @@ class Student:
         yaxis=data.yaxis
         
         values = ssviewer_utils.dataset_pivot(of,enums,yaxis,xaxis,ztypes, source_type,source_value,formatson=True)
-        grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
+        grid = ssviewer_utils.dataset_serialize(values,formatson=False,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
+        #grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
+
+        
+        print grid
         #xml = xml_utils.grid2xml(grid,shrinkfont=12)
         xml = xml_utils.grid2xml(grid)
+        
+        print xmltree.tostring(xml)
         
         return xmltree.tostring(xml)
     
@@ -53,6 +59,8 @@ class Subject:
         
         id = "foobar"
         
+        
+        
         return '<root><row id="1"><cell id="1.1"><value>' + id + '</value></row></root>'
     
 class Adult:
@@ -69,6 +77,9 @@ class Adult:
         
         values = ssviewer_utils.dataset_pivot(of,enums,yaxis,xaxis,ztypes, source_type,source_value,formatson=True)
         grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
+        
+        
+        print grid
         #xml = xml_utils.grid2xml(grid,shrinkfont=5)
         xml = xml_utils.grid2xml(grid)
         

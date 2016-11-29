@@ -1,5 +1,6 @@
 
 import xml.etree.ElementTree as xmltree
+import types
 
 def element_find_tags(filen, tag, root=None,ns=None):
     ''' starting at the root, search for any elements where tag=tag
@@ -126,6 +127,8 @@ def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None):
             if ids==True: cellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx)])
             if isinstance(cell,StringType):
                 cellelement.text = cell
+            elif isinstance(cell,types.UnicodeType):
+                cellelement.text = cell
             elif isinstance(cell,IntType):
                 cellelement.text = str(cell)
             elif isinstance(cell,ListType):
@@ -139,24 +142,36 @@ def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None):
                             subsubcellelement.text = str(v)
                         if ids==True: subcellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subcellidx)])
                     elif isinstance(_cell,tuple):
-                        # only create a subrow if theres going to be more than 1 row
-                        subrowelement = xmltree.SubElement(cellelement,"subrow")
-                        subrowidx+=1
-                        subcellidx=1
-                        for __cell in _cell:
-                            subcellelement = xmltree.SubElement(subrowelement,"subcell")
-                            if shrinkfont<>None:
-                                shrinkfontelement = xmltree.SubElement(subcellelement,'shrinkfont')
-                                shrinkfontelement.text = str(5)
-                                
-                            for k,v in __cell.iteritems():
-                                subsubcellelement = xmltree.SubElement(subcellelement,k)
-                                subsubcellelement.text = str(v)
-                                
+                        
+                        if isinstance(_cell[0],dict) == False:
+                            # no formats or name/values just text cells that need to be put into a concat string
+                            for __cell in _cell:
+                                if cellelement.text == None:
+                                    cellelement.text = __cell
+                                else:
+                                    cellelement.text = cellelement.text + __cell
+                        else:
+                            
+                            # only create a subrow if theres going to be more than 1 row
+                            subrowelement = xmltree.SubElement(cellelement,"subrow")
+                            subrowidx+=1
+                            subcellidx=1
+                            for __cell in _cell:
+                                subcellelement = xmltree.SubElement(subrowelement,"subcell")
+                                if shrinkfont<>None:
+                                    shrinkfontelement = xmltree.SubElement(subcellelement,'shrinkfont')
+                                    shrinkfontelement.text = str(5)
+    
+                                for k,v in __cell.iteritems():
+                                    subsubcellelement = xmltree.SubElement(subcellelement,k)
+    
+                                    
+                                    
                             if ids==True: subcellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subrowidx),str(subcellidx)])
                             subcellidx+=1
                         if ids==True: subrowelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subrowidx)])   
                     else:
+                        
                         subcellelement = xmltree.SubElement(cellelement,"subcell")
                         subcellelement.text = str(_cell)
                         if ids==True: subcellelement.attrib['id'] = ".".join([str(rowidx),str(cellidx),str(subcellidx)])
@@ -174,6 +189,7 @@ def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None):
                     
                     subcellelement = xmltree.SubElement(cellelement,tags[i])
                     subcellelement.text = str(cell[i])
+
             cellidx+=1
         rowidx+=1
     

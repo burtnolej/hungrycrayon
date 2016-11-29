@@ -159,7 +159,7 @@ class TestSchemaInsertRows(unittest.TestCase):
         database = Database('fitness',True)
         
         with database:
-            colnames, rows = tbl_rows_get(database,'workout',['date','type'])
+            colnames, rows,_ = tbl_rows_get(database,'workout',['date','type'])
             self.assertListEqual(rows,[[250772, u'cycling'], [260772, u'rowing']])
             
         database = Database('diet',True)

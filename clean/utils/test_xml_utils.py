@@ -320,7 +320,7 @@ class Test_Grid_to_XML(unittest.TestCase):
         
     def test_alllistofdicts_content_2subrows_2subcells(self):
         
-        grid = [[[(dict(A=1),dict(B=2)),(dict(C=3),dict(D=4))]]]
+        grid = [[[dict(A=1),dict(B=2)],[dict(C=3),dict(D=4)]]]
         
         expected_results = "<root><row><cell><subrow><subcell><A>1</A></subcell><subcell><B>2</B></subcell></subrow><subrow><subcell><C>3</C></subcell><subcell><D>4</D></subcell></subrow></cell></row></root>"
         
@@ -381,7 +381,7 @@ class Test_Grid_to_XML(unittest.TestCase):
         tags = ["value","fgcolor"]
         
         expected_results = "<root><row><cell><value>1</value><fgcolor>red</fgcolor></cell></row></root>"
-        xml = grid2xml(grid,tags)
+        xml = grid2xml(grid,tags=tags)
          
         self.assertEqual(xmltree.tostring(xml),expected_results)
         
@@ -392,7 +392,7 @@ class Test_Grid_to_XML(unittest.TestCase):
         tags = ["value","fgcolor","bgcolor"]
         
         expected_results = "<root><row><cell><value>1</value><fgcolor>red</fgcolor><bgcolor>yellow</bgcolor></cell><cell><value>5</value><fgcolor>blue</fgcolor><bgcolor>green</bgcolor></cell></row></root>"
-        xml = grid2xml(grid,tags)
+        xml = grid2xml(grid,tags=tags)
          
         self.assertEqual(xmltree.tostring(xml),expected_results)
         
@@ -817,22 +817,21 @@ class Test_Pageto_XML(unittest.TestCase):
         
         self.assertEqual(xmltree.tostring(xml),expected_result)
         
-         
         
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    '''
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML_xpath))
+    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML_xpath))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_function))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_function))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_resize))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_valuetype))
     '''
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_nopivot))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pageto_XML))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pageto_XML))
                   
     
     

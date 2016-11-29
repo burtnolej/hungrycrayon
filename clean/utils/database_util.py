@@ -71,7 +71,10 @@ class Database():
     def remove(self):
         '''purpose: deletes the file on the filesystem containing the sqlite db'''
         from os import remove as osremove
-        osremove(self.name+".sqlite")
+        try:
+            osremove(self.name+".sqlite")
+        except OSError:
+            osremove(self.name)
         
     def tbl_get(self):
         '''purpose: queries db internal table to retreive list of created tables

@@ -62,7 +62,7 @@ class TestTableRowsGet(unittest.TestCase):
 
         database = Database(test_db.name,True)
         with database:
-            col_name,tbl_rows = tbl_rows_get(database,test_db.tbl_name,
+            col_name,tbl_rows,_ = tbl_rows_get(database,test_db.tbl_name,
                                              ['col_name1','col_name2',
                                               'col_name3','col_name4'])        
             self.assertListEqual(col_name,test_db.col_name)
@@ -79,7 +79,7 @@ class TestTableRowsGet(unittest.TestCase):
 
         database = Database(test_db.name,True)
         with database:
-            col_name,tbl_rows = tbl_rows_get(database,test_db.tbl_name)        
+            col_name,tbl_rows,_ = tbl_rows_get(database,test_db.tbl_name)        
             self.assertListEqual(col_name,test_db.col_name)
             self.assertListEqual(tbl_rows,test_db.tbl_rows)
             
@@ -99,7 +99,7 @@ class TestTableInsert(unittest.TestCase):
 
         database = Database(test_db.name,True)
         with database:
-            col_name,tbl_rows = tbl_rows_get(database,test_db.tbl_name)        
+            col_name,tbl_rows,_ = tbl_rows_get(database,test_db.tbl_name)        
             self.assertListEqual(col_name,test_db.col_name)
             self.assertListEqual(tbl_rows,test_db.tbl_rows)
             
@@ -114,7 +114,7 @@ class TestTableInsert(unittest.TestCase):
 
         database = Database(test_db.name,True)
         with database:
-            col_name,tbl_rows_1row = tbl_rows_get(database,test_db.tbl_name)        
+            col_name,tbl_rows_1row,_ = tbl_rows_get(database,test_db.tbl_name)        
             self.assertListEqual(col_name,test_db.col_name)
             self.assertListEqual(tbl_rows_1row,test_db.tbl_rows_1row)
 
@@ -176,7 +176,7 @@ class TestTableInsert2(unittest.TestCase):
         database = Database('fitness',True)
             
         with database:
-            tbl_col_name, tbl_rows = tbl_rows_get(database,'workout')
+            tbl_col_name, tbl_rows,_ = tbl_rows_get(database,'workout')
             self.assertListEqual(tbl_rows,[[250772, 'cycling'], [260772, 'rowing']])
                 
         # this is there to force the delete of the 2nd db created but does
@@ -261,7 +261,7 @@ class TestDBTblGeneric3_cols_int(unittest.TestCase):
         self.database = Database(test_db.name,True)
         
         with self.database:
-            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1','col2','col3']) 
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1','col2','col3']) 
             self.assertEquals([[123,456,789]],tbl_rows)
                
 class TestDBTblGeneric3_cols_str(unittest.TestCase):
@@ -298,7 +298,7 @@ class TestDBTblGeneric3_cols_str(unittest.TestCase):
         self.database = Database(test_db.name,True)
 
         with self.database:
-            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1','col2','col3']) 
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1','col2','col3']) 
             self.assertEquals([['abc','def','ghi']],tbl_rows)
 
 class TestDBTblGeneric1_col_str(unittest.TestCase):
@@ -335,7 +335,7 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
         self.database = Database(test_db.name,True)
 
         with self.database:
-            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1']) 
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1']) 
             self.assertEquals([["abc"]],tbl_rows)
             
             
@@ -366,7 +366,7 @@ class TestDBTblGeneric_sysinfo(unittest.TestCase):
             self.dbg.persist()
         self.database = Database(test_db.name,True)
         with self.database:
-            col_name,tbl_rows = tbl_rows_get(self.database,
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,
                                              'dbtbltest',
                                              ['__timestamp','__id']) 
             dt = datetime.strptime(tbl_rows[0][0],"%H:%M:%S")
@@ -422,7 +422,7 @@ class TestDBTblGenericValidateInsertValuesSingleQuotedStr(unittest.TestCase):
         self.database = Database(test_db.name,True)
 
         with self.database:
-            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1']) 
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1']) 
             self.assertEquals([['foobar']],tbl_rows)
 
 class TestDBTblGenericValidateInsertValuesDblQuotedStr(unittest.TestCase):
@@ -449,7 +449,7 @@ class TestDBTblGenericValidateInsertValuesDblQuotedStr(unittest.TestCase):
         self.database = Database(test_db.name,True)
 
         with self.database:
-            col_name,tbl_rows = tbl_rows_get(self.database,'dbtbltest',['col1']) 
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1']) 
             self.assertEquals([["foobar"]],tbl_rows)
 
           
@@ -460,6 +460,8 @@ class TestDBTblGenericValidateInsertValuesObject(unittest.TestCase):
         self.database = Database(test_db.name,True)
         
         class dummy():
+            objid='1.1.1'
+            
             def __repr__(self):
                 return("foobar")
         
@@ -479,6 +481,9 @@ class TestDBTblGenericValidateInsertValuesObject(unittest.TestCase):
         with self.database:        
             #with self.assertRaises(Exception):
             self.dbg.persist()
+
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1']) 
+            self.assertEquals([["1.1.1"]],tbl_rows)
         
 class TestDBTblGenericValidateInsertValuesInt(unittest.TestCase):
 
@@ -533,8 +538,8 @@ if __name__ == "__main__":
 
     suite = unittest.TestSuite()
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert2))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableRowsGet))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert2))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableRowsGet))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableColumnAdd))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_int))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGeneric3_cols_str))
@@ -546,7 +551,6 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesDblQuotedStr))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesSingleQuotedStr))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsert2RowsSameTable))
-    '''
 
     
 
