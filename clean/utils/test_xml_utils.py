@@ -320,8 +320,10 @@ class Test_Grid_to_XML(unittest.TestCase):
         
     def test_alllistofdicts_content_2subrows_2subcells(self):
         
-        grid = [[[dict(A=1),dict(B=2)],[dict(C=3),dict(D=4)]]]
-        
+        grid = [
+            [[(dict(A=1),dict(B=2)),(dict(C=3),dict(D=4))]]
+            ]
+
         expected_results = "<root><row><cell><subrow><subcell><A>1</A></subcell><subcell><B>2</B></subcell></subrow><subrow><subcell><C>3</C></subcell><subcell><D>4</D></subcell></subrow></cell></row></root>"
         
         xml = grid2xml(grid)

@@ -156,7 +156,9 @@ def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None):
                             subrowelement = xmltree.SubElement(cellelement,"subrow")
                             subrowidx+=1
                             subcellidx=1
+
                             for __cell in _cell:
+                                
                                 subcellelement = xmltree.SubElement(subrowelement,"subcell")
                                 if shrinkfont<>None:
                                     shrinkfontelement = xmltree.SubElement(subcellelement,'shrinkfont')
@@ -164,6 +166,7 @@ def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None):
     
                                 for k,v in __cell.iteritems():
                                     subsubcellelement = xmltree.SubElement(subcellelement,k)
+                                    subsubcellelement.text = str(v)
     
                                     
                                     
