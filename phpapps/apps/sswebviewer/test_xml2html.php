@@ -1,11 +1,26 @@
 <?php
 
+
+$PHPLIBPATH = getenv("PHPLIBPATH");
+
+if ($PHPLIBPATH == "") {
+	trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);
+}
+
+set_include_path($PHPLIBPATH);
+require_once 'autoload.php';
+
+include_once 'xml2html.php';
+include_once 'utils_error.php';
+include_once 'utils_utils.php';
+
+/*
 require_once __DIR__ . '/composer/vendor/autoload.php';
 
 include_once 'xml2html.php';
 include_once '../../utils/utils_error.php';
 include_once '../../utils/utils_utils.php';
-
+*/
 //include_once './testcases/testcases_xml2html.php';
 
 set_error_handler('\\UtilsError::error_handler');

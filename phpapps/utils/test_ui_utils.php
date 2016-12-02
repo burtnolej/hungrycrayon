@@ -422,6 +422,34 @@ class test_gethtmllabel extends PHPUnit_Framework_TestCase
 	}
 }
 
+class test_gethtmlswitch extends PHPUnit_Framework_TestCase
+{
+	public function test_()
+	{
+		ob_start(); 
+		
+		$this->expected_result = '<link rel="stylesheet" type="text/css" href="switch.css" /><label class="switch"><input id="foobar" type="checkbox" name="foobar"><div class="slider"></div></label>';
+												
+		gethtmlswitch("foobar","foobar");
+					
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
+	}
+	
+	public function test_checked()
+	{
+		ob_start(); 
+		
+		$this->expected_result = '<link rel="stylesheet" type="text/css" href="switch.css" /><label class="switch"><input id="foobar" type="checkbox" name="foobar"checked><div class="slider"></div></label>';														
+		gethtmlswitch("foobar","foobar",array("foobar"));
+					
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
+	}
+}
+
 $stf = new test_gethtmldropdown();
 $stf->test_();
 $stf->test_default();
@@ -454,5 +482,10 @@ $test->test_class();
 
 $test = new test_gethtmllabel();
 $test->test_();
+
+$test = new test_gethtmlswitch();
+$test->test_();
+$test->test_checked();
+
 
 ?>

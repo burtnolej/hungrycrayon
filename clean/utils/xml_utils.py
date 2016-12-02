@@ -73,21 +73,37 @@ def element_parent_get(root,element):
     parent_map = dict((c, p) for p in root.getiterator() for c in p)   
     return(parent_map[element])
 
+def _addxmlheader(root,header):
+    
+    header = xmltree.fromstring(header)
+    
+    for child in header:
+        childelement = xmltree.SubElement(root,child.tag)
+        childelement.text = child.text
+        
+        for gchild in child._children:
+            gchildelement = xmltree.SubElement(childelement,gchild.tag)
+            gchildelement.text = gchild.text  
+        
+    return(root)
+    
 def record2xml(page,header=None):
     
     root = xmltree.Element('root')
     
     if header <> None:
         
-        header = xmltree.fromstring(header)
+        root = _addxmlheader(root,header)
         
-        for child in header:
-            childelement = xmltree.SubElement(root,child.tag)
-            childelement.text = child.text
+        #header = xmltree.fromstring(header)
+        
+        #for child in header:
+        #    childelement = xmltree.SubElement(root,child.tag)
+        #    childelement.text = child.text
             
-            for gchild in child._children:
-                gchildelement = xmltree.SubElement(childelement,gchild.tag)
-                gchildelement.text = gchild.text        
+        #    for gchild in child._children:
+        #        gchildelement = xmltree.SubElement(childelement,gchild.tag)
+        #        gchildelement.text = gchild.text        
     
     itemidx=1
     for k,v in page.iteritems():
@@ -102,7 +118,7 @@ def record2xml(page,header=None):
     return(root)
                         
     
-def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None):
+def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None,header=None):
     # take a 2d array and return an XML string
     # nodes are called root, row and cell
     # if cell content is a string it will be mapped to text
@@ -117,6 +133,9 @@ def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None):
     
     root = xmltree.Element('root')
     
+    if header <> None:
+        root = _addxmlheader(root,header)
+        
     rowidx=1
     for row in grid:
         rowelement = xmltree.SubElement(root,"row")

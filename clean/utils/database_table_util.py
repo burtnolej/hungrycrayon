@@ -329,20 +329,22 @@ def tbl_col_update(database,tbl_name,old_col_name,new_col_name):
 def tbl_move(database,database_new,tbl_name,overwrite=False):
     
     # get old table details
-    col_defn = tbl_cols_get(database,tbl_name)    
-    colnames,rows,exec_str = tbl_rows_get(database,tbl_name)
-    
-    # create new table details
-    if overwrite == True:
-	try:
-	    tbl_remove(database_new,tbl_name+"_new")
-	except:
-	    pass
-    tbl_create(database_new,tbl_name,col_defn)
-    
-    # insert new data
-    rows = _quotestrs(rows)
-    tbl_rows_insert(database_new,tbl_name,colnames,rows)
+    with database:
+	col_defn = tbl_cols_get(database,tbl_name)    
+	colnames,rows,exec_str = tbl_rows_get(database,tbl_name)
+   
+    with database_new:
+	# create new table details
+	if overwrite == True:
+	    try:
+		tbl_remove(database_new,tbl_name)
+	    except:
+		pass
+	tbl_create(database_new,tbl_name,col_defn)
+	
+	# insert new data
+	rows = _quotestrs(rows)
+	tbl_rows_insert(database_new,tbl_name,colnames,rows)
 
 if __name__ == "__main__":
     pass

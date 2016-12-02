@@ -14,6 +14,8 @@ import sswizard_utils
 import sswizard_query_utils
 from ssviewer_utils_palette import *
 
+from inspect import getmembers
+
 import os
 import os.path
 
@@ -22,25 +24,35 @@ class Student:
         
         source_type="student"
         source_value=id
-        
         if source_value=="all": source_value=""
         
         data = web.input(id='')
 
-        ztypes=data.ztypes.split(",")
-        xaxis=data.xaxis
-        yaxis=data.yaxis
-        
-        values = ssviewer_utils.dataset_pivot(of,enums,yaxis,xaxis,ztypes, source_type,source_value,formatson=True)
-        grid = ssviewer_utils.dataset_serialize(values,formatson=False,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
-        #grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
+        ztypes = data.ztypes.split(",")
+        formatson=False
+        header=None
+        if "formats" in ztypes: 
+            formatson=True
+        else:            
+            header = "<root><parser><value>drawnoformatgrid</value></parser></root>"
 
+        constraints=[]
+        for attr,attr_val in data.iteritems():
+            if attr.startswith('cnstr_') == True:
+                if str(attr_val) <> "NotSelected":
+                    constraints.append((attr[6:],str(attr_val)))
         
-        print grid
-        #xml = xml_utils.grid2xml(grid,shrinkfont=12)
-        xml = xml_utils.grid2xml(grid)
+        values = ssviewer_utils.dataset_pivot(of,enums,data.yaxis,data.xaxis,
+                                              ztypes, source_type,source_value,
+                                              constraints=constraints,
+                                              formatson=True)
         
-        print xmltree.tostring(xml)
+        grid = ssviewer_utils.dataset_serialize(values,formatson=formatson,
+                                                schema = dict(xaxis=data.xaxis,
+                                                              yaxis=data.yaxis,
+                                                              ztypes=ztypes))
+        
+        xml = xml_utils.grid2xml(grid,header=header)
         
         return xmltree.tostring(xml)
     
@@ -50,19 +62,47 @@ class New:
         print web.input(id='')
     
 class Subject:
-    #def GET(self,id):
     def GET(self,id):
         
-        #data = web.input(id='')
+        source_type="subject"
+        source_value=id
+        
+        data = web.input(id='')
 
-        #id = int(id)
+        ztypes = data.ztypes.split(",")
+        xaxis="period"
+        yaxis="dow"
         
-        id = "foobar"
+        formatson=False
+        header=None
+        if "formats" in ztypes: 
+            formatson=True
+        else:            
+            header = "<root><parser><value>drawnoformatgrid</value></parser></root>"
+
+        constraints=[]
+        for attr,attr_val in data.iteritems():
+            if attr.startswith('cnstr_') == True:
+                if str(attr_val) <> "NotSelected":
+                    constraints.append((attr[6:],str(attr_val)))
+        
+        values = ssviewer_utils.dataset_pivot(of,enums,data.yaxis,data.xaxis,
+                                              ztypes, source_type,source_value,
+                                              constraints=constraints,
+                                              formatson=True)
         
         
         
-        return '<root><row id="1"><cell id="1.1"><value>' + id + '</value></row></root>'
-    
+        
+        
+        grid = ssviewer_utils.dataset_serialize(values,formatson=formatson,
+                                                schema = dict(xaxis=data.xaxis,
+                                                              yaxis=data.yaxis,
+                                                              ztypes=ztypes))
+        
+        xml = xml_utils.grid2xml(grid,header=header)
+        return xmltree.tostring(xml)
+
 class Adult:
     def GET(self,id):
         
@@ -77,10 +117,7 @@ class Adult:
         
         values = ssviewer_utils.dataset_pivot(of,enums,yaxis,xaxis,ztypes, source_type,source_value,formatson=True)
         grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
-        
-        
-        print grid
-        #xml = xml_utils.grid2xml(grid,shrinkfont=5)
+
         xml = xml_utils.grid2xml(grid)
         
         return xmltree.tostring(xml)
@@ -92,7 +129,17 @@ class List:
         pagenum=int(data.pagenum)
         pagelen=int(data.pagelen)
         
-        values,colnames = ssviewer_utils.dataset_list(of,enums,pagelen=pagelen,pagenum=pagenum)
+        constraints=[]
+        for attr,attr_val in data.iteritems():
+            if attr.startswith('cnstr_') == True:
+                if str(attr_val) <> "NotSelected":
+                    constraints.append((attr[6:],str(attr_val)))
+                    
+        print constraints
+        
+        values,colnames = ssviewer_utils.dataset_list(of,enums,pagelen=pagelen,
+                                                      pagenum=pagenum,
+                                                      constraints=constraints)
         
         schema = dict(xaxis='row',yaxis='col',colnames=list(colnames))
         

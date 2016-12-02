@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" type="text/css" href="custom-select.css" />
-
+<link rel="stylesheet" type="text/css" href="default.css" />
 
 <section>
     <div id="one"></div>
@@ -45,46 +45,36 @@ div#five {
 			
 					$xml = "<root>
 									<select id='1'>
-										<field>xaxis</field>
-										<values>
-											<value>period</value>
-											<value>dow</value>
-											<value>adult</value>
-											<value>subject</value>
-										</values>
-										<default>period</default>
-									</select>
-									<select id='2'>
-										<field>yaxis</field>
-										<values>
-											<value>period</value>
-											<value>dow</value>
-											<value>adult</value>
-											<value>subject</value>
-										</values>
-										<default>dow</default>
-									</select>
-									<select id='3'>
 										<field>source_type</field>
 										<values>
-											<value>student</value>
-											<value>adult</value>
-											<value>subject</value>
+											<value>list</value>
 										</values>
-										<default>student</default>
+										<default>list</default>
+									</select>
+									<select id='2'>
+										<field>source_value</field>
+										<values>
+											<value>lesson</value>
+										</values>
+										<default>lesson</default>
+									</select>
+									<select id='3'>
+										<field>pagenum</field>
+										<values>
+											<value>1</value>
+											<value>2</value>
+										</values>
+										<default>1</default>
 									</select>
 									<select id='4'>
-										<field>source</field>
+										<field>pagelen</field>
 										<values>
-											<value>dbinsert</value>
-											<value>56n</value>
-											<value>4n</value>
-											<value>4s</value>
-											<value>5s</value>
-											<value>6s</value>
-											<value>56n,4n,4s,5s,6s</value>
+											<value>10</value>
+											<value>100</value>
+											<value>1000</value>
+											<value>10000</value>
 										</values>
-										<default>dbinsert</default>
+										<default>10</default>
 									</select>
 								</root>";
 								
@@ -126,40 +116,6 @@ div#five {
 				gethtmlxmlselect($xml,$_GET,TRUE,FALSE,$spanclass,$class);
 				echo "</div>";				
 				
-				if (in_array('formats',explode(",",$_GET['ztypes']))) {
-					echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"default.css\" />";
-				}
-				else {
-					echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"plain.css\" />";
-				}
-				
-				if (isset($_GET['source_type'])) {
-					if ($_GET['source_type'] == "adult") {
-						$source_type = 'teacher';
-					}
-					else {
-						$source_type = $_GET['source_type'];
-					}
-				}
-				else {
-					$source_type = 'student'; // default
-				}
-				
-				echo "<div id='two'>";
-				gethtmldbselect($SSDB,'lesson',$source_type,"source_value",1,$_GET['source_value'],
-							TRUE,FALSE,$spanclass,$class);
-				echo "<br><br>";
-
-				gethtmlmultiselect("status","status",explode(",",$_GET['ztypes']));
-				gethtmlmultiselect("subject","subject",explode(",",$_GET['ztypes']));
-				gethtmlmultiselect("adult","adult",explode(",",$_GET['ztypes']));
-				gethtmlmultiselect("student","student",explode(",",$_GET['ztypes']));
-		
-				echo "<br><br>";
-				
-				gethtmlswitch("formats","formats",explode(",",$_GET['ztypes']));
-				echo "</div>";
-				
 				echo "<div id='two'>";
 				gethtmldbselect($SSDB,'lesson','subject',"cnstr_subject",1,$_GET['cnstr_subject'],
 							TRUE,FALSE,$spanclass,$class);
@@ -189,6 +145,8 @@ div#five {
 </html>
 
 <?php
+
+$_GET['parser']="drawform";
 
 if(isset($_GET['ztypes'])) {
 

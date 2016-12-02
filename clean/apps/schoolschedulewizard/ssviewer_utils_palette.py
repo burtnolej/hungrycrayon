@@ -11,7 +11,6 @@ from datetime import datetime
 
 __all__ = ['colors','_color_get_multi','color_get','colorpalette','fontpalette']
 
-'''
 
 colors = enum(pink = '#%02x%02x%02x' % (255, 153, 153),
               salmon = '#%02x%02x%02x' % (255, 204, 153),
@@ -94,7 +93,6 @@ fontpalette = dict(Amelia=colors.green,
                    Student_News=colors.lightyellow,
                    subject=colors.blue)
 
-'''
 
 def init_formats(dbname,_globals):
     

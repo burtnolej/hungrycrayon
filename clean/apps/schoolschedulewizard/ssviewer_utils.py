@@ -78,9 +78,9 @@ def _getpage(grid,pagelen,pagenum):
     return(startrow,endrow)
 
 
-def dataset_list(of,enums,pagelen=30,pagenum=1):
-    
-    source_objs = of.query('lesson')
+def dataset_list(of,enums,pagelen=30,pagenum=1,constraints=None,columns=None):
+
+    source_objs = of.query_advanced('lesson',constraints)
         
     grid = []
     colnames = list(source_objs[0].dm.keys())
@@ -89,14 +89,15 @@ def dataset_list(of,enums,pagelen=30,pagenum=1):
     
     startrow,endrow = _getpage(source_objs,pagelen,pagenum)
 
-    for i in range(startrow,endrow+1):        
-        grid.append(source_objs[i].dm.values())
-          
+    for i in range(startrow,endrow+1):
+        if columns== None:
+            grid.append(source_objs[i].dm.values())
+            
     return grid,colnames
 
 def dataset_record(of,clsname,objid):
     
-    if of.object_exists(clsname,objid) == True:    
+    if of.object_exists(clsname,objid) == True:   
         obj = of.object_get(clsname,objid)
         return(obj.dm)
 
@@ -159,8 +160,10 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
 
                         for _val in _vals:
                             
-                            if constraints <> None:
+                            if constraints <> None and constraints <> []:
                                 flag=False
+                                
+                                
                                 for objtype,objval in constraints:
                                     
                                     if getattr(_val,objtype).name <> objval:
@@ -200,7 +203,7 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
 
 def dataset_serialize(values,formatson,schema=None):
 
-    if formatson==True:                
+    #if formatson==True:                
         for x in range(len(values)):
             for y in range(len(values[x])):
                 _value = values[x][y]
@@ -217,8 +220,15 @@ def dataset_serialize(values,formatson,schema=None):
                                 
                                 _formats = []
                                 for i in range(len(_value[0])):
-                                    args = dict(value=_value[0][i],bgcolor=bgs[i],fgcolor=fgs[i])
+                                    args = dict(value=_value[0][i])
+                                    #args = dict(value=_value[0][i],bgcolor=bgs[i],fgcolor=fgs[i])
                                     if schema<>None: args['valuetype'] = schema['ztypes'][i]
+                                    
+                                    
+                                    if formatson==True:
+                                        args['bgcolor'] = bgs[i]
+                                        args['fgcolor'] = fgs[i]
+                                        
                                     _formats.append(args)
                                     
                                     
@@ -236,8 +246,14 @@ def dataset_serialize(values,formatson,schema=None):
                                 bgs,fgs = _color_get_multi(__value)
                                 _formats = []
                                 for i in range(len(__value)):
-                                    args = dict(value=__value[i],bgcolor=bgs[i],fgcolor=fgs[i])
+                                    #args = dict(value=__value[i],bgcolor=bgs[i],fgcolor=fgs[i])
+                                    args = dict(value=__value[i])
                                     if schema<>None: args['valuetype'] = schema['ztypes'][i]
+                                    
+                                    if formatson==True:
+                                        if formatson==True:
+                                            args['bgcolor'] = bgs[i]
+                                            args['fgcolor'] = fgs[i]
                                     _formats.append(args)
 
                                     
@@ -245,10 +261,11 @@ def dataset_serialize(values,formatson,schema=None):
                 else:
                     #if x == 0 or y == 0:
                     if x == 0:
+                        
                         args = dict(value=_value,bgcolor=colors.black,fgcolor=colors.white)
                         if schema<>None: 
-                            if isinstance(schema['yaxis'],list):
-                                args['valuetype'] = schema['yaxis']
+                            #if isinstance(schema['yaxis'],list):
+                            args['valuetype'] = schema['yaxis']
                         values[x][y] = args
                     elif y == 0:
                         args = dict(value=_value,bgcolor=colors.black,fgcolor=colors.white)
@@ -261,8 +278,8 @@ def dataset_serialize(values,formatson,schema=None):
                         args = dict(value=_value,bgcolor=bg,fgcolor=fg)
                         if schema<>None: args['valuetype'] = schema['colnames'][y]
                         values[x][y] = args
-                            
-    return values
+                
+        return values
     
 def _lesson_change(lesson):
 
@@ -282,6 +299,7 @@ def _lesson_change(lesson):
     
     adult = lesson.adult
     student = lesson.student
+    subject = lesson.subject
 
     # add the lesson to the adult object        
     if hasattr(adult,'lessons') == False:
@@ -299,6 +317,13 @@ def _lesson_change(lesson):
     _add(student,'period','recordtype',lesson) # indexed by adult/period
     _add(student,'student','recordtype',lesson) # indexed by adult/period
 
+    # add the lesson to the subject object        
+    if hasattr(subject,'lessons') == False:
+        setattr(subject,'lessons',{})
+        
+    _add(subject,'dow','period',lesson) # indexed by dow/period
+    
+    
 def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1,period="all",
                  dow="all",teacher="all",student="all",source="dbinsert"):
     

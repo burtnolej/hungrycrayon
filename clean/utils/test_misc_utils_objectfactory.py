@@ -319,23 +319,67 @@ class Test_ObjFramework_Database_Derived_Nested_DupeKey(unittest.TestCase):
         print obj1.student,obj2.student
         
 
+class Test_ObjFrameworkSearch(unittest.TestCase):
+
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.of.new(GenericBase,
+                    'Student',
+                    objid='booker',
+                    nationality='british',
+                    modname=__name__)
+        
+        self.of.new(GenericBase,
+                    'Student',
+                    objid='fred',
+                    age=23,
+                    nationality='british',
+                    modname=__name__)
+        
+        self.of.new(GenericBase,
+                    'Student',
+                    objid='fred',
+                    age=35,
+                    nationality='irish',
+                    modname=__name__)
+        
+        self.of.new(GenericBase,
+                    'Classroom',
+                    objid='1a',
+                    nationality='swedish',
+                    modname=__name__)
         
 
+    def tearDown(self):
+        self.of.reset()
+        
+    def test_1clause(self):
+        results = self.of.query_advanced('Student',[('objid','booker')])
+        
+        self.assertEquals(len(results),1)
+        self.assertEquals(results[0].objid,'booker')
+        
+    def test_2clause(self):
+        results = self.of.query_advanced('Student',[('nationality','british'),
+                                                    ('objid','fred')])
+        
+        self.assertEquals(len(results),1)
+        self.assertEquals(results[0].age,23)
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDupeID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_records_same_cls))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_class))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkIter))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived))
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested_DupeKey))
     
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkSearch))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

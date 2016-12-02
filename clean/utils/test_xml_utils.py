@@ -661,6 +661,20 @@ class Test_Grid_to_XML_function(unittest.TestCase):
     
         #print xmltree.tostring(xml)
         
+class Test_Grid_to_XML_header(unittest.TestCase):
+    def test_(self):
+     
+        header = "<root><parser><value>noformatgrid</value></parser></root>"    
+        
+        expected_results = "<root><parser><value>noformatgrid</value></parser><row><cell><value /></cell><cell><value>MO</value></cell></row><row><cell><value>830-910</value></cell><cell><subrow><subcell><value>ELA</value></subcell></subrow></cell></row></root>";
+         
+        grid = [[{'value': ''}, { 'value': u'MO'}], 
+                             [{'value': u'830-910'}, [({'value': u'ELA'},)]]]
+         
+        xml = grid2xml(grid,header=header)
+         
+        self.assertEqual(xmltree.tostring(xml),expected_results)  
+        
 class Test_Grid_to_XML_resize(unittest.TestCase):
        
     def test_1row_1col_1subrow_1subcol_formats(self):
@@ -826,15 +840,15 @@ if __name__ == "__main__":
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_XML_xpath))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_function))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_resize))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_function))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_resize))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_valuetype))
     '''
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_nopivot))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pageto_XML))
                   
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_header))
     
     unittest.TextTestRunner(verbosity=2).run(suite)

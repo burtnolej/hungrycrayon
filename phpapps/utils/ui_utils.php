@@ -107,7 +107,8 @@ function gethtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,
 			
 	$values = getcolumndistinctvalues($dbname,$tablename,$column);
 
-	array_splice($values,0,0,"Not Selected");
+	array_splice($values,0,0,"NotSelected");
+	array_splice($values,1,1,"all");
 	
 	if ($labels == TRUE) {
 		gethtmlselect($name,$values,$widgetcount,$default,$column,$labelclass,$spanclass,$class);
@@ -237,6 +238,25 @@ function gethtmlmultiselect($name,$value,$checked=NULL) {
 		echo "<label for=\"".$value."\" >".$value."</label>";
 		echo "<br>";
 
+}
+
+// HTML switch/slider
+function gethtmlswitch($name,$value,$checked=NULL) {
+
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"switch.css\" />";
+		echo "<label class=\"switch\">";
+		
+		echo "<input id=\"".$value."\" type=\"checkbox\" name=\"".$name."\"";
+
+		if (isset($checked)) {
+			if (in_array($value,$checked)) {
+				echo "checked";
+			}
+		}
+		
+		echo ">";
+		echo "<div class=\"slider\"></div>";
+		echo "</label>";
 }
 
 ?>

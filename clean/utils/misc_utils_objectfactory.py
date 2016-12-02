@@ -88,6 +88,20 @@ class ObjFactory(GenericBase):
             return self.store.keys()
         else:
             return [obj for name, obj in self.store[clsname].iteritems()]
+        
+    def query_advanced(self,clsname,constraints):
+        results =[]
+        for name, obj in self.store[clsname].iteritems():
+            match=True
+            for k,v in constraints:
+                print k,v,getattr(obj,k).name
+                
+                if getattr(obj,k).name <> v:
+                    match=False
+            if match==True:
+                results.append(obj)
+                
+        return(results)
     
     def object_exists(self,clsname,objid):
         return(self.store[clsname].has_key(objid))

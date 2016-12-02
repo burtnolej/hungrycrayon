@@ -11,7 +11,7 @@ from database_util import Database, tbl_create, tbl_index_count, \
 
 from database_table_util import tbl_rows_get, tbl_rows_insert, \
      tbl_rows_insert_from_schema, tbl_cols_get, tbl_col_add, \
-     dbtblgeneric
+     dbtblgeneric, tbl_move
 
 sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
 from misc_utils_enum import enum
@@ -534,10 +534,55 @@ class TestDBTblGenericValidateInsert2RowsSameTable(unittest.TestCase):
             
             self.assertEqual(tbl_count_get(self.database,'dbtbltest'),2)
             
+class TestDBTblMove(unittest.TestCase):
+        
+    def setUp(self):
+        self.schema_file1 = "/Users/burtnolej/Development/pythonapps/clean/utils/test_misc/test_schema_vsimple.xml"
+        schema_execute(self.schema_file1)
+
+        datarows = {'tbl_col_name':[],'tbl_rows':[]}
+        
+        schema_data_get(self.schema_file1,'workout',datarows)
+
+        self.database1 = Database('fitness')
+        
+        with self.database1:
+            tbl_rows_insert(self.database1,'workout',datarows['tbl_col_name'],datarows['tbl_rows'])
+            
+        self.schema_file2 = "/Users/burtnolej/Development/pythonapps/clean/utils/test_misc/test_schema_vsimple2.xml"
+        schema_execute(self.schema_file2)
+        schema_data_get(self.schema_file2,'food',datarows)
+
+        self.database2 = Database('diet')
+        
+        with self.database2:
+            tbl_rows_insert(self.database2,'food',datarows['tbl_col_name'],datarows['tbl_rows'])
+            
+        
+    def test_(self):
+        tbl_move(self.database1,self.database2,'workout',True)
+        
+        expected_results = [[250772, u'cycling'], [260772, u'rowing']]
+        
+        with self.database2:
+            _,rows,_ = tbl_rows_get(self.database2,'workout')        
+        
+        self.assertListEqual(rows,expected_results)
+        
+    def tearDown(self):
+        
+        import os
+        try:
+            os.remove("fitness.sqlite")
+            os.remove("diet.sqlite")
+        except:
+            pass
+        
+            
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert2))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableRowsGet))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableColumnAdd))
@@ -550,9 +595,10 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesInt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesDblQuotedStr))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesSingleQuotedStr))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsert2RowsSameTable))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsert2RowsSameTable))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblMove))
 
     
-
+    
     unittest.TextTestRunner(verbosity=2).run(suite)
     
