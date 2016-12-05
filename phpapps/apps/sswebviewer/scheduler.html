@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<link rel="stylesheet" type="text/css" href="css/div.css" />
+	<link rel="stylesheet" type="text/css" href="css/select.css" />
+	<link rel="stylesheet" type="text/css" href="css/switch.css" />
+	<link rel="stylesheet" type="text/css" href="css/menu.css" />
+
+    <div id="navwrap">
+    		<p class="divlabel">Menu</p>
+		  <ul class="navbar">
+			 <li><a href="/boattypes/featureboats.php">View</a>
+				<ul>
+             	<li><a href="/boattypes/sprint/sprint.php">Sprint</a></li>
+				   <li><a href="/boattypes/fitnesstouring/fitnesstouring.php">Fitness-touring</a></li>
+				   <li><a href="/boattypes/marathon/marathon.php">High Perf</a></li>
+               		<li><a href="/boattypes/surfski/surfskis.php">Surf Skis</a></li>
+				</ul>         
+			 </li>
+			 <li><a href="/rent/services.php">Inventory</a>
+				<ul>
+                    <li><a href="/rent/memb.php">Membership</a></li>
+				   <li><a href="/rent/rboat.php" >Rentals</a></li>
+                    <li><a href="/rent/rb.php">Banquet</a></li>
+                    <li><a href="/rent/faq.php">FAQ</a></li>
+	   
+				</ul>         
+			 </li>
+			 <li><a href="/ages/ages.php">Ages</a>
+				<ul>
+				   <li><a href="/ages/adult.php">Adults</a></li>
+                <li><a href="/ages/children.php">Children</a></li>
+				</ul>         
+			 </li>
+			 <li><a href="about.php">About Us</a>
+                 <li><a href="contact_us.php">Contact Us</a>
+				</ul>
+       </div>
+       
+   <div id="content">
+	<div class="contain">
+		<p class="divlabel">select viewing options</p>
+		<p class="label">columns</p>
+		<span class="select">
+			<select class="custom" >
+				<option>period</option>
+				<option>dow</option>
+				<option>student</option>
+				<option>adult</option>
+			</select>
+		</span>
+		<p class="comment"> ... specifies the data type represented in each column</p>
+		<br>
+		<p class="label">rows</p>
+		<span class="select">
+			<select class="custom" >
+				<option>period</option>
+				<option>dow</option>
+				<option>student</option>
+				<option>adult</option>
+			</select>
+		</span>
+		<p class="comment"> ... specifies the data type represented in each row</p>
+	</div>
+	
+	<div class="contain">
+		<p class="divlabel">select cell datatypes</p>
+			<p class="label switch">subject</p>
+			<label class="switch">
+				<input  type="checkbox">
+				<p class="slider"></p>
+			</label>
+			<p class="label switch">student</p>
+			<label class="switch">
+				<input  type="checkbox">
+				<p class="slider"></p>
+			</label>
+			<br>
+			<p class="label switch">adult</p>
+			<label class="switch">
+				<input  type="checkbox">
+				<p class="slider"></p>
+			</label>
+			<p class="label switch">class type</p>
+			<label class="switch">
+				<input  type="checkbox">
+				<p class="slider"></p>
+			</label>
+		<br>
+	</div>
+	</div>
+</html>

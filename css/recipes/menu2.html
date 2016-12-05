@@ -1,0 +1,129 @@
+
+<html>
+<style>
+
+
+#content {
+	margin-left: 150px;
+}
+
+.navbar	{ /* main navigator element */
+   padding: 0; /* switch off padding */
+	margin: 0; /* switch off the margin */
+	position: fixed; /* always show nav */
+    z-index: 12;
+	}
+	
+.navbar li 	{ /* top level menu item elements in the nav */
+	height:20px; 
+	width: 100px;  /* Each menu item is 150px wide */
+	text-align: center;  /* All text is placed in the center of the box */
+	list-style: none;  /* Removes the default styling (bullets) for the list */
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:80%;
+	margin: 0;
+	background-color: #FEFAFA;
+	border-bottom: 2px solid #FFF;
+}
+
+.navbar a	{ /* hyperlink text in the top level menu items */					
+		padding: 2px 0;
+		border:0;
+		text-decoration: none;  /* Removes the default hyperlink styling. */
+		color: #000; /* Text color is black */
+		display: block;
+		}
+
+.navbar li:hover, a:hover {
+    background-color: FFEFEF;   
+}
+
+.navbar li ul 	{ /* elements for 2nd level down menu items */
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:120%;
+	display: none; /* Hides the drop-down menu */									
+	margin: 0; /* Aligns drop-down box underneath the menu item */
+	padding: 0; /* Aligns drop-down box underneath the menu item */		
+   margin-left:100px;
+   float:left;
+   margin-top: -19px;
+   height: 0px;
+   	background-color: #FEFAFA;
+   	border-bottom: 2px solid #FFF;
+}				
+
+.navbar li:hover ul 	{
+	display: block; /* Displays the drop-down box when the menu item is hovered over */
+	z-index: 12;
+	padding-left: 1px;
+	background-color: #FFEFEF;
+	border-bottom: 2px solid #FFF;
+}
+
+
+.navbar li ul li a 	{
+        z-index: 1001;
+		}
+
+.navbar li ul li a:hover {
+    background-color:#FFEFEF;
+    z-index: 1000;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #FFF;
+}
+
+</style>
+
+    <div id="wrap">
+		  <ul class="navbar">
+			 <li><a href="/index.php">Home</a></li>
+			 <li><a href="/boattypes/featureboats.php">Boat Types</a>
+				<ul>
+             	<li><a href="/boattypes/sprint/sprint.php">Sprint</a></li>
+				   <li><a href="/boattypes/fitnesstouring/fitnesstouring.php">Fitness-touring</a></li>
+				   <li><a href="/boattypes/marathon/marathon.php">High Perf</a></li>
+               		<li><a href="/boattypes/surfski/surfskis.php">Surf Skis</a></li>
+				</ul>         
+			 </li>
+			 <li><a href="/rent/services.php">Inventory</a>
+				<ul>
+                    <li><a href="/rent/memb.php">Membership</a></li>
+				   <li><a href="/rent/rboat.php" >Rentals</a></li>
+                    <li><a href="/rent/rb.php">Banquet</a></li>
+                    <li><a href="/rent/faq.php">FAQ</a></li>
+	   
+				</ul>         
+			 </li>
+			 <li><a href="/ages/ages.php">Ages</a>
+				<ul>
+				   <li><a href="/ages/adult.php">Adults</a></li>
+                <li><a href="/ages/children.php">Children</a></li>
+				</ul>         
+			 </li>
+			 <li><a href="about.php">About Us</a>
+                 <li><a href="contact_us.php">Contact Us</a>
+				</ul>
+       </div>
+       
+       <div id="content">
+<h3>Dropdown Menu inside a Navigation Bar</h3>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+<p>Hover over the "Dropdown" lin.</p>
+</div>
+       </html>

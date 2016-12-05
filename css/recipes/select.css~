@@ -1,0 +1,87 @@
+
+
+p.label  {
+		margin:.25em 0 .25em 0;
+		text-transform: capitalize;
+	position: relative;
+	top:0px;
+	width:100px;height:20px	;	
+	display: inline-block;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:80%;
+	text-align: right;
+	font-weight: bold;
+}
+
+p.divlabel  {
+		margin:.25em 0 .25em 0;
+		text-transform: capitalize;
+	position: relative;
+	height:25px;
+	top:-5px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:100%;
+	font-weight: bold;
+  	display: flex;
+  	align-items: center;
+  	justify-content: center;
+	background-color: #FFEFEF;
+	/*background-color: #D5B4B4;*/
+}
+
+p.comment {
+	width:100px;
+	word-wrap: break-word;
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	font-size:40%;
+	text-align: left;
+	font-weight: lighter;
+	display: inline-block;
+	color:#F00;
+}
+
+span {
+	color: #BBB;
+	display: inline-block;
+	position: relative;
+}
+
+select.custom {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:80%;
+	background-color: #E0E0E0;
+	width: 100px;height:20px;
+	border:0.5px dotted #FFF;
+	text-transform: capitalize;
+	/*border:0px;*/
+	-webkit-appearance: none; /* delete the old arrow */
+	-moz-appearance: none; /* delete the old arrow */
+	appearance: none;   /* delete the old arrow */
+}
+
+span.select::before, span.select::after {
+		content: "";
+		position: absolute;
+		pointer-events: none; /* allows new dropdown arrow to invoke the dropdown*/
+}
+
+span.select::after {
+	content: "\25BE";
+	right: 5px;
+	top:-1px;
+}
+
+span.select::before { /*  Custom dropdown arrow cover */
+		content:"";
+		right: 0; top: 0; bottom: 0;
+		width: 20px;height:19px;
+		background-color: #666;
+		border-top:0.5px dotted #FFF;
+		border-bottom:0.5px dotted #FFF;
+		border-right:0.5px dotted #FFF;
+}
+
+option {
+		text-transform: capitalize;
+		} 

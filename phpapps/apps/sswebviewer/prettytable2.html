@@ -1,0 +1,289 @@
+<html>
+<style>
+
+a {
+text-decoration: none
+}
+
+#cell {
+    padding:0px;
+    line-height:30px;
+    //background-color:#eeeeee;
+    //<!height:2000px;>
+    float:left;
+    text-align:center;;
+    border: 1px solid #73AD21;
+}
+
+#subcell {
+    padding:0px;
+    line-height:30px;
+    //background-color:#eeeeee;
+    //<!height:2000px;>
+    float:left;
+    text-align:center;;
+    border-bottom: 1px solid #000000;
+    border-top: 1px solid #000000;
+
+}
+
+.subcellleft {
+    border-left: 1px solid #000000;
+    min-width: 50px;
+    width:50px;
+}
+
+.subcellright {
+    border-right: 1px solid #000000;
+    min-width: 50px;
+    width:50px;
+}
+
+#rowhdrcell {
+    padding:0px;
+    line-height:30px;
+    foreground-color:#D0C978;
+    background-color:#98969B;
+    <!height:2000px;>
+    float:left;
+    text-align:center;;
+    width: 50px;
+    border: 1px solid #73AD21;
+}
+
+#table {
+	width:100%;
+   background-color:#eeeeee;
+   	<!height:2000px;>
+   float:left;
+   text-align:center;;
+}
+
+#subtable {
+	width:100%;
+   //background-color:#eeeeee;
+   	<!height:2000px;>
+   float:left;
+   text-align:center;;
+}
+
+table {
+    border-collapse: collapse;
+    white-space: nowrap;
+    min-width: 100px;
+    max-width: 150px;
+}
+subtable {
+    border-collapse: collapse;
+    white-space: nowrap;
+    min-width: 10px;
+    max-width: 10px;
+}
+
+</style>
+</html>
+
+
+<table id=table >
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#ffffff width=50px></td>
+		<td id=cell bgcolor=#ffffff fgcolor=#ffffff width=100px>
+			<a style = "color:#f00000;"href="test.html">??</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">Karolina</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">Paraic</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">Issey</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">[Paraic,Rahul]</a>
+		</td>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000 width=100px>
+			<a href="test.html">Amelia</a>
+		</td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>830-910</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td>
+			<table id=subtable>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>
+							<a style = "color:#ffffff;"href="test.html">P</a>
+					</td>
+					<td id=subcellright bgcolor=#ffcc99 fgcolor=#ffffff width=50px>CTime</td>
+					<td><input type="checkbox" name="foobar" value="checked" /></td>
+				</tr>
+				<tr>
+					<td class=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>P</td>
+					<td class=subcellright bgcolor=#ffcc99 fgcolor=#ffffff width=50px>CTime</td>
+					<td><input type="checkbox" name="foobar" value="checked" /></td>
+				</tr>
+			</table>
+		</td>
+		<td>
+			<table id=subtable>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>P</td>
+					<td id=subcellright bgcolor=#ffcc99 fgcolor=#ffffff width=50px>CTime</td>
+					<td><input type="checkbox" name="foobar" value="checked" /></td>
+				</tr>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>P</td>
+					<td id=subcellright bgcolor=#ffcc99 fgcolor=#ffffff width=50px>CTime</td>
+					<td><input type="checkbox" name="foobar" value="checked" /></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>910-950</td>
+		<td>
+			<table id=table>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#666600 fgcolor=#ffffff>Core</td>
+				</tr>
+			</table>
+		</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>950-1030</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td>
+			<table id=table>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#006600 fgcolor=#000000>Science</td>
+				</tr>
+			</table>
+		</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>1030-1110</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td>
+			<table id=subtable>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#ff99cc fgcolor=#ffffff>History</td>
+				</tr>
+			</table>
+		</td>
+		<td id=cell></td>
+		<td id=cell></td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>1110-1210</td>
+		<td>
+			<table id=table>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#663300 fgcolor=#ffffff>CTime</td>
+				</tr>
+			</table>
+		</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>1210-100</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td>
+			<table id=table>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>Peter</td>
+					<td id=subcellright bgcolor=#d3d3d3 fgcolor=#ffffff width=50px>??</td>
+				</tr>
+			</table>
+		</td>
+		<td id=cell></td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>100-140</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td>
+			<table id=table>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#ffcc99 fgcolor=#ffffff>ELA</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>140-220</td>
+		<td id=cell></td><td>
+			<table id=table>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#ccff99 fgcolor=#ffffff>Couns</td>
+				</tr>
+			</table>
+		</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>220-300</td>
+		<td>
+			<table id=table>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#ff99cc fgcolor=#ffffff>Mvmnt</td>
+				</tr>
+			</table>
+		</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+	</tr>
+	<tr>
+		<td id=cell bgcolor=#ffffff fgcolor=#000000>300-330</td>
+		<td>
+			<table id=table>
+				<tr>
+					<td id=subcellleft bgcolor=#d3d3d3 fgcolor=#ffffff>Peter</td>
+					<td id=subcellright bgcolor=#663300 fgcolor=#ffffff>CTime</td>
+				</tr>
+			</table>
+		</td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+		<td id=cell></td>
+	</tr>
+	</table> 

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+
+.box {
+	background-color: #f00;
+	border: 1px solid #00f;
+	height: 30px;
+	width:150px;
+}
+.box::after {
+	background-color: #ff0;
+	border: 1px solid #00f;
+	height: 30px;
+	width:110px;
+	right:50px;
+}
+.custom-dd {
+	font-size: 1.5em;
+}
+
+.custom-dd__select {
+	background-color: #ff0;
+	padding: .5em;
+	max-width: 50;
+	/*min-width: 200px;*/
+	color: #000;    
+}
+
+@supports (pointer-events: none) and
+	  ((-webkit-appearance: none) or
+	  (-moz-appearance: none) or
+	  (appearance: none)) {
+
+	.custom-dd {
+		position: relative;
+		display: inline-block;
+		vertical-align: middle;
+	}
+	
+	.custom-dd__select {
+		padding-right: 2.5em;
+		border: 0;
+		border-radius: 3px;
+		-webkit-appearance: none; /* delete the old arrow */
+		-moz-appearance: none; /* delete the old arrow */
+		appearance: none;   /* delete the old arrow */
+	}
+	
+	.custom-dd::before,
+	.custom-dd::after {
+		content: "";
+		position: absolute;
+		pointer-events: none; /* allows new dropdown arrow to invoke the dropdown*/
+	}
+	
+	.custom-dd::after { /*  Custom dropdown arrow */
+		content: "\25BC";
+		height: 1em;
+		font-size: .325em;
+		line-height: 1;
+		right: 0.6em;
+		top: 50%; margin-top: -.5em;
+	}
+	
+	.custom-dd::before { /*  Custom dropdown arrow cover */
+		width: 0.7em;
+		right: 0; top: 0; bottom: 0;
+		border-radius: 0 3px 3px 0;
+	background-color: #0b0;
+		
+	}
+	
+}
+</style>
+
+</html>
+<html>
+<div id="fsf">
+<br><br>
+
+
+<div class="box">
+	<label for=xaxis>xaxis</label>
+<span class ="custom-dd">
+	<select class ="custom-dd__select " id="xaxis" name="xaxis">
+	<option value="period"selected>period</option>
+	<option value="dow">dow</option>
+	<option value="adult">adult</option>
+	<option value="subject">subject</option></select>
+</span>
+</div>
+<br><br>
+<span class ="custom-dd"><label for=yaxis>yaxis</label>
+	<select class ="custom-dd__select" id="yaxis" name="yaxis">
+	<option value="period">period</option>
+	<option value="dow">dow</option>
+	<option value="adult"selected>adult</option>
+	<option value="subject">subject</option>
+	</select>
+</span>
+<br><br>
+<span class ="custom-dd"><label for=source_type>source_type</label>
+<select class ="custom-dd__select" id="source_type" name="source_type">
+	<option value="student"selected>student</option>
+	<option value="adult">adult</option>
+	<option value="subject">subject</option>
+	</select></span>
+<br><br>
+<span class ="custom-dd">
+<label for=source>source</label>
+<select class ="custom-dd__select" id="source" name="source">
+ 	<option value="dbinsert"selected>dbinsert</option>
+	<option value="56n">56n</option> 
+	<option value="4n">4n</option>
+	<option value="4s">4s</option>
+	<option value="5s">5s</option>
+	<option value="6s">6s</option>
+	<option value="56n,4n,4s,5s,6s">56n,4n,4s,5s,6s</option>
+</select></span><br><br>
+</div>
+</html>

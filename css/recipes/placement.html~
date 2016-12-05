@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html><style>
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+div {margin:.25em .25em .25em .25em} 
+
+div.contain {
+	width:320px;
+	background-color: #FEFAFA;
+	display:block;
+	overflow:auto;
+	float:left;
+}
+</style></html>
+
+<html><link rel="stylesheet" type="text/css" href="select.css" />
+
+	
+	<div class="contain">
+		<p class="divlabel">This describes the group</p>
+		<p class="label">Foobar</p>
+		<span class="select">
+			<select class="custom" >
+				<option>foo</option>
+				<option>bar</option>
+			</select>
+		</span>
+		<p class="comment"> !! plenty of comment space plenty of comment space</p>
+		<br>
+		<p class="label">Longer foobar</p>
+		<span class="select">
+			<select class="custom" >
+				<option>foo</option>
+				<option>bar</option>
+			</select>
+		</span>
+		<p class="comment"> !! long comment  long comment</p>
+		<br>
+		<p class="label">Hmm foobar</p>
+		<span class="select">
+			<select class="custom" >
+				<option>foo foo foo</option>
+				<option>bar</option>
+			</select>
+		</span>
+		<p class="comment"> !! comment</p>
+		<br>
+		<p class="label">Hmm foobar</p>
+		<span class="select">
+			<select class="custom" >
+				<option>foo foo foo</option>
+				<option>bar</option>
+			</select>
+		</span>
+		<p class="comment"> !! comment</p>
+	</div>
+<div class="contain">
+		<p class="divlabel">This describes the group</p>
+		<p class="label">Foobar</p>
+		<span class="select">
+			<select class="custom" >
+				<option>foo</option>
+				<option>bar</option>
+			</select>
+		</span>
+		<p class="comment"> !! plenty of comment space plenty of comment space</p>
+		<br>
+		<p class="label">Longer foobar</p>
+		<span class="select">
+			<select class="custom" >
+				<option>foo</option>
+				<option>bar</option>
+			</select>
+		</span>
+		<p class="comment"> !! long comment  long comment</p>
+		<br>
+		<p class="label">Hmm foobar</p>
+		<span class="select">
+			<select class="custom" >
+				<option>foo foo foo</option>
+				<option>bar</option>
+			</select>
+		</span>
+		<p class="comment"> !! comment</p>
+		<br>
+		<p class="label">Hmm foobar</p>
+		<span class="select">
+			<select class="custom" >
+				<option>foo foo foo</option>
+				<option>bar</option>
+			</select>
+		</span>
+		<p class="comment"> !! comment</p>
+	</div>
+</html>

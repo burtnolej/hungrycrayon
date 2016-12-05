@@ -126,10 +126,13 @@ div#five {
 				gethtmlxmlselect($xml,$_GET,TRUE,FALSE,$spanclass,$class);
 				echo "</div>";				
 				
+				
+				
 				if (in_array('formats',explode(",",$_GET['ztypes']))) {
 					echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"default.css\" />";
 				}
 				else {
+					echo var_dump(explode(",",$_GET['ztypes']));
 					echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"plain.css\" />";
 				}
 				

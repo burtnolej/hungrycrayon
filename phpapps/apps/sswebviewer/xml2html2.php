@@ -1,6 +1,4 @@
-<html>
-<link rel="stylesheet" type="text/css" href="default.css" />
-</html>
+
 
 <?php
 
@@ -145,13 +143,7 @@ function drawgrid($utilsxml,$args=NULL,$formats=NULL) {
 
 function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 	
-	if ($args['yaxis'] == "adult") {
-		echo "<table class = \"\">";
-	}
-	else {
-		echo "<table class = \"widecolumns\">";
-	}
-	
+	echo "<table class = \"borderoff\">";
 
 	$_rows = $utilsxml->xpath("//row"); // get a list of all rows
 
@@ -161,21 +153,17 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 		$_cells = $_row->xpath("child::*"); // get a list of the cells (children) of this row
 	
 		foreach ($_cells as $_cell) {
-			echo "<td id=\"\">";
+			echo "<td>";
 			
 			$_subrows = $_cell->xpath("child::subrow"); // see if any subrows exist
 			
 			if (sizeof($_subrows) <> 0) {
-				 echo "<table class = \"sub\">"; // start a new table
+				 echo "<table class = \"borderoff\">"; // start a new table
 
 				foreach ($_subrows as $_subrow) {	
-	
-					if ($args['yaxis'] == "adult") {
-						echo "<tr><td class=\"sub\">";
-					}
-					else {						
-						echo "<tr><td class=\"sub widecolumns\">";
-					}
+
+					echo "<tr><td class=\"thincol borderoff\">";
+
 					$content="";	
 					$_subcells = $_subrow->xpath("child::subcell"); // see if any subcells exist
 	
@@ -188,11 +176,9 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 								$content = $content." with ".$link;
 							}
 							elseif ($_subcells[$i]->valuetype == 'student') {
-								//$content = $content." [".$_subcells[$i]->value."] ";
 								$content = $content." [".$link."] ";
 							}
 							else {
-								//$content = $content.$_subcells[$i]->value;
 								$content = $content.$link;
 							}
 							

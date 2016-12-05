@@ -44,7 +44,7 @@
 	
 	.custom-dd::after { /*  Custom dropdown arrow */
 		content: "\25BC";
-		height: 1em;
+		height: 3em;
 		font-size: .325em;
 		line-height: 1;
 		right: 0.6em;

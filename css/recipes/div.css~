@@ -1,0 +1,27 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+div.contain {
+	width:320px;
+	background-color: #FEFAFA;
+	display:block;
+	overflow:auto;
+	float:left;
+}
+
+#content {
+	float:left;
+	margin:0px;
+}
+
+#navwrap {
+	margin:.25em .25em .25em .25em;
+	width: 100px; 
+	height: 20px; 
+   padding-bottom: 0px;
+	z-index: 1; /* Makes sure that your menu remains on top of other page elements */
+	position: fixed;
+	background-color: FFEFEF;    
+}
