@@ -1,0 +1,27 @@
+ {
+  text-decoration: none;
+}
+
+table {
+	border: 1px solid #f00;
+	background-color: #ffffff;
+	table-layout:fixed
+}
+
+.borderoff {
+	border: 0px solid #f00;
+	border-collapse:collapse;
+	padding:2px;
+}
+
+td {
+  	border: 1px solid #000;
+	word-wrap:break-word;
+	text-align: center;
+	padding:0px;
+}
+
+.thincol {
+   max-width: 200px;
+   min-width: 100px;
+}

@@ -34,8 +34,9 @@
 		}
 
 .navbar li:hover, a:hover {
-    background-color: #FFEFEF;   
+    background-color: #00EFEF;   
 }
+
 
 .navbar li ul 	{ /* elements for 2nd level down menu items */
 	font-family: Arial, Helvetica, sans-serif;
@@ -68,4 +69,12 @@
     z-index: 1000;
     padding-bottom: 4px;
     border-bottom: 2px solid #FFF;
+}
+
+.navbar li:hover ul 	{
+	display: block; /* Displays the drop-down box when the menu item is hovered over */
+	z-index: 12;
+	padding-left: 1px;
+	background-color: #FFEFEF;
+	border-bottom: 2px solid #FFF;
 }

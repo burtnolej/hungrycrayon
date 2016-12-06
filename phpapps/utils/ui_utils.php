@@ -9,9 +9,7 @@ set_include_path($PHPLIBPATH);
 include_once 'db_utils.php';
 include_once 'utils_xml.php';
 
-
 // HTML Label
-
 function gethtmllabel($label, $labelclass=NULL) {
 
 	echo "<label for=".$label;
@@ -22,6 +20,7 @@ function gethtmllabel($label, $labelclass=NULL) {
 	echo ">".$label."</label>";
 
 }
+
 // HTML Dropdown
 function gethtmldropdown($column,$values,$widgetcount,$default=NULL) {
 
@@ -80,6 +79,28 @@ function gethtmlselect($column,$values,$widgetcount,$default, $label=NULL,$label
 	echo "</span>";
 
 }
+		
+// Custom HTML Select
+function getchtmlselect($column,$values,$widgetcount,$default,$comment=NULL) {
+
+	echo "<p class=\"label\">".$column."</p>";
+	echo "<span class=\"select\">";		
+	echo "<select class=\"custom\" id=\"".$column."\" name=\"".$column."\">"; 
+	
+	foreach ($values as $value) {
+			echo "<option value=\"".$value."\"";
+			if ($value == $default) {
+				echo "selected";
+			}	
+			echo ">".$value."</option>";
+		}
+		
+	echo "</select>";
+	echo "</span>";
+	if ($comment <> NULL) {
+		echo "<p class=\"comment\">".$comment."</p>";
+	}
+}
 
 // HTML DB Dropdown
 function gethtmldbdropdown($dbname,$tablename){
@@ -116,6 +137,58 @@ function gethtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,
 	else{
 		gethtmlselect($name,$values,$widgetcount,$default,$labels,$labelclass,$spanclass,$class);
 	}
+}
+
+// Custom HTML DB Select
+function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$divlabel="",$comment=NULL){
+			
+	if ($divlabel<>NULL) {
+		echo "<div class=\"contain\">";
+		echo "<p class=\"divlabel\">".$divlabel."</p>";
+	}
+	
+	$values = getcolumndistinctvalues($dbname,$tablename,$column);
+
+	array_splice($values,0,0,"NotSelected");
+	array_splice($values,1,1,"all");
+	
+	getchtmlselect($name,$values,$widgetcount,$default,$comment);
+	
+	if ($divlabel<>NULL) {
+		echo "</div>";
+	}
+}
+
+// Custom HTML XML Select
+function getxmlhtmlcselect($xml,$defaults,$divlabel) {
+	
+	$utilsxml = simplexml_load_string($xml,'utils_xml');
+	
+	$_dropdowns = $utilsxml->xpath("//select");
+	
+	$widgetcount = 0;
+	
+	echo "<div class=\"contain\">";
+	echo "<p class=\"divlabel\">".$divlabel."</p>";
+		
+	foreach ($_dropdowns as $_dropdown) {
+				
+		$values = $_dropdown->values->xpath("child::value");
+		$field = (string)$_dropdown->field;
+		$default = NULL;
+
+		if (array_key_exists($field,$defaults)) {
+			$default = $defaults[$field];
+		}
+		elseif (isset($_dropdown->default)){
+			$default = (string)$_dropdown->default;			
+		}
+
+		getchtmlselect($field,$values,$widgetcount,$default,(string)$_dropdown->comment);
+		
+		$widgetcount = $widgetcount+1;
+	}
+	echo "</div>";
 }
 
 // HTML XML Select
@@ -236,7 +309,6 @@ function gethtmlmultiselect($name,$value,$checked=NULL) {
 		}
 		echo "/>";
 		echo "<label for=\"".$value."\" >".$value."</label>";
-		echo "<br>";
 
 }
 
@@ -257,6 +329,84 @@ function gethtmlswitch($name,$value,$checked=NULL) {
 		echo ">";
 		echo "<div class=\"slider\"></div>";
 		echo "</label>";
+}
+
+// Custom HTML switch/slider
+function getchtmlswitch($name,$value,$checked=NULL) {
+
+		echo "<p class=\"label switch\">".$name."</p>";
+		echo "<label class=\"switch\">";
+		
+		echo "<input id=\"".$value."\" type=\"checkbox\" name=\"".$name."\"";
+
+		if (isset($checked)) {
+			if (in_array($value,$checked)) {
+				echo "checked";
+			}
+		}
+		
+		echo ">";
+		echo "<p class=\"slider\"></p>";
+		echo "</label>";
+}
+
+// Custom HTML menu
+function getchtmlxmlmenu($xml,$divlabel) {
+	
+  	echo "<div id=\"navwrap\">";
+   echo "<p class=\"divlabel\">".$divlabel."</p>";
+   echo "<ul class=\"navbar\">";
+		  
+	$utilsxml = simplexml_load_string($xml,'utils_xml');
+	
+	$_toplevelitems = $utilsxml->xpath("//item");
+	
+	$widgetcount = 0;
+	
+	function _getchildmenu($parent) {
+		$name = $parent->attributes()["name"];
+		if (isset($parent->link) == TRUE) {
+			$link = (string)$parent->link;			
+			echo "<li><a href=\"".$link."\">".$name."</a></li>";
+		}
+		else {
+			echo "<li>".$name;
+			//echo "<li><a href=\">".$name."</a></li>";
+		}
+			
+		if (sizeof($parent->children()) <> 0) {
+			foreach ($parent->children() as $child) {
+				echo "<ul>";
+				_getchildmenu($child);
+				echo "</ul>";
+			}
+		}
+		echo "</li>";
+	}
+	
+	_getchildmenu($utilsxml);
+	
+	echo "</ul/</div>";
+
+	/*foreach ($utilsxml->children() as $child) {
+		$name = $child->attributes()["name"];
+		$link = (string)$child->link;
+		echo "<li><a href=\"".$link."\">".$name."</a>";*/
+		
+		//_getchildmenu($child);
+		/*
+		if (sizeof($child->children()) <> 0) {
+			echo "<ul>";
+		
+			foreach ($child->children() as $gchild) {
+				$name = $gchild->attributes()["name"];
+				$link = (string)$gchild->link;
+				echo "<li><a href=\"".$link."\">".$name."</a></li>";
+			}
+			echo "</ul>";
+		}*/
+	
+	
 }
 
 ?>
