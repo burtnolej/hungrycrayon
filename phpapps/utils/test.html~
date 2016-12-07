@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+	
+	<link rel="stylesheet" type="text/css" href="css/select.css" />
+	<div class="contain">
+	<p class="label">foobar</p>
+	<span class="select">
+		<select class="custom">
+			<option>foobar</option>
+			<option selected>barfoo</option>
+		</select>
+	</span>
+	<p class="comment">foobar</p>
+	</div>
+</html>
