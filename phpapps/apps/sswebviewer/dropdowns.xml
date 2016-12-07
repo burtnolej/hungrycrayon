@@ -1,0 +1,84 @@
+<root>
+	<dpivot>
+		<select id='1'>
+			<field>xaxis</field>
+			<values>
+				<value>period</value>
+				<value>dow</value>
+				<value>adult</value>
+				<value>subject</value>
+			</values>
+			<comment>blah blah blah blah blah</comment>
+			<default>period</default>
+		</select>
+		<select id='2'>
+			<field>yaxis</field>
+			<values>
+				<value>period</value>
+				<value>dow</value>
+				<value>adult</value>
+				<value>subject</value>
+			</values>
+			<comment>blah blah blah blah blah</comment>
+			<default>dow</default>
+		</select>
+		<select id='3'>
+			<field>source_type</field>
+			<values>
+				<value>student</value>
+				<value>adult</value>
+				<value>subject</value>
+			</values>
+			<comment>blah blah blah blah blah</comment>
+			<default>student</default>
+		</select>
+		<select id='4'>
+			<field>source</field>
+			<values>
+				<value>dbinsert</value>
+				<value>56n</value>
+				<value>4n</value>
+				<value>4s</value>
+				<value>5s</value>
+				<value>6s</value>
+				<value>56n,4n,4s,5s,6s</value>
+			</values>
+			<comment>blah blah blah blah blah</comment>
+			<default>dbinsert</default>
+		</select>
+	</dpivot>
+	<dsearch>
+		<select id='1'>
+			<field>source_type</field>
+			<values>
+				<value>list</value>
+			</values>
+			<default>list</default>
+		</select>
+		<select id='2'>
+			<field>source_value</field>
+			<values>
+				<value>lesson</value>
+			</values>
+			<default>lesson</default>
+		</select>
+		<select id='3'>
+			<field>pagenum</field>
+			<values>
+				<value>1</value>
+				<value>2</value>
+			</values>
+			<default>1</default>
+		</select>
+		<select id='4'>
+			<field>pagelen</field>
+			<values>
+				<value>10</value>
+				<value>100</value>
+				<value>1000</value>
+				<value>10000</value>
+			</values>
+			<default>10</default>
+		</select>
+	</dsearch>
+</root>

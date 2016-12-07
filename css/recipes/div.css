@@ -1,7 +1,9 @@
+/*
 *{
     margin: 0;
     padding: 0;
 }
+*/
 
 div.contain {
 	margin:.25em .25em .25em .25em;
@@ -14,7 +16,7 @@ div.contain {
 
 #content {
 	float:left;
-	margin:0px;
+	margin-left: 107px;
 }
 
 #navwrap {

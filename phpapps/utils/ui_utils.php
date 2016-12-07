@@ -160,11 +160,18 @@ function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default
 }
 
 // Custom HTML XML Select
-function getxmlhtmlcselect($xml,$defaults,$divlabel) {
+function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 	
 	$utilsxml = simplexml_load_string($xml,'utils_xml');
 	
-	$_dropdowns = $utilsxml->xpath("//select");
+	if ($starttag <> NULL) {
+		$tmproot = $utilsxml->xpath("//".$starttag);
+		$_dropdowns = $tmproot[0]->xpath("//select");
+	}
+	else {
+	
+		$_dropdowns = $utilsxml->xpath("//select");
+	}
 	
 	$widgetcount = 0;
 	
@@ -398,7 +405,7 @@ function getchtmlxmlmenu2($xml,$divlabel) {
 
 	$utilsxml = simplexml_load_string($xml,'utils_xml');
 	
-  	echo "<div>";
+  	echo "<div id=\"wrap\">";
    //echo "<p class=\"divlabel\">".$divlabel."</p>";
    
 	_menu_iter($html_li,$utilsxml,0);

@@ -1,5 +1,16 @@
 <?php
 
+function getdbinfo() {
+	
+	$GLOBALS['PHPLIBPATH'] = getenv("PHPLIBPATH");
+	$GLOBALS['SSDBPATH'] = getenv("SSDBPATH");
+	$GLOBALS['SSDBNAME'] = getenv("PHPLIBPATH");
+
+	if ($GLOBALS['PHPLIBPATH'] == "") {
+		trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);	
+	}
+}
+
 abstract class run_switch
 {
     const alltests = "--all-tests";

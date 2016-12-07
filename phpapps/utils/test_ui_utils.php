@@ -506,11 +506,60 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 		
 		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
 		
-		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><p class="comment">foobar foobar foobar</p><div><br><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><p class="comment">barfoo barfoo barfoo</p><div><br>';
-						
+		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><p class="comment">foobar foobar foobar</p><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><p class="comment">barfoo barfoo barfoo</p></div>';
+								
 		ob_start(); 
 
 		getxmlhtmlcselect($xml,$defaults,'this is a div label');
+
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
+	}
+	
+	public function test_starttag()
+	{
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+	
+		$xml = "<root>
+					<foobar>
+		          <select id='1'>
+		            <field>xaxis</field>
+		            <values>
+		              <value>period</value>
+		          	  <value>dow</value>
+		              <value>adult</value>
+		              <value>subject</value>
+		            </values>
+		            <comment>foobar foobar foobar</comment>
+		            </select>
+		            
+		          <select id='2'>
+		            <field>yaxis</field>
+		            <values>
+		              <value>period</value>
+		              <value>dow</value>
+		              <value>adult</value>
+		              <value>subject</value>
+		            </values>
+		            <comment>barfoo barfoo barfoo</comment>
+		          </select>
+		          </foobar>
+		          <random>
+		          	<random>
+		          	</random>
+		          </random>
+		        </root>";
+		
+		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
+		
+		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><p class="comment">foobar foobar foobar</p><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><p class="comment">barfoo barfoo barfoo</p></div>';
+		ob_start(); 
+
+		getxmlhtmlcselect($xml,$defaults,'this is a div label','foobar');
 
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -702,8 +751,11 @@ $test->test_checked(); */
 /*$test = new test_getchtmlselect();
 $test->test_();
 
+*/
 $test = new test_getxmlchtmlselect();
-$test->test_();*/
+$test->test_();
+$test->test_starttag();
+
 
 /*$test = new test_getchtmldbselect();
 $test->test_();
@@ -712,8 +764,8 @@ $test = new test_getchtmlswitch();
 $test->test_();
 $test->test_checked();*/
 
-$test = new test_getchtmlxmlmenu();
+/*$test = new test_getchtmlxmlmenu();
 $test->test_();
-$test->test_multilevel();
+$test->test_multilevel();*/
 
 ?>

@@ -2,15 +2,15 @@
 
 <style>
 
-#content {
-	margin-left: 107px;
-}
-
 a	{ 			
 		text-decoration: none;  /* Removes the default hyperlink styling. */
 		color: #000; /* Text color is black */
 }
 
+#wrap {
+	position:fixed;
+	z-index:1;
+}
 .nav {
 	position: fixed;
 	margin-left: -30px;
@@ -41,7 +41,7 @@ a	{
 	list-style: none;  /* Removes the default styling (bullets) for the list */
 	padding:0px;
 	margin-left:100px;
-	margin-top: -20px;	
+	margin-top: -20px;
 }
 
 .nav li ul {

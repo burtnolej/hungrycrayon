@@ -164,11 +164,9 @@ if(isset($_GET['ztypes'])) {
 	if (isset($args['trantype']) == True) {
 		switch ($args['trantype']) {
     		case 'new':
-      		//$url = buildurl('http://blackbear:8080/new',$args);
       		$url = buildurl($SSRESTURL.'new',$args);
       	break;
     		default:
-    			//$url = buildurl('http://blackbear:8080/',$args);
 				$url = buildurl($SSRESTURL,$args);
 		}
 	}
