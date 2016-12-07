@@ -591,11 +591,9 @@ class test_getchtmlxmlmenu extends PHPUnit_Framework_TestCase
 	{
 		echo "<!DOCTYPE html>";
 		echo "<html>";
-		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
-		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
 	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/menu.css\" />";
 	    
-	   //ob_start();
+	   ob_start();
 	   
 		$xml = "<root>
 		          <item name='view'>
@@ -608,13 +606,56 @@ class test_getchtmlxmlmenu extends PHPUnit_Framework_TestCase
 		          </item>
 		         </root>";	 
 		         
-		 $this->expected_result = '<div id="navwrap"><p class="divlabel">foobar</p><ul class="navbar"><li><a href="">view</a><ul><li><a href="foobar.php">by student</a></li><li><a href="barfoo.php">by adult</a></li></ul></li></ul/</div>';
-		         
-		 getchtmlxmlmenu($xml,"foobar");   
+		 $this->expected_result = '<div><ul class = "nav"><li>view<ul><li><a href="foobar.php">by student</a></li><li><a href="barfoo.php">by adult</a></li></ul></ul></div>';
+		 		         
+		 getchtmlxmlmenu2($xml,"foobar");   
 		 
-	//$result = ob_get_contents();
-		//ob_end_clean();		
-		//$this->assertEquals($result,$this->expected_result);     
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);     
+	}
+
+	public function test_multilevel()
+	{
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/menu.css\" />";
+	    
+	   ob_start();
+	   
+		$xml = "<root>
+		          <item name='view'>
+		          	<item name='by student'>
+		          		<link>foobar.php</link>
+		          	</item>
+		          	<item name='by adult'>
+		          		<link>barfoo.php</link>
+		         		    	<item name='ana'>
+		          				<link>barfoo.php</link>
+		          			</item>
+		         		    	<item name='patrick'>
+		          				<link>barfoo.php</link>
+		          			</item>
+		         		    	<item name='diana'>
+		          				<link>barfoo.php</link>
+		          				<item name='option1'>
+		          					<link>barfoo.php</link>
+		          				</item>
+		          				<item name='option2'>
+		          					<link>barfoo.php</link>
+		          				</item>
+		          			</item>
+		          	</item>
+		          </item>
+		         </root>";	 
+		         
+		 $this->expected_result = '<div><ul class = "nav"><li>view<ul><li><a href="foobar.php">by student</a></li><li><a href="barfoo.php">by adult</a><ul><li></li><li><a href="barfoo.php">ana</a></li><li><a href="barfoo.php">patrick</a></li><li><a href="barfoo.php">diana</a><ul><li></li><li><a href="barfoo.php">option1</a></li><li><a href="barfoo.php">option2</a></li></ul></ul></ul></ul></div>';
+		 		 		         
+		 getchtmlxmlmenu2($xml,"foobar");   
+		 
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);     
 	}
 }
 		       
@@ -673,5 +714,6 @@ $test->test_checked();*/
 
 $test = new test_getchtmlxmlmenu();
 $test->test_();
+$test->test_multilevel();
 
 ?>

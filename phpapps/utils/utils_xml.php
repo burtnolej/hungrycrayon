@@ -277,7 +277,7 @@ class utils_xml extends SimpleXMLElement {
 		return($details);		
 	}
 
-	function get_item($itemid) {
+	function get_item($itemid,$node=NULL,$nodeid=NULL) {
 		
 		// func    : gets the object for a particular item using the 
 		//         : the unique id to search by
@@ -290,10 +290,15 @@ class utils_xml extends SimpleXMLElement {
 			$itemid = sprintf("'%s'",$itemid);
 		}
 		
-		$xpath_str = sprintf("//%s[%s=%s]",
+		if ($node <> NULL and $nodeid <> NULL) {
+			$xpath_str = sprintf("//%s[%s=%s]",$node,$nodeid,$itemid);
+		}
+		else {
+			$xpath_str = sprintf("//%s[%s=%s]",
 					$this->xpath_node,
 					$this->xpath_node_id,
 					$itemid);
+		}
 		
 		$items = ($this->xpath($xpath_str));
 		
@@ -313,6 +318,19 @@ class utils_xml extends SimpleXMLElement {
 			$depth++;
 		}
 		return($depth);
-	}	
+	}
+	
+	function xml_iter($func,$root=NULL){
+		if ($root==NULL) {
+			$root=$this;
+		}
+			foreach ($root as $tag => $node) {
+				$func($tag,$node);
+
+				if (sizeof($node ->children()) <> 0) {
+					 xml_iter($node);
+				}
+			}
+	}
 }
 ?>

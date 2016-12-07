@@ -350,63 +350,62 @@ function getchtmlswitch($name,$value,$checked=NULL) {
 		echo "</label>";
 }
 
-// Custom HTML menu
-function getchtmlxmlmenu($xml,$divlabel) {
-	
-  	echo "<div id=\"navwrap\">";
-   echo "<p class=\"divlabel\">".$divlabel."</p>";
-   echo "<ul class=\"navbar\">";
-		  
-	$utilsxml = simplexml_load_string($xml,'utils_xml');
-	
-	$_toplevelitems = $utilsxml->xpath("//item");
-	
-	$widgetcount = 0;
-	
-	function _getchildmenu($parent) {
-		$name = $parent->attributes()["name"];
-		if (isset($parent->link) == TRUE) {
-			$link = (string)$parent->link;			
-			echo "<li><a href=\"".$link."\">".$name."</a></li>";
-		}
-		else {
-			echo "<li>".$name;
-			//echo "<li><a href=\">".$name."</a></li>";
-		}
-			
-		if (sizeof($parent->children()) <> 0) {
-			foreach ($parent->children() as $child) {
-				echo "<ul>";
-				_getchildmenu($child);
-				echo "</ul>";
-			}
-		}
-		echo "</li>";
+function _menu_iter($func,$root,$depth){
+
+	if ($depth==0) {
+		echo '<ul class = "nav">';	
+	}
+	else {
+		echo "<ul>";
 	}
 	
-	_getchildmenu($utilsxml);
-	
-	echo "</ul/</div>";
+	foreach ($root as $tag => $node) {
+		
+		echo "<li>";
+		
+		$func($tag,$node);
 
-	/*foreach ($utilsxml->children() as $child) {
-		$name = $child->attributes()["name"];
-		$link = (string)$child->link;
-		echo "<li><a href=\"".$link."\">".$name."</a>";*/
-		
-		//_getchildmenu($child);
-		/*
-		if (sizeof($child->children()) <> 0) {
-			echo "<ul>";
-		
-			foreach ($child->children() as $gchild) {
-				$name = $gchild->attributes()["name"];
-				$link = (string)$gchild->link;
-				echo "<li><a href=\"".$link."\">".$name."</a></li>";
-			}
-			echo "</ul>";
-		}*/
-	
-	
+		$xpath_str = sprintf("./%s","item");
+		$items = $node->xpath($xpath_str);
+
+		if (sizeof($items)<> 0) {
+			
+			$depth+=1;
+			_menu_iter($func,$node,$depth);
+		}
+		else {
+			echo "</li>";
+		}
+	}
+	echo "</ul>";
 }
+
+// Custom HTML menu
+function getchtmlxmlmenu2($xml,$divlabel) {
+	
+		$html_li = function ($tag,$node) {
+			
+			$name = $node->attributes()["name"];
+			
+			if (isset($node->link) == TRUE) {
+				$link = (string)$node->link;			
+				echo "<a href=\"".$link."\">".$name."</a>";
+			}
+			else {
+				echo $name;
+			}
+		};
+
+	$utilsxml = simplexml_load_string($xml,'utils_xml');
+	
+  	echo "<div>";
+   //echo "<p class=\"divlabel\">".$divlabel."</p>";
+   
+	_menu_iter($html_li,$utilsxml,0);
+
+	echo "</div>";
+}
+		
+
 
 ?>
