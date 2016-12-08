@@ -102,6 +102,17 @@ function getchtmlselect($column,$values,$widgetcount,$default,$comment=NULL) {
 	}
 }
 
+// Custom HTML input
+function getchtmlinput($column,$default,$comment=NULL) {
+
+	echo "<p class=\"label\">".$column."</p>";
+	echo "<input class = \"custom\" type=\"text\" name=\"".$column."\" value=\"".$default."\" />";
+
+	if ($comment <> NULL) {
+		echo "<p class=\"comment\">".$comment."</p>";
+	}
+}
+
 // HTML DB Dropdown
 function gethtmldbdropdown($dbname,$tablename){
 	

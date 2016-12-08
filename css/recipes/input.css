@@ -1,0 +1,11 @@
+
+
+input.custom {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:80%;
+	background-color: #E0E0E0;
+	width: 100px;height:20px;
+	border:0.5px dotted #FFF;
+	text-transform: capitalize;
+}
+

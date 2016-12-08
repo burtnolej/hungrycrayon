@@ -745,7 +745,30 @@ class test_getchtmlxmlmenu extends PHPUnit_Framework_TestCase
 		$this->assertEquals($result,$this->expected_result);     
 	}
 }
-		       
+
+
+class test_getchtmlinput extends PHPUnit_Framework_TestCase
+{
+	public function test_()
+	{
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/input.css\" />";
+	    
+	   ob_start();
+	   		         
+		$this->expected_result = '<p class="label">foobar</p><input class="custom" type="text" name="foobar" value="barfoo" /><p class="comment">a comment</p>';
+		 		 		         
+		getchtmlinput("foobar","barfoo","a comment");   
+		 
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);     
+	}
+}
+	
+			       
 /*
 		
 $stf = new test_gethtmldropdown();
@@ -789,12 +812,12 @@ $test->test_checked(); */
 /*$test = new test_getchtmlselect();
 $test->test_();
 
-*/
+
 $test = new test_getxmlchtmlselect();
 $test->test_();
 $test->test_starttag();
 $test->test_starttag2();
-
+*/
 
 /*$test = new test_getchtmldbselect();
 $test->test_();
@@ -806,5 +829,9 @@ $test->test_checked();*/
 /*$test = new test_getchtmlxmlmenu();
 $test->test_();
 $test->test_multilevel();*/
+
+
+$test = new test_getchtmlinput();
+$test->test_();
 
 ?>
