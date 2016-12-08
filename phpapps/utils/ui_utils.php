@@ -164,9 +164,9 @@ function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 	
 	$utilsxml = simplexml_load_string($xml,'utils_xml');
 	
-	if ($starttag <> NULL) {
+	if ($starttag <> NULL) {		
 		$tmproot = $utilsxml->xpath("//".$starttag);
-		$_dropdowns = $tmproot[0]->xpath("//select");
+		$_dropdowns = $tmproot[0]->xpath("./select");
 	}
 	else {
 	
@@ -412,7 +412,20 @@ function getchtmlxmlmenu2($xml,$divlabel) {
 
 	echo "</div>";
 }
-		
+
+// 	div html
+function gethtmldiv($label,$htmbodyfunc,$divclass=NULL,$pclass=NULL) {
+	echo "<div ";
+	if ($divclass<>NULL) { echo "class=\"".$divclass."\""; }
+	echo ">";
+	
+	echo "<p ";
+	if ($pclass<>NULL) { echo "class=\"".$pclass."\""; }
+	echo ">".$label."</p> ";
+
+	$htmbodyfunc();
+	echo "</div>";
+}
 
 
 ?>

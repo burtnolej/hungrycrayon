@@ -565,6 +565,44 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 		ob_end_clean();		
 		$this->assertEquals($result,$this->expected_result);
 	}
+	
+	public function test_starttag2() {
+		
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+		
+		$xml = " <root>
+			<dpivot>
+				<select id='1'>
+				<field>xaxis</field>
+				<values>
+		      		<value>period</value>
+				</values>
+				</select>
+			</dpivot>
+			<dsearch>
+				<select id='1'>
+				<field>yaxis</field>
+				<values>
+		      		<value>pooppoo</value>
+				</values>
+				</select>
+			</dsearch>
+			</root>";
+			
+		$defaults = array();
+		
+		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option></select></span></div>';
+		ob_start(); 
+
+		getxmlhtmlcselect($xml,$defaults,'this is a div label','dpivot');
+
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
+	}
 }
 
 
@@ -755,6 +793,7 @@ $test->test_();
 $test = new test_getxmlchtmlselect();
 $test->test_();
 $test->test_starttag();
+$test->test_starttag2();
 
 
 /*$test = new test_getchtmldbselect();
