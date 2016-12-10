@@ -161,7 +161,7 @@ function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default
 	$values = getcolumndistinctvalues($dbname,$tablename,$column);
 
 	array_splice($values,0,0,"NotSelected");
-	array_splice($values,1,1,"all");
+	array_splice($values,1,0,"all");
 	
 	getchtmlselect($name,$values,$widgetcount,$default,$comment);
 	

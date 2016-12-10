@@ -758,16 +758,54 @@ class test_getchtmlinput extends PHPUnit_Framework_TestCase
 	    
 	   ob_start();
 	   		         
-		$this->expected_result = '<p class="label">foobar</p><input class="custom" type="text" name="foobar" value="barfoo" /><p class="comment">a comment</p>';
-		 		 		         
-		getchtmlinput("foobar","barfoo","a comment");   
+		$this->expected_result = '<p class="label">doofar</p><input class = "custom" type="text" name="foobar" value="barfoo" /><p class="comment">a comment</p>';
+				 		 		         
+		getchtmlinput("doofar","foobar","barfoo","a comment");   
 		 
 		$result = ob_get_contents();
 		ob_end_clean();		
 		$this->assertEquals($result,$this->expected_result);     
 	}
 }
+
+class test_getxmlchtmlinput extends PHPUnit_Framework_TestCase 
+{
+	public function test_()
+		{
+			echo "<!DOCTYPE html>";
+			echo "<html>";
+			echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+		   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/input.css\" />";
+			echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+		
+			$xml = "<root>
+								<foobar>
+				          		<input id='1'>
+				            			<field>xaxis</field>
+				             		<label>period</label>
+				             		<comment>blah blah blah</comment>
+				           		</input>
+				          		<input id='2'>
+				            			<field>yaxis</field>
+				             		<label>dow</label>
+				             		<comment>blah blah blah</comment>
+				           		</input>
+			           		</foobar>
+			        		</root>";
+			
+			$defaults = array("xaxis" => "adult", "yaxis" => "dow");
+			
+			$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">period</p><input class = "custom" type="text" name="xaxis" value="adult" /><p class="comment">blah blah blah</p><p class="label">dow</p><input class = "custom" type="text" name="yaxis" value="dow" /><p class="comment">blah blah blah</p></div>';
+											
+			ob_start(); 
 	
+			getxmlhtmlinput($xml,$defaults,'this is a div label',"foobar");
+	
+			$result = ob_get_contents();
+			ob_end_clean();		
+			$this->assertEquals($result,$this->expected_result);	
+	}
+}
 			       
 /*
 		
@@ -831,7 +869,10 @@ $test->test_();
 $test->test_multilevel();*/
 
 
-$test = new test_getchtmlinput();
+/*$test = new test_getchtmlinput();
+$test->test_();*/
+
+$test = new test_getxmlchtmlinput();
 $test->test_();
 
 ?>

@@ -1,0 +1,8 @@
+
+
+<html>
+<input type="text" name="blah" id="blah" list="foobar">
+<datalist id="foobar">
+	<option>o1</option>
+</datalist>
+</html>

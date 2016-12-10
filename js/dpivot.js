@@ -17,11 +17,14 @@ $(document).ready(function(){
       $('input').each(function (index, value) {    			
   			if (this.checked == true) {
   				ztypes.push(this.id);	
-  			}	
+  			}
+  			else {
+  				url = url + this.id + "=" + this.value + "&";
+  			}
     	});
     		
     	url = url + "ztypes=" + ztypes.join();
-    	//console.log(url);
+    	console.log(url);
     	get(url);
    });
 });

@@ -28,7 +28,7 @@ function getcolumndistinctvalues($dbname,$tablename,$colname) {
 	while ($row = $results->fetchArray()) {
 		$values[] = $row[0];
 	}
-	
+
 	return $values;
 }
 

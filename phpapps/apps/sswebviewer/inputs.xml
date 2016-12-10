@@ -1,0 +1,8 @@
+<root>
+	<dedit>
+		<input id='1'>
+			<field>source_value</field>
+			<label>lesson id</label>
+		</input>
+	</dedit>
+</root>

@@ -200,38 +200,44 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 	echo "</table> ";
 }
 
+function drawmultirecordform($utilsxml,$args=NULL,$formats=NULL) {
+	$_records = $utilsxml->xpath("//record"); // get all the records
+
+	foreach ($_records as $_record) {
+		drawform($_record);
+	}	
+}
 
 function drawform($utilsxml,$args=NULL,$formats=NULL) {
 
-   echo "<html><body>";
-   echo '<form action="update.php" method="post" accept-charset="UTF-8">';
-   echo "<fieldset>";
-
-	$_items = $utilsxml->xpath("//item"); // get a list of all rows
+	$func = function() use ($utilsxml) {
+					
+		$_items = $utilsxml->xpath("./item"); // get a list of all rows
    
-   $widgetcount=0;
-	foreach ($_items as $_item) {
+   		$widgetcount=0;
+		foreach ($_items as $_item) {
 	
-		if ($_item->valuetype == 'adult') {
-    		$valuetype='teacher';
-    	}
-    	elseif ($_item->valuetype == 'id') {
-	 		$valuetype='__id';
-	 	}
-    	elseif ($_item->valuetype == 'objtype') {
-	 		continue;
-	 	}
-      else {
-        	$valuetype=$_item->valuetype;
-		}
+			if ($_item->valuetype == 'adult') {
+    			$valuetype='teacher';
+    		}
+    		elseif ($_item->valuetype == 'id') {
+	 			$valuetype='__id';
+	 		}
+    		elseif ($_item->valuetype == 'objtype') {
+	 			continue;
+	 		}
+      		else {
+      	  		$valuetype=$_item->valuetype;
+			}
+				
+			global $SSDB;
+			
+			getchtmldbselect($SSDB,"lesson",$valuetype,$valuetype,$widgetcount,$_item->value,NULL,"comment");
+			$widgetcount=$widgetcount+1;
+		   }
+	};
 
-   	gethtmltablecoldropdown('test.sqlite','lesson',$valuetype,$widgetcount,$_item->value);
-   	$widgetcount=$widgetcount+1;
-	}
-	
-   echo "</fieldset>";
-   echo "</form>";
-   echo "</body></html>";
+	gethtmldiv("select filters",$func,"contain","divlabel");		
 }
 
 function draw($xmlstr,$args=NULL) {

@@ -134,8 +134,6 @@ class List:
             if attr.startswith('cnstr_') == True:
                 if str(attr_val) <> "NotSelected":
                     constraints.append((attr[6:],str(attr_val)))
-                    
-        print constraints
         
         values,colnames = ssviewer_utils.dataset_list(of,enums,pagelen=pagelen,
                                                       pagenum=pagenum,
@@ -148,12 +146,14 @@ class List:
         
         return xmltree.tostring(xml)
     
-class RefID:
+class SearchID:
     def GET(self,id):
         
         source_type="lesson"
         
         dbid = dbidlookup[id]
+        
+        
         
         _values = ssviewer_utils.dataset_record(of,source_type,dbid)
         
@@ -161,13 +161,48 @@ class RefID:
         
         xml=xml_utils.record2xml(_values,header=header)
         
-        print source_type,dbid,_values, xmltree.tostring(xml)
-        
         return xmltree.tostring(xml)
     
-        #xml = "<root><parser><value>drawform</value></parser><item><valuetype>period</valuetype><value>830-910</value></item><item><valuetype>dow</valuetype><value>MO</value></item></root>"
-    
-        #return(xml)
+class SearchCriteria:
+    def GET(self,id):
+        
+        data = web.input(id='')
+        
+        pagenum=1;
+        pagelen=10000;
+        
+        constraints=[]
+        for attr,attr_val in data.iteritems():
+            if attr.startswith('cnstr_') == True:
+                if str(attr_val) <> "NotSelected":
+                    constraints.append((attr[6:],str(attr_val)))
+        
+        ids,colnames = ssviewer_utils.dataset_list(of,enums,pagelen=pagelen,
+                                                      pagenum=pagenum,
+                                                      constraints=constraints,
+                                                      columns=['id'])
+        
+        if len(ids) < 20:
+            root = xmltree.Element('root')
+        
+            for i in range(1,len(ids)):
+                
+                source_type="lesson"
+                
+                dbid = dbidlookup[ids[i][0]]
+            
+                _values = ssviewer_utils.dataset_record(of,source_type,dbid)
+                
+                xml_utils.record2xml(_values,root=root,name='record')
+            
+        
+            header = "<root><parser><value>drawmultirecordform</value></parser></root>"
+            xml = xml_utils._addxmlheader(root,header)
+            
+            print xmltree.tostring(xml)
+            
+            return xmltree.tostring(xml)
+        
         
 if __name__ == "__main__":
         
@@ -196,7 +231,8 @@ if __name__ == "__main__":
         '/subject/(\w+)', 'Subject',
         '/adult/(\w+)', 'Adult',
         '/list/(\w+)', 'List',
-        '/id/(\w+)', 'RefID',
+        '/id/(\w+)', 'SearchID',
+        '/criteria/(\w+)', 'SearchCriteria',
         '/new/', 'New'
     )
     

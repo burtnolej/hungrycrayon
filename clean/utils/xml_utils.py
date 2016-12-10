@@ -86,25 +86,20 @@ def _addxmlheader(root,header):
             gchildelement.text = gchild.text  
         
     return(root)
+
     
-def record2xml(page,header=None):
+def record2xml(page,root=None,name=None,header=None):
     
-    root = xmltree.Element('root')
+    if root == None:
+        root = xmltree.Element('root')
     
     if header <> None:
         
         root = _addxmlheader(root,header)
+       
+    if name <> None:
+        root = xmltree.SubElement(root,name)
         
-        #header = xmltree.fromstring(header)
-        
-        #for child in header:
-        #    childelement = xmltree.SubElement(root,child.tag)
-        #    childelement.text = child.text
-            
-        #    for gchild in child._children:
-        #        gchildelement = xmltree.SubElement(childelement,gchild.tag)
-        #        gchildelement.text = gchild.text        
-    
     itemidx=1
     for k,v in page.iteritems():
         itemelement = xmltree.SubElement(root,"item")

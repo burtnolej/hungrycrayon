@@ -92,6 +92,11 @@ def dataset_list(of,enums,pagelen=30,pagenum=1,constraints=None,columns=None):
     for i in range(startrow,endrow+1):
         if columns== None:
             grid.append(source_objs[i].dm.values())
+        else:
+            _l=[]
+            for col in columns:
+                _l.append(source_objs[i].dm[col])
+            grid.append(_l)
             
     return grid,colnames
 

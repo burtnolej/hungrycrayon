@@ -3,8 +3,19 @@
 		<link>dpivot.php</link>
 	</item>
 	<item name='search'>
-		<link>dsearch.php</link>
-	</item>				
+		<item name='by criteria'>
+			<link>dsearch.php</link>
+		</item>
+	</item>
+	<item name='edit'>
+			<item name='by id'>
+			<link>dedit.php</link>
+		</item>
+			<item name='by criteria'>
+			<link>deditcriteria.php</link>
+		</item>
+
+	</item>						
 	<item name='view'>
 		<item name='by student'>
 			<link>foobar.php</link>
