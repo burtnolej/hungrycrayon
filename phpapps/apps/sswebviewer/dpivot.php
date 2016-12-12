@@ -45,6 +45,11 @@
 	if(isset($_GET['ztypes'])) {
 		$token =refreshpage();
 		echo "<br><br>";
-		draw($token,$args);
+		
+		$func = function() use ($token,$args) {
+			draw($token,$args);
+		};
+		
+		gethtmldiv("select filters",$func,"table","divlabel");	
 	}
 ?>

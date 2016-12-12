@@ -7,13 +7,23 @@
 
 div.contain {
 	margin:.25em .25em .25em .25em;
-	width:320px;
+	width:220px;
 	background-color: #FEFAFA;
 	display:block;
 	/*overflow:auto;*/
 	float:left;
 }
 
+div.blank {
+	margin:0px;
+	width:100px;
+	float:left;
+}
+
+div.tmp {
+	margin-top: 150px;
+	position:absolute;
+}
 
 #content {
 	float:left;

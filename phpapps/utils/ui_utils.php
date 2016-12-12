@@ -97,20 +97,99 @@ function getchtmlselect($column,$values,$widgetcount,$default,$comment=NULL) {
 		
 	echo "</select>";
 	echo "</span>";
+	
+	/*if ($comment <> NULL) {
+		echo "<p class=\"comment\">".$comment."</p>";
+	}*/
+	
+	if ($comment <> NULL) {
+		echo "<span class=\"comment\"><p>".$comment."</p></span>";
+	}	
+}
+
+// Custom HTML Select - NO LABEL or COMMENT
+function getchtmlselect_nolabel($column,$values,$widgetcount,$default,$comment) {
+
+	echo "<span class=\"select\">";		
+	echo "<select class=\"custom\" id=\"".$column."\" name=\"".$column."\">"; 
+	
+	foreach ($values as $value) {
+			echo "<option value=\"".$value."\"";
+			if ($value == $default) {
+				echo "selected";
+			}	
+			echo ">".$value."</option>";
+		}
+		
+	echo "</select>";
+	echo "</span><br>";
+}
+
+// Custom HTML DB Select
+function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$divlabel="",$comment=NULL){
+			
+	if ($divlabel<>NULL) {
+		echo "<div class=\"contain\">";
+		echo "<p class=\"divlabel\">".$divlabel."</p>";
+	}
+	
+	$values = getcolumndistinctvalues($dbname,$tablename,$column);
+
+	array_splice($values,0,0,"NotSelected");
+	array_splice($values,1,0,"all");
+	
+	getchtmlselect($name,$values,$widgetcount,$default,$comment);
+	
+	if ($divlabel<>NULL) {
+		echo "</div>";
+	}
+}
+
+// Custom HTML input
+function getchtmlinput($label,$field,$default,$comment=NULL) {
+
+	echo "<p class=\"label\">".$label."</p>";
+	echo "<input class = \"custom\" type=\"text\" id=\"".$field."\" value=\"".$default."\" />";
+
 	if ($comment <> NULL) {
 		echo "<p class=\"comment\">".$comment."</p>";
 	}
 }
 
-// Custom HTML input
-function getchtmlinput($column,$default,$comment=NULL) {
-
-	echo "<p class=\"label\">".$column."</p>";
-	echo "<input class = \"custom\" type=\"text\" name=\"".$column."\" value=\"".$default."\" />";
-
-	if ($comment <> NULL) {
-		echo "<p class=\"comment\">".$comment."</p>";
+// Custom HTML XML input
+function getxmlhtmlinput($xml,$defaults,$divlabel,$starttag=NULL) {
+	
+	$utilsxml = simplexml_load_string($xml,'utils_xml');
+	
+	if ($starttag <> NULL) {		
+		$tmproot = $utilsxml->xpath("//".$starttag);
+		$_dropdowns = $tmproot[0]->xpath("./input");
 	}
+	else {
+		$_dropdowns = $utilsxml->xpath("//input");
+	}
+	
+	$widgetcount = 0;
+	
+	echo "<div class=\"contain\">";
+	echo "<p class=\"divlabel\">".$divlabel."</p>";
+		
+	foreach ($_dropdowns as $_dropdown) {
+
+		$field = (string)$_dropdown->field;
+		$label = (string)$_dropdown->label;
+		$default = NULL;
+
+		if (array_key_exists($field,$defaults)) {
+			$default = $defaults[$field];
+		}
+		elseif (isset($_dropdown->default)){
+			$default = (string)$_dropdown->default;			
+		}
+
+		getchtmlinput($label,$field,$default,(string)$_dropdown->comment);
+	}
+	echo "</div>";
 }
 
 // HTML DB Dropdown
@@ -147,26 +226,6 @@ function gethtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,
 	}
 	else{
 		gethtmlselect($name,$values,$widgetcount,$default,$labels,$labelclass,$spanclass,$class);
-	}
-}
-
-// Custom HTML DB Select
-function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$divlabel="",$comment=NULL){
-			
-	if ($divlabel<>NULL) {
-		echo "<div class=\"contain\">";
-		echo "<p class=\"divlabel\">".$divlabel."</p>";
-	}
-	
-	$values = getcolumndistinctvalues($dbname,$tablename,$column);
-
-	array_splice($values,0,0,"NotSelected");
-	array_splice($values,1,0,"all");
-	
-	getchtmlselect($name,$values,$widgetcount,$default,$comment);
-	
-	if ($divlabel<>NULL) {
-		echo "</div>";
 	}
 }
 

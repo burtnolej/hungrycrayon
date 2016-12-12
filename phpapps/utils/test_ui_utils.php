@@ -460,14 +460,14 @@ class test_getchtmlselect extends PHPUnit_Framework_TestCase
 	
 		$this->expected_result = '<p class="label">foobar</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="foobar">foobar</option><option value="barfoo"selected>barfoo</option></select></span><p class="comment">this is a comment</p>';
 				
-		ob_start(); 
+		//ob_start(); 
 		
 		$values = array("foobar","barfoo");
-		getchtmlselect("foobar",$values,1,"barfoo",$comment="this is a comment");
+		getchtmlselect("foobar",$values,1,"barfoo",$comment="blah blah blah blah blah blah blah blah blah blah blah blah blah blah");
 		
-		$result = ob_get_contents();
-		ob_end_clean();		
-		$this->assertEquals($result,$this->expected_result);
+		//$result = ob_get_contents();
+		//ob_end_clean();		
+		//$this->assertEquals($result,$this->expected_result);
 	}
 }
 
@@ -605,7 +605,6 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 	}
 }
 
-
 class test_getchtmldbselect extends PHPUnit_Framework_TestCase
 {
 	public function test_()
@@ -693,7 +692,7 @@ class test_getchtmlxmlmenu extends PHPUnit_Framework_TestCase
 		          </item>
 		         </root>";	 
 		         
-		 $this->expected_result = '<div><ul class = "nav"><li>view<ul><li><a href="foobar.php">by student</a></li><li><a href="barfoo.php">by adult</a></li></ul></ul></div>';
+		 $this->expected_result = '<div id="wrap"><ul class = "nav"><li>view<ul><li><a href="foobar.php">by student</a></li><li><a href="barfoo.php">by adult</a></li></ul></ul></div>';
 		 		         
 		 getchtmlxmlmenu2($xml,"foobar");   
 		 
@@ -736,7 +735,7 @@ class test_getchtmlxmlmenu extends PHPUnit_Framework_TestCase
 		          </item>
 		         </root>";	 
 		         
-		 $this->expected_result = '<div><ul class = "nav"><li>view<ul><li><a href="foobar.php">by student</a></li><li><a href="barfoo.php">by adult</a><ul><li></li><li><a href="barfoo.php">ana</a></li><li><a href="barfoo.php">patrick</a></li><li><a href="barfoo.php">diana</a><ul><li></li><li><a href="barfoo.php">option1</a></li><li><a href="barfoo.php">option2</a></li></ul></ul></ul></ul></div>';
+		$this->expected_result = '<div id="wrap"><ul class = "nav"><li>view<ul><li><a href="foobar.php">by student</a></li><li><a href="barfoo.php">by adult</a><ul><li></li><li><a href="barfoo.php">ana</a></li><li><a href="barfoo.php">patrick</a></li><li><a href="barfoo.php">diana</a><ul><li></li><li><a href="barfoo.php">option1</a></li><li><a href="barfoo.php">option2</a></li></ul></ul></ul></ul></div>';
 		 		 		         
 		 getchtmlxmlmenu2($xml,"foobar");   
 		 
@@ -745,7 +744,6 @@ class test_getchtmlxmlmenu extends PHPUnit_Framework_TestCase
 		$this->assertEquals($result,$this->expected_result);     
 	}
 }
-
 
 class test_getchtmlinput extends PHPUnit_Framework_TestCase
 {
@@ -758,7 +756,7 @@ class test_getchtmlinput extends PHPUnit_Framework_TestCase
 	    
 	   ob_start();
 	   		         
-		$this->expected_result = '<p class="label">doofar</p><input class = "custom" type="text" name="foobar" value="barfoo" /><p class="comment">a comment</p>';
+		$this->expected_result = '<p class="label">doofar</p><input class = "custom" type="text" id="foobar" value="barfoo" /><p class="comment">a comment</p>';
 				 		 		         
 		getchtmlinput("doofar","foobar","barfoo","a comment");   
 		 
@@ -795,8 +793,7 @@ class test_getxmlchtmlinput extends PHPUnit_Framework_TestCase
 			
 			$defaults = array("xaxis" => "adult", "yaxis" => "dow");
 			
-			$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">period</p><input class = "custom" type="text" name="xaxis" value="adult" /><p class="comment">blah blah blah</p><p class="label">dow</p><input class = "custom" type="text" name="yaxis" value="dow" /><p class="comment">blah blah blah</p></div>';
-											
+			$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">period</p><input class = "custom" type="text" id="xaxis" value="adult" /><p class="comment">blah blah blah</p><p class="label">dow</p><input class = "custom" type="text" id="yaxis" value="dow" /><p class="comment">blah blah blah</p></div>';
 			ob_start(); 
 	
 			getxmlhtmlinput($xml,$defaults,'this is a div label',"foobar");
@@ -847,11 +844,11 @@ $test->test_();
 $test->test_checked(); */
 
 
-/*$test = new test_getchtmlselect();
+$test = new test_getchtmlselect();
 $test->test_();
 
 
-$test = new test_getxmlchtmlselect();
+/*$test = new test_getxmlchtmlselect();
 $test->test_();
 $test->test_starttag();
 $test->test_starttag2();
@@ -864,15 +861,15 @@ $test = new test_getchtmlswitch();
 $test->test_();
 $test->test_checked();*/
 
-/*$test = new test_getchtmlxmlmenu();
+/*
+$test = new test_getchtmlxmlmenu();
 $test->test_();
-$test->test_multilevel();*/
+$test->test_multilevel();
 
-
-/*$test = new test_getchtmlinput();
-$test->test_();*/
+$test = new test_getchtmlinput();
+$test->test_();
 
 $test = new test_getxmlchtmlinput();
-$test->test_();
+$test->test_();*/
 
 ?>

@@ -52,10 +52,12 @@ td:hover {
   border-collapse: separate;
   border-spacing: 0px 1px;
   white-space: nowrap;
+  
 }
 
 .cell {
   text-align: center;
+  
  
 }
 

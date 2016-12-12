@@ -8,7 +8,7 @@
 				<value>adult</value>
 				<value>subject</value>
 			</values>
-			<comment>blah blah blah blah blah</comment>
+			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
 			<default>period</default>
 		</select>
 		<select id='2'>
@@ -19,7 +19,7 @@
 				<value>adult</value>
 				<value>subject</value>
 			</values>
-			<comment>blah blah blah blah blah</comment>
+			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
 			<default>dow</default>
 		</select>
 		<select id='3'>
@@ -29,7 +29,7 @@
 				<value>adult</value>
 				<value>subject</value>
 			</values>
-			<comment>blah blah blah blah blah</comment>
+			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
 			<default>student</default>
 		</select>
 		<select id='4'>
@@ -43,7 +43,7 @@
 				<value>6s</value>
 				<value>56n,4n,4s,5s,6s</value>
 			</values>
-			<comment>blah blah blah blah blah</comment>
+			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
 			<default>dbinsert</default>
 		</select>
 	</dpivot>

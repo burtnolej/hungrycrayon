@@ -162,7 +162,7 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 
 				foreach ($_subrows as $_subrow) {	
 
-					echo "<tr><td class=\"thincol borderoff\">";
+					echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#E0E0E0\"";
 
 					$content="";	
 					$_subcells = $_subrow->xpath("child::subcell"); // see if any subcells exist
@@ -171,19 +171,22 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 						
 						for ($i=0;$i<sizeof($_subcells);$i++) {
 							$url = getlinkurl($_subcells[$i],$args);
-							$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
+							
 							if ($_subcells[$i]->valuetype == 'adult') {
-								$content = $content." with ".$link;
+								$link = '<a href="'.$url.'">'."<font color=\"red\">".$_subcells[$i]->value."</font>".'</a>';
+								$content =$content." with ".$link;
 							}
 							elseif ($_subcells[$i]->valuetype == 'student') {
+								$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
 								$content = $content." [".$link."] ";
 							}
 							else {
+								$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
 								$content = $content.$link;
 							}
 							
 						}
-						echo $content;
+						echo ">".$content;
 					}
 					echo "</td></tr>";					
 				}
@@ -199,13 +202,50 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 	}
 	echo "</table> ";
 }
-
+	
 function drawmultirecordform($utilsxml,$args=NULL,$formats=NULL) {
+	
+	echo "<div class=\"tmp\";><br>";
+	
 	$_records = $utilsxml->xpath("//record"); // get all the records
-
+	
 	foreach ($_records as $_record) {
-		drawform($_record);
-	}	
+		
+			$func = function() use ($_record) {
+				
+					global $SSDB;
+					
+				 	$_items = $_record->xpath("./item"); // get a list of all rows
+				 
+				 	$widgetcount=0;
+					foreach ($_items as $_item) {
+					
+						if ($_item->valuetype == 'adult') {
+		    				$valuetype='teacher';
+		    			}
+		    			elseif ($_item->valuetype == 'id') {
+			 				$valuetype='__id';
+			 			}
+		    			elseif ($_item->valuetype == 'objtype') {
+			 				continue;
+			 			}
+		      			else {
+		      	  			$valuetype=$_item->valuetype;
+						}
+		
+						$values = getcolumndistinctvalues($SSDB,'lesson',$valuetype);
+		
+						array_splice($values,0,0,"NotSelected");
+						array_splice($values,1,0,"all");
+						
+						getchtmlselect_nolabel($valuetype,$values,$widgetcount,$_item->value,$comment);
+					}	
+			};
+			
+			gethtmldiv("",$func,"blank",NULL);		
+	}
+	
+	echo "</div>";
 }
 
 function drawform($utilsxml,$args=NULL,$formats=NULL) {
@@ -237,7 +277,7 @@ function drawform($utilsxml,$args=NULL,$formats=NULL) {
 		   }
 	};
 
-	gethtmldiv("select filters",$func,"contain","divlabel");		
+	gethtmldiv("select something",$func,"contain",NULL);		
 }
 
 function draw($xmlstr,$args=NULL) {
