@@ -622,6 +622,26 @@ def gridreduce(grid,blanks,headeroffset=1):
     for row in grid:
 	for colidx in notblankcols:
 	    row.pop(colidx)
+	    
+def gridrollup():
+    ''' if a cell has multi subrows like below
+    
+    [(u'Movement', u'Dylan', u'Peter'), 
+    (u'Movement', u'Dylan', u'Clayton'), 
+    (u'Movement', u'Dylan', u'Booker'), 
+    (u'Movement', u'Dylan', u'Bruno'), 
+    (u'Student News', u'Dylan', u'Bruno'), 
+    (u'Movement', u'Dylan', u'Nathaniel'), 
+    (u'Movement', u'Dylan', u'Tristan'), 
+    (u'Movement', u'Dylan', u'Ashley'), 
+    (u'Movement', u'Dylan', u'Thomas')]
+    
+    based on the rollup keys (adult,subject) we would get
+    [(u'Movement', u'Dylan', u'Peter,Clayton, Booker, Bruno,Nathaniel,Tristan,Ashley,Thomas'), 
+    (u'Student News', u'Dylan', u'Bruno')]
+    
+    '''
+    
     
 def getdatabase():
 

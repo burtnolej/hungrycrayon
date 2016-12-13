@@ -172,6 +172,7 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 						for ($i=0;$i<sizeof($_subcells);$i++) {
 							$url = getlinkurl($_subcells[$i],$args);
 							
+							$output = array();
 							if ($_subcells[$i]->valuetype == 'adult') {
 								$link = '<a href="'.$url.'">'."<font color=\"red\">".$_subcells[$i]->value."</font>".'</a>';
 								$content =$content." with ".$link;
@@ -180,10 +181,15 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 								$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
 								$content = $content." [".$link."] ";
 							}
+							elseif ($_subcells[$i]->valuetype == 'subject') {
+								$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
+								$content = $content.$link;
+							}
 							else {
 								$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
 								$content = $content.$link;
 							}
+
 							
 						}
 						echo ">".$content;

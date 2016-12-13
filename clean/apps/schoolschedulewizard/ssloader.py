@@ -203,7 +203,8 @@ class SSLoader(object):
 		elif  recordtype == 'wp.student.nosubject.teacher':
 		    # WP: Shane, Asher (Amelia)
 		    #subject = "??"
-		    teacher,_rest = self.extract_teacher(record.split(":")[1])
+		    location,_rest = self.extract_location(record)
+		    teacher,_rest = self.extract_teacher(_rest.split(":")[1])
 		    students = self.extract_students(_rest)
 		    dow = _setdow()
 		    subject = _setsubject()
@@ -236,8 +237,9 @@ class SSLoader(object):
 		    _addrecord(locals())
 		elif recordtype == 'wp.student.subject.teacher':
 		    # Math WP: Jack (Stan)
-		    subject = record.split(" ")[0]
-		    teacher,_rest = self.extract_teacher(record.split(":")[1])
+		    location,_rest = self.extract_location(record)
+		    subject = _rest.split(" ")[0]
+		    teacher,_rest = self.extract_teacher(_rest.split(":")[1])
 		    students = self.extract_students(_rest)
 		    subject = _setsubject()
 		    dow = _setdow()	
@@ -333,7 +335,8 @@ class SSLoader(object):
 		    
 		elif recordtype == 'subject.student.subject.teacher':
 		    # ELA: Nathaniel (Amelia)"
-		    subject,_rest = self.extract_subject(record)
+		    location,_rest = self.extract_location(record)
+		    subject,_rest = self.extract_subject(_rest)
 		    teacher,_rest = self.extract_teacher(_rest)
 		    students = self.extract_students(_rest)
 		    dow = _setdow()
@@ -376,7 +379,8 @@ class SSLoader(object):
 		    
 		elif recordtype == 'ap.student.subject.teacher':
 		    # Activity Period: Nathaniel (Amelia)"
-		    subject,_rest = self.extract_subject(record)
+		    location,_rest = self.extract_location(record)
+		    subject,_rest = self.extract_subject(_rest)
 		    teacher,_rest = self.extract_teacher(_rest)
 		    students = self.extract_students(_rest)
 		    dow = _setdow()
@@ -586,6 +590,10 @@ class SSLoader(object):
 		    record += " "
 		    lastchar = " "
 		    continue
+		
+		elif fileasstring[i+1:i+5] == "with":
+		    lastchar = " "
+		    continue
 		elif fileasstring[i-5:i] == "with ":
 		    continue
 		elif fileasstring[i-1:i] == ":":
@@ -709,6 +717,14 @@ class SSLoader(object):
         # works with teacher or no teacher on record
         subject,_rest = record.split(":")
         return(subject,_rest)
+    
+    def extract_location(self,record):
+    
+        try:
+	    _rest,location = record.split("[")
+	    return(location[:-1],_rest)
+	except:
+	    return("",record)
     
     def extract_staff(self,record):
         if record[-2:] <> "++" and record[-2:] <> "--" and record[-2:] <> "**":
@@ -1174,7 +1190,7 @@ if __name__ == "__main__":
     
     APPROOT = os.environ["APPROOT"]
     
-    if os.getcwd() == os.path.join(APPROOT,DEVDIR):
+    '''if os.getcwd() == os.path.join(APPROOT,DEVDIR):
 	env = "DEV"
 	databasename = "test_ssloader"
 	
@@ -1182,35 +1198,39 @@ if __name__ == "__main__":
 	         ('academic.csv',-1,True),('prep56new.csv',-1,True)]
 	#files = [('prep56new_Amelia.csv',5,True)]	
 	
-    elif os.getcwd() == os.path.join(APPROOT,PRODDIR):
-	env = "PROD"
-	databasename = "quad"
-	shutil.copyfile(databasename+".sqlite.backup",databasename+".sqlite")
+    elif os.getcwd() == os.path.join(APPROOT,PRODDIR):'''
+    
+    env = "PROD"
+    databasename = "quad"
+    shutil.copyfile(databasename+".sqlite.backup",databasename+".sqlite")
 
-	'''files = [("prep4student.csv",4,True),
-	         ("prep5student.csv",5,True),
-	         ("prep6student.csv",6,True),
-	         ("prep4data.csv",4,True),
-	         ("prep5data.csv",5,True),
-	         ("prep6data.csv",6,True),
-	         ("staff.csv",-1,True),
-	         ("academic.csv",-1,True),
-	         ('prep56new.csv',-1,True)]'''
-	
-	files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep6IndividualSchedules_new.csv",6,True,"6s"),
-	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4IndividualSchedules_new.csv",4,True,"4s"),
-	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5IndividualSchedules_new.csv",5,True,"5s"),
-	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5and6schedulenewworkperiod.csv",-1,True,"56n"),
-	         ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4schedulenewworkperiod.csv",5,True,"4n")]
-	
-	#files = [("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",-1,True),
-	#          ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep4schedulenewworkperiod.csv",-1,True)]
-	
-	#files = [("/mnt/bumblebee-burtnolej/googledrive/current/CopyofPrep5IndividualSchedules_new.csv",6,True)]
+    '''files = [("prep4student.csv",4,True),
+	     ("prep5student.csv",5,True),
+	     ("prep6student.csv",6,True),
+	     ("prep4data.csv",4,True),
+	     ("prep5data.csv",5,True),
+	     ("prep6data.csv",6,True),
+	     ("staff.csv",-1,True),
+	     ("academic.csv",-1,True),
+	     ('prep56new.csv',-1,True)]'''
+    
+    '''files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep6IndividualSchedules_new.csv",6,True,"6s"),
+             ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4IndividualSchedules_new.csv",4,True,"4s"),
+             ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5IndividualSchedules_new.csv",5,True,"5s"),
+             ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5and6schedulenewworkperiod.csv",-1,True,"56n"),
+             ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4schedulenewworkperiod.csv",5,True,"4n")]'''
+    
+    files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep5and6schedulenewworkperiod.csv",-1,True,"56n")]
+    
+    
+    #files = [("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",-1,True),
+    #          ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep4schedulenewworkperiod.csv",-1,True)]
+    
+    #files = [("/mnt/bumblebee-burtnolej/googledrive/current/CopyofPrep5IndividualSchedules_new.csv",6,True)]
 	                                          
 	
-    else:
-	raise Exception("do not know how to run in this working dir",dir=os.getcwd())
+    '''else:
+	raise Exception("do not know how to run in this working dir",dir=os.getcwd())'''
     
     print "".join(["env=",env,"db=",databasename])
     

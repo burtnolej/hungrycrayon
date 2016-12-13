@@ -47,6 +47,8 @@ class Student:
                                               constraints=constraints,
                                               formatson=True)
         
+        print values;
+        
         grid = ssviewer_utils.dataset_serialize(values,formatson=formatson,
                                                 schema = dict(xaxis=data.xaxis,
                                                               yaxis=data.yaxis,
@@ -90,7 +92,6 @@ class Subject:
                                               ztypes, source_type,source_value,
                                               constraints=constraints,
                                               formatson=True)
-        
         
         
         

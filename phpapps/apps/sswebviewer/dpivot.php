@@ -13,7 +13,10 @@
 	$source_type = flip_source_type();
 	getchtmldbselect($SSDB,'lesson',$source_type,"source_value",1,$_GET['source_value'],'this is a div label','this is a comment');
 	
-	$func = function() { getchtmlswitch("formats","formats",explode(",",$_GET['ztypes'])); };
+	$func = function() { 
+		getchtmlswitch("formats","formats",explode(",",$_GET['ztypes'])); 
+		getchtmlswitch("rollup","rollup",explode(",",$_GET['ztypes'])); 
+	};
 	gethtmldiv("select foo datatypes",$func,"contain","divlabel");
 	
 	$func = function() {

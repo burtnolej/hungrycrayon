@@ -71,7 +71,29 @@ class Test_String2Records(Test_Base):
         
         self.assertListEqual(records,['foobar with blahblah'])
         
+    def test_concat_space(self):
+        
+        records = self.ssloader.string2records("foobar &with blahblah")
+        
+        self.assertListEqual(records,['foobar with blahblah'])
+        
+        
+class Test_String2Records_Prep6SPlitline(Test_Base):
     
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+        fileasstring = self.ssloader.file2string("test_prep6splitline.csv")
+        
+        self.records = self.ssloader.string2records(fileasstring)
+        
+        self.expected_results = ['Omer**', '^', 'Monday', '^', 'Tuesday', '^', 'Wednesday', '^', 'Thursday', '^', 'Friday', '8:30- 9:10', '^', 'Engineering with Paraic', '^', 'ELA with Aaron', '^', 'Engineering with Paraic', '^', 'ELA with Aaron', '^', 'STEM']
+        
+
+    def test_(self):
+        
+        self.assertListEqual(self.expected_results,self.records) 
+        
 class Test_String2Records_Prep41Period(Test_Base):
     
     def setUp(self):
@@ -2816,10 +2838,10 @@ if __name__ == "__main__":
     
     
     # loadrefobjects
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
     
     # loadsynonyms
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadSynonyms))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadSynonyms))'''
     
     # string2records
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records))
@@ -2828,7 +2850,7 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records_Prep4ComputerTime))
         
     # identify_record
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample2))
     
@@ -2921,7 +2943,11 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_1Student_1Period))  
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))'''
+
+
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records_Prep6SPlitline))
+
 
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
