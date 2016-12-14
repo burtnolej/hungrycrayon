@@ -81,9 +81,23 @@ function gethtmlselect($column,$values,$widgetcount,$default, $label=NULL,$label
 }
 		
 // Custom HTML Select
-function getchtmlselect($column,$values,$widgetcount,$default,$comment=NULL) {
-
-	echo "<p class=\"label\">".$column."</p>";
+function getchtmlselect($column,$values,$widgetcount,$default,$args) {
+	
+	if (isset($args['comment'])) {
+		$comment=$args['comment'];
+	}
+	else {
+		$comment=NULL;
+	}
+	
+	if (isset($args['label'])) {
+		$label=$args['label'];
+	}
+	else {
+		$label=$column;
+	}	
+	
+	echo "<p class=\"label\">".$label."</p>";
 	echo "<span class=\"select\">";		
 	echo "<select class=\"custom\" id=\"".$column."\" name=\"".$column."\">"; 
 	
@@ -126,8 +140,29 @@ function getchtmlselect_nolabel($column,$values,$widgetcount,$default,$comment) 
 }
 
 // Custom HTML DB Select
-function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$divlabel="",$comment=NULL){
-			
+function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$args){
+	
+	if (isset($args['comment'])) {
+		$comment=$args['comment'];
+	}
+	else {
+		$comment=NULL;
+	}
+	
+	if (isset($args['label'])) {
+		$label=$args['label'];
+	}
+	else {
+		$label=$column;
+	}	
+	
+	if (isset($args['divlabel'])) {
+		$divlabel=$args['divlabel'];
+	}
+	else {
+		$divlabel=NULL;
+	}	
+	
 	if ($divlabel<>NULL) {
 		echo "<div class=\"contain\">";
 		echo "<p class=\"divlabel\">".$divlabel."</p>";
@@ -138,7 +173,7 @@ function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default
 	array_splice($values,0,0,"NotSelected");
 	array_splice($values,1,0,"all");
 	
-	getchtmlselect($name,$values,$widgetcount,$default,$comment);
+	getchtmlselect($name,$values,$widgetcount,$default,$args);
 	
 	if ($divlabel<>NULL) {
 		echo "</div>";
@@ -252,6 +287,15 @@ function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 				
 		$values = $_dropdown->values->xpath("child::value");
 		$field = (string)$_dropdown->field;
+		
+		$args = array();
+		
+		if (isset($_dropdown->label)) {
+			$args['label'] = (string)$_dropdown->label;
+		}
+		if (isset($_dropdown->comment)) {
+			$args['comment'] = (string)$_dropdown->comment;
+		}		
 		$default = NULL;
 
 		if (array_key_exists($field,$defaults)) {
@@ -261,8 +305,8 @@ function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 			$default = (string)$_dropdown->default;			
 		}
 
-		getchtmlselect($field,$values,$widgetcount,$default,(string)$_dropdown->comment);
-		
+		getchtmlselect($field,$values,$widgetcount,$default,$args);
+				
 		$widgetcount = $widgetcount+1;
 	}
 	echo "</div>";
@@ -409,22 +453,40 @@ function gethtmlswitch($name,$value,$checked=NULL) {
 }
 
 // Custom HTML switch/slider
-function getchtmlswitch($name,$value,$checked=NULL) {
+function getchtmlswitch($name,$value,$args) {
 
+		if (isset($args['checked'])) {
+			if (in_array($value,$args['checked'])) {
+				$checked=TRUE;
+			}
+			else {
+				$checked=FALSE;
+			}
+		}
+		
+		if (isset($args['comment'])) {
+			$comment=$args['comment'];
+		}
+		else {
+			$comment=NULL;
+		}	
+	
 		echo "<p class=\"label switch\">".$name."</p>";
 		echo "<label class=\"switch\">";
 		
 		echo "<input id=\"".$value."\" type=\"checkbox\" name=\"".$name."\"";
 
-		if (isset($checked)) {
-			if (in_array($value,$checked)) {
-				echo "checked";
-			}
+		if ($checked == TRUE) {
+			echo "checked";
 		}
 		
 		echo ">";
-		echo "<p class=\"slider\"></p>";
+		echo "<div class=\"slider\"></div>";
 		echo "</label>";
+
+		if ($comment <> NULL) {
+			echo "<span class=\"comment\"><p>".$comment."</p></span>";
+	}	
 }
 
 function _menu_iter($func,$root,$depth){

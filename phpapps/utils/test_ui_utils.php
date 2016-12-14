@@ -175,8 +175,7 @@ class test_gethtmlmultiselect extends PHPUnit_Framework_TestCase
 
 		ob_start(); 
 		
-		$this->expected_result = '<table><tr><td><input id="adult" type="checkbox" name="ingredients[]" value="adult"/><label for="adult" >adult</label><br></td></tr><tr><td><input id="student" type="checkbox" name="ingredients[]" value="student"/><label for="student" >student</label><br></td></tr><tr><td><input id="period" type="checkbox" name="ingredients[]" value="period"/><label for="period" >period</label><br></td></tr><tr><td><input id="dow" type="checkbox" name="ingredients[]" value="dow"/><label for="dow" >dow</label><br></td></tr><tr><td><input id="lessontype" type="checkbox" name="ingredients[]" value="lessontype"/><label for="lessontype" >lessontype</label><br></td></tr><tr><td><input id="subject" type="checkbox" name="ingredients[]" value="subject"/><label for="subject" >subject</label><br></td></tr><tr><td><input id="synonyms" type="checkbox" name="ingredients[]" value="synonyms"/><label for="synonyms" >synonyms</label><br></td></tr><tr><td><input id="recordtype" type="checkbox" name="ingredients[]" value="recordtype"/><label for="recordtype" >recordtype</label><br></td></tr><tr><td><input id="session" type="checkbox" name="ingredients[]" value="session"/><label for="session" >session</label><br></td></tr><tr><td><input id="lesson" type="checkbox" name="ingredients[]" value="lesson"/><label for="lesson" >lesson</label><br></td></tr></table>';
-														
+		$this->expected_result = '<table><tr><td><input id="adult" type="checkbox" name="ingredients[]" value="adult"/><label for="adult" >adult</label></td></tr><tr><td><input id="student" type="checkbox" name="ingredients[]" value="student"/><label for="student" >student</label></td></tr><tr><td><input id="period" type="checkbox" name="ingredients[]" value="period"/><label for="period" >period</label></td></tr><tr><td><input id="dow" type="checkbox" name="ingredients[]" value="dow"/><label for="dow" >dow</label></td></tr><tr><td><input id="lessontype" type="checkbox" name="ingredients[]" value="lessontype"/><label for="lessontype" >lessontype</label></td></tr><tr><td><input id="subject" type="checkbox" name="ingredients[]" value="subject"/><label for="subject" >subject</label></td></tr><tr><td><input id="synonyms" type="checkbox" name="ingredients[]" value="synonyms"/><label for="synonyms" >synonyms</label></td></tr><tr><td><input id="recordtype" type="checkbox" name="ingredients[]" value="recordtype"/><label for="recordtype" >recordtype</label></td></tr><tr><td><input id="session" type="checkbox" name="ingredients[]" value="session"/><label for="session" >session</label></td></tr><tr><td><input id="lesson" type="checkbox" name="ingredients[]" value="lesson"/><label for="lesson" >lesson</label></td></tr></table>';				
 		getdbhtmlmultiselect($dbname,$query,$name);
 					
 		$result = ob_get_contents();
@@ -193,8 +192,8 @@ class test_gethtmlmultiselect extends PHPUnit_Framework_TestCase
 
 		ob_start(); 
 		
-		$this->expected_result = '<table><tr><td><input id="adult" type="checkbox" name="ingredients[]" value="adult"/><label for="adult" >adult</label><br></td><td><input id="student" type="checkbox" name="ingredients[]" value="student"/><label for="student" >student</label><br></td><td><input id="period" type="checkbox" name="ingredients[]" value="period"/><label for="period" >period</label><br></td></tr><tr><td><input id="dow" type="checkbox" name="ingredients[]" value="dow"/><label for="dow" >dow</label><br></td><td><input id="lessontype" type="checkbox" name="ingredients[]" value="lessontype"/><label for="lessontype" >lessontype</label><br></td><td><input id="subject" type="checkbox" name="ingredients[]" value="subject"/><label for="subject" >subject</label><br></td></tr><tr><td><input id="synonyms" type="checkbox" name="ingredients[]" value="synonyms"/><label for="synonyms" >synonyms</label><br></td><td><input id="recordtype" type="checkbox" name="ingredients[]" value="recordtype"/><label for="recordtype" >recordtype</label><br></td><td><input id="session" type="checkbox" name="ingredients[]" value="session"/><label for="session" >session</label><br></td></tr><tr><td><input id="lesson" type="checkbox" name="ingredients[]" value="lesson"/><label for="lesson" >lesson</label><br></td></tr></table>';
-														
+		$this->expected_result = '<table><tr><td><input id="adult" type="checkbox" name="ingredients[]" value="adult"/><label for="adult" >adult</label></td><td><input id="student" type="checkbox" name="ingredients[]" value="student"/><label for="student" >student</label></td><td><input id="period" type="checkbox" name="ingredients[]" value="period"/><label for="period" >period</label></td></tr><tr><td><input id="dow" type="checkbox" name="ingredients[]" value="dow"/><label for="dow" >dow</label></td><td><input id="lessontype" type="checkbox" name="ingredients[]" value="lessontype"/><label for="lessontype" >lessontype</label></td><td><input id="subject" type="checkbox" name="ingredients[]" value="subject"/><label for="subject" >subject</label></td></tr><tr><td><input id="synonyms" type="checkbox" name="ingredients[]" value="synonyms"/><label for="synonyms" >synonyms</label></td><td><input id="recordtype" type="checkbox" name="ingredients[]" value="recordtype"/><label for="recordtype" >recordtype</label></td><td><input id="session" type="checkbox" name="ingredients[]" value="session"/><label for="session" >session</label></td></tr><tr><td><input id="lesson" type="checkbox" name="ingredients[]" value="lesson"/><label for="lesson" >lesson</label></td></tr></table>';
+																
 		getdbhtmlmultiselect($dbname,$query,$name,2);
 					
 		$result = ob_get_contents();
@@ -212,8 +211,8 @@ class test_gethtmlmultiselect extends PHPUnit_Framework_TestCase
 		$checked = array('adult','student','period');
 		ob_start();
 		
-		$this->expected_result = '<table><tr><td><input id="adult" type="checkbox" name="ingredients[]" value="adult"checked/><label for="adult" >adult</label><br></td></tr><tr><td><input id="student" type="checkbox" name="ingredients[]" value="student"checked/><label for="student" >student</label><br></td></tr><tr><td><input id="period" type="checkbox" name="ingredients[]" value="period"checked/><label for="period" >period</label><br></td></tr><tr><td><input id="dow" type="checkbox" name="ingredients[]" value="dow"/><label for="dow" >dow</label><br></td></tr><tr><td><input id="lessontype" type="checkbox" name="ingredients[]" value="lessontype"/><label for="lessontype" >lessontype</label><br></td></tr><tr><td><input id="subject" type="checkbox" name="ingredients[]" value="subject"/><label for="subject" >subject</label><br></td></tr><tr><td><input id="synonyms" type="checkbox" name="ingredients[]" value="synonyms"/><label for="synonyms" >synonyms</label><br></td></tr><tr><td><input id="recordtype" type="checkbox" name="ingredients[]" value="recordtype"/><label for="recordtype" >recordtype</label><br></td></tr><tr><td><input id="session" type="checkbox" name="ingredients[]" value="session"/><label for="session" >session</label><br></td></tr><tr><td><input id="lesson" type="checkbox" name="ingredients[]" value="lesson"/><label for="lesson" >lesson</label><br></td></tr></table>';
-																
+		$this->expected_result = '<table><tr><td><input id="adult" type="checkbox" name="ingredients[]" value="adult"checked/><label for="adult" >adult</label></td></tr><tr><td><input id="student" type="checkbox" name="ingredients[]" value="student"checked/><label for="student" >student</label></td></tr><tr><td><input id="period" type="checkbox" name="ingredients[]" value="period"checked/><label for="period" >period</label></td></tr><tr><td><input id="dow" type="checkbox" name="ingredients[]" value="dow"/><label for="dow" >dow</label></td></tr><tr><td><input id="lessontype" type="checkbox" name="ingredients[]" value="lessontype"/><label for="lessontype" >lessontype</label></td></tr><tr><td><input id="subject" type="checkbox" name="ingredients[]" value="subject"/><label for="subject" >subject</label></td></tr><tr><td><input id="synonyms" type="checkbox" name="ingredients[]" value="synonyms"/><label for="synonyms" >synonyms</label></td></tr><tr><td><input id="recordtype" type="checkbox" name="ingredients[]" value="recordtype"/><label for="recordtype" >recordtype</label></td></tr><tr><td><input id="session" type="checkbox" name="ingredients[]" value="session"/><label for="session" >session</label></td></tr><tr><td><input id="lesson" type="checkbox" name="ingredients[]" value="lesson"/><label for="lesson" >lesson</label></td></tr></table>';
+																		
 		getdbhtmlmultiselect($dbname,$query,$name,0,$checked);
 				
 		$result = ob_get_contents();
@@ -231,8 +230,8 @@ class test_gethtmlmultiselect extends PHPUnit_Framework_TestCase
 		$checked = array('adult','student','period');
 		ob_start();
 		
-		$this->expected_result = '<table><tr><td><input id="adult" type="checkbox" name="ingredients[]" value="adult"checked/><label for="adult" >adult</label><br></td><td><input id="student" type="checkbox" name="ingredients[]" value="student"checked/><label for="student" >student</label><br></td><td><input id="period" type="checkbox" name="ingredients[]" value="period"checked/><label for="period" >period</label><br></td><td><input id="dow" type="checkbox" name="ingredients[]" value="dow"/><label for="dow" >dow</label><br></td><td><input id="lessontype" type="checkbox" name="ingredients[]" value="lessontype"/><label for="lessontype" >lessontype</label><br></td><td><input id="subject" type="checkbox" name="ingredients[]" value="subject"/><label for="subject" >subject</label><br></td></tr><tr><td><input id="synonyms" type="checkbox" name="ingredients[]" value="synonyms"/><label for="synonyms" >synonyms</label><br></td><td><input id="recordtype" type="checkbox" name="ingredients[]" value="recordtype"/><label for="recordtype" >recordtype</label><br></td><td><input id="session" type="checkbox" name="ingredients[]" value="session"/><label for="session" >session</label><br></td><td><input id="lesson" type="checkbox" name="ingredients[]" value="lesson"/><label for="lesson" >lesson</label><br></td></tr></table>';
-																		
+		$this->expected_result = '<table><tr><td><input id="adult" type="checkbox" name="ingredients[]" value="adult"checked/><label for="adult" >adult</label></td><td><input id="student" type="checkbox" name="ingredients[]" value="student"checked/><label for="student" >student</label></td><td><input id="period" type="checkbox" name="ingredients[]" value="period"checked/><label for="period" >period</label></td><td><input id="dow" type="checkbox" name="ingredients[]" value="dow"/><label for="dow" >dow</label></td><td><input id="lessontype" type="checkbox" name="ingredients[]" value="lessontype"/><label for="lessontype" >lessontype</label></td><td><input id="subject" type="checkbox" name="ingredients[]" value="subject"/><label for="subject" >subject</label></td></tr><tr><td><input id="synonyms" type="checkbox" name="ingredients[]" value="synonyms"/><label for="synonyms" >synonyms</label></td><td><input id="recordtype" type="checkbox" name="ingredients[]" value="recordtype"/><label for="recordtype" >recordtype</label></td><td><input id="session" type="checkbox" name="ingredients[]" value="session"/><label for="session" >session</label></td><td><input id="lesson" type="checkbox" name="ingredients[]" value="lesson"/><label for="lesson" >lesson</label></td></tr></table>';
+																				
 		getdbhtmlmultiselect($dbname,$query,$name,5,$checked);
 				
 		$result = ob_get_contents();
@@ -426,15 +425,15 @@ class test_gethtmlswitch extends PHPUnit_Framework_TestCase
 {
 	public function test_()
 	{
-		ob_start(); 
+		//ob_start(); 
 		
 		$this->expected_result = '<link rel="stylesheet" type="text/css" href="switch.css" /><label class="switch"><input id="foobar" type="checkbox" name="foobar"><div class="slider"></div></label>';
 												
 		gethtmlswitch("foobar","foobar");
 					
-		$result = ob_get_contents();
-		ob_end_clean();		
-		$this->assertEquals($result,$this->expected_result);
+		//$result = ob_get_contents();
+		//ob_end_clean();		
+		//$this->assertEquals($result,$this->expected_result);
 	}
 	
 	public function test_checked()
@@ -458,16 +457,34 @@ class test_getchtmlselect extends PHPUnit_Framework_TestCase
 		echo "<html>";
 		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
 	
-		$this->expected_result = '<p class="label">foobar</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="foobar">foobar</option><option value="barfoo"selected>barfoo</option></select></span><p class="comment">this is a comment</p>';
-				
-		//ob_start(); 
+		$this->expected_result = '<p class="label">foobar</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="foobar">foobar</option><option value="barfoo"selected>barfoo</option></select></span><span class="comment"><p>blah blah blah blah blah blah blah blah blah blah blah blah blah blah</p></span>';
+						
+		ob_start(); 
 		
 		$values = array("foobar","barfoo");
-		getchtmlselect("foobar",$values,1,"barfoo",$comment="blah blah blah blah blah blah blah blah blah blah blah blah blah blah");
+		getchtmlselect("foobar",$values,1,"barfoo",array('comment' => 'blah blah blah blah blah blah blah blah blah blah blah blah blah blah'));
 		
-		//$result = ob_get_contents();
-		//ob_end_clean();		
-		//$this->assertEquals($result,$this->expected_result);
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
+	}
+	
+	public function test_label()
+	{
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+	
+		$this->expected_result = '<p class="label">vardy</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="foobar">foobar</option><option value="barfoo"selected>barfoo</option></select></span><span class="comment"><p>blah blah blah blah blah blah blah blah blah blah blah blah blah blah</p></span>';
+								
+		ob_start(); 
+		
+		$values = array("foobar","barfoo");
+		getchtmlselect("foobar",$values,1,"barfoo",array('label' => 'vardy','comment' => 'blah blah blah blah blah blah blah blah blah blah blah blah blah blah'));
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
 	}
 }
 
@@ -506,8 +523,8 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 		
 		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
 		
-		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><p class="comment">foobar foobar foobar</p><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><p class="comment">barfoo barfoo barfoo</p></div>';
-								
+		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span></div>';
+										
 		ob_start(); 
 
 		getxmlhtmlcselect($xml,$defaults,'this is a div label');
@@ -556,7 +573,7 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 		
 		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
 		
-		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><p class="comment">foobar foobar foobar</p><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><p class="comment">barfoo barfoo barfoo</p></div>';
+		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span></div>';
 		ob_start(); 
 
 		getxmlhtmlcselect($xml,$defaults,'this is a div label','foobar');
@@ -603,6 +620,57 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 		ob_end_clean();		
 		$this->assertEquals($result,$this->expected_result);
 	}
+	
+	public function test_label()
+	{
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+	
+		$xml = "<root>
+					<foobar>
+		          <select id='1'>
+		            <field>xaxis</field>
+		            <label>row header</label>
+		            <values>
+		              <value>period</value>
+		          	  <value>dow</value>
+		              <value>adult</value>
+		              <value>subject</value>
+		            </values>
+		            <comment>foobar foobar foobar</comment>
+		            </select>
+		            
+		          <select id='2'>
+		            <field>yaxis</field>
+		            <label>column header</label>
+		            <values>
+		              <value>period</value>
+		              <value>dow</value>
+		              <value>adult</value>
+		              <value>subject</value>
+		            </values>
+		            <comment>barfoo barfoo barfoo</comment>
+		          </select>
+		          </foobar>
+		          <random>
+		          	<random>
+		          	</random>
+		          </random>
+		        </root>";
+		
+		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
+		
+		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">row header</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><p class="label">column header</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span></div>';
+		ob_start(); 
+
+		getxmlhtmlcselect($xml,$defaults,'this is a div label','foobar');
+
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
+	}
 }
 
 class test_getchtmldbselect extends PHPUnit_Framework_TestCase
@@ -622,10 +690,37 @@ class test_getchtmldbselect extends PHPUnit_Framework_TestCase
 		
 		ob_start(); 
 		
-		$this->expected_result = '<div class="contain"><p class="divlabel">another divlabel</p><p class="label">foobar</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="NotSelected">NotSelected</option><option value="all">all</option><option value="Tuesday"selected>Tuesday</option><option value="Thursday">Thursday</option><option value="Wednesday">Wednesday</option><option value="Friday">Friday</option></select></span><p class="comment">another comment</p><div><br>';
-																		
-		getchtmldbselect($dbname,$tablename,$column,$name,1,'Tuesday','another divlabel','another comment');
-					
+		$this->expected_result = '<div class="contain"><p class="divlabel">divlabel</p><p class="label">foobar</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="NotSelected">NotSelected</option><option value="all">all</option><option value="Monday">Monday</option><option value="Tuesday"selected>Tuesday</option><option value="Thursday">Thursday</option><option value="Wednesday">Wednesday</option><option value="Friday">Friday</option></select></span><span class="comment"><p>another comment</p></span></div>';
+															
+		$args = array('comment'=>'another comment','divlabel' => 'divlabel');						
+		getchtmldbselect($dbname,$tablename,$column,$name,1,'Tuesday',$args);
+							
+		$result = ob_get_contents();
+		ob_end_clean();
+	
+		$this->assertEquals($result,$this->expected_result);
+	}
+	
+	public function test_label()
+	{
+		
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+		
+		$dbname = "test_getchtmldbselect.sqlite";
+		$column = "name";
+		$name = "foobar";
+		$tablename="dow";
+		
+		ob_start(); 
+		
+		$this->expected_result = '<div class="contain"><p class="divlabel">divlabel</p><p class="label">dsfdf</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="NotSelected">NotSelected</option><option value="all">all</option><option value="Monday">Monday</option><option value="Tuesday"selected>Tuesday</option><option value="Thursday">Thursday</option><option value="Wednesday">Wednesday</option><option value="Friday">Friday</option></select></span><span class="comment"><p>another comment</p></span></div>';
+															
+		$args = array('comment'=>'another comment','divlabel' => 'divlabel','label' => 'dsfdf');						
+		getchtmldbselect($dbname,$tablename,$column,$name,1,'Tuesday',$args);
+							
 		$result = ob_get_contents();
 		ob_end_clean();
 	
@@ -645,7 +740,7 @@ class test_getchtmlswitch extends PHPUnit_Framework_TestCase
 		
 		ob_start(); 
 		$this->expected_result = '<p class="label switch">foobar</p><label class="switch"><input id="foobar" type="checkbox" name="foobar"><p class="slider"></p></label>';
-															
+																	
 		getchtmlswitch("foobar","foobar");
 					
 		$result = ob_get_contents();
@@ -668,6 +763,26 @@ class test_getchtmlswitch extends PHPUnit_Framework_TestCase
 		$result = ob_get_contents();
 		ob_end_clean();		
 		$this->assertEquals($result,$this->expected_result);
+	}
+	
+	public function test_multi()
+	{
+		
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/switch.css\" />";
+		
+		//ob_start(); 
+		$this->expected_result = '<p class="label switch">foobar</p><label class="switch"><input id="foobar" type="checkbox" name="foobar"><p class="slider"></p></label>';
+																	
+		getchtmlswitch("foobar","foobar");
+		getchtmlswitch("foobar2","foobar3");
+		getchtmlswitch("foobar2","foobar3");
+					
+		//$result = ob_get_contents();
+		//ob_end_clean();		
+		//$this->assertEquals($result,$this->expected_result);
 	}
 }
 
@@ -804,8 +919,8 @@ class test_getxmlchtmlinput extends PHPUnit_Framework_TestCase
 	}
 }
 			       
+
 /*
-		
 $stf = new test_gethtmldropdown();
 $stf->test_();
 $stf->test_default();
@@ -841,26 +956,26 @@ $test->test_();
 
 $test = new test_gethtmlswitch();
 $test->test_();
-$test->test_checked(); */
-
+$test->test_checked();
 
 $test = new test_getchtmlselect();
 $test->test_();
+$test->test_label();
 
-
-/*$test = new test_getxmlchtmlselect();
+$test = new test_getxmlchtmlselect();
 $test->test_();
 $test->test_starttag();
 $test->test_starttag2();
+$test->test_label();
+
+$test = new test_getchtmldbselect();
+$test->test_();
+$test->test_label();
 */
-
-/*$test = new test_getchtmldbselect();
-$test->test_();
-
 $test = new test_getchtmlswitch();
-$test->test_();
-$test->test_checked();*/
-
+//$test->test_();
+$test->test_multi();
+//$test->test_checked();
 /*
 $test = new test_getchtmlxmlmenu();
 $test->test_();
@@ -870,6 +985,6 @@ $test = new test_getchtmlinput();
 $test->test_();
 
 $test = new test_getxmlchtmlinput();
-$test->test_();*/
-
+$test->test_();
+*/
 ?>

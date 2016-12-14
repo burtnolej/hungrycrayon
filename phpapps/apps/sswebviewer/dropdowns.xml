@@ -2,28 +2,31 @@
 	<dpivot>
 		<select id='1'>
 			<field>xaxis</field>
+			<label>row</label>
 			<values>
 				<value>period</value>
 				<value>dow</value>
 				<value>adult</value>
 				<value>subject</value>
 			</values>
-			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
+			<comment>Pick the field to represent on the xaxis or rows; Period is usually used</comment>
 			<default>period</default>
 		</select>
 		<select id='2'>
 			<field>yaxis</field>
+			<label>column</label>
 			<values>
 				<value>period</value>
 				<value>dow</value>
 				<value>adult</value>
 				<value>subject</value>
 			</values>
-			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
+			<comment>Pick the field to represent on the yaxis or columns; Day-of-week is usually used; putting adult here will create the view in the "schedule new work period" file on the googledrive</comment>
 			<default>dow</default>
 		</select>
 		<select id='3'>
 			<field>source_type</field>
+			<label>datatype</label>
 			<values>
 				<value>student</value>
 				<value>adult</value>
@@ -34,16 +37,16 @@
 		</select>
 		<select id='4'>
 			<field>source</field>
+			<label>input file</label>
 			<values>
-				<value>dbinsert</value>
-				<value>56n</value>
-				<value>4n</value>
-				<value>4s</value>
-				<value>5s</value>
-				<value>6s</value>
-				<value>56n,4n,4s,5s,6s</value>
+				<value>56newworkp</value>
+				<value>4newworkp</value>
+				<value>4student</value>
+				<value>5student</value>
+				<value>6student</value>
+				<value>all new work and all student</value>
 			</values>
-			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
+			<comment>Data conflicts across input files; Select an option to look at one or compare a subset of files</comment>
 			<default>dbinsert</default>
 		</select>
 	</dpivot>

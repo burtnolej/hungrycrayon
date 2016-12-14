@@ -13,6 +13,14 @@ div.contain {
 	/*overflow:auto;*/
 	float:left;
 }
+div.containswitch {
+	margin:.25em .25em .25em .25em;
+	width:160px;
+	background-color: #FEFAFA;
+	display:block;
+	/*overflow:auto;*/
+	float:left;
+}
 
 div.blank {
 	margin:0px;
