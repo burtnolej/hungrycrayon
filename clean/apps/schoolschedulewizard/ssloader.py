@@ -245,7 +245,10 @@ class SSLoader(object):
 		    dow = _setdow()	
 		    _addrecord(locals())
 		elif recordtype == 'wp.nostudent.nosubject.noteacher.with.and':
-		    # Work Period with Alyssa and Paraic		
+		    # Work Period with Alyssa and Paraic
+		    
+		    location,record = self.extract_location(record)
+		    
 		    _teachers = record.split("with")[1]
 		    teachers = _teachers.split("and")
 		    
@@ -261,6 +264,9 @@ class SSLoader(object):
 			
 		elif recordtype == 'wp.nostudent.nosubject.noteacher.with':
 		    # Work Period with Alyssa
+		    
+		    location,record = self.extract_location(record)
+		    
 		    teacher = record.split("with")[1]
 		    teacher = teacher.lstrip()
 		    #subject = "??"
@@ -272,6 +278,9 @@ class SSLoader(object):
 		    
 		elif recordtype == 'wp.nostudent.subject.teacher.with':
 		    # Humanities WP: with alyssa
+		    
+		    location,record = self.extract_location(record)
+		    
 		    teacher = record.split("with")[1]
 		    teacher = teacher.lstrip()
 		    subject = record.split(" ")[0]
@@ -282,8 +291,12 @@ class SSLoader(object):
 		    
 		elif recordtype == 'wp.nostudent.subject.noteacher.with':
 		    # Humanities Work Period with Johnny
-		    subject = record.split(" ")[0]
-		    teacher = record.split("with")[1]
+
+		    location,record = self.extract_location(record)
+		    
+		    
+		    subject = record.lower().split(" ")[0]
+		    teacher = record.lower().split("with")[1]
 		    teacher = teacher.lstrip()
 		    students = _setstudent()
 		    dow = _setdow()
@@ -291,6 +304,10 @@ class SSLoader(object):
 		    _addrecord(locals())
 		elif recordtype == 'subject.nostudent.nosubject.noteacher':
 		    # Humanities
+		    
+		    location,record = self.extract_location(record)
+		    
+		    
 		    subject = record
 		    teacher = _setteacher()
 		    students = _setstudent()
@@ -299,7 +316,11 @@ class SSLoader(object):
 		    _addrecord(locals())
 		elif recordtype == 'subject.nostudent.nosubject.noteacher.with':
 		    # ELA with Amelia
-		    subject,teacher = record.split("with")
+		    
+		    location,record = self.extract_location(record)
+		    
+		    
+		    subject,teacher = record.lower().split("with")
 		    teacher = teacher.lstrip()
 		    subject = subject.strip()
 		    students = _setstudent()
@@ -308,6 +329,10 @@ class SSLoader(object):
 		    _addrecord(locals())
 		elif recordtype == 'subject.nostudent.nosubject.noteacher.with.and':
 		    # ELA with Amelia and Paraic
+		    
+		    location,record = self.extract_location(record)
+		    
+		    
 		    subject,_teachers = record.split("with")
 		    teachers = _teachers.split("and")
 		    subject = subject.strip()
@@ -1220,14 +1245,9 @@ if __name__ == "__main__":
              ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5and6schedulenewworkperiod.csv",-1,True,"56n"),
              ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4schedulenewworkperiod.csv",5,True,"4n")]'''
     
-    files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep5and6schedulenewworkperiod.csv",-1,True,"56n")]
-    
-    
-    #files = [("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep5and6schedulenewworkperiod.csv",-1,True),
-    #          ("/mnt/bumblebee-burtnolej/googledrive/CopyofPrep4schedulenewworkperiod.csv",-1,True)]
-    
-    #files = [("/mnt/bumblebee-burtnolej/googledrive/current/CopyofPrep5IndividualSchedules_new.csv",6,True)]
-	                                          
+    files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep6IndividualSchedules_new.csv",6,True,"6s"),
+             ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5IndividualSchedules_new.csv",5,True,"5s")]
+    	                                          
 	
     '''else:
 	raise Exception("do not know how to run in this working dir",dir=os.getcwd())'''

@@ -622,7 +622,21 @@ def gridreduce(grid,blanks,headeroffset=1):
     for row in grid:
 	for colidx in notblankcols:
 	    row.pop(colidx)
-	    
+
+def gridrollup(grid,keys,schema):
+    gridh = len(grid)
+    gridw = len(grid[0])
+
+    for y in range(1,gridh):
+	for x in range(1,gridw):
+	    if isinstance(grid[y][x],list) == True:
+		if len(grid[y][x]) > 0:
+		    cell = grid[y][x]
+		    grid[y][x] = cellrollup(cell,keys,schema)
+		    grid[y][x].sort()
+    
+    #return grid
+    
 def cellrollup(grid,keys,schema):
     ''' if a cell has multi subrows like below
     
@@ -667,22 +681,25 @@ def cellrollup(grid,keys,schema):
 	    rollupkey.append(rowd[key])
 	
 	if rollupkeyvals.has_key(",".join(rollupkey)) == False:
-	    rollupkeyvals[",".join(rollupkey)] = nonrollupkeydict
+	    rollupkeyvals[",".join(rollupkey)] = deepcopy(nonrollupkeydict)
 	    
 	for nonrollupkey in nonrollupkeys:
 	    rollupkeyvals[",".join(rollupkey)][nonrollupkey].append(rowd[nonrollupkey])
 	    
 	for key in keys:
 	    rollupkeyvals[",".join(rollupkey)][key] = rowd[key]
-	    
+    
     output=[]
     for k,v in rollupkeyvals.iteritems():
+	_output=[]
 	for schemakey in schemakeys:
 	    if isinstance(v[schemakey],list) == True:
-		output.append(",".join(v[schemakey]))
+		_output.append(",".join(v[schemakey]))
 	    else:
-		output.append(v[schemakey])
-	print tuple(output)
+		_output.append(v[schemakey])
+	output.append(tuple(_output))
+	
+    return output
 
 	
     

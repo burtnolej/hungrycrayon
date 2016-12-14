@@ -19,7 +19,7 @@ from database_util import Database
 from database_table_util import tbl_rows_get, tbl_query, tbl_remove
 
 from sswizard_utils import dropdown_build, setenums, session_code_gen, \
-     dbinsert, dbinsert_direct, gridreduce, cellrollup
+     dbinsert, dbinsert_direct, gridreduce, cellrollup, gridrollup
             
 '''def _execfunc(database,value,prep):
     
@@ -506,17 +506,103 @@ class Test_GridRollup(unittest.TestCase):
     def setUp(self):
         pass
     
-    def test_cellrollup(self):
+    def test_cellrollup1(self):
         
         self.grid = [(u'Movement', u'Dylan', u'Peter'), 
                      (u'Movement', u'Dylan', u'Clayton')] 
 
-        self.expected_results = [(u'Movement', u'Dylan', (u'Peter,Clayton'))]
+        self.expected_results = [(u'Movement', u'Dylan', u'Peter,Clayton')]
         
-        cellrollup(self.grid,('subject','adult'),dict(ztypes='subject,adult,student'))
+        results = cellrollup(self.grid,['subject','adult'],dict(ztypes='subject,adult,student'))
         
-        #self.assertListEqual(self.grid,self.expected_results)
-    
+        self.assertListEqual(results,self.expected_results)
+        
+    def test_cellrollup2(self):
+        
+        self.grid = [(u'Movement', u'Dylan', u'Peter'), 
+                     (u'Movement', u'Dylan', u'Clayton'),
+                     (u'Math', u'Dylan', u'Clayton')] 
+
+        self.expected_results = [(u'Movement', u'Dylan', u'Peter,Clayton'),
+                                 (u'Math', u'Dylan', u'Clayton')]
+        
+        results = cellrollup(self.grid,['subject','adult'],dict(ztypes='subject,adult,student'))
+        
+        results.sort()
+        self.expected_results.sort()
+        
+        self.assertListEqual(results,self.expected_results)
+        
+    def test_cellrollup3(self):
+        
+        self.grid = [(u'Movement', u'Dylan', u'Peter'), 
+                     (u'Movement', u'Dylan', u'Clayton'),
+                     (u'Math', u'Dylan', u'Clayton'),
+                     (u'Math', u'Dylan', u'Peter'),
+                     (u'Science', u'Dylan', u'Brian')] 
+
+        self.expected_results = [(u'Movement', u'Dylan', u'Peter,Clayton'),
+                                 (u'Math', u'Dylan', u'Clayton,Peter'),
+                                 (u'Science', u'Dylan', u'Brian')]
+        
+        results = cellrollup(self.grid,['subject','adult'],dict(ztypes='subject,adult,student'))
+        
+        results.sort()
+        self.expected_results.sort()
+        
+        self.assertListEqual(results,self.expected_results)
+        
+    def test_cellrollup4(self):
+        
+        self.grid = [(u'Movement', u'Dylan', u'Peter'), 
+                     (u'Movement', u'Gale', u'Clayton')] 
+
+        self.expected_results = [(u'Movement', u'Dylan,Gale', u'Peter,Clayton')]
+        
+        results = cellrollup(self.grid,['subject'],dict(ztypes='subject,adult,student'))
+        
+        self.assertListEqual(results,self.expected_results)
+        
+    def test_cellrollup5(self):
+        
+        self.grid = [(u'Movement',  u'Peter'), 
+                     (u'Movement',  u'Clayton')] 
+
+        self.expected_results = [(u'Movement', u'Peter,Clayton')]
+        
+        results = cellrollup(self.grid,['subject'],dict(ztypes='subject,student'))
+        
+        self.assertListEqual(results,self.expected_results)
+        
+    def test_gridrollup1(self):        
+        self.grid = [['', u'MO'], 
+                     [u'830-910', [(u'Movement', u'Dylan', u'Peter'), 
+                                   (u'Movement', u'Dylan', u'Clayton')]
+                      ]
+                     ] 
+
+        self.expected_results = [['', u'MO'], 
+                     [u'830-910', [(u'Movement', u'Dylan', u'Peter,Clayton')]
+                      ]
+                     ]
+
+        gridrollup(self.grid,['subject','adult'],dict(ztypes='subject,adult,student'))
+        self.assertListEqual(self.grid,self.expected_results)
+        
+    def test_gridrollup2(self):        
+        self.grid = [['', u'MO',u'TU'], 
+                     [u'830-910', [(u'Movement', u'Dylan', u'Peter'), (u'Movement', u'Dylan', u'Clayton')],[]
+                      ]
+                     ] 
+
+        self.expected_results = [['', u'MO',u'TU'], 
+                     [u'830-910', [(u'Movement', u'Dylan', u'Peter,Clayton')],[]
+                      ]
+                     ]
+
+        gridrollup(self.grid,['subject','adult'],dict(ztypes='subject,adult,student'))
+        self.assertListEqual(self.grid,self.expected_results)
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 

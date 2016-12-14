@@ -109,7 +109,7 @@ def dataset_record(of,clsname,objid):
     return({})
     
 def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_value,
-           conflicts_only='N',constraints=None,wratio=None,formatson=False):
+           conflicts_only='N',constraints=None,wratio=None,formatson=False,rollupson=False):
     
     ''' query in memory objects; pivot data and create a table of results; return in 2d array '''
         
@@ -204,6 +204,9 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
     
     sswizard_utils.gridreduce(values,[[]])
     
+    if rollupson == True:
+        sswizard_utils.gridrollup(values,['subject','adult'],dict(ztypes='subject,adult,student'))
+
     return values
 
 def dataset_serialize(values,formatson,schema=None):

@@ -30,11 +30,16 @@ class Student:
 
         ztypes = data.ztypes.split(",")
         formatson=False
+        rollupson=False
         header=None
         if "formats" in ztypes: 
             formatson=True
         else:            
             header = "<root><parser><value>drawnoformatgrid</value></parser></root>"
+
+        if "rollup" in ztypes: 
+            rollupson=True
+            ztypes.remove("rollup")
 
         constraints=[]
         for attr,attr_val in data.iteritems():
@@ -45,10 +50,9 @@ class Student:
         values = ssviewer_utils.dataset_pivot(of,enums,data.yaxis,data.xaxis,
                                               ztypes, source_type,source_value,
                                               constraints=constraints,
-                                              formatson=True)
+                                              formatson=True,rollupson=rollupson)
         
-        print values;
-        
+
         grid = ssviewer_utils.dataset_serialize(values,formatson=formatson,
                                                 schema = dict(xaxis=data.xaxis,
                                                               yaxis=data.yaxis,
@@ -56,6 +60,9 @@ class Student:
         
         xml = xml_utils.grid2xml(grid,header=header)
         
+        print ztypes
+        print xmltree.tostring(xml)
+
         return xmltree.tostring(xml)
     
 class New:
