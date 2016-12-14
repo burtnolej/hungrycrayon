@@ -623,7 +623,7 @@ def gridreduce(grid,blanks,headeroffset=1):
 	for colidx in notblankcols:
 	    row.pop(colidx)
 	    
-def gridrollup():
+def cellrollup(grid,keys,schema):
     ''' if a cell has multi subrows like below
     
     [(u'Movement', u'Dylan', u'Peter'), 
@@ -641,7 +641,50 @@ def gridrollup():
     (u'Student News', u'Dylan', u'Bruno')]
     
     '''
+    schemakeys = schema['ztypes'].split(",")
     
+    # determine which keys are not part of the rollup key
+    # so they can be concatenated
+    from copy import deepcopy
+    
+    nonrollupkeys = deepcopy(schemakeys)
+    for key in keys:
+	nonrollupkeys.remove(key)
+    
+    nonrollupkeydict = dict([(key, []) for key in nonrollupkeys])
+	
+    rollupkeyvals = {}
+    
+    
+    for row in grid:
+	# join values to valuetypes
+	
+	rowd = dict(zip(schemakeys,row))
+ 
+	# create the unique rollup key values
+	rollupkey = []
+	for key in keys:
+	    rollupkey.append(rowd[key])
+	
+	if rollupkeyvals.has_key(",".join(rollupkey)) == False:
+	    rollupkeyvals[",".join(rollupkey)] = nonrollupkeydict
+	    
+	for nonrollupkey in nonrollupkeys:
+	    rollupkeyvals[",".join(rollupkey)][nonrollupkey].append(rowd[nonrollupkey])
+	    
+	for key in keys:
+	    rollupkeyvals[",".join(rollupkey)][key] = rowd[key]
+	    
+    output=[]
+    for k,v in rollupkeyvals.iteritems():
+	for schemakey in schemakeys:
+	    if isinstance(v[schemakey],list) == True:
+		output.append(",".join(v[schemakey]))
+	    else:
+		output.append(v[schemakey])
+	print tuple(output)
+
+	
     
 def getdatabase():
 

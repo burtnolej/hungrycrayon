@@ -26,8 +26,8 @@ p {
 <label>G</label><input type="number" name="r" id="ginput" value=255 min="1" max="255" step=5 />
 <label>B</label><input type="number" name="r" id="binput" value=255 min="1" max="255" step=5 />
 <br>
- <input type="radio" name="colortype" id="colortype" value="font" checked> font
- <input type="radio" name="colortype" id="colortype" value="bgcolor"> bgcolor<br>
+ <input type="radio" name="colortype" value="font" checked> font
+ <input type="radio" name="colortype" value="bgcolor"> bgcolor<br>
   
 <p id="output">
 FOO

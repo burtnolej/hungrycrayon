@@ -5,8 +5,16 @@ $(document).ready(function() {
     var bval = $( "#binput" ).val();
     
     var rgb = "rgb(" +rval.toString(16)+","+gval.toString(16)+","+bval.toString(16)+")";
+    
+    console.log(rgb)
+    
+    //$('input').each(function(index, value) {
     	
-	var selected = $("input[type='radio'][name='colortype']:checked");
+    
+	
+
+		var selectedVal = "";
+		var selected = $("input[type='radio'][name='colortype']:checked");
     	console.log(selected.val());
     	
     	//console.log($("#colortype" ).checked());

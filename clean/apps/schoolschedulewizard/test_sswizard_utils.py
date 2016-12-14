@@ -18,7 +18,8 @@ from sswizard_query_utils import *
 from database_util import Database
 from database_table_util import tbl_rows_get, tbl_query, tbl_remove
 
-from sswizard_utils import dropdown_build, setenums, session_code_gen, dbinsert, dbinsert_direct, gridreduce
+from sswizard_utils import dropdown_build, setenums, session_code_gen, \
+     dbinsert, dbinsert_direct, gridreduce, cellrollup
             
 '''def _execfunc(database,value,prep):
     
@@ -501,12 +502,27 @@ class Test_GridReduce(unittest.TestCase):
         gridreduce(self.grid,["",[]])
         self.assertListEqual(self.grid,self.expected_results)
     
+class Test_GridRollup(unittest.TestCase):
+    def setUp(self):
+        pass
+    
+    def test_cellrollup(self):
+        
+        self.grid = [(u'Movement', u'Dylan', u'Peter'), 
+                     (u'Movement', u'Dylan', u'Clayton')] 
+
+        self.expected_results = [(u'Movement', u'Dylan', (u'Peter,Clayton'))]
+        
+        cellrollup(self.grid,('subject','adult'),dict(ztypes='subject,adult,student'))
+        
+        #self.assertListEqual(self.grid,self.expected_results)
     
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GridReduce))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GridRollup))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_GridReduce))
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dropdown))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_With_Headers))
