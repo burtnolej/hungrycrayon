@@ -519,15 +519,94 @@ function _menu_iter($func,$root,$depth){
 	echo "</ul>";
 }
 
+function build_dbmenu_xml($dbname,$tablename,$colname) {
+	
+	$names = getcolumndistinctvalues($dbname,$tablename,$colname);
+
+	 return build_menu_xml($names,"foobar","localhost","dpivot.php",array("yaxis"=>"adult"));
+}
+
+function build_menu_xml($keyarr,$menuname,$host="localhost",$script="dpivot.php",$args=NULL){
+	
+		$root=new SimpleXMLElement("<root></root>");
+		$menuroot = $root->addChild("item");	
+		$menuroot->addAttribute("name",$menuname);
+
+		foreach ($keyarr as $label) {		
+		
+			$flags = array("xaxis"					=>"period",
+											"yaxis"				=>"dow",
+											"source_type"	=>"student", 
+										 	"source"				=>"56newworkp",
+											"source_value"=>$label,
+											"cnstr_subject"=>"NotSelected",
+											"cnstr_dow"		=>"NotSelected",
+											"cnstr_period"	=>"NotSelected",
+											"cnstr_student"=>"NotSelected",
+											"cnstr_adult"	=>"NotSelected",
+											"cnstr_prep"		=>"NotSelected",
+											"formats"			=>"on",
+											"rollup"				=>"on",
+											"status"				=>"on",
+											"student"			=>"on",
+											"ztypes"				=>"subject,adult");
+											
+				if ($args <> NULL) {
+					foreach ($args as $k=>$v) {
+						$flags[$k] = $v;
+					}
+				}	
+				
+				$arr = array("ip"=>$host, "file"=>$script, "flags"=>$flags);
+				
+				$child = $menuroot->addChild("item");							
+				$child->addAttribute("name",$label);
+				$link = $child->addChild("link");
+				assoc_array2xml($arr,$link);
+		}
+		
+		return($root->asXML());
+		//return($root);
+}
+
+function _get_menu_xml($root,$arr,$label) {
+
+		$root->addAttribute("name",$label);
+		$link = $child->addChild("link");
+		assoc_array2xml($arr,$link);
+}
+
+function get_menu_xml($arr,$label) {
+	
+		$root=new SimpleXMLElement("<root></root>");
+		$child = $root->addChild("item");
+		$child->addAttribute("name",$label);
+		$link = $child->addChild("link");
+		assoc_array2xml($arr,$link);
+		return($root->asXML());
+}
+
 // Custom HTML menu
 function getchtmlxmlmenu2($xml,$divlabel) {
-	
+
 		$html_li = function ($tag,$node) {
 			
 			$name = $node->attributes()["name"];
 			
 			if (isset($node->link) == TRUE) {
-				$link = (string)$node->link;			
+				if (sizeof($node->link->children())>0) {
+					$link = "http://".$node->link->ip."//".$node->link->file."?";
+		
+					$xpath_str = sprintf("./%s","flags");
+					$items = $node->link->xpath($xpath_str);
+		
+					foreach ($items[0] as $key=>$value) {
+						$link = $link.$key."=".$value."&";
+					}
+				}
+				else {
+					$link = (string)$node->link;			
+				}
 				echo "<a href=\"".$link."\">".$name."</a>";
 			}
 			else {

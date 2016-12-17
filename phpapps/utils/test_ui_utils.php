@@ -858,6 +858,139 @@ class test_getchtmlxmlmenu extends PHPUnit_Framework_TestCase
 		ob_end_clean();		
 		$this->assertEquals($result,$this->expected_result);     
 	}
+	
+	public function test_linkcomponent(){
+	
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/menu.css\" />";
+	    
+	   ob_start();
+		$xml =  "<root>					
+		<item name='by student'>
+			<item name='Booker'>
+				<link>
+					<ip>192.168.1.254</ip>
+					<target>dpivot.php</target>
+					<flags>
+			        	<xaxis>period</xaxis>
+			        	<yaxis>dow</yaxis>
+			       	<source_type>student</source_type>
+			       	<source>56newworkp</source>
+			       	<source_value>Booker</source_value>
+						<cnstr_subject>NotSelected</cnstr_subject>
+						<cnstr_dow>NotSelected</cnstr_dow>
+						<cnstr_period>NotSelected</cnstr_period>
+						<cnstr_student>NotSelected</cnstr_student>
+						<cnstr_adult>NotSelected</cnstr_adult>
+						<cnstr_prep>NotSelected</cnstr_prep>
+						<formats>on</formats>
+						<rollup>on</rollup>
+						<status>on</status>
+						<student>on</student>
+						<ztypes>subject,adult</ztypes>
+					</flags>
+				</link>
+			</item>
+		</item>
+	</root>";
+
+		$this->expected_result ='<div id="wrap"><ul class = "nav"><li>by student<ul><li><a href="http://192.168.1.254//?xaxis=period&yaxis=dow&source_type=student&source=56newworkp&source_value=Booker&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Booker</a></li></ul></ul></div>';
+				 		 		         
+		 getchtmlxmlmenu2($xml,"foobar");   
+		 
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);     
+	}
+	
+	public function test_build_menu_xml2() {
+
+		$xml = build_menu_xml(['Booker','Peter','Clayton'],'foobar','localhost','dpivot.php');
+		
+		$expected_result = '<div id="wrap"><ul class = "nav"><li>foobar<ul><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=dow&source_type=student&source=56newworkp&source_value=Booker&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Booker</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=dow&source_type=student&source=56newworkp&source_value=Peter&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Peter</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=dow&source_type=student&source=56newworkp&source_value=Clayton&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Clayton</a></li></ul></ul></div>';
+		
+		ob_start();
+			   
+		getchtmlxmlmenu2($xml,'foobar');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$expected_result);  
+	}
+	
+	public function test_build_dbmenu_xml() {
+		
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/menu.css\" />";
+	   
+	   $expected_result = '<div id="wrap"><ul class = "nav"><li>foobar<ul><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Nathaniel&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Nathaniel</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Clayton&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Clayton</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Bruno&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Bruno</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Orig&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Orig</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Stephen&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Stephen</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Oscar&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Oscar</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Peter&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Peter</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Jack&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Jack</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Jake&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Jake</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Coby&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Coby</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Thomas&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Thomas</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Yosef&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Yosef</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Tristan&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Tristan</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Ashley&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Ashley</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Simon A&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Simon A</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Booker&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Booker</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=OmerC&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">OmerC</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Asher&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Asher</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Shane&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Shane</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Simon B&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Simon B</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Mackenzie&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Mackenzie</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Nick&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Nick</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Lucy&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Lucy</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Liam&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Liam</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Donovan&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Donovan</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Luke&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Luke</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Tris&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Tris</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Prep 4&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Prep 4</a></li></ul></ul></div>';
+	   
+		$xml = build_dbmenu_xml('test_getdbmenuxml.sqlite','student','name');
+		
+		ob_start();
+		
+		getchtmlxmlmenu2($xml,'foobar');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$expected_result);  
+	}	
+	
+	public function test_append_menu_xml() {
+		/* append a db menu to an existing menu node */
+		
+		$_xml = "<root><item name='view'><item name='by student'><item name='perioddow'></item></item></item></root>";	   		
+		$_xmlinsert = "<root><item name='foobar'><value>dsdasdd</value></item></root>";	   
+		$expected_result = '<div id="wrap"><ul class = "nav"><li>view<ul><li>by student<ul><li>perioddow<ul><li>foobar</li></ul></ul></ul></ul></div>';
+				 		 		         
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/menu.css\" />";
+	   	
+		$xmlinsert = simplexml_load_string($_xmlinsert,'utils_xml');
+		$xml = simplexml_load_string($_xml,'utils_xml');
+		
+		$item =  $xml->get_item("perioddow","item","@name");	
+		append_xml($xmlinsert,$item);
+		
+		ob_start();
+		getchtmlxmlmenu2($xml->asXML(),'foobar');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$expected_result);  
+		
+	}	
+
+	public function test_append_dbmenu_xml() {
+		/* append a db menu to an existing menu node */
+		
+		$xml = "<root><item name='view'><item name='by student'><item name='period-dow'></item></item></item></root>";	 
+		         
+		$this->expected_result = '';
+				 		 		         
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/menu.css\" />";
+	   	 		
+		$expected_result = '<div id="wrap"><ul class = "nav"><li>view<ul><li>by student<ul><li>period-dow<ul><li>foobar<ul><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Nathaniel&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Nathaniel</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Clayton&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Clayton</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Bruno&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Bruno</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Orig&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Orig</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Stephen&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Stephen</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Oscar&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Oscar</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Peter&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Peter</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Jack&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Jack</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Jake&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Jake</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Coby&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Coby</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Thomas&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Thomas</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Yosef&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Yosef</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Tristan&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Tristan</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Ashley&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Ashley</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Simon A&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Simon A</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Booker&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Booker</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=OmerC&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">OmerC</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Asher&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Asher</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Shane&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Shane</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Simon B&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Simon B</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Mackenzie&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Mackenzie</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Nick&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Nick</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Lucy&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Lucy</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Liam&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Liam</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Donovan&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Donovan</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Luke&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Luke</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Tris&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Tris</a></li><li><a href="http://localhost//dpivot.php?xaxis=period&yaxis=adult&source_type=student&source=56newworkp&source_value=Prep 4&cnstr_subject=NotSelected&cnstr_dow=NotSelected&cnstr_period=NotSelected&cnstr_student=NotSelected&cnstr_adult=NotSelected&cnstr_prep=NotSelected&formats=on&rollup=on&status=on&student=on&ztypes=subject,adult&">Prep 4</a></li></ul></ul></ul></ul></ul></div>';
+		
+		$_insertxml = build_dbmenu_xml('test_getdbmenuxml.sqlite','student','name');
+		$insertxml = simplexml_load_string($_insertxml,'utils_xml');
+		$targetxml = simplexml_load_string($xml,'utils_xml');
+		
+		$item =  $targetxml->get_item("period-dow","item","@name");	
+		append_xml($insertxml,$item);
+		ob_start();
+		getchtmlxmlmenu2($targetxml->asXML(),'foobar');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$expected_result);  
+	}	
+	
 }
 
 class test_getchtmlinput extends PHPUnit_Framework_TestCase
@@ -971,16 +1104,23 @@ $test->test_label();
 $test = new test_getchtmldbselect();
 $test->test_();
 $test->test_label();
-*/
+
 $test = new test_getchtmlswitch();
-//$test->test_();
+$test->test_();
 $test->test_multi();
-//$test->test_checked();
-/*
+$test->test_checked();
+*/
+
 $test = new test_getchtmlxmlmenu();
 $test->test_();
 $test->test_multilevel();
+$test->test_linkcomponent();
+$test->test_build_menu_xml2();
+$test->test_build_dbmenu_xml();
+$test->test_append_menu_xml();
+$test->test_append_dbmenu_xml();
 
+/*
 $test = new test_getchtmlinput();
 $test->test_();
 

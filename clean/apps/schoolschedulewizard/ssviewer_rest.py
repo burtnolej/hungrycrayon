@@ -47,6 +47,8 @@ class Student:
                 if str(attr_val) <> "NotSelected":
                     constraints.append((attr[6:],str(attr_val)))
         
+        print constraints
+        
         values = ssviewer_utils.dataset_pivot(of,enums,data.yaxis,data.xaxis,
                                               ztypes, source_type,source_value,
                                               constraints=constraints,

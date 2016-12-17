@@ -328,9 +328,39 @@ class utils_xml extends SimpleXMLElement {
 				$func($tag,$node);
 
 				if (sizeof($node ->children()) <> 0) {
-					 xml_iter($node);
+					$this-> xml_iter($func,$node);
 				}
 			}
 	}
 }
+
+	function assoc_array2xml($arr,$root)  {
+		foreach ($arr as $k=>$v) {
+			
+			if (is_array($v)) {
+				$child = $root->addChild($k);
+				assoc_array2xml($v,$child); 
+			}
+			else {
+				$root->addChild($k,$v);
+			}
+		}
+	}
+	
+	function append_xml($sourceroot,$targetroot) {
+	
+	foreach ($sourceroot as $tag=>$sourcenode) {
+		if (sizeof($sourcenode ->children()) <> 0) {
+			$targetnode = $targetroot->addchild($tag);
+			foreach ($sourcenode->attributes() as $attr=>$attrvalue) {
+				$targetnode[$attr] = (string)$attrvalue;
+			}
+			append_xml($sourcenode,$targetnode);
+		}
+		else {
+			$targetnode = $targetroot->addchild($tag,$sourcenode);
+		}
+	}
+}
+		
 ?>
