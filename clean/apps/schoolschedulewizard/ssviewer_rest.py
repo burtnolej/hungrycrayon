@@ -1,4 +1,5 @@
 import sys
+import os
 from misc_utils_log import Log, logger
 log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
           pidlogname=True,proclogname=False)
@@ -163,8 +164,6 @@ class SearchID:
         
         dbid = dbidlookup[id]
         
-        
-        
         _values = ssviewer_utils.dataset_record(of,source_type,dbid)
         
         header = "<root><parser><value>drawform</value></parser></root>"
@@ -172,7 +171,18 @@ class SearchID:
         xml=xml_utils.record2xml(_values,header=header)
         
         return xmltree.tostring(xml)
+
     
+class Command:
+    def GET(self,id):
+        
+        #data = web.input(id='')
+        
+        if id=="stop":
+            print "bringing down service...."
+            exit()
+        
+        
 class SearchCriteria:
     def GET(self,id):
         
@@ -212,27 +222,60 @@ class SearchCriteria:
             print xmltree.tostring(xml)
             
             return xmltree.tostring(xml)
-        
-        
-if __name__ == "__main__":
-        
-    dbname,refdbname = sswizard_utils.getdatabase()
+           
+def _run(xtraargs):
     
-    '''
-    DBPATH = os.environ['DBPATH']
-    DBNAME = os.environ['DBNAME']
+    print "launching service... pid=",os.getpid()
+    
+    dbname,refdbname = sswizard_utils.getdatabase()
 
-    if DBNAME <> "":
-        dbname=os.path.join(DBPATH,DBNAME)
-        refdbname=os.path.join(DBPATH,DBNAME)
-    elif len(sys.argv) == 2:
-        dbname=os.path.join(DBPATH,sys.argv[1])
-        refdbname=os.path.join(DBPATH,sys.argv[1])
-        sys.argv.pop(1)
-    else:
-        raise Exception("provide a database name on cndline or set $DBNAME/$DBPATH")
-        
-    '''
+    urls = (
+        '/(\w+)', 'Student',
+        '/student/(\w+)', 'Student',
+        '/subject/(\w+)', 'Subject',
+        '/adult/(\w+)', 'Adult',
+        '/list/(\w+)', 'List',
+        '/id/(\w+)', 'SearchID',
+        '/criteria/(\w+)', 'SearchCriteria',
+        '/new/', 'New',
+        '/command/(\w+)','Command'
+    )
+    
+    database = Database(dbname)
+    refdatabase = Database(refdbname)
+    of = ObjFactory(True)
+    enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
+    
+    args = dict(database=database,refdatabase=refdatabase,
+                saveversion=1,of=of,enums=enums)
+
+    if xtraargs<>None:
+        for k,v in xtraargs.iteritems():
+            args[k] = v
+            
+    ssviewer_utils.dataset_load(**args)
+
+    # get a mapping of userobjid to db refid (__id) as of uses the former to index but the web page
+    # uses __id as they are easier to pass in URL
+    with database:
+        dbidlookup = sswizard_query_utils._dbid2userdefid(database,asdict=True)
+
+    #app = web.application(urls, locals())
+    app = web.application(urls, globals())
+    app.run()
+    
+def run(xtraargs=None):
+    pid = os.fork()
+    
+    if pid==0:
+        _run(xtraargs)
+    
+if __name__ == "__main__":
+    
+    #run(dict(source='56n,4n,4s,5s,6s'))
+    run()
+    
+    '''dbname,refdbname = sswizard_utils.getdatabase()
 
     urls = (
         #'/(.*)', 'student','subject','adult','period','dow'
@@ -243,7 +286,8 @@ if __name__ == "__main__":
         '/list/(\w+)', 'List',
         '/id/(\w+)', 'SearchID',
         '/criteria/(\w+)', 'SearchCriteria',
-        '/new/', 'New'
+        '/new/', 'New',
+        '/command/(\w+)','Command'
     )
     
     
@@ -252,7 +296,9 @@ if __name__ == "__main__":
     of = ObjFactory(True)
     enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
     
-    args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums,source='56n,4n,4s,5s,6s')
+    #args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums,source='56n,4n,4s,5s,6s')
+    args = dict(database=database,refdatabase=refdatabase,saveversion=1,of=of,enums=enums)
+
     
     ssviewer_utils.dataset_load(**args)
 
@@ -262,4 +308,4 @@ if __name__ == "__main__":
         dbidlookup = sswizard_query_utils._dbid2userdefid(database,asdict=True)
 
     app = web.application(urls, locals())
-    app.run()
+    app.run()'''

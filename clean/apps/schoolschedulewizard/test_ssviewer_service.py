@@ -6,62 +6,52 @@ from Tkinter import *
 from ttk import *
 
 import unittest
-from ssloader import SSLoader
-from ssviewer import WizardUI, dump2csv
 from database_util import Database
 from database_table_util import tbl_rows_get
-from misc_utils_objectfactory import ObjFactory
-from xml_utils import grid2xml, xml2string
+
 from misc_utils_process import process_kill, process_start, process_get_stdout
 
+import pycurl
 
-class Test_Viewer_Base(unittest.TestCase):
+#curl --get -d "ztypes=subject;xaxis=period;yaxis=dow" http://0.0.0.0:8080/student/Nathaniel
+
+#curl --get http://0.0.0.0:8080/command/stop
+
+class Test_Service_Base(unittest.TestCase):
     
     def setUp(self,dbname,files=None):
         
-        self.dbname = dbname
+        APPROOT = os.environ['APPROOT']
+        DBPATH = os.path.join(APPROOT,"clean","apps","schoolschedulewizard")
+        os.environ['DBPATH'] = DBPATH
         
-        if files <> None:
-            create_test_db(self.dbname,files)
-        self.database = Database(self.dbname)
+        APP = os.path.join(os.environ['DBPATH'],"ssviewer_rest.py")
         
-        of = ObjFactory(True)
-        self.app = WizardUI(self.dbname,of,self.dbname,maxentrycols=12,maxentryrows=20)
+        os.environ['DBNAME'] = dbname
         
-class Test_(Test_Viewer_Base):
+        DB = os.path.join(DBPATH,dbname)
+        
+        cmd = [APP,DB]
+
+        
+        
+class Test_(Test_Service_Base):
     
     def setUp(self):
-        Test_Viewer_Base.setUp(self,"2subrow_1subcol")
+        Test_Service_Base.setUp(self,"test_ssviewer_service")
 
-    def test_1row_1col_2subrow_1subcol(self):
-    
-        # dow=MO,period=830-910,student=Peter,ztype=adult
-                            
-        self.app.load(saveversion=1,student="",dow="MO",period="830-910")
-            
-        results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
+    def test_(self):
         
-        xml = grid2xml(results,ids=True)
-        
-        phpexec = "/home/burtnolej/Development/pythonapps3/phpapps/apps/sswebviewer/xml2html.php"
+        #getfields = []
+        c = pycurl.Curl()
+        c.setopt(c.URL, "http://0.0.0.0:8080/command/stop")
+        c.setopt(c.VERBOSE,True)
+        #c.setopt(c.HTTPHEADER,[header])
+        #c.GETFIELDS,getfields)
 
-        cmd = ['php',phpexec,xml2string(xml)]
-        
-        p = process_start(cmd)
-        print process_get_stdout(p)
-        
-        #self.assertListEqual(results,expected_results)
-        
-    '''def test_Mo_830_910_Peter_adult_2attr(self):
-                
-        expected_results = [['', u'MO'], 
-                            [u'830-910', [(dict(value='ELA',bgcolor='#ffcc99',fgcolor='black'),dict(value='Amelia',bgcolor='#006600',fgcolor='green'))]]]
-                            
-        self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
-
-        results = self.app.viewer(ui=False,ztypes=['subject','adult'],source_type="student",source_value="Peter",formatson=True)
-        
-        self.assertListEqual(results,expected_results)'''
+        c.setopt(c.WRITEDATA, buffer)       
+        c.perform()
+        c.close()     
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
