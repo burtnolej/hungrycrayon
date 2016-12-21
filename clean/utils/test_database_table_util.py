@@ -1,4 +1,9 @@
 
+from misc_utils_log import Log, logger
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
+          pidlogname=True,proclogname=False)
+
+
 import unittest
 from sqlite3 import IntegrityError as S3IntegrityError, \
      OperationalError as S3OperationalError
@@ -13,9 +18,10 @@ from database_table_util import tbl_rows_get, tbl_rows_insert, \
      tbl_rows_insert_from_schema, tbl_cols_get, tbl_col_add, \
      dbtblgeneric, tbl_move
 
-sys.path.append("/home/burtnolej/Development/pythonapps3/utils")
+sys.path.append("/Users/burtnolej/Development/pythonapps3/utils")
 from misc_utils_enum import enum
-from os import remove
+from os import remove, environ
+from time import sleep
 
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
@@ -49,7 +55,7 @@ test_db_str = enum(name="db_name_test",
 
 class TestTableRowsGet(unittest.TestCase):
     def setUp(self):
-        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
+        self.schema_file = environ["PYTHONPATH"] + "/test_misc/test_schema_simple.xml"
     
     def test_tbl_rows_get_spoecific_field(self):
 
@@ -86,7 +92,8 @@ class TestTableRowsGet(unittest.TestCase):
 class TestTableInsert(unittest.TestCase):
     
     def setUp(self):
-        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
+        
+        self.schema_file = environ["PYTHONPATH"] + "/test_misc/test_schema_simple.xml"
     
     def test_tbl_rows_insert(self):
 
@@ -134,7 +141,7 @@ class TestTableInsert(unittest.TestCase):
 class TestTableInsert2(unittest.TestCase):
     
     def setUp(self):
-        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
+        self.schema_file = environ["PYTHONPATH"] + "/test_misc/test_schema_simple.xml"
 
 
     def test_tbl_rows_insert_str_1col(self):
@@ -187,7 +194,7 @@ class TestTableInsert2(unittest.TestCase):
 class TestTableColumnAdd(unittest.TestCase):
     
     def setUp(self):
-        self.schema_file = "/home/burtnolej/Development/pythonapps3/clean/utils/test_misc/test_schema_simple.xml"
+        self.schema_file = environ["PYTHONPATH"] +"/test_misc/test_schema_simple.xml"
         
     def test_tbl_cols_get(self):
         
@@ -533,7 +540,94 @@ class TestDBTblGenericValidateInsert2RowsSameTable(unittest.TestCase):
             self.dbg2.persist()
             
             self.assertEqual(tbl_count_get(self.database,'dbtbltest'),2)
+          
+class TestDBTblGenericUpdate(unittest.TestCase):
+    
+    # update a value and store the version in the db
+    def setUp(self):
+        
+        self.database = Database(test_db.name,True)
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+        
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':123})
+        
+        self.dbg.customtimestamp = "%y%m%d_%H%M%S"
+        self.dbg.keepversion = True
+        
             
+    def test_(self):
+        
+        expected_results = [[123, u'version'], [678, u'current']]
+        
+        with self.database:        
+            self.dbg.persist()
+            origid = self.dbg.id
+            
+            self.dbg.update('col1',678)
+            _,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1','__version'])
+        
+        
+        # check the value has been updated
+        self.assertEqual(self.dbg.col1,678)
+        
+        #check the id should have been updated
+        newid = self.dbg.id
+        self.assertNotEqual(newid,origid) 
+        
+        # check the db representation
+        self.assertListEqual(expected_results,tbl_rows)
+        
+        
+    def test_2updates(self):
+        
+        expected_results = [[123, u'version'], [678, u'version'], [91011, u'current']]
+        
+        with self.database:        
+            self.dbg.persist()
+            origid = self.dbg.id
+
+            self.dbg.update('col1',678)
+            self.dbg.update('col1',91011)
+            
+            _,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1','__version'])
+        
+        
+        # check the value has been updated
+        self.assertEqual(self.dbg.col1,91011)
+        
+        #check the id should have been updated
+        newid = self.dbg.id
+        self.assertNotEqual(newid,origid) 
+        
+        # check the db representation
+        self.assertListEqual(expected_results,tbl_rows)
+        
+    def test_str(self):
+        
+        expected_results = [[123, u'version'], ["def", u'current']]
+        
+        with self.database:        
+            self.dbg.persist()
+            origid = self.dbg.id
+
+            self.dbg.update('col1',"\"def\"")
+            
+            _,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col1','__version'])
+        
+        
+        # check the value has been updated
+        self.assertEqual(self.dbg.col1,"\"def\"")
+        
+        #check the id should have been updated
+        newid = self.dbg.id
+        self.assertNotEqual(newid,origid) 
+        
+        # check the db representation
+        self.assertListEqual(expected_results,tbl_rows)
+        
 class TestDBTblMove(unittest.TestCase):
         
     def setUp(self):
@@ -582,7 +676,7 @@ class TestDBTblMove(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableInsert2))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableRowsGet))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestTableColumnAdd))
@@ -595,10 +689,11 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesInt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesDblQuotedStr))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsertValuesSingleQuotedStr))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsert2RowsSameTable))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericValidateInsert2RowsSameTable))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblMove))
 
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericUpdate))
     
     unittest.TextTestRunner(verbosity=2).run(suite)
     

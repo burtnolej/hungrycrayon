@@ -3,7 +3,7 @@ import sys
 import os
 from os import path as ospath
 from misc_utils_objectfactory import GenericBase, ObjFactory
-from database_table_util import dbtblgeneric, dbtblfactory
+from database_table_util import dbtblgeneric, dbtblfactory, tbl_rows_get
 from database_util import Database
 
 import unittest
@@ -139,9 +139,6 @@ class Test_ObjFrameworkIter(unittest.TestCase):
         result.sort()
         
         self.assertListEqual(result,['1a','booker','fred'])
-        
-#class DBLesson(dbtblgeneric):
-#    pass
       
 class Test_ObjFramework_Database(unittest.TestCase):
 
@@ -292,8 +289,6 @@ class Test_ObjFramework_Database_Derived_Nested_DupeKey(unittest.TestCase):
                            saveversion=0,
                            session='AM.AC.SC')
 
-
-        
         
     def test_student_objid(self):
         
@@ -315,8 +310,71 @@ class Test_ObjFramework_Database_Derived_Nested_DupeKey(unittest.TestCase):
                                  modname=__name__,
                                  dm=self.datamembers)
         
-        print self.of.store['student']
-        print obj1.student,obj2.student
+        #print self.of.store['student']
+        #print obj1.student,obj2.student    
+        
+        self.assertEqual(str(obj1.student),str(obj2.student))
+        
+class Test_ObjFramework_Database_Derived_DB(unittest.TestCase):
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        
+        datamembers = dict(period='830',
+                           student='Booker',
+                           teacher='Amelia',
+                           saveversion=0,
+                           session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,
+                                 'DBLesson',
+                                 objid='dblesson0',
+                                 constructor='datamembers',
+                                 database=self.database,
+                                 of=self.of,
+                                 modname=__name__,
+                                 dm=datamembers)
+        self.foobar.keepversion = True
+        
+    def test_persist(self):
+
+        with self.database:
+            self.foobar.persist()
+
+        self.database = Database('foobar',True)
+        with self.database:
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'DBLesson',['student','teacher']) 
+            
+            self.assertEquals([['Booker','Amelia']],tbl_rows)
+            
+    def test_persist_customtimestamp(self):
+        
+        self.foobar.customtimestamp = "%y%m%d_%H%M%S"
+        with self.database:
+            self.foobar.persist()
+
+        self.database = Database('foobar',True)
+        with self.database:
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'DBLesson',['__timestamp']) 
+            
+            self.assertTrue(13,len(tbl_rows[0][0]))
+            
+    def test_update_1field(self):
+        
+        expected_results = [[u'830', u'AM.AC.SC', u'Booker', u'Amelia', u'version'], 
+                            [u'830', u'AM.AC.SC', u'Booker', u'Aaron', u'current']]
+        self.foobar.customtimestamp = "%y%m%d_%H%M%S"
+        with self.database:
+            self.foobar.persist()
+            self.foobar.update('teacher',"\"Aaron\"")
+
+        self.database = Database('foobar',True)
+        with self.database:
+            col_name,tbl_rows,_ = tbl_rows_get(self.database,'DBLesson',['period','session','student','teacher','__version'] ) 
+            
+            self.assertListEqual(tbl_rows,expected_results)
+                    
+        
         
 
 class Test_ObjFrameworkSearch(unittest.TestCase):
@@ -376,10 +434,11 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_class))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkIter))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived))
-    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested_DupeKey))
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkSearch))
+        
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_DB))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

@@ -13,22 +13,25 @@ from database_table_util import tbl_rows_get
 from misc_utils_objectfactory import ObjFactory
 import sswizard_utils
 import ssviewer_utils
+from shutil import copyfile
 
-def create_test_db(dbname,files):
+
+def create_test_db(dbname,files,keepversion):
     #filename,prep):
     #database = Database(dbname)
     #files = [(filename,prep,True)]
     ssloader = SSLoader(dbname)
+    ssloader.keepversion = keepversion
     ssloader.run(dbname,files)
     
 class Test_Viewer_Base(unittest.TestCase):
     
-    def setUp(self,dbname,files=None):
+    def setUp(self,dbname,files=None,keepversion=False):
         
         self.dbname = dbname
         
         if files <> None:
-            create_test_db(self.dbname,files)
+            create_test_db(self.dbname,files,keepversion)
         self.database = Database(self.dbname)
         
         of = ObjFactory(True)
@@ -47,34 +50,49 @@ also the tests may expect the old periods, so 1210-100,100-140,140-220,220-300,3
 same goes for Test_Viewer_Conflicts_master_record;  same instruxx as above
 '''
 
+'''
+if the tests fail because there are no pm periods; its because the tests are still
+expecting the old style periods; fire up dbtblviewer and update the periods to
+1210-100,100-140,140-220,220-300,300-330 and rerun the test_ abovwe
+'''
+
 class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
     
     def setUp(self):
         #Test_Viewer_Base.setUp(self,"test_ssloader",[("prep5student.csv",5,True)])
         Test_Viewer_Base.setUp(self,"test_ssloader")
     
-    '''def test_(self):
-        pass'''
+    #def test_(self):
+    #    pass
     
     def test_Mo_830_910_Peter_adult_subject(self):
         
-        expected_results = [['', u'MO'], [u'830-910', [(u'Amelia', u'ELA')]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'value': u'Amelia'}, {'value': u'ELA'})]]]
+        
         
         self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
 
         results = self.app.viewer(ui=False,ztypes=['adult','subject'],source_type="student",source_value="Peter")
     
+    
         self.assertListEqual(results,expected_results)
-        
+
     
     def test_Mo_Peter_adult_subject(self):
-        
-        expected_results = [['', u'MO'], [u'830-910', [(u'Amelia', u'ELA')]], [u'910-950', [(u'??', u'Core')]],
-                            [u'950-1030', [(u'Paraic', u'Science')]],[u'1030-1110', [(u'Issey', u'History')]], 
-                            [u'1110-1210', [(u'??', u'Computer Time')]], [u'1210-100', [(u'[Paraic,Rahul]', u'??')]], 
-                            [u'100-140', [(u'Amelia', u'ELA')]], [u'140-220', [(u'Karolina', u'Counseling')]], 
-                            [u'220-300', [(u'??', u'Movement')]], [u'300-330', [(u'??', u'Computer Time')]]]
 
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'value': u'Amelia'}, {'value': u'ELA'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'910-950'}, [({'value': u'??'}, {'value': u'Core'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'950-1030'}, [({'value': u'Paraic'}, {'value': u'Science'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1030-1110'}, [({'value': u'Issey'}, {'value': u'History'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1110-1210'}, [({'value': u'??'}, {'value': u'Computer Time'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1210-100'}, [({'value': u'[Paraic,Rahul]'}, {'value': u'??'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'100-140'}, [({'value': u'Amelia'}, {'value': u'ELA'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'140-220'}, [({'value': u'Karolina'}, {'value': u'Counseling'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'220-300'}, [({'value': u'??'}, {'value': u'Movement'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'300-330'}, [({'value': u'??'}, {'value': u'Computer Time'})]]]
+
+        
         self.app.load(saveversion=1,student="Peter",dow="MO")
 
         results = self.app.viewer(ui=False,ztypes=['adult','subject'],source_type="student",source_value="Peter")
@@ -83,7 +101,7 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
     
     def test_Mo_830_910_Peter_adult_recordtype(self):
         
-        expected_results = [['', u'MO'], [u'1030-1110', [(u'Issey', u'wp')]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1030-1110'}, [({'value': u'Issey'}, {'value': u'wp'})]]]
         
         self.app.load(saveversion=1,student="Peter",dow="MO",period="1030-1110")
 
@@ -93,8 +111,9 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
         
     def test_Mo_830_910_adult_subject(self):
         
-        expected_results = [['', u'MO'],[u'1030-1110',[(u'Jake', u'Aaron'), (u'Peter', u'Issey'), (u'Orig', u'??'), (u'Bruno', u'Dylan'), (u'Oscar', u'Paraic'), (u'Clayton', u'Dylan'), (u'Jack', u'Paraic'), (u'Nathaniel', u'Amelia'), (u'Stephen', u'??')]]]
-
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1030-1110'}, [({'value': u'Jake'}, {'value': u'Aaron'}), ({'value': u'Peter'}, {'value': u'Issey'}), ({'value': u'Orig'}, {'value': u'??'}), ({'value': u'Bruno'}, {'value': u'Dylan'}), ({'value': u'Oscar'}, {'value': u'Paraic'}), ({'value': u'Clayton'}, {'value': u'Dylan'}), ({'value': u'Jack'}, {'value': u'Paraic'}), ({'value': u'Nathaniel'}, {'value': u'Amelia'}), ({'value': u'Stephen'}, {'value': u'??'})]]]
+        
         self.app.load(saveversion=1,student="",dow="MO",period="1030-1110")
 
         results = self.app.viewer(ui=False,ztypes=['student','adult'],source_type="student",source_value="")
@@ -105,19 +124,20 @@ class Test_Viewer_X_Period_Y_DOW(Test_Viewer_Base):
         
     def test_Mo_830_910_count_groupby(self):
         
-        expected_results = [['', u'MO'], [u'1030-1110', [8]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+         [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1030-1110'}, [({'value': 8},)]]]
 
         self.app.load(saveversion=1,student="",dow="MO",period="1030-1110")
 
         results = self.app.viewer(ui=False,ztypes=['*'],source_type="student",source_value="")
 
         self.assertListEqual(results,expected_results)
-        
-        
+               
     def test_Mo_830_910_adult_subject_no_unknowns(self):
         
-        expected_results = [['', u'MO'],[u'1030-1110',[(u'Jake', u'Aaron'), (u'Peter', u'Issey'), (u'Bruno', u'Dylan'), (u'Oscar', u'Paraic'), (u'Clayton', u'Dylan'), (u'Jack', u'Paraic'), (u'Nathaniel', u'Amelia')]]]
-
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1030-1110'}, [({'value': u'Jake'}, {'value': u'Aaron'}), ({'value': u'Peter'}, {'value': u'Issey'}), ({'value': u'Bruno'}, {'value': u'Dylan'}), ({'value': u'Oscar'}, {'value': u'Paraic'}), ({'value': u'Clayton'}, {'value': u'Dylan'}), ({'value': u'Jack'}, {'value': u'Paraic'}), ({'value': u'Nathaniel'}, {'value': u'Amelia'})]]]
+        
         self.app.load(saveversion=1,student="",dow="MO",period="1030-1110",unknown='N')
 
         results = self.app.viewer(ui=False,ztypes=['student','adult'],source_type="student",source_value="")
@@ -132,7 +152,8 @@ class Test_Viewer_X_Period_Y_Adult(Test_Viewer_Base):
 
     def test_Karolina_Peter_adult_subject(self):
         
-        expected_results = [['', u'Karolina'], [u'140-220', [(u'Peter', u'Counseling')]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Karolina'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'140-220'}, [({'value': u'Peter'}, {'value': u'Counseling'})]]]
         
         self.app.load(saveversion=1,student="Peter",teacher="Karolina")
 
@@ -142,17 +163,18 @@ class Test_Viewer_X_Period_Y_Adult(Test_Viewer_Base):
         
     def test_830_910_Peter_adult_subject(self):
         
-        expected_results = [['', u'??', u'Karolina', u'Paraic', u'Issey', u'[Paraic,Rahul]', u'Amelia'], 
-                            [u'830-910', [], [], [], [], [], [(u'Peter', u'ELA')]], 
-                            [u'910-950', [(u'Peter', u'Core')], [], [], [], [], []], 
-                            [u'950-1030', [], [], [(u'Peter', u'Science')], [], [], []], 
-                            [u'1030-1110', [], [], [], [(u'Peter', u'History')], [], []], 
-                            [u'1110-1210', [(u'Peter', u'Computer Time')], [], [], [], [], []], 
-                            [u'1210-100', [], [], [], [], [(u'Peter', u'??')], []], 
-                            [u'100-140', [], [], [], [], [], [(u'Peter', u'ELA')]], 
-                            [u'140-220', [], [(u'Peter', u'Counseling')], [], [], [], []], 
-                            [u'220-300', [(u'Peter', u'Movement')], [], [], [], [], []], 
-                            [u'300-330', [(u'Peter', u'Computer Time')], [], [], [], [], []]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'??'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Karolina'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Paraic'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Issey'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'[Paraic,Rahul]'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Amelia'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [], [], [], [], [], [({'value': u'Peter'}, {'value': u'ELA'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'910-950'}, [({'value': u'Peter'}, {'value': u'Core'})], [], [], [], [], []], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'950-1030'}, [], [], [({'value': u'Peter'}, {'value': u'Science'})], [], [], []], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1030-1110'}, [], [], [], [({'value': u'Peter'}, {'value': u'History'})], [], []], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1110-1210'}, [({'value': u'Peter'}, {'value': u'Computer Time'})], [], [], [], [], []], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1210-100'}, [], [], [], [], [({'value': u'Peter'}, {'value': u'??'})], []], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'100-140'}, [], [], [], [], [], [({'value': u'Peter'}, {'value': u'ELA'})]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'140-220'}, [], [({'value': u'Peter'}, {'value': u'Counseling'})], [], [], [], []], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'220-300'}, [({'value': u'Peter'}, {'value': u'Movement'})], [], [], [], [], []], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'300-330'}, [({'value': u'Peter'}, {'value': u'Computer Time'})], [], [], [], [], []]]
+
 
         self.app.load(saveversion=1,student="Peter",dow="MO")
 
@@ -225,21 +247,19 @@ class Test_Viewer_X_Period_Y_DOW_Formats(Test_Viewer_Base):
 
     def test_Mo_830_910_Peter_adult_1attr(self):
                 
-        expected_results = [[dict(value='',bgcolor='#ffffff',fgcolor='#000000'), dict(value=u'MO',bgcolor='#ffffff',fgcolor='#000000')], 
-                            [dict(value=u'830-910',bgcolor='#ffffff',fgcolor='#000000'), [(dict(value='ELA',bgcolor='#ffcc99',fgcolor='#ffffff'),)]]]
-                            
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},)]]]
+        
         self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
 
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="Peter",formatson=True)
-        
-        #print results
-        
+
         self.assertListEqual(results,expected_results)
         
-    '''def test_Mo_830_910_Peter_adult_2attr(self):
+    def test_Mo_830_910_Peter_adult_2attr(self):
                 
-        expected_results = [['', u'MO'], 
-                            [u'830-910', [(dict(value='ELA',bgcolor='#ffcc99',fgcolor='black'),dict(value='Amelia',bgcolor='#006600',fgcolor='green'))]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'}, {'bgcolor': u'#006600', 'fgcolor': u'#00ff00', 'value': u'Amelia'})]]]
                             
         self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
 
@@ -248,15 +268,15 @@ class Test_Viewer_X_Period_Y_DOW_Formats(Test_Viewer_Base):
         self.assertListEqual(results,expected_results)
         
     def test_Mo_830_910_Peter_adult_1attr_multi_items(self):
-                
-        expected_results = [['', u'MO'], 
-                            [u'830-910', [(dict(value='ELA',bgcolor='#ffcc99',fgcolor='black'),dict(value='Amelia',bgcolor='#006600',fgcolor='green'))]]]
-                            
+                              
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'}, {'bgcolor': u'#006600', 'fgcolor': u'#00ff00', 'value': u'Amelia'})]]]
+       
         self.app.load(saveversion=1,student="Peter",dow="MO",period="830-910")
 
         results = self.app.viewer(ui=False,ztypes=['subject','adult'],source_type="student",source_value="Peter",formatson=True)
         
-        self.assertListEqual(results,expected_results)'''
+        self.assertListEqual(results,expected_results)
         
 class Test_Viewer_UI_Conflicts(Test_Viewer_Base):
     def setUp(self):
@@ -376,8 +396,8 @@ class Test_1row_1col_1subrow_1subcol(Test_Viewer_Base):
        
     def test_(self):
         
-        expected_results = [['', u'MO'], [u'830-910', [(u'ELA',)]]]
-
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'value': u'ELA'},)]]]
+        
         self.app.load(saveversion=1,student="",dow="MO",period="830-910")
         
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
@@ -386,8 +406,9 @@ class Test_1row_1col_1subrow_1subcol(Test_Viewer_Base):
         
     def test_formats(self):
 
-        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
-                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},)]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},)]]]
+        
         self.app.load(saveversion=1,student="",dow="MO",period="830-910")
         
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True)
@@ -403,7 +424,10 @@ class Test_1row_1col_2subrow_1subcol(Test_Viewer_Base):
        
     def test_(self):
         
-        expected_results = [['', u'MO'],[u'830-910', [(u'ELA',), (u'Math',)]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+         [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, 
+          [({'value': u'ELA'},), ({'value': u'Math'},)]]]
+        
         self.app.load(saveversion=1,student="",dow="MO",period="830-910")
         
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
@@ -412,9 +436,9 @@ class Test_1row_1col_2subrow_1subcol(Test_Viewer_Base):
         
     def test_formats(self):
 
-        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
-                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
-                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},), 
+                                                                                                   ({'bgcolor': u'#99ffcc', 'fgcolor': u'#000000', 'value': u'Math'},)]]]
 
         self.app.load(saveversion=1,student="",dow="MO",period="830-910")
         
@@ -431,8 +455,10 @@ class Test_2row_1col_2subrow_1subcol(Test_Viewer_Base):
        
     def test_(self):
         
-        expected_results = [['', u'MO'], [u'830-910', [(u'ELA',), (u'Math',)]], [u'910-950', [(u'ELA',), (u'Math',)]]]
-
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'value': u'ELA'},), ({'value': u'Math'},)]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'910-950'}, [({'value': u'ELA'},), ({'value': u'Math'},)]]]
+        
 
         self.app.load(saveversion=1,student="",dow="MO")
         
@@ -442,12 +468,12 @@ class Test_2row_1col_2subrow_1subcol(Test_Viewer_Base):
         
     def test_formats(self):
 
-        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
-                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
-                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]], 
-                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'910-950'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
-                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]]]
-
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},), 
+                                                                                                   ({'bgcolor': u'#99ffcc', 'fgcolor': u'#000000', 'value': u'Math'},)]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'910-950'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},), 
+                                                                                                   ({'bgcolor': u'#99ffcc', 'fgcolor': u'#000000', 'value': u'Math'},)]]]
+        
         self.app.load(saveversion=1,student="",dow="MO")
         
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True)
@@ -462,27 +488,28 @@ class Test_2row_2col_2subrow_1subcol(Test_Viewer_Base):
         Test_Viewer_Base.setUp(self,"2subrow_1subcol")
        
     def test_(self):
-
-        expected_results = [['', u'MO', u'TU'], 
-                            [u'830-910', [(u'ELA',), (u'Math',)], [(u'ELA',), (u'Math',)]], 
-                            [u'910-950', [(u'ELA',), (u'Math',)], [(u'ELA',), (u'Math',)]]]
+        expected_result = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'TU'}], 
+                           [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'value': u'ELA'},), ({'value': u'Math'},)], [({'value': u'ELA'},), ({'value': u'Math'},)]], 
+                           [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'910-950'}, [({'value': u'ELA'},), ({'value': u'Math'},)], [({'value': u'ELA'},), ({'value': u'Math'},)]]]
 
 
         self.app.load(saveversion=1,student="")
         
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="")
 
-        self.assertListEqual(expected_results,results)
+        self.assertListEqual(expected_result,results)
         
     def test_formats(self):
 
-        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'TU'}], 
-                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
-                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)], [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
-                                                                                                                                                                  ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]], 
-                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'910-950'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
-                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)], [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'},), 
-                                                                                                                                                                  ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'},)]]]
+                                     
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'TU'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},), 
+                                                                                                   ({'bgcolor': u'#99ffcc', 'fgcolor': u'#000000', 'value': u'Math'},)], [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},), 
+                                                                                                                                                                          ({'bgcolor': u'#99ffcc', 'fgcolor': u'#000000', 'value': u'Math'},)]], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'910-950'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},), 
+                                                                                                   ({'bgcolor': u'#99ffcc', 'fgcolor': u'#000000', 'value': u'Math'},)], [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'},), 
+                                                                                                                                                                          ({'bgcolor': u'#99ffcc', 'fgcolor': u'#000000', 'value': u'Math'},)]]]                                                                                                                                                                                                              
+        
         self.app.load(saveversion=1,student="")
         
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True)
@@ -494,11 +521,14 @@ class Test_nrow_ncol_2subrow_1subcol(Test_Viewer_Base):
     def setUp(self):
         Test_Viewer_Base.setUp(self,"test_ssloader")
         
+    '''def test_(self):
+        pass'''
+    
     def test_formats(self):
     
         self.app.load(saveversion=1,student="Peter",dow="MO")
-    
-        self.expected_result = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'??'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Karolina'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Paraic'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Issey'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'[Paraic,Rahul]'}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'Amelia'}], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [], [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'})]], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'910-950'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#666600', 'fgcolor': '#ffffff', 'value': u'Core'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'950-1030'}, [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#006600', 'fgcolor': '#ffffff', 'value': u'Science'})], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1030-1110'}, [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ff9999', 'fgcolor': '#ffffff', 'value': u'History'})], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1110-1210'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#663300', 'fgcolor': '#ffffff', 'value': u'Computer Time'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'1210-100'}, [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'??'})], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'100-140'}, [], [], [], [], [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'})]], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'140-220'}, [], [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ccff99', 'fgcolor': '#ffffff', 'value': u'Counseling'})], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'220-300'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#ff9999', 'fgcolor': '#ffffff', 'value': u'Movement'})], [], [], [], [], []], [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'300-330'}, [({'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Peter'}, {'bgcolor': '#663300', 'fgcolor': '#ffffff', 'value': u'Computer Time'})], [], [], [], [], []]]
+
+        self.expected_result = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'??'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Karolina'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Paraic'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Issey'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'[Paraic,Rahul]'}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'Amelia'}], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [], [], [], [], [], [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'})]], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'910-950'}, [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#666600', 'fgcolor': u'#000000', 'value': u'Core'})], [], [], [], [], []], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'950-1030'}, [], [], [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#006600', 'fgcolor': u'#000000', 'value': u'Science'})], [], [], []], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1030-1110'}, [], [], [], [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#ff9999', 'fgcolor': u'#000000', 'value': u'History'})], [], []], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1110-1210'}, [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#663300', 'fgcolor': u'#000000', 'value': u'Computer Time'})], [], [], [], [], []], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'1210-100'}, [], [], [], [], [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'??'})], []], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'100-140'}, [], [], [], [], [], [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'})]], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'140-220'}, [], [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#ccff99', 'fgcolor': u'#000000', 'value': u'Counseling'})], [], [], [], []], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'220-300'}, [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#ff9999', 'fgcolor': u'#000000', 'value': u'Movement'})], [], [], [], [], []], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'300-330'}, [({'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Peter'}, {'bgcolor': u'#663300', 'fgcolor': u'#000000', 'value': u'Computer Time'})], [], [], [], [], []]]
         
         results = self.app.viewer(ui=False,ztypes=['student','subject'],source_type="student",source_value="Peter",yaxis_type="adult",formatson=True)
             
@@ -513,7 +543,9 @@ class Test_1row_1col_2subrow_2subcol(Test_Viewer_Base):
        
     def test_(self):
         
-        expected_results = [['', u'MO'], [u'830-910', [(u'ELA', u'Amelia'), (u'Math', u'Aaron')]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], 
+                            [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'value': u'ELA'}, {'value': u'Amelia'}), ({'value': u'Math'}, {'value': u'Aaron'})]]]
+        
         
         self.app.load(saveversion=1,student="",dow="MO",period="830-910")
         
@@ -523,10 +555,8 @@ class Test_1row_1col_2subrow_2subcol(Test_Viewer_Base):
         
     def test_formats(self):
 
-        expected_results = [[{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'MO'}], 
-                            [{'bgcolor': '#ffffff', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'fgcolor': '#ffffff', 'value': u'ELA'}, {'bgcolor': '#006600', 'fgcolor': '#00ff00', 'value': u'Amelia'}), 
-                                                                                               ({'bgcolor': '#99ffcc', 'fgcolor': '#ffffff', 'value': u'Math'}, {'bgcolor': '#d3d3d3', 'fgcolor': '#ffffff', 'value': u'Aaron'})]]]
-
+        expected_results = [[{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'MO'}], [{'bgcolor': u'#ffffff', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'fgcolor': u'#000000', 'value': u'ELA'}, {'bgcolor': u'#006600', 'fgcolor': u'#00ff00', 'value': u'Amelia'}), ({'bgcolor': u'#99ffcc', 'fgcolor': u'#000000', 'value': u'Math'}, {'bgcolor': u'#d3d3d3', 'fgcolor': u'#ffffff', 'value': u'Aaron'})]]]
+        
         self.app.load(saveversion=1,student="",dow="MO",period="830-910")
         
         results = self.app.viewer(ui=False,ztypes=['subject','adult'],source_type="student",source_value="",formatson=True)
@@ -542,20 +572,17 @@ class Test_valuetype(Test_Viewer_Base):
         
     def test_formats(self):
 
-        expected_results = [[{'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': u'MO'}], [{'bgcolor': '#ffffff', 'valuetype': 'period', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'valuetype': 'subject', 'fgcolor': '#ffffff', 'value': u'ELA'},)]]]
+        expected_results = [[{'bgcolor': u'#ffffff', 'valuetype': 'dow', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'valuetype': 'dow', 'fgcolor': u'#000000', 'value': u'MO'}], [{'bgcolor': u'#ffffff', 'valuetype': 'period', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'valuetype': 'subject', 'fgcolor': u'#000000', 'value': u'ELA'},)]]]
         
         self.app.load(saveversion=1,student="",dow="MO",period="830-910")
         
         results = self.app.viewer(ui=False,ztypes=['subject'],source_type="student",source_value="",formatson=True,valuetype=True)
         
-        print results
-        
         self.assertListEqual(expected_results,results)
         
     def test_formats_3attr(self):
 
-        expected_results = [[{'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': ''}, {'bgcolor': '#ffffff', 'valuetype': 'dow', 'fgcolor': '#000000', 'value': u'MO'}], [{'bgcolor': '#ffffff', 'valuetype': 'period', 'fgcolor': '#000000', 'value': u'830-910'}, [({'bgcolor': '#ffcc99', 'valuetype': 'subject', 'fgcolor': '#ffffff', 'value': u'ELA'}, {'bgcolor': '#006600', 'valuetype': 'adult', 'fgcolor': '#00ff00', 'value': u'Amelia'}, {'bgcolor': '#d3d3d3', 'valuetype': 'period', 'fgcolor': '#ffffff', 'value': u'830-910'})]]]
-                
+        expected_results = [[{'bgcolor': u'#ffffff', 'valuetype': 'dow', 'fgcolor': u'#000000', 'value': ''}, {'bgcolor': u'#ffffff', 'valuetype': 'dow', 'fgcolor': u'#000000', 'value': u'MO'}], [{'bgcolor': u'#ffffff', 'valuetype': 'period', 'fgcolor': u'#000000', 'value': u'830-910'}, [({'bgcolor': u'#ffcc99', 'valuetype': 'subject', 'fgcolor': u'#000000', 'value': u'ELA'}, {'bgcolor': u'#006600', 'valuetype': 'adult', 'fgcolor': u'#00ff00', 'value': u'Amelia'}, {'bgcolor': u'#d3d3d3', 'valuetype': 'period', 'fgcolor': u'#ffffff', 'value': u'830-910'})]]]
         self.app.load(saveversion=1,student="",dow="MO",period="830-910")
         
         results = self.app.viewer(ui=False,ztypes=['subject','adult','period'],source_type="student",source_value="",formatson=True,valuetype=True)
@@ -678,11 +705,96 @@ class Test_Service_nopivot_17lessons(Test_Viewer_Base):
         self.assertListEqual(expected_results,results) 
         
         
+class Test_Viewer_Update(Test_Viewer_Base):
+    
+    '''
+    cp test_ssloader.sqlite to test_ssviewer_update.sqlite
+    to make sure has recordtype table and that it has old periods
+    
+    uncomment the setUp with files and just un comment pass
+    
+    then run again with inverse
+    '''
+    def setUp(self):
+        #Test_Viewer_Base.setUp(self,"test_ssviewer_update",[("prep5studentClaytonPeriod1WP.csv",5,True)],True)
+        Test_Viewer_Base.setUp(self,"test_ssviewer_update")
+        
+        self.dbname='test_ssviewer_update'
+        refdbname='test_ssviewer_update'
+        
+        self.database = Database(self.dbname)
+        self.refdatabase = Database(refdbname)
+        self.of = ObjFactory(True)
+        self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.refdatabase)
+        
+        
+    '''def test_(self):
+        pass'''
+        
+    def test_create_versions(self):
+
+        expected_results = [['foobar'],['foobar'],['foobar'],['foobar'],['foobar']]
+        
+        ssviewer_utils.dataset_load(self.database,self.refdatabase,
+                                    self.of,self.enums,unknown='Y')
+        
+        with self.database:
+            for lesson in self.of.query('lesson'):
+                lesson.keepversion=True
+                lesson.customtimestamp = "%y%m%d_%H%M%S"
+                lesson.update('subject',"\"foobar\"")
+        
+            _,rows,_ = tbl_rows_get(self.database,"lesson",['subject'],
+                                    [['__version','=',"\"current\""],
+                                     ['status','=',"\"master\""]])
+        
+        self.assertListEqual(expected_results,rows)
+        
+    def tearDown(self):
+        copyfile(self.dbname+".sqlite.backup",self.dbname+".sqlite")
+        
+
+
+class Test_Viewer_Update_Recover(Test_Viewer_Base):
+    
+    def setUp(self):
+        Test_Viewer_Base.setUp(self,"test_ssviewer_update_recover")
+        
+        self.dbname='test_ssviewer_update_recover'
+        refdbname='test_ssviewer_update_recover'
+        
+        self.database = Database(self.dbname)
+        self.refdatabase = Database(refdbname)
+        self.of = ObjFactory(True)
+        self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.refdatabase)
+        
+    def test_(self):
+        
+        expected_results = [['foobar'],['foobar'],['foobar'],['foobar'],['foobar']]
+        
+        ssviewer_utils.dataset_load(self.database,self.refdatabase,
+                                    self.of,self.enums,unknown='Y',
+                                    keepversion=True)
+        
+        results = []
+        for lesson in self.of.query('lesson'):
+            results.append([lesson.subject.name])
+            
+        self.assertListEqual(expected_results,results)
+        
+    
+    def tearDown(self):
+        copyfile(self.dbname+".sqlite.backup",self.dbname+".sqlite")
+        
+class Test_Viewer_Service(Test_Viewer_Base):
+    pass
+
+    
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_2subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_1col_2subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_2col_2subrow_1subcol))
@@ -692,10 +804,14 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_valuetype))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Update))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Update_Recover))
+    
+    
+    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_1lesson))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_2lessons))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_17lessons))'''
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_17lessons))
     
     ''' only need these if conflicts code is uncommented in viewer '''
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts))

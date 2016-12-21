@@ -55,9 +55,12 @@ class WizardUI(Tk):
         #self.clipboard_selection=-1
         Tk.__init__(self)
         
-        globals()['colors'] = dbcolors_get(dbname)
-        self.colorpalette = dbformats_get(dbname,'bgcolor')
-        self.fontpalette = dbformats_get(dbname,'fgcolor')
+        try:
+            globals()['colors'] = dbcolors_get(dbname)
+            self.colorpalette = dbformats_get(dbname,'bgcolor')
+            self.fontpalette = dbformats_get(dbname,'fgcolor')
+        except:
+            pass
         
         #self.colorpalette = colorpalette
         #self.fontpalette = fontpalette
@@ -79,7 +82,7 @@ class WizardUI(Tk):
         self.of = of
 
         
-        font = tkFont.Font(family="monospace", size=12) 
+        font = tkFont.Font(family="monospace", size=9) 
         self.font = font
         
         self.lastsaveversion=0
@@ -359,18 +362,18 @@ class WizardUI(Tk):
                                                             
                                 if isinstance(_value[0],tuple) == True:
                                     # 1 item, multi attributes
-                                    bgs,fgs = _color_get_multi(_value[0])
+                                    bgs,fgs = ssviewer_utils._color_get_multi(_value[0])
                                     _widgets = widget.addlabel(len(_value[0]),True,_value[0],bgs,fgs,wratio)
                                 elif isinstance(_value[0],list) == False:
                                     # 1 item, single value
-                                    bg,fg = color_get(_value[0])
+                                    bg,fg = ssviewer_utils.color_get(_value[0])
                                     _widgets = widget.addlabel(1,True,_value[0],bg,fg)
                                     
                             # multiple items
                             #if len(_value) > 1 and conflicts_only == "Y": # replace with line below if want to switch on conflicts
                             if len(_value) > 1:
                                 for __value in _value:
-                                    bgs,fgs = _color_get_multi(__value)
+                                    bgs,fgs = ssviewer_utils._color_get_multi(__value)
                                     _widgets = widget.addlabel(len(__value),True,__value,bgs,fgs,wratio)
 
                     else:

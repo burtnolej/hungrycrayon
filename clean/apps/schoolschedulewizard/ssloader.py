@@ -56,6 +56,7 @@ class SSLoader(object):
     
     def __init__(self,databasename,prep=-1):
 	
+	self.keepversion = False
 	self.database = Database(databasename)
 	_rules = [('computertime',[("Computer Time",1),(":",0),("with",0)]),
 
@@ -999,8 +1000,10 @@ class SSLoader(object):
 		
 		dblessonrows.append(_record)
 		
-	dbinsert_direct(self.database,dbsessionrows,'session',self.sourcecode,masterstatus=False)
-	dbinsert_direct(self.database,dblessonrows,'lesson',self.sourcecode,masterstatus=False)    
+	dbinsert_direct(self.database,dbsessionrows,'session',
+	                self.sourcecode,masterstatus=False,keepversion=self.keepversion)
+	dbinsert_direct(self.database,dblessonrows,'lesson',
+	                self.sourcecode,masterstatus=False,keepversion=self.keepversion)    
 
     def primary_record_set_session(self):
 	
@@ -1187,6 +1190,7 @@ class SSLoader(object):
 	    pass
 
 	self.ssloader = SSLoader(self.databasename)
+	self.ssloader.keepversion=self.keepversion
 	self.ssloader.ssloader(files,self.databasename)
 
 	log.log(thisfuncname(),3,msg="creating master record set")    
@@ -1203,8 +1207,8 @@ class SSLoader(object):
 
 	if insertprimary==True:
 	    log.log(thisfuncname(),10,msg="loading master record set")    
-	    dbinsert_direct(self.database,newsessionrows,'session','dbinsert')
-	    dbinsert_direct(self.database,newrows,'lesson','dbinsert')
+	    dbinsert_direct(self.database,newsessionrows,'session','dbinsert',keepversion=self.keepversion)
+	    dbinsert_direct(self.database,newrows,'lesson','dbinsert',keepversion=self.keepversion)
 	else:
 	    return newrows
 

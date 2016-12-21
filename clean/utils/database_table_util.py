@@ -9,9 +9,10 @@ log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
 from misc_utils_enum import enum
 from database_util import schema_data_get, db_enum, Database, \
      tbl_create, tbl_exists, tbl_remove, tbl_rename
-from misc_utils_generic import GenericBase
+from misc_utils_generic import GenericBase, IDGenerator
 from datetime import datetime
 from types import StringType,IntType, UnicodeType
+from copy import deepcopy
 
 test_db = enum(name="db_name_test",
                tbl_name="tbl_name_test",
@@ -72,7 +73,17 @@ class dbtblgeneric(GenericBase):
 	if include_internal == True:
 	    self.tbl_col_defn += [('__timestamp','text'),('__id','text')]
 	    self.tbl_col_names += ['__timestamp','__id']
+	    
+	    if hasattr(self,"keepversion"):
+		self.tbl_col_defn += [('__version','text')]
+		self.tbl_col_names += ['__version']
 	
+    def _gettimestamp(self):
+	if hasattr(self,"customtimestamp"):
+	    timeformatstr = self.customtimestamp
+	else:
+	    timeformatstr = "%H:%M:%S"
+	return(datetime.now().strftime(timeformatstr))  
 	
     def tbl_row_value_get(self,include_internal=True):
 	#t = [_val for _key,_val in self.attr_get_keyval(include_callable=False,
@@ -94,10 +105,27 @@ class dbtblgeneric(GenericBase):
 		
 		
 	# also include useful system info 
-	if include_internal == True:
-	    t.append("\"" + datetime.now().strftime("%H:%M:%S") + "\"")
-	    t.append("\"" + self.id + "\"")
+	if include_internal == True:	    
+	    if hasattr(self,'__timestamp') == False:	
+		t.append("\"" + self._gettimestamp()  + "\"")
+	    else:
+		t.append("\""+getattr(self,"__timestamp")+"\"")
+		
+	    if hasattr(self,'id') == False:
+	    #if hasattr(self,'__id') == False:
+		#t.append("\"" + str(self.id) + "\"")
+		t.append("\"" + str(IDGenerator().getid()) + "\"")
+	    else:
+		#t.append("\""+str(getattr(self,"id"))+"\"")
+		t.append("\""+str(getattr(self,"id"))+"\"")
 	    
+	    if hasattr(self,"keepversion"):
+		if hasattr(self,'__version') == False:
+		    #t.append("\"init\"")
+		    t.append("\"current\"")
+		else:
+		    t.append("\""+getattr(self,"__version")+"\"")
+		
 	self.tbl_row_values = [t]
  
     def _metadata_set(self,include_internal=True):
@@ -128,6 +156,44 @@ class dbtblgeneric(GenericBase):
 	                         self.tbl_row_values)
 	
 	return(result,exec_str)
+    
+    
+    @logger(log)    
+    def update(self,field,newvalue):
+	
+	currentrecord = dict(zip(self.tbl_col_names,self.tbl_row_values[0]))
+	
+	_id = IDGenerator().getid()
+	_ts = self._gettimestamp()
+	
+	newrecord = deepcopy(currentrecord)
+	newrecord['__version'] = "\"current\""
+	newrecord[field] = newvalue
+	newrecord['__id'] = "\""+_id+"\""
+	
+	newrecord['__timestamp'] = "\""+_ts+"\""
+	
+	if currentrecord[field] <> newrecord[field]:
+	    # create a new row in the database with version "current"
+
+	    result,exec_str = tbl_rows_insert(self.database,
+	                         self.tbl_name,
+	                         newrecord.keys(),
+	                         [newrecord.values()])
+	    
+	    # update version of current row to version "version"
+	    #tbl_rows_update(self.database,self.tbl_name,['__version',"\"version\"",
+	    #	                                             '__id',currentrecord['__id']])
+	    
+	    tbl_rows_update(self.database,self.tbl_name,['__version',"\"version\"",
+		                                             '__id',"\""+self.id+"\""])    
+	    
+	    # update in mem object to new val and new db version id and timestamp
+	    setattr(self,field,newvalue)
+	    setattr(self,'id',_id)
+	    setattr(self,'__version',"current")
+	    setattr(self,'__timestamp',_ts)
+	    
 
 	
 def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
@@ -145,6 +211,7 @@ def tbl_rows_insert(database,tbl_name,tbl_col_name,tbl_rows):
     exec_str = "INSERT INTO {table} ({keys}) VALUES {rows}".format(table=tbl_name, \
                                                                        keys=col_name_str,\
                                                                        rows=tbl_rows_str)
+    
     result = database.execute(exec_str)
 
     return(exec_str,result) 

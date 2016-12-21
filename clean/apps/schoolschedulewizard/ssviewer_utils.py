@@ -7,14 +7,18 @@ log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
 
 from misc_utils import nxnarraycreate, thisfuncname
 from misc_utils_objectfactory import ObjFactory
+from misc_utils_generic import IDGenerator
 import sswizard_utils
 from ssviewer_utils_palette import *
 #from ssviewer_utils_palette import init_formats
 
 from database_util import Database, tbl_create
-from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query
+from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query, tbl_rows_insert, \
+     tbl_rows_update
 
 from ssviewer_utils_palette import dbformats_get, dbcolors_get
+
+from copy import deepcopy
 
 dbname,_ = sswizard_utils.getdatabase()
 
@@ -55,6 +59,73 @@ class schoolschedgeneric(dbtblgeneric):
 
             
         return(getattr(self,clsname))
+       
+    def update(self,field,newvalue):
+
+        # this is over writing the base class update
+        
+        # these are hacks; and the datatypes id/adult need to be
+        # called the same thing internally all the time
+        # until then though ....
+
+        # remove the id field as its set on the object from the
+        # internal __id field for convenience but should not be repersisted
+        # as the database layer will create the new __id for any revisions
+        
+        _id = getattr(self,'id').name
+        setattr(self,"__id",_id)
+        delattr(self,'id')
+
+        self.tbl_row_value_get(False)
+        self.tbl_col_defn_get(False)
+        self.tbl_name_get()
+
+        # and also 
+        try:
+            _idx = self.tbl_col_names.index('adult')
+            self.tbl_col_names.remove('adult')
+            self.tbl_col_names.insert(0,'teacher')
+        except:
+            pass
+
+        # and also objtype is not persisted
+        try:
+            _idx = self.tbl_col_names.index('objtype')
+            self.tbl_col_names.pop(_idx)
+            self.tbl_row_values[0].pop(_idx)
+        except:
+            pass
+
+        currentrecord = dict(zip(self.tbl_col_names,self.tbl_row_values[0]))
+
+        _id = IDGenerator().getid()
+        _ts = self._gettimestamp()
+
+        newrecord = deepcopy(currentrecord)
+        newrecord['__version'] = "\"current\""
+        newrecord[field] = newvalue
+        newrecord['__id'] = "\""+_id+"\""
+        newrecord['saveversion'] = 1
+
+        newrecord['__timestamp'] = "\""+_ts+"\""
+
+        if currentrecord[field] <> newrecord[field]:
+            # create a new row in the database with version "current"
+
+            result,exec_str = tbl_rows_insert(self.database,
+                                              self.tbl_name,
+                                              newrecord.keys(),
+                                              [newrecord.values()])
+
+            # update version of current row to version "version"
+            tbl_rows_update(self.database,self.tbl_name,['__version',"\"version\"",
+                                                         '__id',"\""+getattr(self,"__id")+"\""])
+
+            # update in mem object to new val and new db version id and timestamp
+            setattr(self,field,newvalue)
+            setattr(self,'id',_id)
+            setattr(self,'__version',"current")
+            setattr(self,'__timestamp',_ts)
     
 
 def _getpage(grid,pagelen,pagenum):
@@ -209,6 +280,7 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
 
     return values
 
+
 def dataset_serialize(values,formatson,schema=None):
 
     #if formatson==True:                
@@ -243,9 +315,17 @@ def dataset_serialize(values,formatson,schema=None):
                                 values[x][y].append(tuple(_formats))
                             elif isinstance(_value[0],list) == False:
                                 # 1 item, single value
-                                bg,fg = color_get(_value[0])
-
-                                print "1,1 attr",_value[0],bgs,fgs
+                                _formats = []
+                                
+                                args = dict(value=_value[0])
+                                
+                                if formatson==True:
+                                    args['bgcolor'] = bgs[i]
+                                    args['fgcolor'] = fgs[i]
+                                         
+                                _formats.append(args)
+                                values[x][y].append(tuple(_formats))
+                                
                         # multiple items
                         ''' uncomment if want to generate conflicts report'''
                         #if len(_value) > 1 and conflicts_only == "Y":
@@ -333,11 +413,14 @@ def _lesson_change(lesson):
     
     
 def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1,period="all",
-                 dow="all",teacher="all",student="all",source="dbinsert"):
+                 dow="all",teacher="all",student="all",source="dbinsert",keepversion=False):
     
     of.reset()
     
     whereclause = []
+    if keepversion==True:
+        ''' if versioning enabled make sure to only recover the latest/current version '''
+        whereclause = [['__version','=',"\"current\""]]
     
     # saveversion
     log.log(thisfuncname(),3,msg="loading",saveversion=str(saveversion))

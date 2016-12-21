@@ -436,7 +436,7 @@ def _getuserobjid(enums,cols,d):
     return(".".join(map(str,[_isenum(enums,col,d[col]) for col in cols])))	    
     
 @logger(log)
-def dbinsert_direct(database,records,tblname,source,masterstatus=True):
+def dbinsert_direct(database,records,tblname,source,masterstatus=True,keepversion=False):
     '''
     
     records : list of records where a record is of the form ('period','dow','subject','adult','student','type')
@@ -540,8 +540,17 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True):
 	    d['substatus'] = "notset"  
 	    
 	d['__id'] = IDGenerator().getid()
-	d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
+	
 
+	if keepversion == True:
+	    #d['__version'] = "init"
+	    d['__version'] = "current"
+	    d['__timestamp'] = datetime.now().strftime("%y-%m-%d_%H:%M:%S")
+	    
+	else:
+	    d['__timestamp'] = datetime.now().strftime("%H:%M:%S")
+	    
+		
 	d['enum'] = tablerow_count
 	d['source'] = source
     

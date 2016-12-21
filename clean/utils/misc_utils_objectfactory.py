@@ -94,9 +94,8 @@ class ObjFactory(GenericBase):
         for name, obj in self.store[clsname].iteritems():
             match=True
             for k,v in constraints:
-                print k,v,getattr(obj,k).name
-                
-                if getattr(obj,k).name <> v:
+                #if getattr(obj,k).name <> v:
+                if getattr(obj,k) <> v:
                     match=False
             if match==True:
                 results.append(obj)
