@@ -8,6 +8,7 @@ from ttk import *
 import unittest
 import ssviewer_utils
 import sswizard_utils
+import shutil
 
 from misc_utils_objectfactory import ObjFactory
 
@@ -125,11 +126,100 @@ class Test_getrecord(unittest.TestCase):
         use status field as "deleted"
         '''
     
+class Test_addrecord(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.dbname='service_add_record'
+        self.database = Database(self.dbname)
+        self.of = ObjFactory(True)
+        self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.database)
+        self.prepmap = sswizard_utils._loadprepmapper(self.database)
+
+        args = dict(database=self.database,refdatabase=self.database,saveversion=1,of=self.of,enums=self.enums)
+        ssviewer_utils.dataset_load(**args)
+
+    def test_(self):
+        
+        expected_result = 'Stan.Math.Tuesday.830-910'
+        
+        datamembers = {'student':'Nathaniel',
+                       'adult':'Stan',
+                       'subject':'Math',
+                       'period':'830-910',
+                       'recordtype':'subject',
+                       'dow':'Tuesday'}
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    datamembers=datamembers)
+    
+        ssviewer_utils.dataset_add(**args)
+    
+        self.assertEqual(self.of.object_get('lesson',datamembers['userobjid']).session.name,
+                         expected_result)
+        
+
+    def test_pivot(self):
+        
+        expected_result = [['', u'MO', u'TU'], [u'830-910', [], [('Math',)]], [u'1030-1110', [(u'Game Period',)], []]]
+
+        datamembers = {'student':'Clayton',
+                       'adult':'Stan',
+                       'subject':'Math',
+                       'period':'830-910',
+                       'recordtype':'subject',
+                       'dow':'Tuesday'}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    datamembers=datamembers)
+    
+        newobj = ssviewer_utils.dataset_add(**args)
+        
+        
+        args = dict(of=self.of,enums=self.enums,
+                    yaxis_type='dow',xaxis_type='period',
+                    source_type='student',source_value='Clayton',
+                    ztypes=['subject'])
+                    
+        result = ssviewer_utils.dataset_pivot(**args)
+    
+        self.assertListEqual(result,expected_result)
+        
+        with self.database:
+            newobj.persist()
+            
+            
+    def test_dupe(self):
+        
+        expected_result = [['', u'MO', u'TU'], [u'830-910', [], [('Math',)]], [u'1030-1110', [(u'Game Period',)], []]]
+
+        datamembers = {'student':'Clayton',
+                       'adult':'Stan',
+                       'subject':'Math',
+                       'period':'830-910',
+                       'recordtype':'subject',
+                       'dow':'Tuesday'}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    datamembers=datamembers)
+    
+        newobj = ssviewer_utils.dataset_add(**args)
+        
+        with self.assertRaises(Exception):
+            newobj = ssviewer_utils.dataset_add(**args)
+        
+        
+    def tearDown(self):
+        shutil.copyfile(self.dbname+".sqlite.backup",self.dbname + ".sqlite")
+        
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
+    
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

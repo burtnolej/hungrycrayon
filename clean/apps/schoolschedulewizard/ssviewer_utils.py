@@ -14,7 +14,7 @@ from ssviewer_utils_palette import *
 
 from database_util import Database, tbl_create
 from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query, tbl_rows_insert, \
-     tbl_rows_update
+     tbl_rows_update, tbl_exists, tbl_create
 
 from ssviewer_utils_palette import dbformats_get, dbcolors_get
 
@@ -60,8 +60,54 @@ class schoolschedgeneric(dbtblgeneric):
             
         return(getattr(self,clsname))
        
-    def update(self,field,newvalue):
+    def persist(self,createtable=True):
 
+        self._metadata_set()
+
+        try:
+            _idx = self.tbl_col_defn.index('adult')
+            self.tbl_col_defn.remove('adult')
+            self.tbl_col_defn.insert(0,'teacher')
+        except:
+            pass
+        
+        if not tbl_exists(self.database,self.tbl_name) ==True:
+            tbl_create(self.database,
+                       self.tbl_name,
+                       self.tbl_col_defn)
+
+        try:
+            _idx = self.tbl_col_names.index('adult')
+            self.tbl_col_names.remove('adult')
+            self.tbl_col_names.insert(0,'teacher')
+        except:
+            pass
+
+        # and also objtype is not persisted
+        try:
+            _idx = self.tbl_col_names.index('objtype')
+            self.tbl_col_names.pop(_idx)
+            self.tbl_row_values[0].pop(_idx)
+        except:
+            pass
+        
+        result,exec_str = tbl_rows_insert(self.database,
+                                          self.tbl_name,
+                                          self.tbl_col_names,
+                                          self.tbl_row_values)
+
+        return(result,exec_str)
+
+
+    def update(self,field,newvalue,dbname=None):
+
+        # this is needed to get around the sqlite limitation that
+        # an sqlite cursor can only be used in the thread it was instantiated in
+        if dbname <> None:
+            database = Database(dbname)
+        else:
+            database = self.database
+            
         # this is over writing the base class update
         
         # these are hacks; and the datatypes id/adult need to be
@@ -72,8 +118,11 @@ class schoolschedgeneric(dbtblgeneric):
         # internal __id field for convenience but should not be repersisted
         # as the database layer will create the new __id for any revisions
         
-        _id = getattr(self,'id').name
-        setattr(self,"__id",_id)
+        _oldidobj = getattr(self,'id')
+        #_id = getattr(self,'id').name
+        #setattr(self,"__id",_id)
+        setattr(self,"__id",_oldidobj.name)
+            
         delattr(self,'id')
 
         self.tbl_row_value_get(False)
@@ -103,7 +152,7 @@ class schoolschedgeneric(dbtblgeneric):
 
         newrecord = deepcopy(currentrecord)
         newrecord['__version'] = "\"current\""
-        newrecord[field] = newvalue
+        newrecord[field] = "\"" + str(newvalue) + "\""
         newrecord['__id'] = "\""+_id+"\""
         newrecord['saveversion'] = 1
 
@@ -112,18 +161,27 @@ class schoolschedgeneric(dbtblgeneric):
         if currentrecord[field] <> newrecord[field]:
             # create a new row in the database with version "current"
 
-            result,exec_str = tbl_rows_insert(self.database,
-                                              self.tbl_name,
-                                              newrecord.keys(),
-                                              [newrecord.values()])
-
-            # update version of current row to version "version"
-            tbl_rows_update(self.database,self.tbl_name,['__version',"\"version\"",
-                                                         '__id',"\""+getattr(self,"__id")+"\""])
+            with database:
+                result,exec_str = tbl_rows_insert(database,
+                                                  self.tbl_name,
+                                                  newrecord.keys(),
+                                                  [newrecord.values()])
+    
+                # update version of current row to version "version"
+                tbl_rows_update(database,self.tbl_name,['__version',"\"version\"",
+                                                             '__id',"\""+getattr(self,"__id")+"\""])
 
             # update in mem object to new val and new db version id and timestamp
-            setattr(self,field,newvalue)
-            setattr(self,'id',_id)
+            
+            # assumes that field is also an objects whose value is in the name attr
+            _oldobj = getattr(self,field)
+            setattr(_oldobj,'name',newvalue)
+
+            # give the new updated record the same database ref id as prev version
+            setattr(_oldidobj,"name",_id)
+            setattr(self,'id',_oldidobj)
+            
+            #setattr(self,'id',_id)
             setattr(self,'__version',"current")
             setattr(self,'__timestamp',_ts)
     
@@ -386,6 +444,7 @@ def _lesson_change(lesson):
         obj.lessons[xtype_id][ytype_id].append(lesson)
     
     adult = lesson.adult
+        
     student = lesson.student
     subject = lesson.subject
 
@@ -412,6 +471,47 @@ def _lesson_change(lesson):
     _add(subject,'dow','period',lesson) # indexed by dow/period
     
     
+def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,keepversion=False):
+    '''
+    in the datamembers dict needs to come 'period','student','dow','adult','subject','recordtype'
+    
+    values need to be the names for dow, so 'Monday','Tuesday' etc'''
+
+    datamembers['session'] = ".".join([datamembers['adult'],datamembers['subject'],datamembers['dow'],
+                               sswizard_utils._isname(enums,'period',datamembers['period'])])
+    
+    datamembers['userobjid'] = sswizard_utils._getuserobjid(enums,['period','dow','student','adult','subject'],datamembers)
+    
+    # check that the userobjid does not already exist
+    if of.object_exists('lesson',datamembers['userobjid']) == True:
+        raise Exception("id already in use",datamembers['userobjid'])
+    
+    datamembers['objtype'] = 'lesson'   
+    datamembers['status'] = 'complete'
+    datamembers['prep'] = int(prepmap[datamembers['student']])
+    datamembers['source']="manual"
+    datamembers['saveversion']=1
+        
+    # switch to code
+    datamembers['dow'] = sswizard_utils._iscode(enums,'dow',datamembers['dow'])
+    
+    with database:
+        _,_lesson_count,_ = sswizard_utils._maxlessonenum(database)
+        datamembers['enum'] = int(_lesson_count[0][0])+1
+
+    lesson = of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
+                         constructor='datamembers',database=database,
+                         of=of,modname=__name__,dm=datamembers)
+    
+    _lesson_change(lesson)
+    
+    log.log(thisfuncname(),10,msg="lesson obj added",dm=datamembers)
+    
+    with database:
+        lesson.persist()
+    return(lesson)
+    
+
 def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1,period="all",
                  dow="all",teacher="all",student="all",source="dbinsert",keepversion=False):
     

@@ -14,8 +14,10 @@ import ssviewer_utils
 import sswizard_utils
 import sswizard_query_utils
 from ssviewer_utils_palette import *
+from time import sleep
 
 from inspect import getmembers
+from threading import Lock
 
 import os
 import os.path
@@ -47,9 +49,7 @@ class Student:
             if attr.startswith('cnstr_') == True:
                 if str(attr_val) <> "NotSelected":
                     constraints.append((attr[6:],str(attr_val)))
-        
-        print constraints
-        
+
         values = ssviewer_utils.dataset_pivot(of,enums,data.yaxis,data.xaxis,
                                               ztypes, source_type,source_value,
                                               constraints=constraints,
@@ -62,17 +62,22 @@ class Student:
                                                               ztypes=ztypes))
         
         xml = xml_utils.grid2xml(grid,header=header)
-        
-        print ztypes
-        print xmltree.tostring(xml)
 
         return xmltree.tostring(xml)
     
-class New:
-    def GET(self):
+class Add:
+    def GET(self,objtype):
         
-        print web.input(id='')
+        _dm = web.input()
+
+        datamembers = dict(zip(_dm.keys(),_dm.values()))  
+        
+        args = dict(database=database,refdatabase=database,
+                    prepmap=prepmap,of=of,enums=enums,
+                    datamembers=datamembers)
     
+        newobj = ssviewer_utils.dataset_add(**args)
+        
 class Subject:
     def GET(self,id):
         
@@ -139,7 +144,7 @@ class List:
 
         pagenum=int(data.pagenum)
         pagelen=int(data.pagelen)
-        
+                
         constraints=[]
         for attr,attr_val in data.iteritems():
             if attr.startswith('cnstr_') == True:
@@ -150,6 +155,11 @@ class List:
                                                       pagenum=pagenum,
                                                       constraints=constraints)
         
+        # if rawdata flag is present just return the values list
+        # row 1 is the column headings
+        if data.has_key('rawdata'):
+            return values
+            
         schema = dict(xaxis='row',yaxis='col',colnames=list(colnames))
         
         _values = ssviewer_utils.dataset_serialize(values,formatson=True,schema = schema)
@@ -172,15 +182,37 @@ class SearchID:
         
         return xmltree.tostring(xml)
 
+class UpdateID:
+    def GET(self,clsname):
+        
+        data = web.input()
+        
+        dbid = dbidlookup[data['id']]
+        data.pop('id')
+        
+        obj = of.object_get(clsname,dbid)
+        
+        for attr,attr_val in data.iteritems():            
+            print "for record",dbid,"update",attr,"from",getattr(obj,attr).name,"to",attr_val
+            obj.keepversion=True
+            obj.customtimestamp = "%y%m%d_%H%M%S"
+            obj.update(attr,attr_val,dbname)
     
 class Command:
-    def GET(self,id):
+    def GET(self,cmd):
         
         #data = web.input(id='')
         
-        if id=="stop":
+        if cmd=="stop":
             print "bringing down service...."
-            exit()
+            app.stop()
+            
+            #exit("stopping")
+
+        elif cmd=="ping":
+            return("ping")
+        elif cmd=="stats":
+            return(len(of.query('lesson')))
         
         
 class SearchCriteria:
@@ -222,12 +254,25 @@ class SearchCriteria:
             print xmltree.tostring(xml)
             
             return xmltree.tostring(xml)
-           
-def _run(xtraargs):
+        
+def mutex_processor():
+    mutex = Lock()
+    
+    def processor_func(handle):
+        mutex.acquire()
+        try:
+            return handle()
+        finally:
+            mutex.release()
+    return processor_func
+
+def _run(port,**xtraargs):
     
     print "launching service... pid=",os.getpid()
     
-    dbname,refdbname = sswizard_utils.getdatabase()
+    _dbname,refdbname = sswizard_utils.getdatabase()
+
+    globals()['dbname'] = _dbname
 
     urls = (
         '/(\w+)', 'Student',
@@ -237,19 +282,25 @@ def _run(xtraargs):
         '/list/(\w+)', 'List',
         '/id/(\w+)', 'SearchID',
         '/criteria/(\w+)', 'SearchCriteria',
-        '/new/', 'New',
-        '/command/(\w+)','Command'
+        '/add/(\w+)', 'Add',
+        '/command/(\w+)','Command',
+        '/update/(\w+)','UpdateID'
     )
     
-    database = Database(dbname)
+    globals()['database'] = Database(dbname)
     refdatabase = Database(refdbname)
-    of = ObjFactory(True)
-    enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
+    #of = ObjFactory(True)
+    #enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
+    
+    
+    globals()['of'] = ObjFactory(True)
+    globals()['enums'] = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
+    globals()['prepmap'] = sswizard_utils._loadprepmapper(database)
     
     args = dict(database=database,refdatabase=refdatabase,
                 saveversion=1,of=of,enums=enums)
 
-    if xtraargs<>None:
+    if xtraargs<>{}:
         for k,v in xtraargs.iteritems():
             args[k] = v
             
@@ -258,22 +309,34 @@ def _run(xtraargs):
     # get a mapping of userobjid to db refid (__id) as of uses the former to index but the web page
     # uses __id as they are easier to pass in URL
     with database:
-        dbidlookup = sswizard_query_utils._dbid2userdefid(database,asdict=True)
+        globals()['dbidlookup'] = sswizard_query_utils._dbid2userdefid(database,asdict=True)
 
     #app = web.application(urls, locals())
-    app = web.application(urls, globals())
+    globals()['app'] = web.application(urls, globals())
+    #globals()['app'].add_processor(mutex_processor())
+    
+    sys.argv.append(str(port))    
     app.run()
     
-def run(xtraargs=None):
+def run(port=8080,**xtraargs):
     pid = os.fork()
     
     if pid==0:
-        _run(xtraargs)
+        _run(port,**xtraargs)
     
 if __name__ == "__main__":
     
     #run(dict(source='56n,4n,4s,5s,6s'))
-    run()
+
+    args={}
+    try:
+        if sys.argv[1] == "--allow-unknown":
+            args['unknown'] = 'Y'
+            sys.argv.pop(1)
+    except:
+        pass
+    
+    run(**args)
     
     '''dbname,refdbname = sswizard_utils.getdatabase()
 
