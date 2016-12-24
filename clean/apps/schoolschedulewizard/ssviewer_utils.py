@@ -229,7 +229,7 @@ def dataset_list(of,enums,pagelen=30,pagenum=1,constraints=None,columns=None):
             
     return grid,colnames
 
-def dataset_record(of,clsname,objid):
+def dataset_record(of,clsname,objid,new=False):
     
     if of.object_exists(clsname,objid) == True:   
         obj = of.object_get(clsname,objid)
@@ -469,8 +469,14 @@ def _lesson_change(lesson):
         setattr(subject,'lessons',{})
         
     _add(subject,'dow','period',lesson) # indexed by dow/period
+
+def dataset_new(source_type):
     
-    
+    if source_type == "lesson":
+        cols = ['adult','subject','dow','period','student','recordtype']
+     
+    return(dict((col,"") for col in cols))
+
 def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,keepversion=False):
     '''
     in the datamembers dict needs to come 'period','student','dow','adult','subject','recordtype'

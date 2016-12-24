@@ -8,6 +8,7 @@ from ttk import *
 import unittest
 import ssviewer_utils
 import sswizard_utils
+import sswizard_query_utils
 import shutil
 
 from misc_utils_objectfactory import ObjFactory
@@ -84,15 +85,16 @@ class Test_getrecord(unittest.TestCase):
     def setUp(self):
         
         dbname='service_getrecord_1lesson'
-        database = Database(dbname)
+        self.database = Database(dbname)
         self.of = ObjFactory(True)
-        enums = sswizard_utils.setenums(dow="all",prep=-1,database=database)
+        enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.database)
         
-        args = dict(database=database,refdatabase=database,saveversion=1,of=self.of,enums=enums)
+        args = dict(database=self.database,refdatabase=self.database,saveversion=1,
+                    of=self.of,enums=enums)
         
         ssviewer_utils.dataset_load(**args)
 
-    def test_lesson(self):
+    '''def test_lesson(self):
         
         expected_results = {'status': u'master', 'recordtype': u'subject', 'period': u'1030-1110', 'substatus': u'complete', 'source': u'dbinsert', 'session': u'Dylan.Game Period.Monday.1030-1110', 'adult': u'Dylan', 'student': u'Clayton', 'id': u'00427CB0', 'objtype': 'lesson', 'dow': u'MO', 'userobjid': u'4.1.2.37.37', 'subject': u'Game Period'}
         
@@ -114,17 +116,26 @@ class Test_getrecord(unittest.TestCase):
         
         results = ssviewer_utils.dataset_record(self.of,'subject','Game Period')
         
+        self.assertEqual(expected_results,results)'''
+        
+    def test_with_idlookup(self):
+        
+        expected_results = {'status': u'master', 'substatus': u'complete', 
+                            'recordtype': u'subject', 'period': u'1030-1110', 
+                            'dow': u'MO', 'source': u'dbinsert', 
+                            'session': u'Dylan.Game Period.Monday.1030-1110', 
+                            'adult': u'Dylan', 'student': u'Clayton', 'id': u'00427CB0', 
+                            'objtype': 'lesson', 'prep': 5, 'userobjid': u'4.1.2.37.37', 
+                            'subject': u'Game Period'}
+        
+        with self.database:
+            dbidlookup = sswizard_query_utils._dbid2userdefid(self.database,asdict=True)
+
+        dbid = dbidlookup["00427CB0"]
+        
+        results = ssviewer_utils.dataset_record(self.of,'lesson',dbid)
+        
         self.assertEqual(expected_results,results)
-        
-        '''
-        need to put date on timestamp
-        
-        consider just marking original full record as "del"
-           
-        and added a complete new one
-           
-        use status field as "deleted"
-        '''
     
 class Test_addrecord(unittest.TestCase):
     
@@ -211,14 +222,37 @@ class Test_addrecord(unittest.TestCase):
     def tearDown(self):
         shutil.copyfile(self.dbname+".sqlite.backup",self.dbname + ".sqlite")
         
+
+class Test_newrecord(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.dbname='test_service_new_record'
+        self.database = Database(self.dbname)
+        self.of = ObjFactory(True)
+        self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.database)
+        self.prepmap = sswizard_utils._loadprepmapper(self.database)
+
+        args = dict(database=self.database,refdatabase=self.database,saveversion=1,of=self.of,enums=self.enums)
+        ssviewer_utils.dataset_load(**args)
+
+    def test_(self):
+    
+        expected_result = {'adult':"",'subject':"",'dow':"",'period':"",'student':"",
+                           'recordtype':""}
+        
+        result = ssviewer_utils.dataset_new('lesson')
+    
+        self.assertEqual(result,expected_result)
+        
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
-    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

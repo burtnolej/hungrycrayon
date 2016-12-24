@@ -78,6 +78,19 @@ class Add:
     
         newobj = ssviewer_utils.dataset_add(**args)
         
+class New:
+    def GET(self,objtype):
+        
+        #source_type="lesson"
+        
+        _values = ssviewer_utils.dataset_new(objtype)
+        
+        header = "<root><parser><value>drawform</value></parser></root>"
+        
+        xml=xml_utils.record2xml(_values,header=header)
+        
+        return xmltree.tostring(xml)
+    
 class Subject:
     def GET(self,id):
         
@@ -283,6 +296,7 @@ def _run(port,**xtraargs):
         '/id/(\w+)', 'SearchID',
         '/criteria/(\w+)', 'SearchCriteria',
         '/add/(\w+)', 'Add',
+        '/new/(\w+)', 'New',
         '/command/(\w+)','Command',
         '/update/(\w+)','UpdateID'
     )

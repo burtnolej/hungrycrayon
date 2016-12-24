@@ -133,6 +133,38 @@ class Test_Add(Test_Base):
         
     def tearDown(self):
         shutil.copyfile(self.dbname+".backup",self.dbname)
+
+class Test_SearchByID(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,"test_ssviewer_rest.sqlite",8080)
+        
+    def test_(self):
+        
+        expected_result = '<root><parser><value>drawform</value></parser><item id="1"><value>master</value><valuetype>status</valuetype></item><item id="2"><value>incomplete</value><valuetype>substatus</valuetype></item><item id="3"><value>wp</value><valuetype>recordtype</valuetype></item><item id="4"><value>830-910</value><valuetype>period</valuetype></item><item id="5"><value>MO</value><valuetype>dow</valuetype></item><item id="6"><value>dbinsert</value><valuetype>source</valuetype></item><item id="7"><value>??.Math.Monday.830-910</value><valuetype>session</valuetype></item><item id="8"><value>??</value><valuetype>adult</valuetype></item><item id="9"><value>Clayton</value><valuetype>student</valuetype></item><item id="10"><value>046CE5DA</value><valuetype>id</valuetype></item><item id="11"><value>lesson</value><valuetype>objtype</valuetype></item><item id="12"><value>5</value><valuetype>prep</valuetype></item><item id="13"><value>1.1.2.8.4</value><valuetype>userobjid</valuetype></item><item id="14"><value>Math</value><valuetype>subject</valuetype></item></root>'
+        
+        result = ssrest.restquery(self.url + "id/046CE5DA")
+        self.assertEqual(expected_result,result)
+        
+        
+    def tearDown(self):
+        shutil.copyfile(self.dbname+".backup",self.dbname)
+        
+        
+class Test_New(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,"test_ssviewer_rest.sqlite",8080)
+        
+    def test_(self):
+        
+        expected_result = '<root><parser><value>drawform</value></parser><item id="1"><value /><valuetype>recordtype</valuetype></item><item id="2"><value /><valuetype>period</valuetype></item><item id="3"><value /><valuetype>adult</valuetype></item><item id="4"><value /><valuetype>student</valuetype></item><item id="5"><value /><valuetype>dow</valuetype></item><item id="6"><value /><valuetype>subject</valuetype></item></root>'
+        
+        result = ssrest.restquery(self.url + "new/lesson")
+        self.assertEqual(expected_result,result)
+        
+        
+    def tearDown(self):
+        shutil.copyfile(self.dbname+".backup",self.dbname)
+        
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
@@ -143,5 +175,8 @@ if __name__ == "__main__":
     '''
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_View))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New))
+    
     unittest.TextTestRunner(verbosity=2).run(suite) 
