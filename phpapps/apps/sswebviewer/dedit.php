@@ -7,30 +7,28 @@
 	include_once 'bootstrap.php';
 	initpage();
 	
-	//$xml = file_get_contents("inputs.xml");
+	$xml = file_get_contents("inputs.xml");
 	
-	//getxmlhtmlinput($xml,$_GET,'div label',"dedit");
+	getxmlhtmlinput($xml,$_GET,'div label',"dedit");
 	
 ?>
 
-<script src="dnew.js"></script>
+<script src="dpivot.js"></script>
 <script src="stylesheets.js"></script>
 <script>var Globals = <?php echo json_encode(array(
 'script_name' => $_SERVER['PHP_SELF'],'server_name' => $_SERVER['SERVER_NAME'])); 
 ?>;</script>
 
 <?php
-if(isset($_GET['fdfgdgdfgdfg'])) {
-	$_GET['source_type']="new";
-	$_GET['source_value']="lesson";
-	$_GET['parser']="drawform";
-	//$_GET['foobar'] = TRUE;
+
+$_GET['source_type']="id";
+$_GET['parser']="drawform";
+
+if(isset($_GET['source_value'])) {
 	$token =refreshpage();
 	echo "<br><br>";
 	draw($token,$args);
-	
 }
-
 
 
 ?>

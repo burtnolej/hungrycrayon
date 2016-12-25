@@ -347,6 +347,8 @@ function gethtmlxmlselect($xml,$defaults,$labels=FALSE,$labelclass=FALSE,$spancl
 	}
 }
 
+
+
 // HTML DB Table Column Dropdown
 function gethtmltablecoldropdown($dbname,$tablename,$column,$widgetcount,$default=NULL){
 	

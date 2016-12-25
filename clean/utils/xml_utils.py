@@ -105,9 +105,9 @@ def record2xml(page,root=None,name=None,header=None):
         itemelement = xmltree.SubElement(root,"item")
         itemelement.attrib['id'] = str(itemidx)
         valueelement = xmltree.SubElement(itemelement,"value")
-        valueelement.text = v
+        valueelement.text = str(v)
         valuetypeelement = xmltree.SubElement(itemelement,"valuetype")
-        valuetypeelement.text = k
+        valuetypeelement.text = str(k)
         itemidx+=1
         
     return(root)
