@@ -70,7 +70,7 @@ class Test_Update(Test_Base):
     def setUp(self):
         Test_Base.setUp(self,"test_ssviewer_rest.sqlite",8080)
         
-    def test_(self):
+    '''def test_(self):
 
         expected_results = ['doodah']
                 
@@ -82,9 +82,23 @@ class Test_Update(Test_Base):
                            source_value="Clayton",cnstr_dow="MO")    
     
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
+        self.assertListEqual(results,expected_results)'''
+        
+    def test_(self):
+
+        expected_results = ['doodah']
+                
+        ssrest.restquery(self.url + "update/046CE5DA",
+                         value_changes="subject,doodah")    
+
+        buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
+                           yaxis="dow",ztypes="subject",source_type="student",
+                           source_value="Clayton",cnstr_dow="MO")    
+    
+        results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
         self.assertListEqual(results,expected_results)
                 
-    def test_multi(self):
+    '''def test_multi(self):
 
         expected_results = ['doodah4']
         
@@ -102,7 +116,7 @@ class Test_Update(Test_Base):
                            source_value="Clayton",cnstr_dow="MO")    
     
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
-        self.assertListEqual(results,expected_results)
+        self.assertListEqual(results,expected_results)'''
                 
     def tearDown(self):
         shutil.copyfile(self.dbname+".backup",self.dbname)
@@ -166,17 +180,36 @@ class Test_New(Test_Base):
         shutil.copyfile(self.dbname+".backup",self.dbname)
         
         
+class Test_Dump(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,"test_ssviewer_rest_dump.sqlite",8080)
+ 
+    def test_(self):
+        
+        expected_results = ['Humanities','Math','Humanities','??','Student News']
+            
+        buf = ssrest.restquery(self.url + "command/dump")  
+
+        print buf
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
     ''' need to restart the rest service to run these tests again 
     killall python
     python ./ssviewer_rest.py --allow-unknown
+    
     '''
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_View))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_View))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New))
+    
+    '''
+    this test needs test_ssviewer_rest.sqlite link to point to _dump
+    '''
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

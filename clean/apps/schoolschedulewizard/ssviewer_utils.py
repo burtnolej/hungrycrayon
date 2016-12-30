@@ -33,26 +33,26 @@ class schoolschedgeneric(dbtblgeneric):
         super(schoolschedgeneric,self).__init__(database=database,
                                                 **kwargs)
         
-        self.of = of
+        #self.of = of
         self.database = database
         
         for k,v in kwargs['dm'].iteritems():
             if v <> 'None':
                 if recursion == True:
                     # create objects for all member attributes
-                    self.attr_set(v,k)
+                    self.attr_set(of,v,k)
                                    
-    def attr_set(self,name,clsname):        
+    def attr_set(self,of,name,clsname):        
         datamembers = dict(objtype=clsname,
                            userobjid=name,
                            name=name)
         
-        setattr(self,clsname,self.of.new(schoolschedgeneric,
+        setattr(self,clsname,of.new(schoolschedgeneric,
                                          clsname,
                                          objid=name, # unique key to store obj in of
                                          constructor='datamembers',
                                          database=self.database,
-                                         of=self.of,
+                                         of=of,
                                          modname=__name__,
                                          recursion=False,
                                          dm=datamembers))

@@ -268,7 +268,8 @@ class Command:
             return("ping")
         elif cmd=="stats":
             return(len(of.query('lesson')))
-        
+        elif cmd=="dump":
+            return(of.dumpobj())
         
 class SearchCriteria:
     def GET(self,id):

@@ -11,6 +11,7 @@ from inspect import isclass
 import unittest
 import time
 from collections import OrderedDict
+from types import StringType,IntType, UnicodeType
     
 class ObjFactory(GenericBase):
     
@@ -78,6 +79,7 @@ class ObjFactory(GenericBase):
             else:
                 self.store[clsname][kwargs['objid']] = newobj
                 log.log(thisfuncname(),20,msg="created",newobj=newobj,kwargs=kwargs)
+            
         else:
             log.log(thisfuncname,15,msg="key conflict",kwargs=kwargs)
 
@@ -125,7 +127,40 @@ class ObjFactory(GenericBase):
                 
     def reset(self):
         self.store = {}
+
+    def dumpobj(self):
         
+        suppress_objects=True
+        maxdepth=2
+        
+        def _dumpobj(results,depth,**kw):
+            depth+=1
+            result=kw
+            for k,v in kw['obj'].attr_get_keyval(False):
+                if type(v) not in [IntType,StringType,UnicodeType] and depth <= maxdepth:
+                    
+                    if hasattr(v,'objid'): # make sure its actual data not ref data like a database
+                        _dumpobj(results,depth,
+                                 obj=v,
+                                 objtype=v.__class__.__name__,
+                                 objid=v.objid,
+                                 pobjid=kw['objid'])
+                result[k]=v
+            results.append(result)
+        
+        results = []
+        depth=0
+        for objtype in self.store.keys():
+            for objid in self.store[objtype]:
+                obj = self.store[objtype][objid]
+                _dumpobj(results,depth,
+                         obj=obj,
+                         objtype=objtype,
+                         objid=objid,
+                         pobjid="ROOT")
+                
+        return results
+            
     def __repr__(self):
         return('ObjFactory')
     

@@ -373,15 +373,12 @@ class Test_ObjFramework_Database_Derived_DB(unittest.TestCase):
             col_name,tbl_rows,_ = tbl_rows_get(self.database,'DBLesson',['period','session','student','teacher','__version'] ) 
             
             self.assertListEqual(tbl_rows,expected_results)
-                    
-        
-        
 
-class Test_ObjFrameworkSearch(unittest.TestCase):
+class Test_ObjFrameworkDumpNested(unittest.TestCase):
 
     def setUp(self):
         self.of = ObjFactory(True)
-        self.of.new(GenericBase,
+        self.obj1 = self.of.new(GenericBase,
                     'Student',
                     objid='booker',
                     nationality='british',
@@ -411,7 +408,7 @@ class Test_ObjFrameworkSearch(unittest.TestCase):
     def tearDown(self):
         self.of.reset()
         
-    def test_1clause(self):
+    '''def test_1clause(self):
         results = self.of.query_advanced('Student',[('objid','booker')])
         
         self.assertEquals(len(results),1)
@@ -422,12 +419,122 @@ class Test_ObjFrameworkSearch(unittest.TestCase):
                                                     ('objid','fred')])
         
         self.assertEquals(len(results),1)
-        self.assertEquals(results[0].age,23)
+        self.assertEquals(results[0].age,23)'''
+        
+        
+    def test_update_then_search(self):
+        ''' make sure that search picks up the updated version of the object '''
+        
+        self.obj1.nationality = 'indian'
+        results = self.of.query_advanced('Student',[('objid','booker')])
+        
+        self.assertEquals(results[0].nationality,'indian')
+        
+        
+class Test_ObjFrameworkDump(unittest.TestCase):
+    
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.obj1 = self.of.new(GenericBase,
+                    'Student',
+                    objid='booker',
+                    nationality='british',
+                    modname=__name__)
+        
+        self.of.new(GenericBase,
+                    'Student',
+                    objid='dave',
+                    age=23,
+                    nationality='british',
+                    modname=__name__)
+        
+        self.of.new(GenericBase,
+                    'Student',
+                    objid='fred',
+                    age=35,
+                    nationality='irish',
+                    modname=__name__)
+        
+        self.of.new(GenericBase,
+                    'Classroom',
+                    objid='1a',
+                    modname=__name__)
+        
+    def test_(self):
+        results = self.of.dump()
+        
+        expected_results = [dict(objtype='Student',objid='booker',nationality='british'),
+                            dict(objtype='Student',objid='dave',nationality='british',age=23),
+                            dict(objtype='Student',objid='fred',nationality='irish',age=35),
+                            dict(objtype='Classroom',objid='1a')]
+        
+        
+
+class Test_ObjFrameworkDump(unittest.TestCase):
+    
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.obj1 = self.of.new(GenericBase,
+                    'Student',
+                    objid='booker',
+                    nationality='british',
+                    modname=__name__)
+        
+    def test_(self):
+        from types import StringType,IntType, UnicodeType
+        expected_results = [[('pobjid', 'ROOT'),('objid', 'booker'), ('objtype', 'Student'), ('nationality', 'british')]]
+                
+        _results = self.of.dumpobj()
+        results = []
+        for result in _results:
+            result.pop('id')
+            results.append([(k,v) for k,v in result.iteritems() if type(v) in [IntType,StringType,UnicodeType]])
+        
+        expected_results.sort()
+        results.sort()
+        
+        self.assertListEqual(expected_results,results)
+        
+class Test_ObjFrameworkDumpNested(unittest.TestCase):
+    
+    def setUp(self):
+        self.of = ObjFactory(True)
+
+
+        self.student = self.of.new(GenericBase,
+                                   'Student',
+                                   objid='booker',
+                                   nationality='british',
+                                   modname=__name__)
+        
+        self.lesson = self.of.new(GenericBase,
+                                  'Lesson',
+                                  objid='1.1',
+                                  period='830-910',
+                                  dow='MO',
+                                  student=self.student,
+                                  modname=__name__)
+        
+    def test_(self):
+        from types import StringType,IntType, UnicodeType
+        expected_results = [[('pobjid', '1.1'), ('objid', 'booker'), ('objtype', 'Student'), ('nationality', 'british')], [('pobjid', 'ROOT'), ('period', '830-910'), ('dow', 'MO'), ('objid', '1.1'), ('objtype', 'Lesson')], [('pobjid', 'ROOT'), ('objid', 'booker'), ('objtype', 'Student'), ('nationality', 'british')]]
+
+                
+        _results = self.of.dumpobj()
+        results = []
+        for result in _results:
+            result.pop('id')
+            results.append([(k,v) for k,v in result.iteritems() if type(v) in [IntType,StringType,UnicodeType]])
+
+        expected_results.sort()
+        results.sort()
+        
+        self.assertListEqual(expected_results,results)
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDupeID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_records_same_cls))
@@ -436,9 +543,12 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested_DupeKey))
-    
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkSearch))
-        
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_DB))
+    '''
+    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkSearch))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNested))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDump))
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

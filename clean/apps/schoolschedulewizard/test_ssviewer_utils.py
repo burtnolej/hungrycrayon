@@ -155,7 +155,7 @@ class Test_addrecord(unittest.TestCase):
         expected_result = 'Stan.Math.Tuesday.830-910'
         
         datamembers = {'student':'Nathaniel',
-                       'adult':'Stan',
+                       'teacher':'Stan',
                        'subject':'Math',
                        'period':'830-910',
                        'recordtype':'subject',
@@ -174,7 +174,7 @@ class Test_addrecord(unittest.TestCase):
         expected_result = [['', u'MO', u'TU'], [u'830-910', [], [('Math',)]], [u'1030-1110', [(u'Game Period',)], []]]
 
         datamembers = {'student':'Clayton',
-                       'adult':'Stan',
+                       'teacher':'Stan',
                        'subject':'Math',
                        'period':'830-910',
                        'recordtype':'subject',
@@ -204,7 +204,7 @@ class Test_addrecord(unittest.TestCase):
         expected_result = [['', u'MO', u'TU'], [u'830-910', [], [('Math',)]], [u'1030-1110', [(u'Game Period',)], []]]
 
         datamembers = {'student':'Clayton',
-                       'adult':'Stan',
+                       'teacher':'Stan',
                        'subject':'Math',
                        'period':'830-910',
                        'recordtype':'subject',
@@ -246,14 +246,37 @@ class Test_newrecord(unittest.TestCase):
         self.assertEqual(result,expected_result)
         
         
+class Test_dump(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.dbname='test_ssviewer_rest_dump'
+        self.database = Database(self.dbname)
+        self.of = ObjFactory(True)
+        self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.database)
+        self.prepmap = sswizard_utils._loadprepmapper(self.database)
+
+        args = dict(database=self.database,refdatabase=self.database,saveversion=1,of=self.of,enums=self.enums)
+        ssviewer_utils.dataset_load(**args)
+
+    def test_(self):
+        
+        for record in self.of.dumpobj():
+            try:
+                print record['pobjid'],record['objtype'],record['name']
+            except:
+                print "na"
+            #for k,v in record.iteritems():
+            #    print k,v
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
-    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_dump))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
