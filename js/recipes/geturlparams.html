@@ -1,0 +1,21 @@
+
+
+
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<!-- call this page with get params /geturlparams.html?foo=bar-->
+<script type="text/javascript">
+
+$(document).ready(function(){
+
+	// get the whole file location with params
+	// file:///Users/burtnolej/Development/pythonapps/js/recipes/geturlparams.html
+	console.log(window.location);	
+	
+	// get the url from after the 
+	console.log(window.location.search.substr(1));
+	
+});
+
+</script>
+</html>

@@ -6,6 +6,8 @@ var url = "";
 $(document).ready(function(){
    $("select, input").on('change',function(){
    	
+   	console.log(this.id);
+   	
    	url = "http://".concat(Globals.server_name,"/",Globals.script_name,"?");
    	
    	ztypes = new Array();

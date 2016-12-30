@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<!--<script src="https://code.jquery.com/qunit/qunit-2.0.1.js"></script>-->
+<script type="text/javascript"  src="document_utils.js"></script>
+<script>
+				
+			sel = addSelectElement("sel",Array("a","b","c"));
+			sel[0].selected = 'selected';
+			sel1 = addSelectElement("sel1",Array("a","b","c"));
+			sel1[1].selected = 'selected';
+			sel2 = addSelectElement("sel2",Array("a","b","c"));
+			sel2[2].selected = 'selected';
+			btnel = addElement("button","submit","btn1");
+			
+			var initvalues = getElementValues("select");
+					
+			$("button").on('click',function()	{
+				newvalues = getElementValues("select");
+				
+				console.log(initvalues.join(","));
+				console.log(newvalues.join(","));
+				
+				results = compare_1darrays(initvalues,newvalues);
+				console.log(results.join(","));
+				
+			});
+			
+			sel[2].selected = 'selected';
+			sel1[2].selected = 'selected';
+			sel2[2].selected = 'selected';
+			$('button[name="btn1"]').click();
+			
+			delElement("sel1");
+			delElement("sel2");
+			delElement("sel");
+			delElement("btn1");
+			
+		
+</script>
+</body>
+
+</html>

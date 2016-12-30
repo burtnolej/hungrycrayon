@@ -1,14 +1,22 @@
 
-var ztypes = new Array();
+/*var ztypes = new Array();
 var url = "";
 
 $(document).ready(function(){
 	
+	var initvalues = getElementValues("select");
+	var results = Array();
+			
 	// first check if this is event is a submit button press
-	$("input").on('click',function(){
-		url = buildurl();
+	$("input[name='button']").on('click',function(){
 		
+		url = buildurl();
 		url = url + "&page_status=submit";
+		
+		// add the changes to 
+		results = getElementValueChanges("select",initvalues);
+		url = url + "&value_changes="+results.join(",");
+		console.log(url);
 		get(url);
 	});
 		
@@ -19,7 +27,7 @@ $(document).ready(function(){
  			get(url);
 		}
  	});
-});
+});*/
 
 
 function buildurl() {

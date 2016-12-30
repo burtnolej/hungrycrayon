@@ -42,7 +42,7 @@ with restservice:
     #print ssviewer_rest_utils.restquery(URL + "update/lesson",subject="doodah",id="046CE5DA"))
     
     # list
-    #print ssviewer_rest_utils.restquery(URL + "list/lesson",pagenum=1,pagelen=20,rawdata=True)
+    print ssviewer_rest_utils.restquery(URL + "list/lesson",pagenum=1,pagelen=20,rawdata=True)
     
     # stats
     #print ssviewer_rest_utils.restquery(URL + "command/stats")

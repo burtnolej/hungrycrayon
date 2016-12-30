@@ -21,7 +21,7 @@ from ttk import *
 import tkFont
 
 class DBTableUI(Tk):
-    def __init__(self,maxentrycols=16,maxentryrows=12,
+    def __init__(self,maxentrycols=25,maxentryrows=12,
                  maxnewrowcols=16,maxnewrowrows=3):
         
         Tk.__init__(self)

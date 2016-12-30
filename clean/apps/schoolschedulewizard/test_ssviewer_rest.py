@@ -173,9 +173,9 @@ if __name__ == "__main__":
     killall python
     python ./ssviewer_rest.py --allow-unknown
     '''
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_View))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_View))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New))
     

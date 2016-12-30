@@ -1,0 +1,63 @@
+<html>
+	<select name="select1">
+		<option>foobar2</option>
+		<option>foobar3</option>
+		<option selected>not selected</option>
+
+	</select>
+	<select name="select2">
+		<option>boohah1</option>
+		<option>boohah2</option>
+		<option>boohah3</option>
+		<option selected>not selected</option>
+	</select>
+	
+	<p name="output">notset</p>
+	<input type="button" name="submit" value="submit" />
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	lastvalues = new Array();
+	values = new Array();
+	
+	$(document).ready(function(){
+		lastvalues = getvalues();
+	});
+	
+	$("input").on('click',function(){
+   		
+   		values = getvalues();
+	   	
+	   	if (arr2str(values) != arr2str(lastvalues)) {
+			$('p[name="output"]').text(arr2str(values));
+		}
+		else {
+			$('p[name="output"]').text("no change");
+		}
+		
+		lastvalues = values;
+	});
+	
+	function compare_arrays(arr1,arr2) {
+	}
+	
+	function getvalues() {
+		newvalues = new Array();
+		
+   		$('select').each(function (index, value) {
+   			newvalues.push(this.value);
+	   		});
+	    		
+	 	$('input').each(function (index, value) {    
+   			newvalues.push(this.value);
+	   	});
+	   	
+	   	return newvalues;
+	}
+	
+	function arr2str(arr){
+		return(JSON.stringify(arr));
+	}
+	
+	</script>
+</html>

@@ -184,6 +184,8 @@ class schoolschedgeneric(dbtblgeneric):
             #setattr(self,'id',_id)
             setattr(self,'__version',"current")
             setattr(self,'__timestamp',_ts)
+            
+        return _id
     
 
 def _getpage(grid,pagelen,pagenum):
@@ -479,12 +481,14 @@ def dataset_new(source_type):
 
 def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,keepversion=False):
     '''
-    in the datamembers dict needs to come 'period','student','dow','adult','subject','recordtype'
-    
+    in the datamembers dict needs to come 'period','student','dow','adult','subject','recordtype
     values need to be the names for dow, so 'Monday','Tuesday' etc'''
-
-    datamembers['session'] = ".".join([datamembers['adult'],datamembers['subject'],datamembers['dow'],
+    
+    datamembers['session'] = ".".join([datamembers['teacher'],datamembers['subject'],datamembers['dow'],
                                sswizard_utils._isname(enums,'period',datamembers['period'])])
+    
+    datamembers['adult'] = datamembers['teacher']
+    datamembers.pop('teacher')
     
     datamembers['userobjid'] = sswizard_utils._getuserobjid(enums,['period','dow','student','adult','subject'],datamembers)
     

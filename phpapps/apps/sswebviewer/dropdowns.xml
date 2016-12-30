@@ -84,4 +84,20 @@
 			<default>10</default>
 		</select>
 	</dsearch>
+	<dnew>
+		<select id='1'>
+			<field>source_value</field>
+			<label>record type</label>
+			<values>
+			<value>not selected</value>
+				<value>lesson</value>
+				<value>subject</value>
+				<value>student</value>
+				<value>adult</value>
+				<value>period</value>
+				<value>down</value>
+			</values>
+			<default>not selected</default>
+		</select>
+	</dnew>
 </root>

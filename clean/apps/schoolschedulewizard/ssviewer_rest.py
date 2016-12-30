@@ -72,11 +72,33 @@ class Add:
 
         datamembers = dict(zip(_dm.keys(),_dm.values()))  
         
+        # these are not required to build the new record and
+        # the service takes ALL members of datamembers and adds them to
+        # the new message payload
+        try:
+            datamembers.pop('page_status')
+            datamembers.pop('source_type')
+            datamembers.pop('source_value')
+        except:
+            pass
+        
         args = dict(database=database,refdatabase=database,
                     prepmap=prepmap,of=of,enums=enums,
                     datamembers=datamembers)
-    
+
         newobj = ssviewer_utils.dataset_add(**args)
+        
+        header = "<root><parser><value>drawform</value></parser></root>"
+        
+        _values =dict(objtype =newobj.objtype.name,
+                      userobjid=newobj.userobjid.name)
+        
+        xml=xml_utils.record2xml(_values,header=header)
+        
+        print xml
+        
+        return xmltree.tostring(xml)
+    
         
 class New:
     def GET(self,objtype):
@@ -196,20 +218,40 @@ class SearchID:
         return xmltree.tostring(xml)
 
 class UpdateID:
-    def GET(self,clsname):
+    
+    #lets pass in the id as a param; clsname not necessar
+    #probably need an object_get that does not need clsname
+    
+    #def GET(self,clsname):
+    def GET(self,id):
         
         data = web.input()
         
-        dbid = dbidlookup[data['id']]
-        data.pop('id')
+        dbid = dbidlookup[id]
+        #data.pop('id')
         
-        obj = of.object_get(clsname,dbid)
+        obj = of.object_get('lesson',dbid)
         
-        for attr,attr_val in data.iteritems():            
+        _value_changes = data['value_changes'].split(",")
+        value_changes = {}
+        
+        for i in range(0,len(_value_changes),2):
+            value_changes[_value_changes[i]] = _value_changes[i+1]
+            
+        
+        for attr,attr_val in value_changes.iteritems():          
             print "for record",dbid,"update",attr,"from",getattr(obj,attr).name,"to",attr_val
             obj.keepversion=True
             obj.customtimestamp = "%y%m%d_%H%M%S"
-            obj.update(attr,attr_val,dbname)
+            newid = obj.update(attr,attr_val,dbname)
+            
+            globals()['dbidlookup'][newid] = dbid
+            globals()['dbidlookup'].pop(id)
+            
+            print "for record",dbid,"update",attr,"to",getattr(obj,attr).name,"(",getattr(obj,'id').name,")"
+  
+            getattr(obj,'id').name
+        return newid
     
 class Command:
     def GET(self,cmd):
@@ -312,7 +354,7 @@ def _run(port,**xtraargs):
     globals()['prepmap'] = sswizard_utils._loadprepmapper(database)
     
     args = dict(database=database,refdatabase=refdatabase,
-                saveversion=1,of=of,enums=enums)
+                saveversion=1,of=of,enums=enums,keepversion=True)
 
     if xtraargs<>{}:
         for k,v in xtraargs.iteritems():

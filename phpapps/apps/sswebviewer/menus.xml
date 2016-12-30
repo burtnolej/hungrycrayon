@@ -7,6 +7,9 @@
 			<link>dsearch.php</link>
 		</item>
 	</item>
+	<item name='new'>
+			<link>dnew.php</link>
+	</item>
 	<item name='edit'>
 			<item name='by id'>
 			<link>dedit.php</link>
@@ -18,11 +21,34 @@
 	</item>						
 	<item name='view'>
 		<item name='by student'>
-			<link>foobar.php</link>
+			<item name='Booker'>
+				<link>
+					<ip>192.168.1.254</ip>
+					<target>dpivot.php</target>
+					<flags>
+			        	<xaxis>period</xaxis>
+			        	<yaxis>dow</yaxis>
+			       	<source_type>student</source_type>
+			       	<source>56newworkp</source>
+			       	<source_value>Booker</source_value>
+						<cnstr_subject>NotSelected</cnstr_subject>
+						<cnstr_dow>NotSelected</cnstr_dow>
+						<cnstr_period>NotSelected</cnstr_period>
+						<cnstr_student>NotSelected</cnstr_student>
+						<cnstr_adult>NotSelected</cnstr_adult>
+						<cnstr_prep>NotSelected</cnstr_prep>
+						<formats>on</formats>
+						<rollup>on</rollup>
+						<status>on</status>
+						<student>on</student>
+						<ztypes>subject,adult</ztypes>
+					</flags>
+				</link>
+			</item>
 		</item>
 		<item name='by adult'>
 			<link>barfoo.php</link>
 		</item>
 	</item>
 </root>
-		         
+		        
