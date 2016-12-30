@@ -128,6 +128,57 @@ class ObjFactory(GenericBase):
     def reset(self):
         self.store = {}
 
+    def dumpobjrpt(self,objref=True):
+        
+        ''' set objref to false if want to exclude the python internal ref (if your testing etc)
+            testing for name attributes as sometime object does not have __repr__ setup (like lesson)
+        
+            sample results:
+            ['1038f2190', 'ROOT', 'adult', u'Amelia'], 
+            ['1038f2250', 'ROOT', 'student', u'Clayton'], 
+            ['1038f2310', 'ROOT', 'id', u'054C4D26'], 
+            ['1038f2190', u'1.2.2.6.22', 'adult', u'Amelia'], 
+            ['1038e8f10', u'1.2.2.6.22', 'dow', u'TU'], 
+            ['1038f2310', u'1.2.2.6.22', 'id', u'054C4D26'],
+            ['1038f23d0', u'1.2.2.6.22', 'objtype', 'lesson'], 
+            ['1038e8e50', u'1.2.2.6.22', 'period', u'830-910'], 
+            
+            use something like below to pretty print:
+            
+            output.sort() # to line up the same objects
+            for _output in output:
+                _o_str = ""  
+                for _o in _output:
+                    _o_str+=str(_o).ljust(12)[:12]
+            
+                print _o_str
+        '''
+        output = []
+        for record in self.dumpobj():
+
+            _output=[]
+            
+            if objref==True:
+                _output.append(record['obj'].__str__().split("0x")[1][:-1])
+            
+            _output.append(record['pobjid'])
+            
+            if hasattr(record['objtype'],'name'):
+                _output.append(record['objtype'].name)
+            else:
+                _output.append(record['objtype'])
+            
+            if hasattr(record,'name'):
+                _output.append(record['name'])
+            else:
+                if hasattr(record['userobjid'],'name'):
+                    _output.append(record['userobjid'].name)
+                else:
+                    _output.append(record['userobjid'])
+
+            output.append(_output)
+        return output
+            
     def dumpobj(self):
         
         suppress_objects=True

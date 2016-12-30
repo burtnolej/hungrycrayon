@@ -261,13 +261,46 @@ class Test_dump(unittest.TestCase):
 
     def test_(self):
         
-        for record in self.of.dumpobj():
-            try:
-                print record['pobjid'],record['objtype'],record['name']
-            except:
-                print "na"
-            #for k,v in record.iteritems():
-            #    print k,v
+        expected_results = [['ROOT', 'status', u'master'], 
+                            ['ROOT', 'prep', 5], 
+                            ['ROOT', 'recordtype', u'wp'], 
+                            ['ROOT', 'objtype', 'lesson'], 
+                            ['ROOT', 'period', u'830-910'], 
+                            ['ROOT', 'substatus', u'complete'], 
+                            ['ROOT', 'source', u'dbinsert'], 
+                            ['ROOT', 'session', u'Amelia.Humanities.Tuesday.830-910'], 
+                            ['ROOT', 'adult', u'Amelia'], 
+                            ['ROOT', 'student', u'Clayton'], 
+                            ['ROOT', 'id', u'054C4D26'], 
+                            [u'1.2.2.6.22', 'adult', u'Amelia'], 
+                            [u'1.2.2.6.22', 'dow', u'TU'], 
+                            [u'1.2.2.6.22', 'id', u'054C4D26'],
+                            [u'1.2.2.6.22', 'objtype', 'lesson'], 
+                            [u'1.2.2.6.22', 'period', u'830-910'], 
+                            [u'1.2.2.6.22', 'prep', 5], 
+                            [u'1.2.2.6.22', 'recordtype', u'wp'], 
+                            [u'1.2.2.6.22', 'session', u'Amelia.Humanities.Tuesday.830-910'], 
+                            [u'1.2.2.6.22', 'source', u'dbinsert'], 
+                            [u'1.2.2.6.22', 'status', u'master'], 
+                            [u'1.2.2.6.22', 'student', u'Clayton'],
+                            [u'1.2.2.6.22', 'subject', u'Humanities'], 
+                            [u'1.2.2.6.22', 'substatus', u'complete'], 
+                            [u'1.2.2.6.22', 'userobjid', u'1.2.2.6.22'],
+                            ['ROOT', 'lesson', u'1.2.2.6.22'], 
+                            ['ROOT', 'dow', u'TU'], 
+                            ['ROOT', 'userobjid', u'1.2.2.6.22'], 
+                            ['ROOT', 'subject', u'Humanities']]
+        
+        result = self.of.dumpobjrpt(False)
+        
+        self.assertListEqual(result,expected_results)
+        
+        #for _output in output:
+        #    _o_str = ""  
+        #    for _o in _output:
+        #        _o_str+=str(_o).ljust(12)[:12]
+        #    
+        #    print _o_str
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
