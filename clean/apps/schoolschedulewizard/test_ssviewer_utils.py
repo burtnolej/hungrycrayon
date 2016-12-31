@@ -94,12 +94,11 @@ class Test_getrecord(unittest.TestCase):
         
         ssviewer_utils.dataset_load(**args)
 
-    '''def test_lesson(self):
+    def test_lesson(self):
         
-        expected_results = {'status': u'master', 'recordtype': u'subject', 'period': u'1030-1110', 'substatus': u'complete', 'source': u'dbinsert', 'session': u'Dylan.Game Period.Monday.1030-1110', 'adult': u'Dylan', 'student': u'Clayton', 'id': u'00427CB0', 'objtype': 'lesson', 'dow': u'MO', 'userobjid': u'4.1.2.37.37', 'subject': u'Game Period'}
-        
+        expected_results = {'status': u'master', 'substatus': u'complete', 'recordtype': u'subject', 'period': u'1030-1110', 'dow': u'MO', 'source': u'dbinsert', 'session': u'Dylan.Game Period.Monday.1030-1110', 'adult': u'Dylan', 'student': u'Clayton', 'id': u'00427CB0', 'objtype': 'lesson', 'prep': 5, 'userobjid': u'4.1.2.37.37', 'subject': u'Game Period'}
         results = ssviewer_utils.dataset_record(self.of,'lesson','4.1.2.37.37')
-        
+                
         self.assertEqual(expected_results,results)
         
     def test_lesson_notfound(self):
@@ -116,7 +115,7 @@ class Test_getrecord(unittest.TestCase):
         
         results = ssviewer_utils.dataset_record(self.of,'subject','Game Period')
         
-        self.assertEqual(expected_results,results)'''
+        self.assertEqual(expected_results,results)
         
     def test_with_idlookup(self):
         
@@ -261,56 +260,22 @@ class Test_dump(unittest.TestCase):
 
     def test_(self):
         
-        expected_results = [['ROOT', 'status', u'master'], 
-                            ['ROOT', 'prep', 5], 
-                            ['ROOT', 'recordtype', u'wp'], 
-                            ['ROOT', 'objtype', 'lesson'], 
-                            ['ROOT', 'period', u'830-910'], 
-                            ['ROOT', 'substatus', u'complete'], 
-                            ['ROOT', 'source', u'dbinsert'], 
-                            ['ROOT', 'session', u'Amelia.Humanities.Tuesday.830-910'], 
-                            ['ROOT', 'adult', u'Amelia'], 
-                            ['ROOT', 'student', u'Clayton'], 
-                            ['ROOT', 'id', u'054C4D26'], 
-                            [u'1.2.2.6.22', 'adult', u'Amelia'], 
-                            [u'1.2.2.6.22', 'dow', u'TU'], 
-                            [u'1.2.2.6.22', 'id', u'054C4D26'],
-                            [u'1.2.2.6.22', 'objtype', 'lesson'], 
-                            [u'1.2.2.6.22', 'period', u'830-910'], 
-                            [u'1.2.2.6.22', 'prep', 5], 
-                            [u'1.2.2.6.22', 'recordtype', u'wp'], 
-                            [u'1.2.2.6.22', 'session', u'Amelia.Humanities.Tuesday.830-910'], 
-                            [u'1.2.2.6.22', 'source', u'dbinsert'], 
-                            [u'1.2.2.6.22', 'status', u'master'], 
-                            [u'1.2.2.6.22', 'student', u'Clayton'],
-                            [u'1.2.2.6.22', 'subject', u'Humanities'], 
-                            [u'1.2.2.6.22', 'substatus', u'complete'], 
-                            [u'1.2.2.6.22', 'userobjid', u'1.2.2.6.22'],
-                            ['ROOT', 'lesson', u'1.2.2.6.22'], 
-                            ['ROOT', 'dow', u'TU'], 
-                            ['ROOT', 'userobjid', u'1.2.2.6.22'], 
-                            ['ROOT', 'subject', u'Humanities']]
+        expected_results = [[u'1.2.2.6.22', '-', '-', 'subject'], 
+                            ['ROOT', u'Amelia', u'Clayton', 'lesson'], 
+                            ['ROOT', '-', '-', 'subject']]
         
-        result = self.of.dumpobjrpt(['subject'],False)
+        result = self.of.dumpobjrpt(objtypes=['lesson','subject'],objref=False,
+                                    fields=['adult','student'])
         
-        #then have the dump just report back things to do with subject
-        
-        #self.assertListEqual(result,expected_results)
-        
-        for _output in result:
-            _o_str = ""  
-            for _o in _output:
-                _o_str+=str(_o).ljust(12)[:12]
-            
-            print _o_str
+        self.assertListEqual(result,expected_results)
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_dump))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

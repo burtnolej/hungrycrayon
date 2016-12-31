@@ -792,14 +792,33 @@ class Test_ObjFrameworkDumpRptNestedSchoolsched(unittest.TestCase):
         results.sort()
         
         self.assertListEqual(expected_results,results)
+        
     
+    def test_filter_objtype_field_filters(self):
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [['ROOT', '-', '-', 'student'], 
+                            ['ROOT', 'Amelia', 'Booker', 'DBLesson'], 
+                            ['dblesson0', '-', '-', 'student']]
+
+
+        results = self.of.dumpobjrpt(objtypes=['DBLesson','student'],
+                                     objref=False,
+                                     fields=['teacher','student'])
+         
+        
+        expected_results.sort()
+        results.sort()
+        
+        self.assertListEqual(expected_results,results)
+        
     def tearDown(self):
         self.of.reset()
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDupeID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_records_same_cls))
@@ -811,8 +830,8 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_DB))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNested))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDump))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNestedSchoolsched))'''
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRpt))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNestedSchoolsched))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRpt))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRptNestedSchoolsched))
     
     

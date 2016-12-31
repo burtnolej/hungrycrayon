@@ -160,9 +160,9 @@ class ObjFactory(GenericBase):
         
         if fields == None:
             fields = ['objtype']
+        else:
+            fields.append('objtype')
             
-        #objtypes=None
-        
         output = []
         for record in self.dumpobj(objtypes):
       
@@ -174,11 +174,13 @@ class ObjFactory(GenericBase):
             _output.append(record['pobjid'])
             
             for field in fields:
-                if record.has_key(field):
-                    if hasattr(record[field],'name'):
-                        _output.append(record[field].name)
+                if hasattr(record['obj'],field):
+                    if hasattr(getattr(record['obj'],field),'name'):
+                        _output.append(getattr(record['obj'],field).name)
                     else:
-                        _output.append(record[field])
+                        _output.append(str(getattr(record['obj'],field)))
+                elif record.has_key(field):
+                    _output.append(record[field])
                 else:
                     _output.append("-")
                         
