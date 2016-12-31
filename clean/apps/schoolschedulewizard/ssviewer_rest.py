@@ -269,7 +269,18 @@ class Command:
         elif cmd=="stats":
             return(len(of.query('lesson')))
         elif cmd=="dump":
-            return(of.dumpobj())
+            results = of.dumpobjrpt()
+                   
+            results.sort() # to line up the same objects
+            for _output in results:
+                _o_str = ""  
+                for _o in _output:
+                    _o_str+=str(_o).ljust(15)[:15]
+            
+                print _o_str
+
+            return(results)
+
         
 class SearchCriteria:
     def GET(self,id):

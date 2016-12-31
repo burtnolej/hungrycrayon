@@ -128,7 +128,8 @@ class ObjFactory(GenericBase):
     def reset(self):
         self.store = {}
 
-    def dumpobjrpt(self,objref=True):
+    def dumpobjrpt(self,fields=None,objtypes=None,objref=True):
+        ''' provides more control over the output of dumpobj '''
         
         ''' set objref to false if want to exclude the python internal ref (if your testing etc)
             testing for name attributes as sometime object does not have __repr__ setup (like lesson)
@@ -153,45 +154,54 @@ class ObjFactory(GenericBase):
             
                 print _o_str
         '''
+        
+        '''objtypes=['lesson','subject']
+        fields=['adult','student']'''
+        
+        if fields == None:
+            fields = ['objtype']
+            
+        #objtypes=None
+        
         output = []
-        for record in self.dumpobj():
-
+        for record in self.dumpobj(objtypes):
+      
             _output=[]
             
-            if objref==True:
+            if objref==True:            
                 _output.append(record['obj'].__str__().split("0x")[1][:-1])
             
             _output.append(record['pobjid'])
             
-            if hasattr(record['objtype'],'name'):
-                _output.append(record['objtype'].name)
-            else:
-                _output.append(record['objtype'])
-            
-            if hasattr(record,'name'):
-                _output.append(record['name'])
-            else:
-                if hasattr(record['userobjid'],'name'):
-                    _output.append(record['userobjid'].name)
+            for field in fields:
+                if record.has_key(field):
+                    if hasattr(record[field],'name'):
+                        _output.append(record[field].name)
+                    else:
+                        _output.append(record[field])
                 else:
-                    _output.append(record['userobjid'])
-
+                    _output.append("-")
+                        
+                
             output.append(_output)
         return output
             
-    def dumpobj(self):
+    def dumpobj(self,objtypes=None):
         
         suppress_objects=True
         maxdepth=2
         
-        def _dumpobj(results,depth,**kw):
+        def _dumpobj(results,depth,objtypes,**kw):
             depth+=1
             result=kw
             for k,v in kw['obj'].attr_get_keyval(False):
                 if type(v) not in [IntType,StringType,UnicodeType] and depth <= maxdepth:
                     
                     if hasattr(v,'objid'): # make sure its actual data not ref data like a database
-                        _dumpobj(results,depth,
+                        
+                        if objtypes <> None and v.__class__.__name__ not in objtypes:
+                            continue
+                        _dumpobj(results,depth,objtypes,
                                  obj=v,
                                  objtype=v.__class__.__name__,
                                  objid=v.objid,
@@ -201,10 +211,14 @@ class ObjFactory(GenericBase):
         
         results = []
         depth=0
-        for objtype in self.store.keys():
+
+        if objtypes == None:
+            objtypes = self.store.keys()
+        
+        for objtype in objtypes:
             for objid in self.store[objtype]:
                 obj = self.store[objtype][objid]
-                _dumpobj(results,depth,
+                _dumpobj(results,depth,objtypes,
                          obj=obj,
                          objtype=objtype,
                          objid=objid,

@@ -188,9 +188,7 @@ class Test_Dump(Test_Base):
         
         expected_results = ['Humanities','Math','Humanities','??','Student News']
             
-        buf = ssrest.restquery(self.url + "command/dump")  
-
-        print buf
+        ssrest.restquery(self.url + "command/dump")  
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()

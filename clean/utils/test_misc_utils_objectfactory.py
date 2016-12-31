@@ -207,26 +207,26 @@ class schoolschedgeneric(dbtblgeneric):
         super(schoolschedgeneric,self).__init__(database=database,
                                                 **kwargs)
         
-        self.of = of
+        #self.of = of
         self.database = database
         
         for k,v in kwargs['dm'].iteritems():
             if v <> 'None':
                 if recursion == True:
                     # create objects for all member attributes
-                    self.attr_set(v,k)
+                    self.attr_set(v,k,of)
                                    
-    def attr_set(self,name,clsname):        
+    def attr_set(self,name,clsname,of):        
         datamembers = dict(objtype=clsname,
                            userobjid=name,
                            name=name)
         
-        setattr(self,clsname,self.of.new(schoolschedgeneric,
+        setattr(self,clsname,of.new(schoolschedgeneric,
                                          clsname,
                                          objid=name, # unique key to store obj in of
                                          constructor='datamembers',
                                          database=self.database,
-                                         of=self.of,
+                                         of=of,
                                          modname=__name__,
                                          recursion=False,
                                          dm=datamembers))
@@ -517,7 +517,19 @@ class Test_ObjFrameworkDumpNested(unittest.TestCase):
         
     def test_(self):
         from types import StringType,IntType, UnicodeType
-        expected_results = [[('pobjid', '1.1'), ('objid', 'booker'), ('objtype', 'Student'), ('nationality', 'british')], [('pobjid', 'ROOT'), ('period', '830-910'), ('dow', 'MO'), ('objid', '1.1'), ('objtype', 'Lesson')], [('pobjid', 'ROOT'), ('objid', 'booker'), ('objtype', 'Student'), ('nationality', 'british')]]
+        expected_results = [[('pobjid', '1.1'), 
+                             ('objid', 'booker'), 
+                             ('objtype', 'Student'), 
+                             ('nationality', 'british')], 
+                            [('pobjid', 'ROOT'), 
+                             ('period', '830-910'), 
+                             ('dow', 'MO'), 
+                             ('objid', '1.1'), 
+                             ('objtype', 'Lesson')], 
+                            [('pobjid', 'ROOT'), 
+                             ('objid', 'booker'), 
+                             ('objtype', 'Student'), 
+                             ('nationality', 'british')]]
 
                 
         _results = self.of.dumpobj()
@@ -528,8 +540,261 @@ class Test_ObjFrameworkDumpNested(unittest.TestCase):
 
         expected_results.sort()
         results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+    def test_filter_on_lesson(self):
+        
+        # only report on the Lesson object (and its children)
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [[('pobjid', 'ROOT'), 
+                             ('period', '830-910'), 
+                             ('dow', 'MO'), 
+                             ('objid', '1.1'), 
+                             ('objtype', 'Lesson')]]
+
+
+                
+        _results = self.of.dumpobj(['Lesson'])
+        results = []
+        for result in _results:
+            result.pop('id')
+            results.append([(k,v) for k,v in result.iteritems() if type(v) in [IntType,StringType,UnicodeType]])
+
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+    def test_filter_on_student(self):
+        
+        # only report on the Student object and its children
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [[('pobjid', 'ROOT'), 
+                             ('objid', 'booker'), 
+                             ('objtype', 'Student'), 
+                             ('nationality', 'british')]]
+                
+        _results = self.of.dumpobj(['Student'])
+        results = []
+        for result in _results:
+            result.pop('id')
+            results.append([(k,v) for k,v in result.iteritems() if type(v) in [IntType,StringType,UnicodeType]])
+
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+        
+class Test_ObjFrameworkDumpNestedSchoolsched(unittest.TestCase):
+    
+    # same as above just with the school sched nested object
+    # so each attr is another object of (not a string or int) that 
+    # potentially needs to be accessed via accessors
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        
+        datamembers = dict(period='830',
+                           student='Booker',
+                           dow='MO',
+                           teacher='Amelia',
+                           saveversion=0,
+                           session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,
+                                 'DBLesson',
+                                 objid='dblesson0',
+                                 constructor='datamembers',
+                                 database=self.database,
+                                 of=self.of,
+                                 modname=__name__,
+                                 dm=datamembers)
+        
+        
+    def test_(self):
+        from types import StringType,IntType, UnicodeType
+            
+        expected_results = [[('name', 0), ('pobjid', 'ROOT'), ('objid', 0), ('objtype', 'saveversion'), ('userobjid', 0)], 
+                            [('name', 0), ('pobjid', 'dblesson0'), ('objid', 0), ('objtype', 'saveversion'), ('userobjid', 0)], 
+                            [('name', '830'), ('pobjid', 'ROOT'), ('objid', '830'), ('objtype', 'period'), ('userobjid', '830')], 
+                            [('name', '830'), ('pobjid', 'dblesson0'), ('objid', '830'), ('objtype', 'period'), ('userobjid', '830')], 
+                            [('name', 'AM.AC.SC'), ('pobjid', 'ROOT'), ('objid', 'AM.AC.SC'), ('objtype', 'session'), ('userobjid', 'AM.AC.SC')], 
+                            [('name', 'AM.AC.SC'), ('pobjid', 'dblesson0'), ('objid', 'AM.AC.SC'), ('objtype', 'session'), ('userobjid', 'AM.AC.SC')], 
+                            [('name', 'Amelia'), ('pobjid', 'ROOT'), ('objid', 'Amelia'), ('objtype', 'teacher'), ('userobjid', 'Amelia')], 
+                            [('name', 'Amelia'), ('pobjid', 'dblesson0'), ('objid', 'Amelia'), ('objtype', 'teacher'), ('userobjid', 'Amelia')], 
+                            [('name', 'Booker'), ('pobjid', 'ROOT'), ('objid', 'Booker'), ('objtype', 'student'), ('userobjid', 'Booker')], 
+                            [('name', 'Booker'), ('pobjid', 'dblesson0'), ('objid', 'Booker'), ('objtype', 'student'), ('userobjid', 'Booker')], 
+                            [('name', 'MO'), ('pobjid', 'ROOT'), ('objid', 'MO'), ('objtype', 'dow'), ('userobjid', 'MO')],
+                            [('name', 'MO'), ('pobjid', 'dblesson0'), ('objid', 'MO'), ('objtype', 'dow'), ('userobjid', 'MO')], 
+                            [('pobjid', 'ROOT'), ('objid', 'dblesson0'), ('objtype', 'DBLesson')]]
+        
+
+        _results = self.of.dumpobj()
+        results = []
+        for result in _results:
+            result.pop('id')
+            results.append([(k,v) for k,v in result.iteritems() if type(v) in [IntType,StringType,UnicodeType]])
+
+        expected_results.sort()
+        results.sort()
         
         self.assertListEqual(expected_results,results)
+        
+    def test_filter_lesson(self):
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [[('pobjid', 'ROOT'), ('objid', 'dblesson0'), ('objtype', 'DBLesson')]]
+        
+        _results = self.of.dumpobj(['DBLesson'])
+        results = []
+        for result in _results:
+            result.pop('id')
+            results.append([(k,v) for k,v in result.iteritems() if type(v) in [IntType,StringType,UnicodeType]])
+
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+    def test_filter_lesson_student(self):
+        
+        # will only give children of lesson or student that are of type lesson or student
+        from types import StringType,IntType, UnicodeType
+            
+        expected_results = [[('name', 'Booker'), ('pobjid', 'ROOT'), ('objid', 'Booker'), ('objtype', 'student'), ('userobjid', 'Booker')], 
+                            [('name', 'Booker'), ('pobjid', 'dblesson0'), ('objid', 'Booker'), ('objtype', 'student'), ('userobjid', 'Booker')], 
+                            [('pobjid', 'ROOT'), ('objid', 'dblesson0'), ('objtype', 'DBLesson')]]
+
+
+        _results = self.of.dumpobj(['DBLesson','student'])
+        results = []
+        for result in _results:
+            result.pop('id')
+            results.append([(k,v) for k,v in result.iteritems() if type(v) in [IntType,StringType,UnicodeType]])
+
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+        
+class Test_ObjFrameworkDumpRpt(unittest.TestCase):
+    
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.obj1 = self.of.new(GenericBase,
+                    'Student',
+                    objid='booker',
+                    nationality='british',
+                    modname=__name__)
+        
+    def test_no_datafields(self):
+        from types import StringType,IntType, UnicodeType
+        expected_results = [['ROOT', 'Student']]
+
+                
+        results = self.of.dumpobjrpt(objref=False)
+        
+        expected_results.sort()
+        results.sort()
+        
+        self.assertListEqual(expected_results,results)
+        
+    def test_inc_datafields(self):
+        from types import StringType,IntType, UnicodeType
+        expected_results = [['ROOT', 'british', 'Student']]
+
+                
+        results = self.of.dumpobjrpt(fields=['nationality'],objref=False)
+        
+        expected_results.sort()
+        results.sort()
+        
+        self.assertListEqual(expected_results,results)
+ 
+        
+class Test_ObjFrameworkDumpRptNestedSchoolsched(unittest.TestCase):
+    
+    # same as above just with the school sched nested object
+    # so each attr is another object of (not a string or int) that 
+    # potentially needs to be accessed via accessors
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        
+        datamembers = dict(period='830',
+                           student='Booker',
+                           dow='MO',
+                           teacher='Amelia',
+                           saveversion=0,
+                           session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,
+                                 'DBLesson',
+                                 objid='dblesson0',
+                                 constructor='datamembers',
+                                 database=self.database,
+                                 of=self.of,
+                                 modname=__name__,
+                                 dm=datamembers)
+        
+        
+    def test_(self):
+        from types import StringType,IntType, UnicodeType
+        results = self.of.dumpobjrpt(objref=False)
+        
+        expected_results = [['ROOT', 'period'], 
+                            ['ROOT', 'saveversion'], 
+                            ['ROOT', 'dow'], 
+                            ['dblesson0', 'dow'], 
+                            ['dblesson0', 'period'], 
+                            ['dblesson0', 'saveversion'], 
+                            ['dblesson0', 'session'], 
+                            ['dblesson0', 'student'], 
+                            ['dblesson0', 'teacher'], 
+                            ['ROOT', 'DBLesson'], 
+                            ['ROOT', 'session'], 
+                            ['ROOT', 'student'], 
+                            ['ROOT', 'teacher']]
+        
+        self.assertListEqual(expected_results,results)
+
+    def test_filter_objtype(self):
+        from types import StringType,IntType, UnicodeType
+        results = self.of.dumpobjrpt(objtypes=['DBLesson','student'],objref=False)
+         
+        expected_results = [['dblesson0', 'student'], 
+                            ['ROOT', 'DBLesson'],
+                            ['ROOT', 'student']]
+        
+        
+        expected_results.sort()
+        results.sort()
+        
+        self.assertListEqual(expected_results,results)
+        
+    def test_filter_objtype_3items(self):
+        from types import StringType,IntType, UnicodeType
+        results = self.of.dumpobjrpt(objtypes=['DBLesson','student','dow'],objref=False)
+         
+        expected_results = [['dblesson0', 'student'], 
+                            ['ROOT', 'DBLesson'],
+                            ['ROOT', 'student'],
+                            ['dblesson0', 'dow'], 
+                            ['ROOT', 'dow']] 
+        
+        
+        expected_results.sort()
+        results.sort()
+        
+        self.assertListEqual(expected_results,results)
+    
+    def tearDown(self):
+        self.of.reset()
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
@@ -544,11 +809,11 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested_DupeKey))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_DB))
-    '''
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkSearch))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNested))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDump))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNestedSchoolsched))'''
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRpt))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRptNestedSchoolsched))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
