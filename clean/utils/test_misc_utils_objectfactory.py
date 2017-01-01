@@ -815,10 +815,56 @@ class Test_ObjFrameworkDumpRptNestedSchoolsched(unittest.TestCase):
     def tearDown(self):
         self.of.reset()
         
+
+class Test_ObjFrameworkGetByVal(unittest.TestCase):   
+    # test we can find an return an object given the type and the value
+    
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        
+        datamembers = dict(period='830',
+                           student='Booker',
+                           dow='MO',
+                           teacher='Amelia',
+                           saveversion=0,
+                           session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,
+                                 'DBLesson',
+                                 objid='dblesson0',
+                                 constructor='datamembers',
+                                 database=self.database,
+                                 of=self.of,
+                                 modname=__name__,
+                                 dm=datamembers)
+        
+        datamembers = dict(period='910',
+                           student='Clayton',
+                           dow='TU',
+                           teacher='Stan',
+                           saveversion=0,
+                           session='ST.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,
+                                 'DBLesson',
+                                 objid='dblesson1',
+                                 constructor='datamembers',
+                                 database=self.database,
+                                 of=self.of,
+                                 modname=__name__,
+                                 dm=datamembers)
+        
+    def test_(self):
+
+        self.assertEquals(self.of.object_get_byval("period","830").name,"830")        
+        self.assertEquals(self.of.object_get_byval("period","910").name,"910")
+        self.assertEquals(self.of.object_get_byval("period","foobar"),None)
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkBasic))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDupeID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_2_records_same_cls))
@@ -832,7 +878,10 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDump))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNestedSchoolsched))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRpt))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRptNestedSchoolsched))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRptNestedSchoolsched))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkGetByVal))
+    
+    
     
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

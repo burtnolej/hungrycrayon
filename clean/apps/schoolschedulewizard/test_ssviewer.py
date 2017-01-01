@@ -728,22 +728,59 @@ class Test_Viewer_Update(Test_Viewer_Base):
         self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.refdatabase)
         
         
+    def test_object_updates(self):
+        ssviewer_utils.dataset_load(self.database,self.refdatabase,
+                                    self.of,self.enums,unknown='Y')
+        
+        lesson = self.of.object_get('lesson','1.1.2.8.4')
+        lesson.keepversion=True
+        lesson.customtimestamp = "%y%m%d_%H%M%S"
+        lesson.update(self.of,'period',"910-950")
+            
+        expected_results = {'status': u'master', 'substatus': u'incomplete', 'recordtype': u'wp', 
+                            'period': u'830-910', 'dow': u'MO', 'source': u'dbinsert', 
+                            'session': u'??.Math.Monday.830-910', 'adult': u'??', 'student': u'Clayton', 
+                            'id': u'046CE5DA', 'objtype': 'lesson', 'prep': 5, 'userobjid': u'1.1.2.8.4', 
+                            'subject': u'foobar'}
+        
+        # just test keys as order changes
+        _dmkeys = lesson.dm.keys()
+        _expkeys = expected_results.keys()
+        _dmkeys.sort()
+        _expkeys.sort()
+        
+        self.assertEqual(_dmkeys,_expkeys)
+            
+        # test specific value has been updated
+        self.assertEqual(lesson.dm['period'],"910-950")
+        self.assertEqual(getattr(lesson,'period').name,"910-950")
+        
+        # test that the period object values have not been changed
+        oldval = self.of.object_get_byval("period","830-910")
+        newval = self.of.object_get_byval("period","910-950")
+        self.assertEquals(oldval.name,"830-910")
+        self.assertEquals(newval.name,"910-950")
+        
+        # test that the period attr on lesson now points to the 910-950 period
+        self.assertEquals(getattr(lesson,'period'),newval)
+        
     '''def test_(self):
         pass'''
         
     def test_create_versions(self):
 
-        expected_results = [['foobar'],['foobar'],['foobar'],['foobar'],['foobar']]
+        expected_results = [['Math'],['Math'],['Math'],['Math'],['Math']]
         
         ssviewer_utils.dataset_load(self.database,self.refdatabase,
                                     self.of,self.enums,unknown='Y')
         
-        with self.database:
-            for lesson in self.of.query('lesson'):
-                lesson.keepversion=True
-                lesson.customtimestamp = "%y%m%d_%H%M%S"
-                lesson.update('subject',"\"foobar\"")
         
+        for lesson in self.of.query('lesson'):
+            lesson.keepversion=True
+            lesson.customtimestamp = "%y%m%d_%H%M%S"
+            lesson.update(self.of,'subject',"Math")
+        
+        with self.database:
             _,rows,_ = tbl_rows_get(self.database,"lesson",['subject'],
                                     [['__version','=',"\"current\""],
                                      ['status','=',"\"master\""]])
@@ -793,25 +830,26 @@ class Test_Viewer_Service(Test_Viewer_Base):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_2subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_1col_2subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_2col_2subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nrow_ncol_2subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW_Formats))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_valuetype))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_2subcol))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_1col_2subrow_1subcol))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_2col_2subrow_1subcol))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nrow_ncol_2subrow_1subcol))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW_Formats))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_Adult))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_valuetype))'''
+
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Update))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Update_Recover))
     
     
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_1lesson))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_2lessons))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_17lessons))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_1lesson))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_2lessons))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_17lessons))
     
     ''' only need these if conflicts code is uncommented in viewer '''
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts))

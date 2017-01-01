@@ -189,10 +189,9 @@ class dbtblgeneric(GenericBase):
 		                                             '__id',"\""+self.id+"\""])    
 	    
 	    # update in mem object to new val and new db version id and timestamp
-	    setattr(self,field,newvalue)
-	    setattr(self,'id',_id)
-	    setattr(self,'__version',"current")
-	    setattr(self,'__timestamp',_ts)
+	    self.updateobj(field,newvalue,**dict(id=_id,
+	                                       __version="current",
+	                                       __timestamp=_ts))
 	    
 
 	

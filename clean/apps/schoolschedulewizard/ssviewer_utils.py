@@ -99,7 +99,7 @@ class schoolschedgeneric(dbtblgeneric):
         return(result,exec_str)
 
 
-    def update(self,field,newvalue,dbname=None):
+    def update(self,of,field,newvalue,dbname=None):
 
         # this is needed to get around the sqlite limitation that
         # an sqlite cursor can only be used in the thread it was instantiated in
@@ -174,8 +174,16 @@ class schoolschedgeneric(dbtblgeneric):
             # update in mem object to new val and new db version id and timestamp
             
             # assumes that field is also an objects whose value is in the name attr
-            _oldobj = getattr(self,field)
-            setattr(_oldobj,'name',newvalue)
+            
+            _newvalobj = of.object_get_byval(field,newvalue)
+            
+            if _newvalobj == None:
+                log.log(thisfuncname(),2,msg="tryng to update to a value that does not exist",field=field,newvalue=newvalue)
+                return -1
+            
+            #_oldobj = getattr(self,field)
+            #setattr(_oldobj,'name',newvalue)
+            setattr(self,field,_newvalobj)
 
             # give the new updated record the same database ref id as prev version
             setattr(_oldidobj,"name",_id)
@@ -184,6 +192,11 @@ class schoolschedgeneric(dbtblgeneric):
             #setattr(self,'id',_id)
             setattr(self,'__version',"current")
             setattr(self,'__timestamp',_ts)
+            
+            # update internal dm
+            _dm = getattr(self,"dm")
+            _dm[field] = newvalue
+            setattr(self,"dm",_dm)
             
         return _id
     

@@ -243,7 +243,7 @@ class UpdateID:
             print "for record",dbid,"update",attr,"from",getattr(obj,attr).name,"to",attr_val
             obj.keepversion=True
             obj.customtimestamp = "%y%m%d_%H%M%S"
-            newid = obj.update(attr,attr_val,dbname)
+            newid = obj.update(of,attr,attr_val,dbname)
             
             globals()['dbidlookup'][newid] = dbid
             globals()['dbidlookup'].pop(id)

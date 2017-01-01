@@ -335,6 +335,10 @@ class TestDBTblGeneric1_col_str(unittest.TestCase):
     def test_dbobject_get_row_value(self):
         self.assertEquals(self.dbg.tbl_row_values,[['"abc"']])
         
+    def test_dbobject_get_dm_values(self):
+        # internal dict containing values of data members
+        self.assertEquals(self.dbg.dm,{'col1': 'abc'})
+        
     def test_persist(self):
         with self.database:        
             self.dbg.persist()
@@ -580,6 +584,9 @@ class TestDBTblGenericUpdate(unittest.TestCase):
         # check the db representation
         self.assertListEqual(expected_results,tbl_rows)
         
+        # check the internal dict representation
+        self.assertEquals(self.dbg.dm,{'col1':678})
+        
         
     def test_2updates(self):
         
@@ -605,6 +612,9 @@ class TestDBTblGenericUpdate(unittest.TestCase):
         # check the db representation
         self.assertListEqual(expected_results,tbl_rows)
         
+        # check the internal dict representation
+        self.assertEquals(self.dbg.dm,{'col1':91011})
+        
     def test_str(self):
         
         expected_results = [[123, u'version'], ["def", u'current']]
@@ -627,6 +637,49 @@ class TestDBTblGenericUpdate(unittest.TestCase):
         
         # check the db representation
         self.assertListEqual(expected_results,tbl_rows)
+        
+    
+class TestDBTblGenericUpdateMultiField(unittest.TestCase):
+    
+    # update a value and store the version in the db
+    def setUp(self):
+        
+        self.database = Database(test_db.name,True)
+        
+        class dbtbltest(dbtblgeneric):
+            pass
+        
+        self.dbg = dbtbltest.datamembers(database=self.database,
+                                         dm={'col1':123,'col2':"abc",'col3':0x434})
+        
+        self.dbg.customtimestamp = "%y%m%d_%H%M%S"
+        self.dbg.keepversion = True
+        
+            
+    def test_(self):
+        
+        expected_results = [["abc", u'version'], ["foobar", u'current']]
+        
+        with self.database:        
+            self.dbg.persist()
+            origid = self.dbg.id
+            
+            self.dbg.update('col2',"\"foobar\"")
+            _,tbl_rows,_ = tbl_rows_get(self.database,'dbtbltest',['col2','__version'])
+        
+        
+        # check the value has been updated
+        self.assertEqual(self.dbg.col2,"\"foobar\"")
+        
+        #check the id should have been updated
+        newid = self.dbg.id
+        self.assertNotEqual(newid,origid) 
+        
+        # check the db representation
+        self.assertListEqual(expected_results,tbl_rows)
+        
+        # check the internal dict representation
+        self.assertEquals(self.dbg.dm,{'col1':123,'col2':"\"foobar\"",'col3':0x434})
         
 class TestDBTblMove(unittest.TestCase):
         
@@ -694,6 +747,9 @@ if __name__ == "__main__":
 
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericUpdate))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestDBTblGenericUpdateMultiField))
+    
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite)
     

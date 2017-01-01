@@ -109,6 +109,12 @@ class ObjFactory(GenericBase):
     
     def object_get(self,clsname,objid):
         return(self.store[clsname][objid])
+    
+    def object_get_byval(self,clsname,value):
+        for name, obj in self.store[clsname].iteritems():
+            if name == value:
+                return obj
+        return None
         
     def object_iter(self):
         for cls in self.store.values():

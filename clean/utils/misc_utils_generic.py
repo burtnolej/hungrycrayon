@@ -86,3 +86,14 @@ class GenericBase(object):
         cls1._setattr(_datamembers)
         
         return(cls1)
+    
+    def updateobj(self,field,newvalue,**args):
+        setattr(self,field,newvalue)
+        for k,v in args.iteritems():
+            setattr(self,k,v)
+        #setattr(self,'id',_id)
+        #setattr(self,'__version',"current")
+        #setattr(self,'__timestamp',_ts)
+    
+        # and update internal dict
+        self.dm[field] = newvalue  
