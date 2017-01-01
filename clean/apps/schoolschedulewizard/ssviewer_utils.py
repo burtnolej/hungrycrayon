@@ -208,11 +208,29 @@ def _getpage(grid,pagelen,pagenum):
         endrow = numrows-1
     return(startrow,endrow)
 
+def _dump(of):
+    
+    results = of.dumpobjrpt(objtypes=['lesson','period'],objref=True,fields=['period','subject','id','name'])    
+
+    print
+    print
+    
+    for _output in results:
+        _o_str = ""
+        for _o in _output:
+            _o_str+=str(_o).ljust(15)[:15]
+        #_o_str += "\n"
+        print _o_str
+        #return _o_str
+    #else:
+        #return(results)    
 
 def dataset_list(of,enums,pagelen=30,pagenum=1,constraints=None,columns=None):
 
     source_objs = of.query_advanced('lesson',constraints)
-        
+    
+    _dump(of)
+    
     grid = []
     colnames = list(source_objs[0].dm.keys())
 
@@ -228,7 +246,11 @@ def dataset_list(of,enums,pagelen=30,pagenum=1,constraints=None,columns=None):
             for col in columns:
                 _l.append(source_objs[i].dm[col])
             grid.append(_l)
-            
+    
+    print
+    print grid
+    print
+    
     return grid,colnames
 
 def dataset_record(of,clsname,objid,new=False):

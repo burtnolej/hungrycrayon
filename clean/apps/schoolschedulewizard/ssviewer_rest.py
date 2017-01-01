@@ -255,9 +255,7 @@ class UpdateID:
     
 class Command:
     def GET(self,cmd):
-        
-        #data = web.input(id='')
-        
+
         if cmd=="stop":
             print "bringing down service...."
             app.stop()
@@ -269,17 +267,35 @@ class Command:
         elif cmd=="stats":
             return(len(of.query('lesson')))
         elif cmd=="dump":
-            results = of.dumpobjrpt()
-                   
-            results.sort() # to line up the same objects
-            for _output in results:
-                _o_str = ""  
-                for _o in _output:
-                    _o_str+=str(_o).ljust(15)[:15]
             
-                print _o_str
+            data = web.input()
+            
+            objtypes = data['objtypes'].split(",")
+            fields = data['fields'].split(",")
+            pprint = data['pprint'].split(",")
+            
+            if data['fields'].split(",")==0:
+                objref=False
+            else:
+                objref=True
+                
+            if data['pprint'].split(",")==0:
+                pprint=False
+            else:
+                pprint=True
+        
+            results = of.dumpobjrpt(objtypes=objtypes,objref=objref,fields=fields)    
 
-            return(results)
+            if pprint == True:
+                _o_str = ""
+
+                for _output in results:
+                    for _o in _output:
+                        _o_str+=str(_o).ljust(15)[:15]
+                    _o_str += "\n"
+                return _o_str
+            else:
+                return(results)
 
         
 class SearchCriteria:

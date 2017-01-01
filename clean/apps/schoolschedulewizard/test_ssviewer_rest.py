@@ -188,8 +188,22 @@ class Test_Dump(Test_Base):
         
         expected_results = ['Humanities','Math','Humanities','??','Student News']
             
-        ssrest.restquery(self.url + "command/dump")  
+        results = ssrest.restquery(self.url + "command/dump",
+                                   objtypes='lesson,period',
+                                   fields='period,subject,id,name',
+                                   objref=0,
+                                   pprint=1)
         
+        
+        print
+        print results
+        
+        buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
+                           yaxis="dow",ztypes="subject",source_type="student",
+                           source_value="Clayton")    
+    
+        print buf
+            
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
