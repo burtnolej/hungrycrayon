@@ -264,7 +264,8 @@ function drawform($utilsxml,$args=NULL,$formats=NULL) {
 		foreach ($_items as $_item) {
 	
 			if ($_item->valuetype == 'adult') {
-    			$valuetype='teacher';
+    			$valuetype='teacher'; ## needs to be enabled if distinct enabled below
+				//$valuetype='adult';
     		}
     		elseif ($_item->valuetype == 'id') {
 	 			$valuetype='__id';
@@ -278,12 +279,31 @@ function drawform($utilsxml,$args=NULL,$formats=NULL) {
 				
 			global $SSDB;
 			
-			getchtmldbselect($SSDB,"lesson",$valuetype,$valuetype,$widgetcount,$_item->value,NULL,"comment");
+			//getchtmldbselect($SSDB,"lesson",$valuetype,$valuetype,$widgetcount,$_item->value,NULL,"comment");
+			getchtmldbselect($SSDB,"lesson",$_item->valuetype,$valuetype,$widgetcount,$_item->value,array("distinct" => false));
+
 			$widgetcount=$widgetcount+1;
 		   }
 	};
 
 	gethtmldiv("select something",$func,"contain",NULL);		
+}
+
+function drawentryform($utilsxml,$args=NULL,$formats=NULL) {
+
+	$func = function() use ($utilsxml) {
+		$_items = $utilsxml->xpath("./item"); // get a list of all rows
+   
+   		$widgetcount=0;
+		foreach ($_items as $_item) {
+					
+			global $SSDB;			
+			getchtmlinput($_item->valuetype,$_item->valuetype,$_item->value,NULL);
+			$widgetcount=$widgetcount+1;
+		   }
+	};
+
+	gethtmldiv("input something",$func,"contain",NULL);		
 }
 
 function draw($xmlstr,$args=NULL) {

@@ -701,8 +701,9 @@ class test_getchtmldbselect extends PHPUnit_Framework_TestCase
 		$this->assertEquals($result,$this->expected_result);
 	}
 	
-	public function test_label()
+	public function test_label_novalues_directive()
 	{
+		/* early version with no directive for how to get option values */
 		
 		echo "<!DOCTYPE html>";
 		echo "<html>";
@@ -726,6 +727,60 @@ class test_getchtmldbselect extends PHPUnit_Framework_TestCase
 	
 		$this->assertEquals($result,$this->expected_result);
 	}
+	
+	public function test_label_distinct()
+	{
+		/*supports directive for values but using distinct values of main record table (like lesson)*/
+		
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+		
+		$dbname = "test_getchtmldbselect.sqlite";
+		$column = "name";
+		$name = "foobar";
+		$tablename="dow";
+		
+		ob_start(); 
+		
+		$this->expected_result = '<div class="contain"><p class="divlabel">divlabel</p><p class="label">dsfdf</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="NotSelected">NotSelected</option><option value="all">all</option><option value="Monday">Monday</option><option value="Tuesday"selected>Tuesday</option><option value="Thursday">Thursday</option><option value="Wednesday">Wednesday</option><option value="Friday">Friday</option></select></span><span class="comment"><p>another comment</p></span></div>';
+															
+		$args = array('comment'=>'another comment','divlabel' => 'divlabel','label' => 'dsfdf','distinct' => true);						
+		getchtmldbselect($dbname,$tablename,$column,$name,1,'Tuesday',$args);
+							
+		$result = ob_get_contents();
+		ob_end_clean();
+	
+		$this->assertEquals($result,$this->expected_result);
+	}
+	
+	public function test_tablevalues()
+	{
+		/*supports directive for values and uses values in specific tables (like period) */
+				
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+		
+		$dbname = "test_getchtmldbselect.sqlite";
+		$column = "period";
+		$name = "foobar";
+		$tablename="dow";
+		
+		ob_start(); 
+		
+		$this->expected_result = '<div class="contain"><p class="divlabel">divlabel</p><p class="label">dsfdf</p><span class="select"><select class="custom" id="foobar" name="foobar"><option value="NotSelected">NotSelected</option><option value="all">all</option><option value="830-910">830-910</option><option value="910-950">910-950</option><option value="950-1030">950-1030</option><option value="1030-1110">1030-1110</option><option value="1110-1210">1110-1210</option><option value="1210-100">1210-100</option><option value="100-140">100-140</option><option value="140-220">140-220</option><option value="220-300">220-300</option><option value="300-330">300-330</option></select></span><span class="comment"><p>another comment</p></span></div>';
+															
+		$args = array('comment'=>'another comment','divlabel' => 'divlabel','label' => 'dsfdf','distinct' => false);						
+		getchtmldbselect($dbname,$tablename,$column,$name,1,'Tuesday',$args);
+							
+		$result = ob_get_contents();
+		ob_end_clean();
+	
+		$this->assertEquals($result,$this->expected_result);
+	}	
 }
 
 class test_getchtmlswitch extends PHPUnit_Framework_TestCase
@@ -1099,17 +1154,23 @@ $test = new test_getxmlchtmlselect();
 $test->test_();
 $test->test_starttag();
 $test->test_starttag2();
-$test->test_label();
+$test->test_label();*/
+
 
 $test = new test_getchtmldbselect();
-$test->test_();
-$test->test_label();
+//$test->test_();
+//$test->test_label_novalues_directive();
+//$test->test_label_distinct();
+$test->test_tablevalues();
 
+
+
+/*
 $test = new test_getchtmlswitch();
 $test->test_();
 $test->test_multi();
 $test->test_checked();
-*/
+
 
 $test = new test_getchtmlxmlmenu();
 $test->test_();
@@ -1120,7 +1181,7 @@ $test->test_build_dbmenu_xml();
 $test->test_append_menu_xml();
 $test->test_append_dbmenu_xml();
 
-/*
+
 $test = new test_getchtmlinput();
 $test->test_();
 

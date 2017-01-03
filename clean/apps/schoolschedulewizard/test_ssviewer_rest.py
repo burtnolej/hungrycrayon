@@ -68,7 +68,7 @@ class Test_View(Test_Base):
 
 class Test_Update(Test_Base):
     def setUp(self):
-        Test_Base.setUp(self,"test_ssviewer_rest.sqlite",8080)
+        Test_Base.setUp(self,"test_ssviewer_rest_dump.sqlite",8080)
         
     '''def test_(self):
 
@@ -86,14 +86,37 @@ class Test_Update(Test_Base):
         
     def test_(self):
 
-        expected_results = ['doodah']
+        sleep(1)
+        expected_results = ['Humanities']
                 
-        ssrest.restquery(self.url + "update/046CE5DA",
-                         value_changes="subject,doodah")    
+        ssrest.restquery(self.url + "update/02B1EEDC",
+                         value_changes="subject,Humanities")    
 
         buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
                            yaxis="dow",ztypes="subject",source_type="student",
-                           source_value="Clayton",cnstr_dow="MO")    
+                           source_value="Clayton",cnstr_dow="WE")    
+    
+        results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
+        self.assertListEqual(results,expected_results)
+        
+        
+    def test_2updates(self):
+        
+        sleep(1)
+        
+        # server already has state post execution of test_
+        expected_results = ['Math']
+                
+        #ssrest.restquery(self.url + "update/046CE5DA",
+        #                 value_changes="subject,Humanities")    
+
+        ssrest.restquery(self.url + "update/054C4D26",
+                         value_changes="subject,Math")    
+
+
+        buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
+                           yaxis="dow",ztypes="subject",source_type="student",
+                           source_value="Clayton",cnstr_dow="TU")    
     
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
         self.assertListEqual(results,expected_results)
@@ -144,6 +167,24 @@ class Test_Add(Test_Base):
             _,rows,_ = tbl_rows_get(db,'lesson',['student','teacher','subject','period','dow'])
        
         self.assertListEqual(expected_results,rows)
+        
+    def test_object(self):
+
+        expected_results =[[u'Clayton', u'??', u'Math', u'830-910', u'MO'], 
+                           [u'Clayton', u'??', u'??', u'830-910', u'WE'], 
+                           [u'Clayton', u'??', u'Student News', u'830-910', u'TH'], 
+                           [u'Clayton', u'Amelia', u'Humanities', u'830-910', u'TU'], 
+                           [u'Clayton', u'??', u'Humanities', u'830-910', u'FR'], 
+                           [u'Clayton', u'Stan', u'Math', u'830-910', u'TU']]
+                
+        ssrest.restquery(self.url + "add/lesson",
+                         student='Clayton',adult='Stan',subject='Math',period='830-910',
+                         recordtype='subject',dow='Tuesday')
+        
+        self.assertListEqual(expected_results,rows)
+        
+    def tearDown(self):
+        shutil.copyfile(self.dbname+".backup",self.dbname)
         
     def tearDown(self):
         shutil.copyfile(self.dbname+".backup",self.dbname)
@@ -214,7 +255,7 @@ if __name__ == "__main__":
     '''
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_View))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New))
     
@@ -222,6 +263,6 @@ if __name__ == "__main__":
     this test needs test_ssviewer_rest.sqlite link to point to _dump
     '''
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

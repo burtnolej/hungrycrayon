@@ -149,7 +149,7 @@ class Test_addrecord(unittest.TestCase):
         args = dict(database=self.database,refdatabase=self.database,saveversion=1,of=self.of,enums=self.enums)
         ssviewer_utils.dataset_load(**args)
 
-    def test_(self):
+    '''def test_(self):
         
         expected_result = 'Stan.Math.Tuesday.830-910'
         
@@ -165,10 +165,57 @@ class Test_addrecord(unittest.TestCase):
         ssviewer_utils.dataset_add(**args)
     
         self.assertEqual(self.of.object_get('lesson',datamembers['userobjid']).session.name,
-                         expected_result)
+                         expected_result)'''
         
+        
+    '''def test_internal_dict(self):
+        
+        expected_result = {'status': 'complete', 'recordtype': 'subject', 'enum': 665, 
+                           'period': '830-910', 'saveversion': 1, 'prep': 5, 'source': 'manual', 
+                           'session': 'Stan.Math.Tuesday.830-910', 'adult': 'Stan', 'student': 'Nathaniel', 
+                           'objtype': 'lesson', 'dow': u'TU', 'userobjid': '1.2.1.2.4', 'subject': 'Math'}
 
-    def test_pivot(self):
+        datamembers = {'student':'Nathaniel',
+                       'teacher':'Stan',
+                       'subject':'Math',
+                       'period':'830-910',
+                       'recordtype':'subject',
+                       'dow':'Tuesday'}
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    datamembers=datamembers)
+    
+        ssviewer_utils.dataset_add(**args)
+    
+        obj = self.of.object_get('lesson',datamembers['userobjid'])
+                                 
+        self.assertEqual(obj.dm,expected_result)'''
+        
+    def test_db(self):
+        
+        expected_result = [[u'Dylan', u'Clayton', u'1030-1110', u'MO', u'Game Period', u'subject'], 
+                           [u'Stan', u'Nathaniel', u'830-910', u'TU', u'Math', u'subject']]
+
+
+        datamembers = {'student':'Nathaniel',
+                       'teacher':'Stan',
+                       'subject':'Math',
+                       'period':'830-910',
+                       'recordtype':'subject',
+                       'dow':'Tuesday'}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    datamembers=datamembers)
+    
+        obj = ssviewer_utils.dataset_add(**args)
+
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',['teacher','student','period','dow','subject','recordtype','__id'])
+         
+        
+        
+        self.assertListEqual(expected_result,rows)
+        
+    '''def test_pivot(self):
         
         expected_result = [['', u'MO', u'TU'], [u'830-910', [], [('Math',)]], [u'1030-1110', [(u'Game Period',)], []]]
 
@@ -193,10 +240,6 @@ class Test_addrecord(unittest.TestCase):
         result = ssviewer_utils.dataset_pivot(**args)
     
         self.assertListEqual(result,expected_result)
-        
-        with self.database:
-            newobj.persist()
-            
             
     def test_dupe(self):
         
@@ -215,8 +258,141 @@ class Test_addrecord(unittest.TestCase):
         newobj = ssviewer_utils.dataset_add(**args)
         
         with self.assertRaises(Exception):
-            newobj = ssviewer_utils.dataset_add(**args)
+            newobj = ssviewer_utils.dataset_add(**args)'''
         
+        
+    def tearDown(self):
+        shutil.copyfile(self.dbname+".sqlite.backup",self.dbname + ".sqlite")
+        
+class Test_addrecord_refdata(unittest.TestCase):
+    
+    ''' for adding non lesson records '''
+    
+    def setUp(self):
+        
+        self.dbname='service_add_record'
+        self.database = Database(self.dbname)
+        self.of = ObjFactory(True)
+        self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.database)
+        self.prepmap = sswizard_utils._loadprepmapper(self.database)
+
+        args = dict(database=self.database,refdatabase=self.database,saveversion=1,of=self.of,enums=self.enums)
+        ssviewer_utils.dataset_load(**args)
+
+    def test_add_period_db(self):
+        
+        expected_result = [[u'330-400']]
+        
+        objtype = 'period'
+        datamembers = {'name':'330-400'}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    objtype=objtype,datamembers=datamembers)
+    
+        ssviewer_utils.dataset_add(**args)
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,"period",['name'],[["name","=","\"330-400\""]])
+    
+        self.assertEqual(rows,expected_result)
+        
+        
+    def test_add_period_object(self):
+        
+        expected_result = [[u'330-400']]
+
+        objtype = 'period'
+        datamembers = {'name':'330-400'}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    objtype=objtype,datamembers=datamembers)
+    
+        newobj = ssviewer_utils.dataset_add(**args)
+        
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,"period",['name'],[["name","=","\"330-400\""]])
+            
+        self.assertEqual(rows,expected_result)
+        
+        expected_result = {'objtype': 'period', 'name': '330-400', 'userobjid': '330-400'}
+        self.assertEqual(newobj.dm,expected_result)
+        
+    '''def test_add_dow(self):
+        
+        expected_result = [[u'Monday', u'MO', u'1'], [u'Tuesday', u'TU', u'2'], [u'Thursday', u'TH', u'3'], 
+                           [u'Wednesday', u'WE', u'4'], [u'Friday', u'FR', u'5'], [u'XX', u'Foobarday', u'6']]
+
+        objtype = 'dow'
+        datamembers = {'name':'XX',
+                       'code':'Foobarday'}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    objtype=objtype,datamembers=datamembers)
+    
+        ssviewer_utils.dataset_add(**args)
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,"dow",['name','code','enum'])
+
+        self.assertEqual(rows,expected_result)
+        
+    def test_add_student(self):
+        
+        expected_result = [[u'Jon', u'JB', u'29']]
+
+        objtype = 'student'
+        datamembers = {'name':'Jon',
+                       'code':'JB',
+                       'prep':5}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    objtype=objtype,datamembers=datamembers)
+    
+        ssviewer_utils.dataset_add(**args)
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,"student",['name','code','enum'],[["name","=","\"Jon\""]])
+
+        self.assertEqual(rows,expected_result)
+        
+    def test_add_adult(self):
+        
+        expected_result = [[u'Jon', u'JB', u'39']]
+
+        objtype = 'adult'
+        datamembers = {'name':'Jon',
+                       'code':'JB',
+                       'prep':5}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    objtype=objtype,datamembers=datamembers)
+    
+        ssviewer_utils.dataset_add(**args)
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,"adult",['name','code','enum'],[["name","=","\"Jon\""]])
+
+        self.assertEqual(rows,expected_result)
+        
+    def test_add_subject(self):
+        
+        expected_result = [[u'Jon', u'JB', u'38']]
+
+        objtype = 'subject'
+        datamembers = {'name':'Jon',
+                       'code':'JB',
+                       'lessontype':'ap'}
+        
+        args = dict(database=self.database,refdatabase=self.database,prepmap=self.prepmap,of=self.of,enums=self.enums,
+                    objtype=objtype,datamembers=datamembers)
+    
+        ssviewer_utils.dataset_add(**args)
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,"subject",['name','code','enum'],[["name","=","\"Jon\""]])
+
+        self.assertEqual(rows,expected_result)'''
         
     def tearDown(self):
         shutil.copyfile(self.dbname+".sqlite.backup",self.dbname + ".sqlite")
@@ -272,11 +448,13 @@ class Test_dump(unittest.TestCase):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_dump))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord_refdata))
+    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_dump))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

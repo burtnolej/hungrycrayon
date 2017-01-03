@@ -82,7 +82,7 @@ function gethtmlselect($column,$values,$widgetcount,$default, $label=NULL,$label
 		
 // Custom HTML Select
 function getchtmlselect($column,$values,$widgetcount,$default,$args) {
-	
+	      
 	if (isset($args['comment'])) {
 		$comment=$args['comment'];
 	}
@@ -140,6 +140,7 @@ function getchtmlselect_nolabel($column,$values,$widgetcount,$default,$comment) 
 }
 
 // Custom HTML DB Select
+
 function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$args){
 	
 	if (isset($args['comment'])) {
@@ -168,8 +169,16 @@ function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default
 		echo "<p class=\"divlabel\">".$divlabel."</p>";
 	}
 	
-	$values = getcolumndistinctvalues($dbname,$tablename,$column);
-
+	if (isset($args['distinct'])) {
+		if ($args['distinct'] == false) {
+			$values = getfieldvalues($dbname,$column);	
+		}
+	}
+	
+	if (!isset($values)) {
+		$values = getcolumndistinctvalues($dbname,$tablename,$column);
+	}
+	
 	array_splice($values,0,0,"NotSelected");
 	array_splice($values,1,0,"all");
 	
@@ -266,7 +275,7 @@ function gethtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,
 
 // Custom HTML XML Select
 function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
-	
+	      
 	$utilsxml = simplexml_load_string($xml,'utils_xml');
 	
 	if ($starttag <> NULL) {		
@@ -314,7 +323,7 @@ function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 
 // HTML XML Select
 function gethtmlxmlselect($xml,$defaults,$labels=FALSE,$labelclass=FALSE,$spanclass=NULL,$class=NULL) {
-	
+	      
 	$utilsxml = simplexml_load_string($xml,'utils_xml');
 	
 	$_dropdowns = $utilsxml->xpath("//select");

@@ -32,4 +32,19 @@ function getcolumndistinctvalues($dbname,$tablename,$colname) {
 	return $values;
 }
 
+function getfieldvalues($dbname,$tablename) {
+		
+	$values = array();
+	
+	$db = new SQLite3($dbname);
+	
+	$results = $db->query("select name from ".$tablename);
+	
+	while ($row = $results->fetchArray()) {
+		$values[] = $row[0];
+	}
+
+	return $values;
+}
+
 ?>

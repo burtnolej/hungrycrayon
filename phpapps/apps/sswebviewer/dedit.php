@@ -117,21 +117,18 @@ $(document).ready(function(){
  	});
 });
 
-
-
-
-
 </script>
 
 <?php
 
 if(isset($_GET['page_status'])) {
+	echo "<br>update me<br>";
 	$_GET['source_type']="update";
 	//$_GET['source_value']="lesson";
 	//$_GET['source_value']="id";
 	$token =refreshpage();
 	$_GET['parser']="drawform";
-	echo "<br>update me<br>";
+	
 	//draw($token,$args);
 }
 

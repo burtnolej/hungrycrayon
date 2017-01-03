@@ -62,6 +62,11 @@
 			<field>source_value</field>
 			<values>
 				<value>lesson</value>
+				<value>dow</value>
+				<value>period</value>
+				<value>subject</value>
+				<value>adult</value>
+				<value>student</value>
 			</values>
 			<default>lesson</default>
 		</select>
@@ -95,7 +100,7 @@
 				<value>student</value>
 				<value>adult</value>
 				<value>period</value>
-				<value>down</value>
+				<value>dow</value>
 			</values>
 			<default>not selected</default>
 		</select>

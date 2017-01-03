@@ -422,6 +422,14 @@ def _iscode(enums,objtype,value):
 	log.log(thisfuncname(),2,msg="could not lookup name2code",objtype=objtype,value=str(value))
 	return "??"
 
+def _addenum(enums,objtype,name,code,enum):
+	enums[objtype]['name'] = name
+	enums[objtype]['code'] = code
+	enums[objtype]['name2code'][name] = code
+	enums[objtype]['code2name'][code] = name
+	enums[objtype]['name2enum'][name] = enum
+	enums[objtype]['code2enum'][code] = enum
+							
 def _loadprepmapper(database):
     cols = ['name','prep']
 

@@ -9,6 +9,7 @@ from misc_utils import nxnarraycreate, thisfuncname
 from misc_utils_objectfactory import ObjFactory
 from misc_utils_generic import IDGenerator
 import sswizard_utils
+import sswizard_query_utils
 from ssviewer_utils_palette import *
 #from ssviewer_utils_palette import init_formats
 
@@ -64,6 +65,7 @@ class schoolschedgeneric(dbtblgeneric):
 
         self._metadata_set()
 
+        # switch adult name to teacher
         try:
             _idx = self.tbl_col_defn.index('adult')
             self.tbl_col_defn.remove('adult')
@@ -71,6 +73,7 @@ class schoolschedgeneric(dbtblgeneric):
         except:
             pass
         
+
         if not tbl_exists(self.database,self.tbl_name) ==True:
             tbl_create(self.database,
                        self.tbl_name,
@@ -82,6 +85,22 @@ class schoolschedgeneric(dbtblgeneric):
             self.tbl_col_names.insert(0,'teacher')
         except:
             pass
+        
+        # switch id name to _id
+        '''try:
+            _idx = self.tbl_col_defn.index('id')
+            self.tbl_col_defn.remove('id')
+            self.tbl_col_defn.insert(_idx,'__id')
+        except:
+            pass
+        
+        try:
+            _idx = self.tbl_col_names.index('id')
+            self.tbl_col_names.remove('id')
+            self.tbl_col_names.insert(_idx,'__id')
+        except:
+            pass'''
+
 
         # and also objtype is not persisted
         try:
@@ -90,6 +109,14 @@ class schoolschedgeneric(dbtblgeneric):
             self.tbl_row_values[0].pop(_idx)
         except:
             pass
+        
+        # or userobjid
+        try:
+            _idx = self.tbl_col_names.index('userobjid')
+            self.tbl_col_names.pop(_idx)
+            self.tbl_row_values[0].pop(_idx)
+        except:
+            pass        
         
         result,exec_str = tbl_rows_insert(self.database,
                                           self.tbl_name,
@@ -221,28 +248,14 @@ def _getpage(grid,pagelen,pagenum):
         endrow = numrows-1
     return(startrow,endrow)
 
-def _dump(of):
-    
-    results = of.dumpobjrpt(objtypes=['lesson','period'],objref=True,fields=['period','subject','id','name'])    
+def dataset_list(of,enums,objtype='lesson',pagelen=30,pagenum=1,constraints=None,columns=None):
 
-    print
-    print
+    source_objs = of.query_advanced(objtype,constraints)
     
-    for _output in results:
-        _o_str = ""
-        for _o in _output:
-            _o_str+=str(_o).ljust(15)[:15]
-        #_o_str += "\n"
-        print _o_str
-        #return _o_str
-    #else:
-        #return(results)    
-
-def dataset_list(of,enums,pagelen=30,pagenum=1,constraints=None,columns=None):
-
-    source_objs = of.query_advanced('lesson',constraints)
+    #print source_objs[0].dm
+    #print source_objs[1].dm
+    #print source_objs[2].dm
     
-    _dump(of)
     
     grid = []
     colnames = list(source_objs[0].dm.keys())
@@ -252,18 +265,18 @@ def dataset_list(of,enums,pagelen=30,pagenum=1,constraints=None,columns=None):
     startrow,endrow = _getpage(source_objs,pagelen,pagenum)
 
     for i in range(startrow,endrow+1):
-        if columns== None:
-            grid.append(source_objs[i].dm.values())
-        else:
-            _l=[]
-            for col in columns:
+        if columns==None:
+            columns = colnames
+            #grid.append(source_objs[i].dm.values())
+        #else:
+        _l=[]
+        for col in columns:
+            try:
                 _l.append(source_objs[i].dm[col])
-            grid.append(_l)
-    
-    print
-    print grid
-    print
-    
+            except:
+                _l.append("none")
+        grid.append(_l)
+
     return grid,colnames
 
 def dataset_record(of,clsname,objid,new=False):
@@ -511,50 +524,87 @@ def dataset_new(source_type):
     
     if source_type == "lesson":
         cols = ['adult','subject','dow','period','student','recordtype']
-     
+    elif source_type == "lesson":
+        cols = ['code','name','prep']
+    else:
+        cols = ['code','name']
+        
     return(dict((col,"") for col in cols))
 
-def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,keepversion=False):
+def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,objtype='lesson',keepversion=False):
     '''
     in the datamembers dict needs to come 'period','student','dow','adult','subject','recordtype
     values need to be the names for dow, so 'Monday','Tuesday' etc'''
+    _objid = None
+    _userobjid = None
     
-    datamembers['session'] = ".".join([datamembers['teacher'],datamembers['subject'],datamembers['dow'],
-                               sswizard_utils._isname(enums,'period',datamembers['period'])])
-    
-    datamembers['adult'] = datamembers['teacher']
-    datamembers.pop('teacher')
-    
-    datamembers['userobjid'] = sswizard_utils._getuserobjid(enums,['period','dow','student','adult','subject'],datamembers)
-    
-    # check that the userobjid does not already exist
-    if of.object_exists('lesson',datamembers['userobjid']) == True:
-        raise Exception("id already in use",datamembers['userobjid'])
-    
-    datamembers['objtype'] = 'lesson'   
-    datamembers['status'] = 'complete'
-    datamembers['prep'] = int(prepmap[datamembers['student']])
-    datamembers['source']="manual"
-    datamembers['saveversion']=1
+    if objtype == "lesson":
+        datamembers['session'] = ".".join([datamembers['teacher'],datamembers['subject'],datamembers['dow'],
+                                   sswizard_utils._isname(enums,'period',datamembers['period'])])
         
-    # switch to code
-    datamembers['dow'] = sswizard_utils._iscode(enums,'dow',datamembers['dow'])
+        datamembers['adult'] = datamembers['teacher']
+        datamembers.pop('teacher')
+        
+        datamembers['userobjid'] = sswizard_utils._getuserobjid(enums,['period','dow','student','adult','subject'],datamembers)
+        
+        # check that the userobjid does not already exist
+        if of.object_exists('lesson',datamembers['userobjid']) == True:
+            raise Exception("id already in use",datamembers['userobjid'])
+        
+        datamembers['objtype'] = 'lesson'   
+        datamembers['status'] = 'complete'
+        datamembers['prep'] = int(prepmap[datamembers['student']])
+        datamembers['source']="manual"
+        datamembers['saveversion']=1
+            
+        # switch to code
+        datamembers['dow'] = sswizard_utils._iscode(enums,'dow',datamembers['dow'])
+        
+        with database:
+            _,_lesson_count,_ = sswizard_utils._maxlessonenum(database)
+            datamembers['enum'] = int(_lesson_count[0][0])+1
     
-    with database:
-        _,_lesson_count,_ = sswizard_utils._maxlessonenum(database)
-        datamembers['enum'] = int(_lesson_count[0][0])+1
+        
+        lesson = of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
+                             constructor='datamembers',database=database,
+                             of=of,modname=__name__,dm=datamembers)
+        
+        _lesson_change(lesson)
+        
+        log.log(thisfuncname(),10,msg="lesson obj added",objtype=objtype,dm=datamembers)
+        
+        with database:
+            lesson.persist()
+        return(lesson)
+    else:
+        if objtype == "student":  
+            datamembers['prep'] = int(prepmap[datamembers['name']])
+        
+        with database:
+            _,_obj_count,_ = sswizard_query_utils._rowcount(database,objtype)
+            _enum = int(_obj_count[0][0])+1
+            
+        sswizard_utils._addenum(enums,objtype,datamembers['name'],  datamembers['code'],_enum)  
 
-    lesson = of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
-                         constructor='datamembers',database=database,
-                         of=of,modname=__name__,dm=datamembers)
+    if _userobjid == None:
+        _userobjid = datamembers['name'] # set the of unique id (use name for all non lesson objects
+        
+    if _objid == None:
+        _objid = datamembers['name']
+
+    datamembers['userobjid'] = _userobjid
+    datamembers['enum'] = _enum
+    datamembers['objtype'] = objtype  
     
-    _lesson_change(lesson)
-    
-    log.log(thisfuncname(),10,msg="lesson obj added",dm=datamembers)
+    obj = of.new(schoolschedgeneric,str(objtype),objid=_objid,constructor='datamembers',database=database,
+                         of=of,modname=__name__,recursion=False,dm=datamembers)
+
+    log.log(thisfuncname(),10,msg="lesson obj added",objtype=objtype,dm=datamembers)
     
     with database:
-        lesson.persist()
-    return(lesson)
+        obj.persist()
+    return(obj)
+    
     
 
 def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1,period="all",

@@ -15,7 +15,7 @@ import sswizard_utils
 import sswizard_query_utils
 from ssviewer_utils_palette import *
 from time import sleep
-
+from copy import deepcopy
 from inspect import getmembers
 from threading import Lock
 
@@ -86,29 +86,39 @@ class Add:
                     prepmap=prepmap,of=of,enums=enums,
                     datamembers=datamembers)
 
-        newobj = ssviewer_utils.dataset_add(**args)
-        
+        newobj = ssviewer_utils.dataset_add(database,database,of,enums,prepmap,datamembers,objtype)
+            
         header = "<root><parser><value>drawform</value></parser></root>"
         
-        _values =dict(objtype =newobj.objtype.name,
-                      userobjid=newobj.userobjid.name)
+        if hasattr(newobj.userobjid,"name"):
+            _userobjid = newobj.userobjid.name
+        else:
+            _userobjid = newobj.userobjid
+            
+        if hasattr(newobj.objtype,"name"):
+            _objtype = newobj.objtype.name
+        else:
+            _objtype = newobj.objtype
+
+        _values =dict(objtype =_objtype,userobjid=_userobjid)
         
         xml=xml_utils.record2xml(_values,header=header)
-        
-        print xml
         
         return xmltree.tostring(xml)
     
         
 class New:
     def GET(self,objtype):
-        
-        #source_type="lesson"
-        
+                
         _values = ssviewer_utils.dataset_new(objtype)
         
-        header = "<root><parser><value>drawform</value></parser></root>"
-        
+        if objtype == "lesson":
+            # lessson record can only be created from defined values (those specified in the individual ref tables
+            header = "<root><parser><value>drawform</value></parser></root>"
+        else:
+            # a new on any other record is to create new defined values for lesson
+            header = "<root><parser><value>drawentryform</value></parser></root>"
+            
         xml=xml_utils.record2xml(_values,header=header)
         
         return xmltree.tostring(xml)
@@ -186,7 +196,7 @@ class List:
                 if str(attr_val) <> "NotSelected":
                     constraints.append((attr[6:],str(attr_val)))
         
-        values,colnames = ssviewer_utils.dataset_list(of,enums,pagelen=pagelen,
+        values,colnames = ssviewer_utils.dataset_list(of,enums,objtype,pagelen=pagelen,
                                                       pagenum=pagenum,
                                                       constraints=constraints)
         
@@ -213,6 +223,12 @@ class SearchID:
         
         header = "<root><parser><value>drawform</value></parser></root>"
         
+        # only allow editing of adult,period,dow,recordtype,student,subject
+        
+        for k in list(_values.keys()):
+            if k not in ['adult','period','dow','recordtype','student','subject']:
+                _values.pop(k)
+                
         xml=xml_utils.record2xml(_values,header=header)
         
         return xmltree.tostring(xml)
@@ -238,19 +254,21 @@ class UpdateID:
         for i in range(0,len(_value_changes),2):
             value_changes[_value_changes[i]] = _value_changes[i+1]
             
-        
         for attr,attr_val in value_changes.iteritems():          
             print "for record",dbid,"update",attr,"from",getattr(obj,attr).name,"to",attr_val
             obj.keepversion=True
             obj.customtimestamp = "%y%m%d_%H%M%S"
             newid = obj.update(of,attr,attr_val,dbname)
             
-            globals()['dbidlookup'][newid] = dbid
-            globals()['dbidlookup'].pop(id)
+            if newid <> -1:
+                globals()['dbidlookup'][newid] = dbid
+                globals()['dbidlookup'].pop(id)
             
-            print "for record",dbid,"update",attr,"to",getattr(obj,attr).name,"(",getattr(obj,'id').name,")"
-  
-            getattr(obj,'id').name
+                print "for record",dbid,"update",attr,"to",getattr(obj,attr).name,"(",getattr(obj,'id').name,")"
+            else:
+                print "value to update to is not found"
+                
+        #getattr(obj,'id').name
         return newid
     
 class Command:

@@ -5,15 +5,24 @@ var url = "";
 $(document).ready(function(){
 	
 	// first check if this is event is a submit button press
-	$("input").on('click',function(){
+	//$("input").on('click',function(){
+	$("input[name='button']").on('click',function(){
+		
+		console.log("first");
 		url = buildurl();
 		
 		url = url + "&page_status=submit";
 		get(url);
 	});
 		
-	$("select, input").on('change',function(){
+	//$("select, input").on('change',function(){
+	$("select").on('change',function(){
+
 		// if the element that changed is on the watchlist redraw the page
+		
+		console.log("second");
+
+
 		if (Globals.watch_list.indexOf(this.id)  != -1) {
 			url = buildurl();
  			get(url);
