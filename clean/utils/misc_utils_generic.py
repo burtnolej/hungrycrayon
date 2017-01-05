@@ -18,7 +18,8 @@ class GenericBase(object):
         
     def attr_get_keyval(self,include_callable=True, 
                         include_baseattr=True,
-                        include_nondataattr=True):
+                        include_nondataattr=True,
+                        include_dm=False):
         ''' ignore contains a list of suffixes. all attr with this
         suffix should be ignored'''
         from inspect import getmro, getmembers
@@ -32,7 +33,7 @@ class GenericBase(object):
             
             # this is used internally and will never be returned
             # use obj.name to access
-            if _name == 'dm':
+            if _name == 'dm'and include_dm==False:
                 continue
             
             if hasattr(self,'dm') == True:

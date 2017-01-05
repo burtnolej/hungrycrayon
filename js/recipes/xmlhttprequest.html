@@ -1,0 +1,47 @@
+<html>
+<body></body>
+
+<p id="message"></p>
+
+
+<script  type="text/javascript"  src="jquery-3.1.1.js"></script>
+<script>
+
+
+
+function httpGetAsync(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 0)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+    xmlHttp.send(null);
+}
+
+/*var HttpClient = function() {
+    this.get = function(aUrl, aCallback) {
+        var anHttpRequest = new XMLHttpRequest();
+        anHttpRequest.onreadystatechange = function() { 
+            if (anHttpRequest.readyState == 4 && anHttpRequest.status == 0)
+                aCallback(anHttpRequest.responseText);
+        }
+
+        anHttpRequest.open( "GET", aUrl, true );            
+        anHttpRequest.send( null );
+    }
+}*/
+
+url = 'http://0.0.0.0:8080/command/dump?objtypes=period&fields=name,pobjid&pprint=1&fieldnames=1&submit=submit&';
+var client = new httpGetAsync();
+httpGetAsync(url, function(response) {
+   document.write(response);
+   console.log("dfdf");
+   document.getElementById("message").innerHTML = response;
+});
+
+</script>
+</html>
+
+

@@ -812,9 +812,216 @@ class Test_ObjFrameworkDumpRptNestedSchoolsched(unittest.TestCase):
         
         self.assertListEqual(expected_results,results)
         
+
+    def test_all_fields(self):
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [['ROOT', 'dm:teacher=Amelia', 
+                             'dm:session=AM.AC.SC', 'dm:student=Booker', 
+                             'dm:period=830', 'dm:saveversion=0', 
+                             'dm:dow=MO', 'dm:dm:dow=MO', 'dow:MO', 
+                             'objid:dblesson0', 'period:830', 
+                             'recursion:True', 'saveversion:0', 
+                             'session:AM.AC.SC', 'student:Booker', 
+                             'teacher:Amelia']]
+
+        results = self.of.dumpobjrpt(objtypes=['DBLesson'],
+                                     objref=False,
+                                     fields=['all'],
+                                     omitfields=['id'],
+                                     fieldnames=True)
+         
+        
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+
+        
     def tearDown(self):
         self.of.reset()
         
+
+class Test_ObjFrameworkDumpRptNestedSchoolschedConstraints(unittest.TestCase):
+    
+    # same as above just with the school sched nested object
+    # so each attr is another object of (not a string or int) that 
+    # potentially needs to be accessed via accessors
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        
+        datamembers = dict(period='830-910',student='Booker',dow='MO',
+                           teacher='Amelia',saveversion=0,session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,'DBLesson',objid='dblesson0',constructor='datamembers',database=self.database,of=self.of,modname=__name__,dm=datamembers)
+        
+        
+        datamembers = dict(period='910-950',student='Booker',dow='MO',
+                           teacher='Stan',saveversion=0,session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,'DBLesson',objid='dblesson1',constructor='datamembers',database=self.database,of=self.of,modname=__name__,dm=datamembers)
+        
+
+        datamembers = dict(period='950-1020',student='Booker',dow='MO',
+                           teacher='Samantha',saveversion=0,session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,'DBLesson',objid='dblesson2',constructor='datamembers',database=self.database,of=self.of,modname=__name__,dm=datamembers)
+    
+
+        datamembers = dict(period='830-910',student='Clayton',dow='MO',
+                           teacher='Samantha',saveversion=0,session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,'DBLesson',objid='dblesson3',constructor='datamembers',database=self.database,of=self.of,modname=__name__,dm=datamembers)
+        
+
+    def test_no_constraint(self):
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results =[['ROOT', '-', 'DBLesson'], ['ROOT', '-', 'DBLesson'], 
+                           ['ROOT', '-', 'DBLesson'], ['ROOT', '-', 'DBLesson'], 
+                           ['ROOT', '0', 'saveversion'], ['ROOT', '830-910', 'period'], 
+                           ['ROOT', '910-950', 'period'], ['ROOT', '950-1020', 'period'], 
+                           ['ROOT', 'AM.AC.SC', 'session'], ['ROOT', 'Amelia', 'teacher'], 
+                           ['ROOT', 'Booker', 'student'], ['ROOT', 'Clayton', 'student'], 
+                           ['ROOT', 'MO', 'dow'], ['ROOT', 'Samantha', 'teacher'], 
+                           ['ROOT', 'Stan', 'teacher'], ['dblesson0', '0', 'saveversion'],
+                           ['dblesson0', '830-910', 'period'], ['dblesson0', 'AM.AC.SC', 'session'], 
+                           ['dblesson0', 'Amelia', 'teacher'], ['dblesson0', 'Booker', 'student'],
+                           ['dblesson0', 'MO', 'dow'], ['dblesson1', '0', 'saveversion'], 
+                           ['dblesson1', '910-950', 'period'], ['dblesson1', 'AM.AC.SC', 'session'], 
+                           ['dblesson1', 'Booker', 'student'], ['dblesson1', 'MO', 'dow'], 
+                           ['dblesson1', 'Stan', 'teacher'], ['dblesson2', '0', 'saveversion'], 
+                           ['dblesson2', '950-1020', 'period'], ['dblesson2', 'AM.AC.SC', 'session'], 
+                           ['dblesson2', 'Booker', 'student'], ['dblesson2', 'MO', 'dow'], 
+                           ['dblesson2', 'Samantha', 'teacher'], ['dblesson3', '0', 'saveversion'], 
+                           ['dblesson3', '830-910', 'period'], ['dblesson3', 'AM.AC.SC', 'session'], 
+                           ['dblesson3', 'Clayton', 'student'], ['dblesson3', 'MO', 'dow'], 
+                           ['dblesson3', 'Samantha', 'teacher']]
+
+        results = self.of.dumpobjrpt(objref=False,
+                                     fields=['name'],
+                                     omitfields=['id'])
+         
+        
+        expected_results.sort()
+        results.sort()
+
+        #print results
+        self.assertEqual(len(results),39)
+        
+    def test_1constraint(self):
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [['ROOT', 'student:Booker', 'period:830-910', 'objtype:DBLesson'], 
+                            ['ROOT', 'student:Clayton', 'period:830-910', 'objtype:DBLesson']]
+
+        results = self.of.dumpobjrpt(objtypes=['DBLesson'],
+                                     objref=False,
+                                     fields=['student','period'],
+                                     omitfields=['id'],
+                                     fieldnames=True,
+                                     constraints=dict(period=['830-910']))
+         
+        
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+    def test_1constraint_multivals(self):
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [['ROOT', 'student:Booker', 'period:830-910', 'objtype:DBLesson'], 
+                            ['ROOT', 'student:Booker', 'period:950-1020', 'objtype:DBLesson'], 
+                            ['ROOT', 'student:Clayton', 'period:830-910', 'objtype:DBLesson']]
+        
+        results = self.of.dumpobjrpt(objtypes=['DBLesson'],
+                                     objref=False,
+                                     fields=['student','period'],
+                                     omitfields=['id'],
+                                     fieldnames=True,
+                                     constraints=dict(period=['830-910','950-1020']))
+         
+        
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+    def test_1constraint_teacher(self):
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [['ROOT', 'teacher:Stan', 'period:910-950', 'objtype:DBLesson']]
+        
+        results = self.of.dumpobjrpt(objtypes=['DBLesson'],
+                                     objref=False,
+                                     fields=['teacher','period'],
+                                     omitfields=['id'],
+                                     fieldnames=True,
+                                     constraints=dict(teacher=['Stan']))
+         
+        
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+        
+class Test_ObjFrameworkDumpRptNestedSchoolschedFieldNameHdr(unittest.TestCase):
+    
+    # same as above just with the school sched nested object
+    # so each attr is another object of (not a string or int) that 
+    # potentially needs to be accessed via accessors
+    def setUp(self):
+        self.of = ObjFactory(True)
+        self.database = Database('foobar')
+        
+        datamembers = dict(period='830-910',student='Booker',dow='MO',
+                           teacher='Amelia',saveversion=0,session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,'DBLesson',objid='dblesson0',constructor='datamembers',database=self.database,of=self.of,modname=__name__,dm=datamembers)
+        
+        
+        datamembers = dict(period='910-950',student='Booker',dow='MO',
+                           teacher='Stan',saveversion=0,session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,'DBLesson',objid='dblesson1',constructor='datamembers',database=self.database,of=self.of,modname=__name__,dm=datamembers)
+        
+
+        datamembers = dict(period='950-1020',student='Booker',dow='MO',
+                           teacher='Samantha',saveversion=0,session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,'DBLesson',objid='dblesson2',constructor='datamembers',database=self.database,of=self.of,modname=__name__,dm=datamembers)
+    
+
+        datamembers = dict(period='830-910',student='Clayton',dow='MO',
+                           teacher='Samantha',saveversion=0,session='AM.AC.SC')
+
+        self.foobar= self.of.new(schoolschedgeneric,'DBLesson',objid='dblesson3',constructor='datamembers',database=self.database,of=self.of,modname=__name__,dm=datamembers)
+        
+    def test_1constraint(self):
+        from types import StringType,IntType, UnicodeType
+        
+        expected_results = [['ROOT', 'student:Booker', 'period:830-910', 'objtype:DBLesson'], 
+                            ['ROOT', 'student:Clayton', 'period:830-910', 'objtype:DBLesson']]
+
+        results = self.of.dumpobjrpt(objtypes=['DBLesson'],
+                                     objref=False,
+                                     fields=['student','period'],
+                                     omitfields=['id'],
+                                     C 1-on-1
+G 1-on-1
+A 1-on-1
+E 1-on-1=True)
+         
+        
+        expected_results.sort()
+        results.sort()
+
+        self.assertListEqual(expected_results,results)
+
+        self.assertListEqual(expected_results,results)
 
 class Test_ObjFrameworkGetByVal(unittest.TestCase):   
     # test we can find an return an object given the type and the value
@@ -873,14 +1080,18 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_Nested_DupeKey))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_DB))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFramework_Database_Derived_DB))'''
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNested))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDump))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpNestedSchoolsched))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRpt))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRptNestedSchoolsched))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRptNestedSchoolsched))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkGetByVal))
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRptNestedSchoolschedConstraints))
+    
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ObjFrameworkDumpRptNestedSchoolschedFieldNameHdr))
     
     
     
