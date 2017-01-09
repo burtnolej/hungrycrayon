@@ -1,0 +1,161 @@
+<html>
+<body></body>
+<style> 
+body { 
+	width:2220px;
+} 
+
+label {
+	color:#000;
+	text-align: left;
+	display:inline-block;
+	width:100px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:80%;
+	font-weight: bold;
+}
+
+input[type="text"] {
+	color:#000;
+	text-align: left;
+	display:inline-block;
+	width:200px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:80%;
+}
+
+body { width:3000px;}
+table {word-wrap:break-word;border-collapse: collapse;}
+tr {color: #000;border: 1px solid #000; }
+td {word-wrap:break-word; border-right: 1px solid #000; }
+            
+</style>
+<script  type="text/javascript"  src="jquery-3.1.1.js"></script>
+<script>
+
+function _addElement(html_arr,hidden) {
+	var div= document.createElement('div');
+
+	if (hidden) { html_arr.splice(2,0," hidden ") }
+	
+	html_str =html_arr.join("");
+	
+	console.log(html_str);
+	div.innerHTML= html_str;
+	var el= div.firstChild;
+	document.body.appendChild(el);   
+	return el;
+}
+
+function addElement(type,label,name,id,hidden=false,subtype=null,defaultval=null) {
+	// for building paragraph, button etc
+	var html_arr = Array();
+	html_arr.push('<');
+	html_arr.push(type);
+	
+	if (subtype != null) {
+		html_arr.push(' type="');
+		html_arr.push(subtype);
+		html_arr.push('"');
+	}
+	
+	if (defaultval != null) {
+		html_arr.push(' value="');
+		html_arr.push(defaultval);
+		html_arr.push('"');
+	}
+	
+	html_arr.push(' name="');
+	html_arr.push(name);
+	html_arr.push('"');
+	
+	html_arr.push(' id="');
+	html_arr.push(id);
+	html_arr.push('"');
+	
+	html_arr.push('>');
+	html_arr.push(label);	
+	html_arr.push('</');
+	html_arr.push(type);
+	html_arr.push('>');
+	
+	_addElement(html_arr,hidden)
+}
+
+function getElementValues(type) {
+	var values = Array();
+	$(type).each(function (index, value) {
+   		values.push(this.value);
+	});
+	return values;
+}
+
+function getElementsName(type) {
+	var values = Array();
+	$(type).each(function (index, name) {
+   		values.push(this.name);
+	});
+	return values;
+}
+
+  function makeRequest(url) {
+    httpRequest = new XMLHttpRequest();
+
+    if (!httpRequest) {
+      alert('Giving up :( Cannot create an XMLHTTP instance');
+      return false;
+    }
+    httpRequest.onreadystatechange = alertContents;
+    httpRequest.open('GET', url,true);
+    httpRequest.send();
+  }
+
+  function alertContents() {
+    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+      if (httpRequest.status === 200) {
+        //alert(httpRequest.responseText);
+        document.getElementById("message").innerHTML = this.responseText;
+      } else {
+        alert(httpRequest.status);
+      }
+    }
+  }
+  
+attrs = Array("ip","port","command","objtypes","fields","pprint","constraints","omitfields","fieldnames");
+default_values = Array("0.0.0.0","8080","command/dump","period","name,pobjid",1,"","",1);
+
+for (i=0;i<attrs.length;i++) {
+	addElement("label",attrs[i],attrs[i],"lbl"+i.toString(),hidden=false);
+	addElement("input",attrs[i],attrs[i],"inp1"+i.toString(),hidden=false,subtype="text",defaultval=default_values[i]);
+	document.write('<br/>');
+}
+
+addElement("input","submit","submit","btn"+i.toString(),hidden=false,subtype="button",defaultval="submit");
+addElement("p","","message","message",hidden=false);
+
+$(document).ready(function(){
+
+	//http://0.0.0.0:8080/command/dump?objtypes=period&fields=name,pobjid&pprint=true
+	$("input[name='submit']").on('click',function(){
+
+		names =getElementsName("input");
+		values = getElementValues("input");
+		url = "http://";
+		
+		url = "http://" + $('input[name="ip"]').attr('value');
+		url = url + ":" + $('input[name="port"]').attr('value');
+		url = url + "/" + $('input[name="command"]').attr('value') + "?";
+
+		for (i=3;i<names.length;i++) {
+			if ( values[i] != "") {
+				url = url + names[i] + "=" + values[i] + "&";
+			}
+		}
+		
+   		makeRequest(url);
+	});
+});
+</script>
+</html>
+
+

@@ -1,6 +1,6 @@
 import sys
 from misc_utils_log import Log, logger
-log = Log(cacheflag=True,logdir="/tmp/log",verbosity=10,
+log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
           pidlogname=True,proclogname=False)
 
 import os
@@ -12,6 +12,7 @@ import unittest
 import time
 from collections import OrderedDict
 from types import StringType,IntType, UnicodeType
+from inspect import getmembers
     
 class ObjFactory(GenericBase):
     
@@ -96,9 +97,13 @@ class ObjFactory(GenericBase):
         for name, obj in self.store[clsname].iteritems():
             match=True
             for k,v in constraints:
-                #if getattr(obj,k).name <> v:
-                if getattr(obj,k) <> v:
-                    match=False
+                if hasattr(getattr(obj,k),'name'):
+                    if getattr(obj,k).name <> v:
+                        match=False
+                else:
+                    if getattr(obj,k) <> v:
+                        match=False
+                    
             if match==True:
                 results.append(obj)
                 
@@ -134,7 +139,8 @@ class ObjFactory(GenericBase):
     def reset(self):
         self.store = {}
 
-    def dumpobjrpt(self,fields=None,objtypes=None,objref=True):
+    def dumpobjrpt(self,fields=None,objtypes=None,objref=True, 
+                   omitfields=[],fieldnames=False,constraints=None,fieldhdr=False):
         ''' provides more control over the output of dumpobj '''
         
         ''' set objref to false if want to exclude the python internal ref (if your testing etc)
@@ -164,34 +170,75 @@ class ObjFactory(GenericBase):
         '''objtypes=['lesson','subject']
         fields=['adult','student']'''
         
+        allfields=False
+        
+        if constraints == None:
+            constraints={}
+            
         if fields == None:
             fields = ['objtype']
+        elif fields == ['all']:
+            allfields=True
         else:
             fields.append('objtype')
             
         output = []
+        
+        if fieldhdr == True:
+            pass
+            
         for record in self.dumpobj(objtypes):
       
             _output=[]
+            constraint_hit=False
             
             if objref==True:            
                 _output.append(record['obj'].__str__().split("0x")[1][:-1])
             
             _output.append(record['pobjid'])
             
+            if allfields == True:
+                fields=[]
+                for attr,val in getmembers(record['obj']):
+                    if callable(val) == False and attr.startswith("__") == False and attr.startswith("tbl_") == False and attr <> "database":
+                        fields.append(attr)
+            
             for field in fields:
+                _ostr = ""
+                if field in omitfields:
+                    continue
                 if hasattr(record['obj'],field):
                     if hasattr(getattr(record['obj'],field),'name'):
-                        _output.append(getattr(record['obj'],field).name)
+                        attrval = getattr(record['obj'],field).name
                     else:
-                        _output.append(str(getattr(record['obj'],field)))
+                        attrval = getattr(record['obj'],field)
+                    
+                    if isinstance(attrval,dict):
+                        for k,v in attrval.iteritems():
+                            _ostr = k+"="+str(v)
+                            if fieldnames == True:
+                                _ostr = field + ":" + _ostr
+                            _output.append(_ostr)
+                            
+                    elif constraints.has_key(field) and not attrval in constraints[field]:
+                            constraint_hit=True
+                    else:
+                        _ostr = str(attrval)
+    
                 elif record.has_key(field):
-                    _output.append(record[field])
+                    _ostr = record[field]
                 else:
-                    _output.append("-")
-                        
+                    _ostr = "-"
+                    
+                if fieldnames == True:
+                    _output.append(field + ":" + _ostr)
+                else:
+                    _output.append(_ostr)      
                 
-            output.append(_output)
+            
+            
+            if constraint_hit == False:
+                output.append(_output)
         return output
             
     def dumpobj(self,objtypes=None):

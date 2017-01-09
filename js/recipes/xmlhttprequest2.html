@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<span id="ajaxButton" style="cursor: pointer; text-decoration: underline">
+  Make a request
+</span>
+
+<!--<h2>Using the XMLHttpRequest object</h2>
+
+<button type="button" onclick="loadXMLDoc()">Change Content</button>-->
+
+<p id="demo"></p>
+
+<script type="text/javascript">
+(function() {
+  var httpRequest;
+  document.getElementById("ajaxButton").onclick = function() { 
+  		//makeRequest('file:///Users/burtnolej/Development/pythonapps/js/recipes/test.html');
+  		//makeRequest('https://www.google.com');
+  		//makeRequest('http://localhost/test.html?ddfsf=sfdfsssdf');
+  		makeRequest('http://0.0.0.0:8080/command/dump?objtypes=period&fields=name,pobjid&pprint=1&fieldnames=1&submit=submit&');
+   };
+
+  function makeRequest(url) {
+    httpRequest = new XMLHttpRequest();
+
+    if (!httpRequest) {
+      alert('Giving up :( Cannot create an XMLHTTP instance');
+      return false;
+    }
+    httpRequest.onreadystatechange = alertContents;
+    httpRequest.open('GET', url,true);
+    httpRequest.send();
+  }
+
+  function alertContents() {
+    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+      if (httpRequest.status === 200) {
+        //alert(httpRequest.responseText);
+        document.getElementById("demo").innerHTML = this.responseText;
+      } else {
+        alert(httpRequest.status);
+      }
+    }
+  }
+})();
+</script>
+
+
+
+/*
+function loadXMLDoc() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+  //console.log(this.status);
+  
+    if (this.readyState == 4 && this.status == 0) {
+    var mythis = this.responseXML;
+    	console.log(this.responseXML);
+      document.getElementById("demo").innerHTML =this.responseXML;
+    }
+  };
+  var url = 'http://0.0.0.0:8080/command/dump?objtypes=period&fields=name,pobjid&pprint=1&fieldnames=1&submit=submit&';
+
+  xhttp.open("GET", 'http://localhost/test.html', true);
+  xhttp.send();
+}*/
+</script>
+
+</body>
+</html>

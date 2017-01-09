@@ -85,22 +85,6 @@ class schoolschedgeneric(dbtblgeneric):
             self.tbl_col_names.insert(0,'teacher')
         except:
             pass
-        
-        # switch id name to _id
-        '''try:
-            _idx = self.tbl_col_defn.index('id')
-            self.tbl_col_defn.remove('id')
-            self.tbl_col_defn.insert(_idx,'__id')
-        except:
-            pass
-        
-        try:
-            _idx = self.tbl_col_names.index('id')
-            self.tbl_col_names.remove('id')
-            self.tbl_col_names.insert(_idx,'__id')
-        except:
-            pass'''
-
 
         # and also objtype is not persisted
         try:
@@ -123,11 +107,21 @@ class schoolschedgeneric(dbtblgeneric):
                                           self.tbl_col_names,
                                           self.tbl_row_values)
 
+        if hasattr(self,"id") == False:
+            _idx = self.tbl_col_names.index('__id')
+            setattr(self,"id",self.tbl_row_values[_idx])
+            
+        if self.dm.has_key('id') == False:
+            _idx = self.tbl_col_names.index('__id')
+            self.dm["id"] = self.tbl_row_values[0][_idx].replace('\"','')
+        
         return(result,exec_str)
 
 
     def update(self,of,field,newvalue,dbname=None):
 
+        print getattr(self,"dm")
+        
         # this is needed to get around the sqlite limitation that
         # an sqlite cursor can only be used in the thread it was instantiated in
         if dbname <> None:
@@ -145,10 +139,20 @@ class schoolschedgeneric(dbtblgeneric):
         # internal __id field for convenience but should not be repersisted
         # as the database layer will create the new __id for any revisions
         
-        _oldidobj = getattr(self,'id')
+        if hasattr(self,'id') == True:
+            _oldidobj = getattr(self,'id')
+        elif hasattr(self,'__id') == True:
+            _oldidobj = getattr(self,'__id')
+        else:
+            raise Exception("cannot find an ID field")
+            
         #_id = getattr(self,'id').name
         #setattr(self,"__id",_id)
-        setattr(self,"__id",_oldidobj.name)
+        
+        if hasattr(_oldidobj,"name") == True:
+            setattr(self,"__id",_oldidobj.name)
+        else:
+            setattr(self,"__id",_oldidobj)
             
         delattr(self,'id')
 
@@ -187,7 +191,7 @@ class schoolschedgeneric(dbtblgeneric):
 
         if currentrecord[field] <> newrecord[field]:
             # create a new row in the database with version "current"
-
+            
             with database:
                 result,exec_str = tbl_rows_insert(database,
                                                   self.tbl_name,
@@ -213,7 +217,14 @@ class schoolschedgeneric(dbtblgeneric):
             setattr(self,field,_newvalobj)
 
             # give the new updated record the same database ref id as prev version
-            setattr(_oldidobj,"name",_id)
+            if hasattr(_oldidobj,"name") == True:
+                #setattr(self,"__id",_oldidobj.name)
+                setattr(_oldidobj,"name",_id)
+            else:
+                #setattr(self,"__id",_oldidobj)
+                setattr(self,_oldidobj,_id)
+
+            #setattr(_oldidobj,"name",_id)
             setattr(self,'id',_oldidobj)
             
             #setattr(self,'id',_id)
@@ -221,6 +232,9 @@ class schoolschedgeneric(dbtblgeneric):
             setattr(self,'__timestamp',_ts)
             
             # update internal dm
+            print getattr(self,"dm")
+            
+            
             _dm = getattr(self,"dm")
             _dm[field] = newvalue
             setattr(self,"dm",_dm)
@@ -248,14 +262,12 @@ def _getpage(grid,pagelen,pagenum):
         endrow = numrows-1
     return(startrow,endrow)
 
-def dataset_list(of,enums,objtype='lesson',pagelen=30,pagenum=1,constraints=None,columns=None):
-
+#def dataset_list(of,enums,objtype='lesson',pagelen=30,pagenum=1,
+#                 constraints=None,columns=None):
+def dataset_list(of,enums,objtype='lesson',pagelen=30,pagenum=1,
+                 constraints=[],columns=None):
+    
     source_objs = of.query_advanced(objtype,constraints)
-    
-    #print source_objs[0].dm
-    #print source_objs[1].dm
-    #print source_objs[2].dm
-    
     
     grid = []
     colnames = list(source_objs[0].dm.keys())
@@ -552,17 +564,18 @@ def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,objtype='lesso
             raise Exception("id already in use",datamembers['userobjid'])
         
         datamembers['objtype'] = 'lesson'   
-        datamembers['status'] = 'complete'
+        datamembers['substatus'] = 'complete'
+        datamembers['status'] = 'master'
         datamembers['prep'] = int(prepmap[datamembers['student']])
         datamembers['source']="manual"
-        datamembers['saveversion']=1
+        #datamembers['saveversion']=1
             
         # switch to code
         datamembers['dow'] = sswizard_utils._iscode(enums,'dow',datamembers['dow'])
         
-        with database:
-            _,_lesson_count,_ = sswizard_utils._maxlessonenum(database)
-            datamembers['enum'] = int(_lesson_count[0][0])+1
+        #with database:
+        #    _,_lesson_count,_ = sswizard_utils._maxlessonenum(database)
+        #    datamembers['enum'] = int(_lesson_count[0][0])+1
     
         
         lesson = of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
@@ -603,6 +616,7 @@ def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,objtype='lesso
     
     with database:
         obj.persist()
+        
     return(obj)
     
     
@@ -662,8 +676,9 @@ def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1
     # load from database
     cols = ['period','student','session','dow','prep','teacher','subject','userobjid','status','substatus','recordtype','source','__id']        
     with database:
+        
         colndefn,rows,exec_str = tbl_rows_get(database,'lesson',cols,whereclause)
-
+    
         log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
     
     cols = ['period','student','session','dow','prep','adult','subject','userobjid','status','substatus','recordtype','source','id']

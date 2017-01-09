@@ -18,6 +18,7 @@ from time import sleep
 from copy import deepcopy
 from inspect import getmembers
 from threading import Lock
+from copy import deepcopy
 
 import os
 import os.path
@@ -103,6 +104,9 @@ class Add:
         _values =dict(objtype =_objtype,userobjid=_userobjid)
         
         xml=xml_utils.record2xml(_values,header=header)
+        
+        globals()['dbidlookup'][newobj.id] = _userobjid
+        print "added to dbid",newobj.id,_userobjid
         
         return xmltree.tostring(xml)
     
@@ -219,7 +223,7 @@ class SearchID:
         
         dbid = dbidlookup[id]
         
-        _values = ssviewer_utils.dataset_record(of,source_type,dbid)
+        _values = deepcopy(ssviewer_utils.dataset_record(of,source_type,dbid))
         
         header = "<root><parser><value>drawform</value></parser></root>"
         
@@ -247,6 +251,9 @@ class UpdateID:
         #data.pop('id')
         
         obj = of.object_get('lesson',dbid)
+        
+        
+        print obj.dm
         
         _value_changes = data['value_changes'].split(",")
         value_changes = {}
@@ -288,30 +295,69 @@ class Command:
             
             data = web.input()
             
-            objtypes = data['objtypes'].split(",")
-            fields = data['fields'].split(",")
-            pprint = data['pprint'].split(",")
+            web.header('Access-Control-Allow-Origin','*')
+            web.header('Access-Control-Allow-Credientials','true')
+            #objtypes = data['objtypes'].split(",")
+            #fields = data['fields'].split(",")
+            #pprint = data['pprint'].split(",")
             
-            if data['fields'].split(",")==0:
-                objref=False
-            else:
-                objref=True
+            
+            listfields = ['objtypes','omitfields','fields']
+            dictfields = ['constraints']
+            boolfields = ['fieldnames','objref']
+            urldict = {}
+            
+            for field in listfields:
+                try:
+                    urldict[field] = data[field].split(",")
+                except:
+                    pass
+                
+            for field in boolfields:
+                urldict[field] = False
+                
+                
+                try:
+                    if data[field] == "1":
+                        urldict[field] = True
+                        print field
+                except:
+                    pass
+                
+            for field in dictfields:
+                try:
+                    _urldict = {}
+                    for nvp in data[field].split(","):
+                        k,v = nvp.split("=")
+                        _urldict[k]=v
+
+                    urldict[field] = _urldict
+                except:
+                    pass
                 
             if data['pprint'].split(",")==0:
                 pprint=False
             else:
                 pprint=True
-        
-            results = of.dumpobjrpt(objtypes=objtypes,objref=objref,fields=fields)    
 
+            results = of.dumpobjrpt(**urldict)
+            
+            css = "body { width:3000px;}"
+            css += "table { border: 1px solid #f00;}"
+            css += "td {border: 1px solid #000;word-wrap:break-word;}"
+           
             if pprint == True:
-                _o_str = ""
+                #_o_str = "<html><style>"+css+"</style><body><table>"
+                _o_str = "<table>"
 
                 for _output in results:
+                    _o_str = _o_str + "<tr>"
                     for _o in _output:
-                        _o_str+=str(_o).ljust(15)[:15]
-                    _o_str += "\n"
-                return _o_str
+                        _o_str+="<td>"+str(_o)+"</td>"
+                        #.ljust(15)[:15]
+                    _o_str += "</tr>"
+                #return _o_str+"</table></body></html>"
+                return _o_str+"</table>"
             else:
                 return(results)
 
@@ -438,6 +484,7 @@ if __name__ == "__main__":
     except:
         pass
     
+    args['source'] = '56n'
     run(**args)
     
     '''dbname,refdbname = sswizard_utils.getdatabase()
