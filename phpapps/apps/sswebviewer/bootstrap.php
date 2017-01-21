@@ -68,7 +68,8 @@
 				function set_stylesheet() {
 					global $_GET;
 					if (in_array('formats',explode(",",$_GET['ztypes']))) {
-						echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"default.css\" />";
+						//echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"default.css\" />";
+						echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"plain.css\" />";
 					}
 					else {
 						echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"plain.css\" />";

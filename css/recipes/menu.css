@@ -29,7 +29,7 @@ a	{
 	background-color: #EEE;
 }
 
- .nav li:hover { /* highlight list items when hovered over */
+ .nav li:hover { 
 	background-color: #F00;
 	display: block;
 }
@@ -51,6 +51,7 @@ a	{
 .nav li:hover > ul {
 	display: block;
 }
+
 
 </style>
 </html>

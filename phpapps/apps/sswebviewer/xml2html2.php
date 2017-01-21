@@ -13,9 +13,9 @@ set_include_path($PHPLIBPATH);
 include_once 'utils_xml.php';
 include_once 'ui_utils.php';
 
-function getlinkurl($cell,$args) {
+function getlinkurl($cell,$args,$page='dpivot.php') {
 	
-		$url = "dpivot.php?source_type=".$cell->valuetype."&source_value=".$cell->value;
+		$url = $page."?source_type=".$cell->valuetype."&source_value=".$cell->value;
 		
 		if ($args<>NULL) {
 		
@@ -88,12 +88,18 @@ function drawcell($cell,$class,$args,$size=1,$index=1) {
 
 function drawrow($row,$args) {
 	echo "<tr>"; // start a sub row
+	
+	
+	
 				
 	$_subcells = $row->xpath("child::subcell"); // see if any subcells exist
 	
 	if (sizeof($_subcells) <> 0) {
 		for ($i=0;$i<sizeof($_subcells);$i++) {
-			drawcell($_subcells[$i],"cell sub",$args,sizeof($_subcells)-1,$i);
+			//drawcell($_subcells[$i],"cell sub",$args,sizeof($_subcells)-1,$i);
+			drawcell($_subcells[$i],"thincol borderoff",$args,sizeof($_subcells)-1,$i);
+			//echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#E0E0E0\"";
+			
 		}
 		echo "</tr>";
 	}
@@ -101,7 +107,8 @@ function drawrow($row,$args) {
 
 function drawgrid($utilsxml,$args=NULL,$formats=NULL) {
 	
-	echo "<table id=table >";
+	//echo "<table id=table >";
+	echo "<table class = \"borderoff\">";
 
 	$_rows = $utilsxml->xpath("//row"); // get a list of all rows
 
@@ -116,7 +123,10 @@ function drawgrid($utilsxml,$args=NULL,$formats=NULL) {
 			
 			if (sizeof($_subrows) <> 0) {
 
-				echo '<td><table class="table sub">'; // start a new table
+				//echo '<td><table class="table sub">'; // start a new table
+				echo "<td><table class = \"borderoff\">";
+				
+				
 
 				foreach ($_subrows as $_subrow) {					
 					drawrow($_subrow,$args);
@@ -162,7 +172,8 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 
 				foreach ($_subrows as $_subrow) {	
 
-					echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#E0E0E0\"";
+					//echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#E0E0E0\"";
+					echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#EEEEEE\"";
 
 					$content="";	
 					$_subcells = $_subrow->xpath("child::subcell"); // see if any subcells exist
@@ -174,7 +185,7 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 							
 							$output = array();
 							if ($_subcells[$i]->valuetype == 'adult') {
-								$link = '<a href="'.$url.'">'."<font color=\"red\">".$_subcells[$i]->value."</font>".'</a>';
+								$link = '<a href="'.$url.'">'."<font color=\"darkred\">".$_subcells[$i]->value."</font>".'</a>';
 								$content =$content." with ".$link;
 							}
 							elseif ($_subcells[$i]->valuetype == 'student') {
@@ -182,12 +193,33 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 								$content = $content." [".$link."] ";
 							}
 							elseif ($_subcells[$i]->valuetype == 'subject') {
-								$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
+								$link = '<a href="'.$url.'">'."<font color=\"darkgreen\">".$_subcells[$i]->value."</font>".'</a>';
+								//$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
 								$content = $content.$link;
+							}
+							elseif ($_subcells[$i]->valuetype == 'period') {
+								$link = '<a href="'.$url.'">'."<font color=\"orange\">".$_subcells[$i]->value."</font>".'</a>';
+								$content = $content." @".$link;
+							}
+							elseif ($_subcells[$i]->valuetype == 'dow') {
+								$link = '<a href="'.$url.'">'."<font color=\"purple\">".$_subcells[$i]->value."</font>".'</a>';
+								$content = $content." on ".$link;
+							}
+							elseif ($_subcells[$i]->valuetype == 'recordtype') {
+								$link = '<a href="'.$url.'">'."<font color=\"darkblue\">".$_subcells[$i]->value."</font>".'</a>';
+								//$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
+								$content = $content." {".$link."} ";
+							}
+							elseif ($_subcells[$i]->valuetype == 'id') {
+								$url = getlinkurl($_subcells[$i],$args,"dedit.php");
+								$link = '<a href="'.$url.'">'."<i>".$_subcells[$i]->value."</i>".'</a>';
+								//$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
+								$content = $content." {".$link."} ";
 							}
 							else {
 								$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
 								$content = $content.$link;
+								//echo $_subcells[$i]->valuetype;
 							}
 
 							

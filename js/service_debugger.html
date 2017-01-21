@@ -1,17 +1,65 @@
 <html>
 <body></body>
-<style> 
-body { 
+<style>
+
+html *
+{
+	font-family: Arial, Helvetica, sans-serif;  !important;
+}
+ 
+div.params {
+	background-color:#00F;
+	float:left;
+	display:block;
+	width:400px;
+}
+div.history {
+	overflow:scroll;
+	float:left;
+	background-color:#F00;
+	display:block;
+	width:200px;
+	height:300px;
+}
+
+div.url {
+	position:absolute;
+	top:300px;
+	background-color:#0F0;
+	float:none;
+}
+
+div.message { 
+	position:absolute;
+	top:350px;
+	background-color:#0FF;
 	width:2220px;
 } 
+
+#time {
+	position:absolute;
+	top:0px;
+	right:10px;
+	color:#F0F;
+}
+
+#status {
+width:100px;
+}
+
+#url {
+	width:100%;
+}
+
+p.history {
+	color:#0F0;
+}
 
 label {
 	color:#000;
 	text-align: left;
 	display:inline-block;
 	width:100px;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size:80%;
 	font-weight: bold;
 }
 
@@ -20,66 +68,116 @@ input[type="text"] {
 	text-align: left;
 	display:inline-block;
 	width:200px;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size:80%;
 }
 
-body { width:3000px;}
-table {word-wrap:break-word;border-collapse: collapse;}
-tr {color: #000;border: 1px solid #000; }
-td {word-wrap:break-word; border-right: 1px solid #000; }
+body { 
+	width:3000px;
+}
+
+table {
+	word-wrap:break-word;
+	border-collapse: collapse;
+}
+tr {
+	color: #000;
+	border: 1px solid #000; 
+}
+
+td {
+	word-wrap:break-word; 
+	border-right: 1px solid #000; 
+	font-size:80%;  !important;
+}
             
 </style>
 <script  type="text/javascript"  src="jquery-3.1.1.js"></script>
 <script>
 
-function _addElement(html_arr,hidden) {
+function _addElement(html_arr,hidden,parentelement,placement='bottom') {
 	var div= document.createElement('div');
 
 	if (hidden) { html_arr.splice(2,0," hidden ") }
 	
 	html_str =html_arr.join("");
 	
-	console.log(html_str);
 	div.innerHTML= html_str;
 	var el= div.firstChild;
-	document.body.appendChild(el);   
+	
+	if (placement=="bottom") {
+		parentelement.appendChild(el);   
+	}
+	else {
+		parentelement.insertBefore(el,parentelement.firstChild);   
+	}
+	
 	return el;
 }
 
-function addElement(type,label,name,id,hidden=false,subtype=null,defaultval=null) {
+function addElement(element_type,id,options) {
 	// for building paragraph, button etc
 	var html_arr = Array();
+	var hidden = options.hidden;
+	delete options['hidden'];
+	
 	html_arr.push('<');
-	html_arr.push(type);
+	html_arr.push(element_type);
 	
-	if (subtype != null) {
-		html_arr.push(' type="');
-		html_arr.push(subtype);
-		html_arr.push('"');
+	/*for (var property in options) {
+		if (options.hasOwnProperty(property)) {
+			if (options[property] != null) {
+				html_arr.push(' '+property+'="');html_arr.push(options[property]);html_arr.push('"');
+			}
+	    }
+	}*/
+
+	if (options.href != null) {
+		html_arr.push(' href="');html_arr.push(options.href);html_arr.push('"');
 	}
 	
-	if (defaultval != null) {
-		html_arr.push(' value="');
-		html_arr.push(defaultval);
-		html_arr.push('"');
+	if (options.subtype != null) {
+		html_arr.push(' type="');html_arr.push(options.subtype);html_arr.push('"');
 	}
 	
-	html_arr.push(' name="');
-	html_arr.push(name);
-	html_arr.push('"');
+	if (options.default != null) {
+		html_arr.push(' value="');html_arr.push(options.default);html_arr.push('"');
+	}
+	
+	if (options.class != null) {
+		html_arr.push(' class="');html_arr.push(options.class);html_arr.push('"');
+	}
+	
+	if (options.name != null) {
+		html_arr.push(' name="');html_arr.push(options.name);html_arr.push('"');
+	}
 	
 	html_arr.push(' id="');
 	html_arr.push(id);
 	html_arr.push('"');
 	
 	html_arr.push('>');
-	html_arr.push(label);	
+	
+	if (options.label != null) {
+		html_arr.push(options.label);	
+	}
+	
 	html_arr.push('</');
-	html_arr.push(type);
+	html_arr.push(element_type);
 	html_arr.push('>');
 	
-	_addElement(html_arr,hidden)
+	if (options.parentid == null) {
+		parentelement = document.body;
+	}
+	else {
+		parentelement = document.getElementById(options.parentid);
+	}
+	
+	_addElement(html_arr,hidden,parentelement,options.placement)
+}
+
+function myTimer() {
+    var d = new Date();
+    document.getElementById("time").innerHTML = d.toLocaleTimeString();
+    makeRequest("http://0.0.0.0:8080/command/ping",writeHttpServiceStatus);
 }
 
 function getElementValues(type) {
@@ -98,61 +196,160 @@ function getElementsName(type) {
 	return values;
 }
 
-  function makeRequest(url) {
+function makeRequest(url,alert_contents) {
     httpRequest = new XMLHttpRequest();
 
     if (!httpRequest) {
       alert('Giving up :( Cannot create an XMLHTTP instance');
       return false;
     }
-    httpRequest.onreadystatechange = alertContents;
+    httpRequest.onreadystatechange = alert_contents;
     httpRequest.open('GET', url,true);
     httpRequest.send();
-  }
+    
+    url_history.push(url);
+	element = document.getElementById("history")
 
-  function alertContents() {
-    if (httpRequest.readyState === XMLHttpRequest.DONE) {
-      if (httpRequest.status === 200) {
-        //alert(httpRequest.responseText);
-        document.getElementById("message").innerHTML = this.responseText;
+    var linkid = new Date().getTime();
+
+	var options = {
+		hidden:false,
+		href: url
+	};
+	
+	options.name = "foobar";
+	options.label = linkid;
+	options.parentid = "history";
+	options.placement = "top";
+
+	_addElement(Array("<br>"),false,document.getElementById("history"),'top');
+	addElement("a",linkid,options);
+	
+	
+	$('a[id="'+linkid+'"]').on('click',function (id) {
+   		console.log(this.href);
+   		return false;
+	});
+
+}
+
+function writeHttpResponse() {
+	if (httpRequest.readyState === XMLHttpRequest.DONE) {
+		if (httpRequest.status === 200) {
+			document.getElementById("message").innerHTML = this.responseText;
+			
       } else {
-        alert(httpRequest.status);
+      		alert(httpRequest.status);
       }
-    }
-  }
-  
+	}	
+}
+
+function writeHttpServiceStatus() {
+	if (httpRequest.readyState === XMLHttpRequest.DONE) {
+		element = document.getElementById("status")
+		if (httpRequest.status === 200) {
+			element.innerHTML = this.responseText;
+			if (this.responseText == "ping") {
+				$("p[id='timer']").css("background-color", "#F00");
+				element.style.backgroundColor = "green";
+			}
+      } else {
+      		element.style.backgroundColor = "red";
+      }
+	}	
+}
+ 
+function geturl()  {
+	names =getElementsName("input");
+	values = getElementValues("input");
+	url = "http://";
+		
+	url = "http://" + $('input[name="ip"]').attr('value');
+	url = url + ":" + $('input[name="port"]').attr('value');
+	url = url + "/" + $('input[name="command"]').attr('value') + "?";
+
+	for (i=3;i<names.length;i++) {
+		if ( values[i] != "") {
+			url = url + names[i] + "=" + values[i] + "&";
+		}
+	}
+	document.getElementById("url").innerHTML = url;
+	return url;
+}
+
+var url_history = Array();
+
 attrs = Array("ip","port","command","objtypes","fields","pprint","constraints","omitfields","fieldnames");
 default_values = Array("0.0.0.0","8080","command/dump","period","name,pobjid",1,"","",1);
 
+var options = {
+	//label:null;
+	//name:null;
+	hidden:false
+	//subtype=null;
+	//default=null;
+	//classs=null;
+	//parentid=null;
+};
+
+options.name = "time";
+addElement("p","time",options);
+
+options.name = "status";
+addElement("p","status",options);
+
+options.name = "params";options.class = "params";
+addElement("div","params",options);	
+
+options.name = "history";options.class = "history";
+addElement("div","history",options);
+
+options.name = "url";options.class = "url";
+addElement("div","url",options);
+
+options.name = "message";options.class = "message";
+addElement("div","message",options);
+						
 for (i=0;i<attrs.length;i++) {
-	addElement("label",attrs[i],attrs[i],"lbl"+i.toString(),hidden=false);
-	addElement("input",attrs[i],attrs[i],"inp1"+i.toString(),hidden=false,subtype="text",defaultval=default_values[i]);
-	document.write('<br/>');
+
+	var options = {hidden:false};
+	options.name = attrs[i];
+	options.label = attrs[i];
+	options.parentid = "params";
+	addElement("label","lbl"+i.toString(),options);
+	
+	options.subtype = "text";
+	options.default = default_values[i];
+	options.parentid = "params";
+	addElement("input","inp1"+i.toString(),options);
+	
+	_addElement(Array("<br>"),false,document.getElementById("params"));
+
 }
 
-addElement("input","submit","submit","btn"+i.toString(),hidden=false,subtype="button",defaultval="submit");
-addElement("p","","message","message",hidden=false);
+var options = {hidden:false};
+
+options.name = "url";
+options.parentid="url";
+addElement("p","url",options);
+
+options.name = "message";
+options.parentid = "message";
+addElement("p","message",options);
 
 $(document).ready(function(){
 
-	//http://0.0.0.0:8080/command/dump?objtypes=period&fields=name,pobjid&pprint=true
-	$("input[name='submit']").on('click',function(){
+	//var myVar = setInterval(myTimer, 1000);
 
-		names =getElementsName("input");
-		values = getElementValues("input");
-		url = "http://";
-		
-		url = "http://" + $('input[name="ip"]').attr('value');
-		url = url + ":" + $('input[name="port"]').attr('value');
-		url = url + "/" + $('input[name="command"]').attr('value') + "?";
-
-		for (i=3;i<names.length;i++) {
-			if ( values[i] != "") {
-				url = url + names[i] + "=" + values[i] + "&";
-			}
-		}
-		
-   		makeRequest(url);
+	$('input[name!="submit"]').keypress(function (e) {
+		var key = e.which;
+		if(key == 13)  // the enter key code
+	  	{	 	
+   			makeRequest(geturl(),writeHttpResponse);
+   		}
+   		else {
+   			geturl();
+   		}
 	});
 });
 </script>

@@ -444,7 +444,7 @@ def _getuserobjid(enums,cols,d):
     return(".".join(map(str,[_isenum(enums,col,d[col]) for col in cols])))	    
     
 @logger(log)
-def dbinsert_direct(database,records,tblname,source,masterstatus=True,keepversion=False):
+def dbinsert_direct(database,records,tblname,source,cols,masterstatus=True,keepversion=False):
     '''
     
     records : list of records where a record is of the form ('period','dow','subject','adult','student','type')
@@ -484,15 +484,33 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True,keepversio
     
 	tablerow_count = int(_lesson_count[0][0])+1
 	
-    lcols = ['period','dow','subject','adult','student','recordtype']
-    scols = ['period','dow','subject','adult','student','recordtype','numstudents']
+    # this is now passed into the function so that additional columns can be added easily by setting self.cols on the loade
+    # and then passing that in as a param
+    #lcols = ['period','dow','subject','adult','student','recordtype','record']
+	
+    try:
+	_idx = cols.index('teacher')
+	cols.pop(_idx)
+	cols.insert(_idx,'adult')
+    except:
+	pass
+    
+    try:
+	_idx = cols.index('students')
+	cols.pop(_idx)
+	cols.insert(_idx,'student')
+    except:
+	pass
+    
     
     for record in records:
 
 	# prepare fields to complete record
 	if tblname == 'session':
 	    
-	    d = dict(zip(scols,record))
+	    #cols = ['period','dow','subject','adult','student','recordtype','numstudents']
+	    
+	    d = dict(zip(cols,record))
 	    d['dow'] = _isname(enums,'dow',d['dow'])
 	    d['period'] = _isenum(enums,'period',d['period'])
 	    d['code'] = ".".join([d['adult'],d['subject'],d['dow'],_isname(enums,'period',d['period'])])
@@ -521,7 +539,7 @@ def dbinsert_direct(database,records,tblname,source,masterstatus=True,keepversio
 
 	elif tblname == 'lesson':
 
-	    d = dict(zip(lcols,record))
+	    d = dict(zip(cols,record))
 
 	    d['dow'] = _iscode(enums,'dow',d['dow'])
 	    d['period'] = _isname(enums,'period',d['period'])

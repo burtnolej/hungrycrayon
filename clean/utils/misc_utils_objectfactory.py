@@ -110,7 +110,9 @@ class ObjFactory(GenericBase):
         return(results)
     
     def object_exists(self,clsname,objid):
-        return(self.store[clsname].has_key(objid))
+        if self.store.has_key(clsname):
+            return(self.store[clsname].has_key(objid))
+        return False
     
     def object_get(self,clsname,objid):
         return(self.store[clsname][objid])

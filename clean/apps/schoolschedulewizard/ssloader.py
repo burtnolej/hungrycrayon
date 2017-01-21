@@ -70,10 +70,13 @@ class SSLoader(object):
 	          ('wp.nostudent.subject.teacher.with', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",1),('Computer Time',0),('with',1)]), 
 	          ('wp.nostudent.nosubject.noteacher.with', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
 	          ('wp.nostudent.subject.noteacher.with', [("subject=^**",1),("Subject=Work Period",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
-	          
+	
+	          ('seminar.nostudent.subject.teacher.with', [("subject=^**",1),("Seminar",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
+
 	          ('ap.student.subject.teacher',[("Subject=^Activity Period",1),(":",1),("\(",1),("\)",1)]),
 	          ('ap.student.subject.noteacher',[("Subject=^Activity Period",1),(":",1),("\(",0),("\)",0)]),
 	          ('ap.nostudent.nosubject.noteacher', [("Subject=^Activity Period$",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),
+	          
 	          
 	          ('subject.nostudent.nosubject.noteacher', [("subject=^**$",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),	          
 	          ('subject.nostudent.nosubject.noteacher.with.and', [("subject=^**",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1),('and',1)]),	   
@@ -151,6 +154,7 @@ class SSLoader(object):
 		continue		
 
 	    def _addrecord(_locals):
+		
 		_record = [_locals[field] for field in self.fields]
 		_records.append(_record)
 		log.log(thisfuncname(),10,msg="record added",record=_record)
@@ -288,7 +292,17 @@ class SSLoader(object):
 		    students = _setstudent()
 		    dow = _setdow()	
 		    _addrecord(locals())
-		    
+		    	    
+		elif recordtype == 'seminar.nostudent.subject.teacher.with':
+		    # "Math Seminar G2 with Stan"
+		    subject = record.lower().split(" ")[0]
+		    teacher = record.lower().split("with")[1]
+		    teacher = teacher.lstrip()
+		    students = _setstudent()
+		    dow = _setdow()
+		    subject = _setsubject()
+		    #fullrecord = record
+		    _addrecord(locals())
 		    
 		elif recordtype == 'wp.nostudent.subject.noteacher.with':
 		    # Humanities Work Period with Johnny
@@ -974,12 +988,12 @@ class SSLoader(object):
         
         dblessonrows = []
         dbsessionrows = []
-        
-        cols = ['period','dow','subject','teacher','students',"recordtype"]
-	_idx = cols.index('students')
+
+        #cols = ['period','dow','subject','teacher','students',"recordtype","record"]
+	_idx = self.fields.index('students')
 	
         for record in records:
-	    d = dict(zip(cols,record))
+	    d = dict(zip(self.fields,record))
 	    
 	    # switch the last item for a count of number of students
 	    # this is so we can determine which session was created with no students and so
@@ -1000,10 +1014,11 @@ class SSLoader(object):
 		
 		dblessonrows.append(_record)
 		
-	dbinsert_direct(self.database,dbsessionrows,'session',
-	                self.sourcecode,masterstatus=False,keepversion=self.keepversion)
+	dbinsert_direct(self.database,dbsessionrows,'session',self.sourcecode,
+	                ['period','dow','subject','adult','student','recordtype','numstudents'],
+	                masterstatus=False,keepversion=self.keepversion)
 	dbinsert_direct(self.database,dblessonrows,'lesson',
-	                self.sourcecode,masterstatus=False,keepversion=self.keepversion)    
+	                self.sourcecode,list(self.fields),masterstatus=False,keepversion=self.keepversion)    
 
     def primary_record_set_session(self):
 	
@@ -1090,15 +1105,24 @@ class SSLoader(object):
 	    
 	cols = ['period','dow','student','teacher','subject','status','source','recordtype']
 	
+	try:
+	    _idx = self.fields.index('students')
+	    self.fields.pop(_idx)
+	    self.fields.insert(_idx,'student')
+	except:
+	    pass
+	
 	# order by makes sure any completed records get 
 	with self.database:
-	    _,rows,_ = tbl_rows_get(self.database,'lesson',cols)
+	    _,rows,_ = tbl_rows_get(self.database,'lesson',self.fields)
 
 
+	print rows
+	
 	hashmap={}
 	for row in rows:
 
-	    d = dict(zip(cols,row))
+	    d = dict(zip(self.fields,row))
 	    
 	    hashkey = ".".join([d['dow'],d['period'],d['student']])
 	    
@@ -1113,10 +1137,11 @@ class SSLoader(object):
 	    _recordtype = d['recordtype'].split(".")[0]
 	    #_additem(hashmap[hashkey]['recordtype'],d['recordtype'])
 	    _additem(hashmap[hashkey]['recordtype'],_recordtype)
+	    #_additem(hashmap[hashkey]['record'],d['record'])
 
 	for row in rows:
 	    
-	    d = dict(zip(cols,row))
+	    d = dict(zip(self.fields,row))
 	
 	    hashkey = ".".join([d['dow'],d['period'],d['student']])    
 	    
@@ -1131,8 +1156,11 @@ class SSLoader(object):
 
 	return (hashmap)
     	
-    def ssloader(self,files,databasename="htmlparser"):
+    def ssloader(self,files,databasename="htmlparser",fields=None):
         
+        if fields <> None:
+	    self.fields = fields
+	    
         for file in files:
 	    
 	    if len(file) == 4:
@@ -1189,16 +1217,28 @@ class SSLoader(object):
 	except:
 	    pass
 
+	# pass in self.fields here in case its been updated since
+	# object constructed
 	self.ssloader = SSLoader(self.databasename)
+	self.ssloader.fields = self.fields
+	
 	self.ssloader.keepversion=self.keepversion
 	self.ssloader.ssloader(files,self.databasename)
+
+	# for now only  create primary record in certain cases - as it has no meaning when we have adde extra
+	# fields like record etc
+	if hasattr(self,"primary_record"):
+	    if self.primary_record == False:
+		log.log(thisfuncname(),3,msg="primary_record flag set to false, skipping") 
+		return
 
 	log.log(thisfuncname(),3,msg="creating master record set")    
 
 	hashmap = self.primary_record_set()
 	newrows = []
 	for key,d in hashmap.iteritems():
-	    newrows.append([d['period'],d['dow'],_formatval('subject',d),_formatval('teacher',d),d['student'],_formatval('recordtype',d)])
+	    newrows.append([d['period'],d['dow'],_formatval('subject',d),_formatval('teacher',d),d['student'],
+	                    _formatval('recordtype',d)])
     
 	hashmap = self.primary_record_set_session()
 	newsessionrows = []
@@ -1207,8 +1247,10 @@ class SSLoader(object):
 
 	if insertprimary==True:
 	    log.log(thisfuncname(),10,msg="loading master record set")    
-	    dbinsert_direct(self.database,newsessionrows,'session','dbinsert',keepversion=self.keepversion)
-	    dbinsert_direct(self.database,newrows,'lesson','dbinsert',keepversion=self.keepversion)
+	    dbinsert_direct(self.database,newsessionrows,'session','dbinsert',
+	                     ['period','dow','subject','adult','student','recordtype','numstudents'],
+	                     keepversion=self.keepversion)
+	    dbinsert_direct(self.database,newrows,'lesson','dbinsert',self.fields,keepversion=self.keepversion)
 	else:
 	    return newrows
 
@@ -1249,14 +1291,19 @@ if __name__ == "__main__":
              ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5and6schedulenewworkperiod.csv",-1,True,"56n"),
              ("/mnt/bumblebee-burtnolej/googledrive/current/Prep4schedulenewworkperiod.csv",5,True,"4n")]'''
     
-    files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep6IndividualSchedules_new.csv",6,True,"6s"),
-             ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5IndividualSchedules_new.csv",5,True,"5s")]
+    '''files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep6IndividualSchedules_new.csv",6,True,"6s"),
+             ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5IndividualSchedules_new.csv",5,True,"5s")]'''
+    
+    files = [("/Users/burtnolej/Development/pythonapps/clean/scripts/googledrive/googledrive/current/Prep6IndividualSchedules-2ndSemester_new.csv",6,True,"6s2"),
+             ("/Users/burtnolej/Development/pythonapps/clean/scripts/googledrive/googledrive/current/Prep5IndividualSchedules-2ndSemester_new.csv",5,True,"5s2")]
     	                                          
 	
     '''else:
 	raise Exception("do not know how to run in this working dir",dir=os.getcwd())'''
     
     print "".join(["env=",env,"db=",databasename])
-    
+        
     ssloader = SSLoader(databasename)
+    ssloader.fields =  ['period','dow','subject','teacher','students',"recordtype","record"] 
+    ssloader.primary_record = False
     ssloader.run(databasename,files)

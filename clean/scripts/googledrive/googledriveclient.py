@@ -117,19 +117,45 @@ def main():
     #gfilesofinterest = ['Prep 4 Individual Schedules','Prep 4 schedule new work period','Prep 5 and 6 schedule new work period',
     #          'Prep 6 Individual Schedules','Copy of Prep 5 Individual Schedules']
 
-    gfilesofinterest = ['Prep 4 Individual Schedules','Prep 4 schedule new work period','Prep 5 and 6 schedule new work period',
-              'Prep 6 Individual Schedules','Prep 5 Individual Schedules']
+    gfilesofinterest = ['Prep 4 Individual Schedules',
+                        'Prep 4 schedule new work period',
+                        'Prep 5 and 6 schedule new work period',
+                        'Prep 6 Individual Schedules',
+                        'Prep 5 Individual Schedules',
+                        'Prep 5 Individual Schedules - 2nd Semester',
+                        'Prep 6 Individual Schedules - 2nd Semester',
+                        'Master Schedule Prep 5 & 6',
+                        'Stan Schedule',
+                        'Sonja Schedule',
+                        'Samantha Schedule',
+                        'Aaron Schedule',
+                        'Dylan Schedule',
+                        'Issey Schedule',
+                        'Jess Schedule',
+                        'Karolina Schedule',
+                        'Moira Schedule',
+                        'Alyssa L. Schedule',
+                        'Paraic Schedule',
+                        'Thea Schedule',
+                        'Jacki Schedule',
+                        'Amelia Schedule',
+                        'Eric Schedule']  
     
 
     picklefilename = "metastore.dat"
     
-    dir = "/mnt/bumblebee-burtnolej/googledrive"
+    #dir = "/mnt/bumblebee-burtnolej/googledrive"
+    dir = "googledrive"
     cdir = os.path.join(dir,"current")
 
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     
     gfilelist = gdrivelist(http)
+     
+    #for gfile in gfilelist:
+    #    print(gfile['name'])
+    #exit()
     
     store = {}
     

@@ -1,5 +1,5 @@
 <html>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="jquery-3.1.1.js"></script>
 <script src="stylesheets.js"></script>
 </html>
 
@@ -22,6 +22,8 @@
 		getchtmlswitch("formats","formats",$args);
 		$args['comment'] = 'Rollup multiple entries where they only differ by student, to conserve space on the screen';	
 		getchtmlswitch("rollup","rollup",$args); 
+		$args['comment'] = 'Display the number of records in each cell instead of the records themselves';
+		getchtmlswitch("count","count",$args); 
 	};
 	gethtmldiv("Visual Config",$func,"containswitch","divlabel");
 	
@@ -31,6 +33,11 @@
 		getchtmlswitch("subject","subject",$args);
 		getchtmlswitch("adult","adult",$args);
 		getchtmlswitch("student","student",$args);
+		getchtmlswitch("period","period",$args);
+		getchtmlswitch("dow","dow",$args);
+		getchtmlswitch("record","record",$args);
+		getchtmlswitch("recordtype","recordtype",$args);
+		getchtmlswitch("id","id",$args);
 	};
 	
 	gethtmldiv("datafields",$func,"containswitch","divlabel");		
@@ -39,18 +46,22 @@
 		global $SSDB;
 
 		$comment = 'Filter the grid to only show rows that match this criteria';
-		$args = array('comment'=>$comment, 'label' => 'Subject');							
+		$args = array('comment'=>$comment, 'label' => 'Subject',"distinct" => false);							
 		getchtmldbselect($SSDB,'lesson','subject',"cnstr_subject",1,$_GET['cnstr_subject'],$args);		
-		$args = array('comment'=>$comment, 'label' => 'Weekday');			
+		$args = array('comment'=>$comment, 'label' => 'Weekday',"distinct" => false);			
 		getchtmldbselect($SSDB,'lesson','dow',"cnstr_dow",1,$_GET['cnstr_dow'],$args);		
-		$args = array('comment'=>$comment, 'label' => 'Period');			
+		$args = array('comment'=>$comment, 'label' => 'Period',"distinct" => false);					
 		getchtmldbselect($SSDB,'lesson','period',"cnstr_period",1,$_GET['cnstr_period'],$args);
-		$args = array('comment'=>$comment, 'label' => 'Student');					
+		$args = array('comment'=>$comment, 'label' => 'Student',"distinct" => false);							
 		getchtmldbselect($SSDB,'lesson','student',"cnstr_student",1,$_GET['cnstr_student'],$args);
-		$args = array('comment'=>$comment, 'label' => 'Teacher');	
-		getchtmldbselect($SSDB,'lesson','teacher',"cnstr_adult",1,$_GET['cnstr_adult'],$args);
-		$args = array('comment'=>$comment, 'label' => 'Prep');	
+		$args = array('comment'=>$comment, 'label' => 'Teacher',"distinct" => false);			
+		getchtmldbselect($SSDB,'lesson','adult',"cnstr_adult",1,$_GET['cnstr_adult'],$args);
+		$args = array('comment'=>$comment, 'label' => 'Prep');				
 		getchtmldbselect($SSDB,'lesson','prep',"cnstr_prep",1,$_GET['cnstr_prep'],$args);
+		$args = array('comment'=>$comment, 'label' => 'Source File');			
+		getchtmldbselect($SSDB,'lesson','source',"cnstr_source",1,$_GET['cnstr_source'],$args);
+		$args = array('comment'=>$comment, 'label' => 'Record Type','manualvalues' => Array('wp','ap','academic','seminar'));	
+		getchtmldbselect($SSDB,'lesson','recordtype',"cnstr_recordtype",1,$_GET['cnstr_recordtype'],$args);
 	};
 	gethtmldiv("select filters",$func,"contain","divlabel");	
 ?>
@@ -66,10 +77,10 @@
 		$token =refreshpage();
 		echo "<br><br>";
 		
-		$func = function() use ($token,$args) {
-			draw($token,$args);
+		$func = function() use ($token,$_GET) {
+			draw($token,$_GET);
 		};
-		
-		gethtmldiv("select filters",$func,"table","divlabel");	
+		$title = "Pivot Table: ".$_GET['source_type']."=".$_GET['source_value'];
+		gethtmldiv($title,$func,"table","divlabel");	
 	}
 ?>

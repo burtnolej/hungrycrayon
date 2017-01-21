@@ -1,5 +1,5 @@
 <html>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="jquery-3.1.1.js"></script>
 <script src="stylesheets.js"></script>
 </html>
 
@@ -38,22 +38,5 @@ elseif(isset($_GET['source_value'])) {
 	echo "<br><br>";
 	draw($token,$args);
 }
-
-/*
-if(isset($_GET['page_status'])) {
-	$_GET['source_type']="add";
-	$token =refreshpage();
-	$_GET['parser']="drawform";
-	echo "<br><br>";
-	draw($token,$args);
-}
-elseif(isset($_GET['source_value'])) {
-	$_GET['source_type']="new";
-	$_GET['parser']="drawform";
-	$token =refreshpage();
-	echo "<br><br>";
-	draw($token,$args);
-}
-*/
 
 ?>

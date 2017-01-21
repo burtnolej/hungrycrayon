@@ -21,7 +21,7 @@ from ttk import *
 import tkFont
 
 class DBTableUI(Tk):
-    def __init__(self,maxentrycols=25,maxentryrows=12,
+    def __init__(self,maxentrycols=18,maxentryrows=12,
                  maxnewrowcols=16,maxnewrowrows=3):
         
         Tk.__init__(self)
@@ -61,7 +61,7 @@ class DBTableUI(Tk):
         self.bind("<Prior>",self.focus_next_widget)
         self.grid()
 
-        font = tkFont.Font(family="monospace", size=14)  
+        font = tkFont.Font(family="monospace", size=10)  
 
         # entry grid origin label
         xlbl_widget_args=dict(width=10,font=font)
@@ -754,5 +754,5 @@ class DBTableUI(Tk):
     
 if __name__ == "__main__":
 
-    app = DBTableUI(maxentryrows=50, maxnewrowrows=40)
+    app = DBTableUI(maxentryrows=75, maxnewrowrows=10)
     app.mainloop()

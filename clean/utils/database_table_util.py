@@ -74,9 +74,9 @@ class dbtblgeneric(GenericBase):
 	    self.tbl_col_defn += [('__timestamp','text'),('__id','text')]
 	    self.tbl_col_names += ['__timestamp','__id']
 	    
-	    if hasattr(self,"keepversion"):
-		self.tbl_col_defn += [('__version','text')]
-		self.tbl_col_names += ['__version']
+	if hasattr(self,"keepversion") and getattr(self,"keepversion") == True:
+	    self.tbl_col_defn += [('__version','text')]
+	    self.tbl_col_names += ['__version']
 	
     def _gettimestamp(self):
 	if hasattr(self,"customtimestamp"):
@@ -119,12 +119,12 @@ class dbtblgeneric(GenericBase):
 		#t.append("\""+str(getattr(self,"id"))+"\"")
 		t.append("\""+str(getattr(self,"id"))+"\"")
 	    
-	    if hasattr(self,"keepversion"):
-		if hasattr(self,'__version') == False:
-		    #t.append("\"init\"")
-		    t.append("\"current\"")
-		else:
-		    t.append("\""+getattr(self,"__version")+"\"")
+	if hasattr(self,"keepversion") and getattr(self,"keepversion") == True:
+	    if hasattr(self,'__version') == False:
+		#t.append("\"init\"")
+		t.append("\"current\"")
+	    else:
+		t.append("\""+getattr(self,"__version")+"\"")
 		
 	self.tbl_row_values = [t]
  
@@ -154,7 +154,6 @@ class dbtblgeneric(GenericBase):
 	                         self.tbl_name,
 	                         self.tbl_col_names,
 	                         self.tbl_row_values)
-	
 	
 	return(result,exec_str)
     

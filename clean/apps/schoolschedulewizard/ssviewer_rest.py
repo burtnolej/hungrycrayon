@@ -1,6 +1,6 @@
 import sys
 import os
-from misc_utils_log import Log, logger
+from misc_utils_log import Log, logger, thisfuncname
 log = Log(cacheflag=True,logdir="/tmp/log",verbosity=20,
           pidlogname=True,proclogname=False)
 
@@ -23,53 +23,13 @@ from copy import deepcopy
 import os
 import os.path
 
-class Student:
-    def GET(self,id):
-        
-        source_type="student"
-        source_value=id
-        if source_value=="all": source_value=""
-        
-        data = web.input(id='')
 
-        ztypes = data.ztypes.split(",")
-        formatson=False
-        rollupson=False
-        header=None
-        if "formats" in ztypes: 
-            formatson=True
-        else:            
-            header = "<root><parser><value>drawnoformatgrid</value></parser></root>"
-
-        if "rollup" in ztypes: 
-            rollupson=True
-            ztypes.remove("rollup")
-
-        constraints=[]
-        for attr,attr_val in data.iteritems():
-            if attr.startswith('cnstr_') == True:
-                if str(attr_val) <> "NotSelected":
-                    constraints.append((attr[6:],str(attr_val)))
-
-        values = ssviewer_utils.dataset_pivot(of,enums,data.yaxis,data.xaxis,
-                                              ztypes, source_type,source_value,
-                                              constraints=constraints,
-                                              formatson=True,rollupson=rollupson)
-        
-
-        grid = ssviewer_utils.dataset_serialize(values,formatson=formatson,
-                                                schema = dict(xaxis=data.xaxis,
-                                                              yaxis=data.yaxis,
-                                                              ztypes=ztypes))
-        
-        xml = xml_utils.grid2xml(grid,header=header)
-
-        return xmltree.tostring(xml)
-    
 class Add:
     def GET(self,objtype):
         
         _dm = web.input()
+        
+        print _dm
 
         datamembers = dict(zip(_dm.keys(),_dm.values()))  
         
@@ -82,12 +42,9 @@ class Add:
             datamembers.pop('source_value')
         except:
             pass
-        
-        args = dict(database=database,refdatabase=database,
-                    prepmap=prepmap,of=of,enums=enums,
-                    datamembers=datamembers)
 
-        newobj = ssviewer_utils.dataset_add(database,database,of,enums,prepmap,datamembers,objtype)
+        newobj = ssviewer_utils.dataset_add(database,database,of,enums,prepmap,
+                                            datamembers,objtype,keepversion=True)
             
         header = "<root><parser><value>drawform</value></parser></root>"
         
@@ -125,68 +82,80 @@ class New:
             
         xml=xml_utils.record2xml(_values,header=header)
         
+        print xmltree.tostring(xml)
         return xmltree.tostring(xml)
+    
+def _pivot(data,source_type,source_value):
+
+    if source_value=="all": source_value=""
+    
+    ztypes = data.ztypes.split(",")
+    
+    formatson=False
+    header=None
+    
+    if "formats" in ztypes: 
+        formatson=True
+    else:            
+        header = "<root><parser><value>drawnoformatgrid</value></parser></root>"
+        
+    if "count" in ztypes: 
+        ztypes=["*"]
+
+    constraints=[]
+    for attr,attr_val in data.iteritems():
+        if attr.startswith('cnstr_') == True:
+            if str(attr_val) <> "NotSelected":
+                constraints.append((attr[6:],str(attr_val)))
+    
+    values = ssviewer_utils.dataset_pivot(of,enums,data.yaxis,data.xaxis,
+                                          ztypes, source_type,source_value,
+                                          constraints=constraints,
+                                          formatson=True)
+    
+    grid = ssviewer_utils.dataset_serialize(values,formatson=formatson,
+                                            schema = dict(xaxis=data.xaxis,
+                                                          yaxis=data.yaxis,
+                                                          ztypes=ztypes))
+    xml = xml_utils.grid2xml(grid,header=header)
+    
+
+    return xmltree.tostring(xml)
+    
+class Student:
+    def GET(self,id):
+        
+        data = web.input(id='')
+        source_type="student"
+        source_value=id
+        return (_pivot(data,source_type,source_value))
     
 class Subject:
     def GET(self,id):
         
         source_type="subject"
-        source_value=id
-        
+        source_value=id        
         data = web.input(id='')
-
-        ztypes = data.ztypes.split(",")
-        xaxis="period"
-        yaxis="dow"
-        
-        formatson=False
-        header=None
-        if "formats" in ztypes: 
-            formatson=True
-        else:            
-            header = "<root><parser><value>drawnoformatgrid</value></parser></root>"
-
-        constraints=[]
-        for attr,attr_val in data.iteritems():
-            if attr.startswith('cnstr_') == True:
-                if str(attr_val) <> "NotSelected":
-                    constraints.append((attr[6:],str(attr_val)))
-        
-        values = ssviewer_utils.dataset_pivot(of,enums,data.yaxis,data.xaxis,
-                                              ztypes, source_type,source_value,
-                                              constraints=constraints,
-                                              formatson=True)
-        
-        
-        
-        
-        grid = ssviewer_utils.dataset_serialize(values,formatson=formatson,
-                                                schema = dict(xaxis=data.xaxis,
-                                                              yaxis=data.yaxis,
-                                                              ztypes=ztypes))
-        
-        xml = xml_utils.grid2xml(grid,header=header)
-        return xmltree.tostring(xml)
+        return (_pivot(data,source_type,source_value))
 
 class Adult:
     def GET(self,id):
         
         source_type="adult"
         source_value=id
-
         data = web.input(id='')
+        return (_pivot(data,source_type,source_value))
 
-        ztypes=data.ztypes.split(",")
-        xaxis=data.xaxis
-        yaxis=data.yaxis
+class Schema:
+    def GET(self,objtype):
         
-        values = ssviewer_utils.dataset_pivot(of,enums,yaxis,xaxis,ztypes, source_type,source_value,formatson=True)
-        grid = ssviewer_utils.dataset_serialize(values,formatson=True,schema = dict(xaxis=xaxis,yaxis=yaxis,ztypes=ztypes))
-
-        xml = xml_utils.grid2xml(grid)
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
         
-        return xmltree.tostring(xml)
-    
+        source_objs = of.query_advanced(objtype,[])
+        colnames = list(source_objs[0].dm.keys())
+        return ",".join(colnames)
+        
 class List:
     def GET(self,objtype):
         data = web.input(id='')
@@ -216,6 +185,23 @@ class List:
         
         return xmltree.tostring(xml)
     
+class Load:
+    def GET(self,objtype):
+        data = web.input()
+        
+        args = dict(database=database,refdatabase=database,
+                    objtype=str(objtype),of=of,saveversion=1,unknown='N',
+                    keepversion=False)
+        
+        whereclause=[]
+        for attr,attr_val in data.iteritems():
+            whereclause.append([attr,"=",attr_val])
+            
+        print whereclause
+        args['whereclause'] = whereclause
+        
+        ssviewer_utils.dataset_loadref(**args)  
+        
 class SearchID:
     def GET(self,id):
         
@@ -237,6 +223,48 @@ class SearchID:
         
         return xmltree.tostring(xml)
 
+def _update(obj,_value_changes):
+    
+    value_changes = {}
+    
+    for i in range(0,len(_value_changes),2):
+        value_changes[_value_changes[i]] = _value_changes[i+1]
+        
+    for attr,attr_val in value_changes.iteritems():
+        
+        obj.keepversion=True
+        obj.customtimestamp = "%y%m%d_%H%M%S"
+        
+        
+        newid = obj.update(of,attr,attr_val,dbname)
+        
+        
+        if attr == "teacher": attr = "adult"
+        
+        logstr = "for record "+ str(obj.objid) + " updating " + str(attr)," from " + str(getattr(obj,attr).name) + " to " + str(attr_val)
+        log.log(thisfuncname(),3,msg=logstr)
+            
+    return newid    
+    
+class UpdateUID:
+    
+    def GET(self,id):
+        
+        data = web.input()
+        
+        obj = of.object_get('lesson',id)
+        
+        newid = _update(obj,data['value_changes'].split(","))
+        
+        if newid <> -1:
+            globals()['dbidlookup'][newid] = id
+            globals()['dbidlookup'].pop(obj.id)
+            log.log(thisfuncname(),3,msg=str(dbid) + " updated")
+        else:
+            log.log(thisfuncname(),2,msg="value to update to is not found",value=attr_val)
+            
+        return newid
+    
 class UpdateID:
     
     #lets pass in the id as a param; clsname not necessar
@@ -248,55 +276,72 @@ class UpdateID:
         data = web.input()
         
         dbid = dbidlookup[id]
-        #data.pop('id')
         
         obj = of.object_get('lesson',dbid)
         
+        ssviewer_utils._lesson_change(obj,delete=True)
+        newid = _update(obj,data['value_changes'].split(","))
+        ssviewer_utils._lesson_change(obj)
         
-        print obj.dm
-        
-        _value_changes = data['value_changes'].split(",")
-        value_changes = {}
-        
-        for i in range(0,len(_value_changes),2):
-            value_changes[_value_changes[i]] = _value_changes[i+1]
+        if newid <> -1:
+            globals()['dbidlookup'][newid] = dbid
+            globals()['dbidlookup'].pop(id)
+            log.log(thisfuncname(),3,msg=str(dbid) + " updated")
+        else:
+            log.log(thisfuncname(),2,msg="value to update to is not found",value=data['value_changes'])
             
-        for attr,attr_val in value_changes.iteritems():          
-            print "for record",dbid,"update",attr,"from",getattr(obj,attr).name,"to",attr_val
-            obj.keepversion=True
-            obj.customtimestamp = "%y%m%d_%H%M%S"
-            newid = obj.update(of,attr,attr_val,dbname)
-            
-            if newid <> -1:
-                globals()['dbidlookup'][newid] = dbid
-                globals()['dbidlookup'].pop(id)
-            
-                print "for record",dbid,"update",attr,"to",getattr(obj,attr).name,"(",getattr(obj,'id').name,")"
-            else:
-                print "value to update to is not found"
-                
-        #getattr(obj,'id').name
         return newid
-    
+        
 class Command:
     def GET(self,cmd):
+        
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
 
         if cmd=="stop":
             print "bringing down service...."
             app.stop()
-            
-            #exit("stopping")
-
         elif cmd=="ping":
             return("ping")
         elif cmd=="stats":
             return(len(of.query('lesson')))
+        elif cmd=="config":
+            return(len(of.query('lesson')))
+        elif cmd=="reload":
+            
+            data = web.input()
+            
+            xtraargs={}
+            for attr,attr_val in data.iteritems():
+                xtraargs[attr] = attr_val
+    
+            #globals()['dbname'] = _dbname
+            globals()['database'] = Database(globals()['dbname'])
+            refdatabase = globals()['database']
+
+            globals()['of'] = ObjFactory(True)
+            globals()['enums'] = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
+            globals()['prepmap'] = sswizard_utils._loadprepmapper(database)
+             
+            args = dict(database=database,refdatabase=refdatabase,
+                         saveversion=1,of=of,enums=enums,keepversion=True)
+         
+            if xtraargs<>{}:
+                for k,v in xtraargs.iteritems():
+                    args[k] = v
+                     
+            ssviewer_utils.dataset_load(**args)
+         
+            # get a mapping of userobjid to db refid (__id) as of uses the former to index but the web page
+            # uses __id as they are easier to pass in URL
+            with database:
+                globals()['dbidlookup'] = sswizard_query_utils._dbid2userdefid(database,asdict=True)
+            
         elif cmd=="dump":
             
             data = web.input()
             
-            web.header('Access-Control-Allow-Origin','*')
-            web.header('Access-Control-Allow-Credientials','true')
+
             #objtypes = data['objtypes'].split(",")
             #fields = data['fields'].split(",")
             #pprint = data['pprint'].split(",")
@@ -315,8 +360,6 @@ class Command:
                 
             for field in boolfields:
                 urldict[field] = False
-                
-                
                 try:
                     if data[field] == "1":
                         urldict[field] = True
@@ -335,13 +378,18 @@ class Command:
                 except:
                     pass
                 
-            if data['pprint'].split(",")==0:
-                pprint=False
-            else:
-                pprint=True
+            if data.has_key('pprint'):
+                if data['pprint']=="0":
+                    pprint=False
+                else:
+                    pprint=True
 
             results = of.dumpobjrpt(**urldict)
             
+            if data.has_key('count'):
+                if data['count']=="0":
+                    return(len(results))
+                
             css = "body { width:3000px;}"
             css += "table { border: 1px solid #f00;}"
             css += "td {border: 1px solid #000;word-wrap:break-word;}"
@@ -427,12 +475,15 @@ def _run(port,**xtraargs):
         '/subject/(\w+)', 'Subject',
         '/adult/(\w+)', 'Adult',
         '/list/(\w+)', 'List',
+        '/load/(\w+)', 'Load',
+        '/schema/(\w+)', 'Schema',
         '/id/(\w+)', 'SearchID',
         '/criteria/(\w+)', 'SearchCriteria',
         '/add/(\w+)', 'Add',
         '/new/(\w+)', 'New',
         '/command/(\w+)','Command',
-        '/update/(\w+)','UpdateID'
+        '/update/(\w+)','UpdateID',
+        '/updateuid/(\w+)','UpdateUID'
     )
     
     globals()['database'] = Database(dbname)
@@ -484,7 +535,7 @@ if __name__ == "__main__":
     except:
         pass
     
-    args['source'] = '56n'
+    #args['source'] = '6s2,5s2'
     run(**args)
     
     '''dbname,refdbname = sswizard_utils.getdatabase()

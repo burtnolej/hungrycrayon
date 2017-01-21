@@ -169,16 +169,21 @@ function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default
 		echo "<p class=\"divlabel\">".$divlabel."</p>";
 	}
 	
-	if (isset($args['distinct'])) {
-		if ($args['distinct'] == false) {
-			$values = getfieldvalues($dbname,$column);	
+	if (isset($args['manualvalues'])) {
+		$values =$args['manualvalues'];
+	}
+	else {
+		if (isset($args['distinct'])) {
+			if ($args['distinct'] == false) {
+				$values = getfieldvalues($dbname,$column);	
+			}
 		}
+		
+		if (!isset($values)) {
+			$values = getcolumndistinctvalues($dbname,$tablename,$column);
+		}	
 	}
-	
-	if (!isset($values)) {
-		$values = getcolumndistinctvalues($dbname,$tablename,$column);
-	}
-	
+		
 	array_splice($values,0,0,"NotSelected");
 	array_splice($values,1,0,"all");
 	

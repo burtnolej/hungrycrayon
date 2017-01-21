@@ -817,6 +817,13 @@ class Test_RecordIdentifcation(Test_Base):
         
         self.assertEquals(recordtype, 'ignore')
     
+    # with Seminar
+    def test_teacher_With_Seminar(self):
+        self.inputstr = "Math Seminar G2 with Stan"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'seminar.nostudent.subject.teacher.with')
+    
     # with
     def test_With(self):
         self.inputstr = "Engineering with Paraic"
@@ -965,9 +972,6 @@ class Test_RecordIdentifcation(Test_Base):
         recordtype = self.ssloader.identify_record(self.inputstr)
          
         self.assertEquals(recordtype, 'wp.nostudent.subject.teacher.with')        
-        
-        
-
     
     
     
@@ -1022,7 +1026,21 @@ class Test_RecordIdentifcation_realsample2(Test_Base):
                 recordtype="dow"
             results[recordtype] += 1
            
-
+class Test_PreProcessRecordsWithSeminar(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+    def test_(self):
+        
+        self.records = ['09/19/16','8:30- 9:10','^','ELA Seminar G2 with Amelia','^','Engineering with Paraic']
+        
+        clean_records,_,_ = self.ssloader.pre_process_records(self.records)
+        
+        expected_results = [['830-910','Monday','ela','amelia',[],'seminar.nostudent.subject.teacher.with'],
+                          ['830-910','Tuesday','engineering','paraic',[],'subject.nostudent.nosubject.noteacher.with']]
+        
+        self.assertListEqual(clean_records,expected_results)
+        
 class Test_PreProcessRecordsWith(Test_Base):
     def setUp(self):
         Test_Base.setUp(self)
@@ -1720,6 +1738,85 @@ class Test_DBLoader_Prep5_1period(Test_Base):
         results = _pivotexecfunc(self.ssloader.database,'test','period','dow','session',distinct=True,master=False)
 
         self.assertListEqual(results,expected_results)
+        
+class Test_DBLoader_1row_added_field(Test_Base):
+    
+    # tests creating a record with an added field (in this case 'record')
+    # which represents the full record that was init loaded
+    
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+        
+    def test_(self):
+        expected_results = [[u'seminar.nostudent.subject.teacher.with', u'Humanities', 
+                             u'830-910', u'MO', u'Clayton','Humanities Seminar G2 with Amelia']]
+        self.ssloader.ssloader([('1record.csv',5,True)],self.databasename,
+                               fields=['period','dow','subject','teacher','students',"recordtype","record"])        
+
+        cols = ['recordtype','subject','period','dow','student','record']
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',cols)
+            
+        self.assertListEqual(expected_results,rows)
+        
+    def test_run(self):
+        
+        expected_results = [[u'seminar.nostudent.subject.teacher.with', u'Humanities', 
+                             u'830-910', u'MO', u'Clayton','Humanities Seminar G2 with Amelia']]
+        
+        files = [('1record.csv',-1,True)]
+        self.ssloader = SSLoader(self.databasename)  
+        self.ssloader.fields = ['period','dow','subject','teacher','students',"recordtype","record"]
+        self.ssloader.primary_record = False # do not create primary record
+        
+        self.ssloader.run(self.databasename,files)       
+
+        cols = ['recordtype','subject','period','dow','student','record']
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',cols)
+            
+        self.assertListEqual(expected_results,rows)
+        
+class Test_DBLoader_SeminarWith(Test_Base):
+    
+    # tests that seminars are loading  specific work periods are parsed correctly
+    
+    def setUp(self):
+        Test_Base.setUp(self)
+        
+        self.database = Database(self.databasename)
+        try:
+            with self.database:
+                tbl_remove(self.database,'lesson')
+                tbl_remove(self.database,'session')
+        except:
+            pass
+        
+    def test_(self):
+        expected_results = [[u'wp.nostudent.subject.noteacher', u'Math', u'830-910', u'MO', u'Clayton'], 
+                            [u'seminar.nostudent.subject.teacher.with', u'Humanities', u'830-910', u'TU', u'Clayton'], 
+                            [u'wp.nostudent.nosubject.noteacher', u'??', u'830-910', u'WE', u'Clayton'], 
+                            [u'subject.nostudent.nosubject.noteacher', u'Student News', u'830-910', u'TH', u'Clayton'], 
+                            [u'subject.nostudent.nosubject.noteacher', u'Humanities', u'830-910', u'FR', u'Clayton']]
+        
+        self.ssloader.ssloader([('seminar_with.csv',5,True)],self.databasename)        
+
+        cols = ['recordtype','subject','period','dow','student']
+        
+        with self.database:
+            _,rows,_ = tbl_rows_get(self.database,'lesson',cols,[['source','=',"\"" + "seminar_with.csv" + "\""]])
+            
+        #self.assertListEqual(expected_results,rows)
         
 
 class Test_DBLoader_Prep5Student_WP(Test_Base):
@@ -2850,22 +2947,18 @@ class Test_DBLoader_Versioning(Test_Base):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    
+    '''
     # #####################################################################################################
     # unit tests=
     
-    
     # pre_process_records
-    
-    
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))   
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_3Student_1period))    
     #unittest.TextTestRunner(verbosity=2).run(suite) 
     #exit()
     
-    
     # loadrefobjects
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
     
     # loadsynonyms
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadSynonyms))
@@ -2876,11 +2969,11 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records_Prep41Period))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records_Prep4ComputerTime))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_String2Records_Prep6SPlitline))
-        
+     
     # identify_record
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample2))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation_realsample2))
     
     # applyrules
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_ApplyRules))
@@ -2937,15 +3030,15 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodWith))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWorkPeriodWithSubject))    
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PreProcessRecordsWithSeminar))   
+    
     
     # dbloader
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader))
     
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_All))
-    '''
-    
     # db primary record set
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_With_Staff_Student))  
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Primary_Record_Set_Nathaniel))
@@ -2960,7 +3053,6 @@ if __name__ == "__main__":
     
     # 1 period of 1 prep
 
-    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Student_WP))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5Computertime))
@@ -2971,10 +3063,14 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic_Stan))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_3Student))  
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_1Student_1Period))  
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter))'''
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_1Student_1Period))'''
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
 
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_SeminarWith))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_1row_added_field))
+    
+    
     unittest.TextTestRunner(verbosity=2).run(suite) 
     
     

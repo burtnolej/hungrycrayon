@@ -18,7 +18,7 @@ from database_table_util import dbtblgeneric, tbl_rows_get, tbl_query, tbl_rows_
      tbl_rows_update, tbl_exists, tbl_create
 
 from ssviewer_utils_palette import dbformats_get, dbcolors_get
-
+from collections import OrderedDict
 from copy import deepcopy
 
 dbname,_ = sswizard_utils.getdatabase()
@@ -48,17 +48,30 @@ class schoolschedgeneric(dbtblgeneric):
                            userobjid=name,
                            name=name)
         
-        setattr(self,clsname,of.new(schoolschedgeneric,
-                                         clsname,
-                                         objid=name, # unique key to store obj in of
-                                         constructor='datamembers',
-                                         database=self.database,
-                                         of=of,
-                                         modname=__name__,
-                                         recursion=False,
-                                         dm=datamembers))
-
+        datamembers['code'] = name
+        
+        try:
+            datamembers['enum'] = len(of.store[clsname]) + 1    
+        except KeyError:    
+            datamembers['enum'] = 0
             
+        obj = of.new(schoolschedgeneric,
+                     clsname,
+                     objid=name, # unique key to store obj in of
+                     constructor='datamembers',
+                     database=self.database,
+                     of=of,
+                     modname=__name__,
+                     recursion=False,
+                     dm=datamembers)
+        
+        setattr(self,clsname,obj)
+        
+        '''datamembers['id'] = self.id
+        datamembers['code'] = name'''
+        obj.dm['id'] = obj.id
+        
+
         return(getattr(self,clsname))
        
     def persist(self,createtable=True):
@@ -110,7 +123,7 @@ class schoolschedgeneric(dbtblgeneric):
         if hasattr(self,"id") == False:
             _idx = self.tbl_col_names.index('__id')
             setattr(self,"id",self.tbl_row_values[_idx])
-            
+
         if self.dm.has_key('id') == False:
             _idx = self.tbl_col_names.index('__id')
             self.dm["id"] = self.tbl_row_values[0][_idx].replace('\"','')
@@ -120,8 +133,6 @@ class schoolschedgeneric(dbtblgeneric):
 
     def update(self,of,field,newvalue,dbname=None):
 
-        print getattr(self,"dm")
-        
         # this is needed to get around the sqlite limitation that
         # an sqlite cursor can only be used in the thread it was instantiated in
         if dbname <> None:
@@ -145,9 +156,6 @@ class schoolschedgeneric(dbtblgeneric):
             _oldidobj = getattr(self,'__id')
         else:
             raise Exception("cannot find an ID field")
-            
-        #_id = getattr(self,'id').name
-        #setattr(self,"__id",_id)
         
         if hasattr(_oldidobj,"name") == True:
             setattr(self,"__id",_oldidobj.name)
@@ -181,6 +189,8 @@ class schoolschedgeneric(dbtblgeneric):
         _id = IDGenerator().getid()
         _ts = self._gettimestamp()
 
+        
+        
         newrecord = deepcopy(currentrecord)
         newrecord['__version'] = "\"current\""
         newrecord[field] = "\"" + str(newvalue) + "\""
@@ -189,6 +199,8 @@ class schoolschedgeneric(dbtblgeneric):
 
         newrecord['__timestamp'] = "\""+_ts+"\""
 
+        #_newvalobj = of.object_get_byval(field,newvalue)
+        
         if currentrecord[field] <> newrecord[field]:
             # create a new row in the database with version "current"
             
@@ -206,7 +218,11 @@ class schoolschedgeneric(dbtblgeneric):
             
             # assumes that field is also an objects whose value is in the name attr
             
+            if field=="teacher": 
+                field = "adult"
+                
             _newvalobj = of.object_get_byval(field,newvalue)
+            
             
             if _newvalobj == None:
                 log.log(thisfuncname(),2,msg="tryng to update to a value that does not exist",field=field,newvalue=newvalue)
@@ -232,9 +248,6 @@ class schoolschedgeneric(dbtblgeneric):
             setattr(self,'__timestamp',_ts)
             
             # update internal dm
-            print getattr(self,"dm")
-            
-            
             _dm = getattr(self,"dm")
             _dm[field] = newvalue
             setattr(self,"dm",_dm)
@@ -262,12 +275,14 @@ def _getpage(grid,pagelen,pagenum):
         endrow = numrows-1
     return(startrow,endrow)
 
-#def dataset_list(of,enums,objtype='lesson',pagelen=30,pagenum=1,
-#                 constraints=None,columns=None):
-def dataset_list(of,enums,objtype='lesson',pagelen=30,pagenum=1,
+def dataset_list(of,enums=None,objtype='lesson',pagelen=30,pagenum=1,
                  constraints=[],columns=None):
     
-    source_objs = of.query_advanced(objtype,constraints)
+    try:
+        source_objs = of.query_advanced(objtype,constraints)
+    except KeyError:
+        log.log(thisfuncname(),3,msg="list requested and no members found",objtype=objtype,constraints=constraints)
+        return [],[]
     
     grid = []
     colnames = list(source_objs[0].dm.keys())
@@ -298,12 +313,16 @@ def dataset_record(of,clsname,objid,new=False):
         return(obj.dm)
 
     return({})
-    
+
+@logger(log) 
 def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_value,
            conflicts_only='N',constraints=None,wratio=None,formatson=False,rollupson=False):
     
     ''' query in memory objects; pivot data and create a table of results; return in 2d array '''
         
+    log.log(thisfuncname(),3,yaxis_type=yaxis_type,xaxis_type=xaxis_type,ztypes=ztypes,source_type=source_type,source_value=source_value,
+               conflicts_only=conflicts_only,constraints=constraints,wratio=wratio,formatson=formatson,rollupson=rollupson)
+    
     if source_value == "":
         source_objs = of.query(source_type)
     else:
@@ -311,18 +330,30 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
         
     xaxis_obj = of.query(xaxis_type)
     yaxis_obj = of.query(yaxis_type)
+
+    count=1
     
-    count=0
-    yaxis_enum = {}
+    # uncomment here to make DOW's present in order
+    yaxis_enum = OrderedDict() 
+    #yaxis_enum = {}
     for _yaxis_obj in yaxis_obj:
         yaxis_enum[_yaxis_obj.name] = count
         count+=1
-    
-    xaxis_enum = enums[xaxis_type]['name2enum']
+     
+    count=1   
+    xaxis_enum = OrderedDict()
+    #xaxis_enum = {}
+    for _xaxis_obj in xaxis_obj:
+        xaxis_enum[_xaxis_obj.name] = count
+        count+=1
+        
+    # use these if want to drive pivot axes from ref table rather than the  values
+    # used so far by actual objects
+    #xaxis_enum = enums[xaxis_type]['name2enum']
     
     values = [] # contains the values displayed on the grid
 
-    values = [['']]    
+    values = [['']]
     for yval in yaxis_enum.keys():
         values[0].append(yval)
         
@@ -369,7 +400,7 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
                                 
                             if ztypes == ['*']:
                                 if celltext == []:
-                                    celltext.append(0)
+                                    celltext.append(1)
                                 else:
                                     celltext[0] = celltext[0] + 1
                                 continue
@@ -383,7 +414,10 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
                                     try:
                                         _celltext.index(zval.name)
                                     except:
+                                        #if hasattr(zval,'name'):
                                         _celltext = _additem(_celltext,zval.name)
+                                        #else:
+                                        #    _celltext = _additem(_celltext,zval)
                                         pass
                                         
                             try:      
@@ -392,7 +426,7 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
                                 celltext.append(tuple(_celltext))
                                 
             values[x].append(celltext)
-    
+
     sswizard_utils.gridreduce(values,[[]])
     
     if rollupson == True:
@@ -489,61 +523,62 @@ def dataset_serialize(values,formatson,schema=None):
                 
         return values
     
-def _lesson_change(lesson):
+def _lesson_change(lesson,delete=False):
 
     def _add(obj,xtype,ytype,lesson):
         
         xtype_id = getattr(lesson,xtype).objid
         ytype_id = getattr(lesson,ytype).objid
-        
-        # indexed by dow/period
+
         if obj.lessons.has_key(xtype_id) == False:
             obj.lessons[xtype_id] = {} 
 
         if obj.lessons[xtype_id].has_key(ytype_id) == False:
             obj.lessons[xtype_id][ytype_id] = []
+           
+        # add if this object not already indexed 
+        try:
+            obj.lessons[xtype_id][ytype_id].index(lesson)
+        except ValueError:
+            obj.lessons[xtype_id][ytype_id].append(lesson)
             
-        obj.lessons[xtype_id][ytype_id].append(lesson)
+    def _delete(obj,xtype,ytype,lesson):
+        xtype_id = getattr(lesson,xtype).objid
+        ytype_id = getattr(lesson,ytype).objid
+        try:
+            obj.lessons[xtype_id][ytype_id].remove(lesson)
+        except:
+            pass
+        
+    source_types = ['adult','student','subject']
+    xaxes = yaxes = ['dow','period','recordtype','subject','student','adult']
     
-    adult = lesson.adult
-        
-    student = lesson.student
-    subject = lesson.subject
-
-    # add the lesson to the adult object        
-    if hasattr(adult,'lessons') == False:
-        setattr(adult,'lessons',{})
-        
-    _add(adult,'dow','period',lesson) # indexed by dow/period
-    _add(adult,'student','period',lesson) # indexed by student/period
-
-    # add the lesson to the student object
-    if hasattr(student,'lessons') == False:
-        setattr(student,'lessons',{})
-        
-    _add(student,'dow','period',lesson) # indexed by dow/period
-    _add(student,'adult','period',lesson) # indexed by adult/period
-    _add(student,'period','recordtype',lesson) # indexed by adult/period
-    _add(student,'student','recordtype',lesson) # indexed by adult/period
-
-    # add the lesson to the subject object        
-    if hasattr(subject,'lessons') == False:
-        setattr(subject,'lessons',{})
-        
-    _add(subject,'dow','period',lesson) # indexed by dow/period
-
+    for source_type in source_types:
+        lesson_attr = getattr(lesson,source_type)
+        for xaxis in xaxes:
+            for yaxis in yaxes:
+                if xaxis <> yaxis:
+                    if hasattr(lesson_attr,'lessons') == False:
+                        setattr(lesson_attr,'lessons',{})
+                        
+                    if delete==True:
+                        _delete(lesson_attr,xaxis,yaxis,lesson)
+                    else:
+                        _add(lesson_attr,xaxis,yaxis,lesson)
+                    
 def dataset_new(source_type):
     
     if source_type == "lesson":
         cols = ['adult','subject','dow','period','student','recordtype']
-    elif source_type == "lesson":
+    elif source_type == "student":
         cols = ['code','name','prep']
     else:
         cols = ['code','name']
         
     return(dict((col,"") for col in cols))
 
-def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,objtype='lesson',keepversion=False):
+def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,objtype='lesson',
+                keepversion=False):
     '''
     in the datamembers dict needs to come 'period','student','dow','adult','subject','recordtype
     values need to be the names for dow, so 'Monday','Tuesday' etc'''
@@ -568,31 +603,32 @@ def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,objtype='lesso
         datamembers['status'] = 'master'
         datamembers['prep'] = int(prepmap[datamembers['student']])
         datamembers['source']="manual"
+
         #datamembers['saveversion']=1
             
         # switch to code
         datamembers['dow'] = sswizard_utils._iscode(enums,'dow',datamembers['dow'])
         
-        #with database:
-        #    _,_lesson_count,_ = sswizard_utils._maxlessonenum(database)
-        #    datamembers['enum'] = int(_lesson_count[0][0])+1
-    
-        
         lesson = of.new(schoolschedgeneric,'lesson',objid=datamembers['userobjid'],
                              constructor='datamembers',database=database,
                              of=of,modname=__name__,dm=datamembers)
+        
         
         _lesson_change(lesson)
         
         log.log(thisfuncname(),10,msg="lesson obj added",objtype=objtype,dm=datamembers)
         
         with database:
+            lesson.keepversion=keepversion
             lesson.persist()
+            
         return(lesson)
+    
     else:
-        if objtype == "student":  
-            datamembers['prep'] = int(prepmap[datamembers['name']])
         
+        if objtype == "student":
+            prepmap[datamembers['name']] = datamembers['prep']
+            
         with database:
             _,_obj_count,_ = sswizard_query_utils._rowcount(database,objtype)
             _enum = int(_obj_count[0][0])+1
@@ -607,13 +643,13 @@ def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,objtype='lesso
 
     datamembers['userobjid'] = _userobjid
     datamembers['enum'] = _enum
-    datamembers['objtype'] = objtype  
+    datamembers['objtype'] = objtype 
     
     obj = of.new(schoolschedgeneric,str(objtype),objid=_objid,constructor='datamembers',database=database,
                          of=of,modname=__name__,recursion=False,dm=datamembers)
 
     log.log(thisfuncname(),10,msg="lesson obj added",objtype=objtype,dm=datamembers)
-    
+        
     with database:
         obj.persist()
         
@@ -674,13 +710,16 @@ def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1
     log.log(thisfuncname(),3,msg="loading",source=str(source))
 
     # load from database
+    #cols = ['period','student','session','dow','prep','teacher','subject','userobjid','status','substatus','recordtype','source','__id','record']        
     cols = ['period','student','session','dow','prep','teacher','subject','userobjid','status','substatus','recordtype','source','__id']        
+
     with database:
         
         colndefn,rows,exec_str = tbl_rows_get(database,'lesson',cols,whereclause)
     
         log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
     
+    #cols = ['period','student','session','dow','prep','adult','subject','userobjid','status','substatus','recordtype','source','id','record']
     cols = ['period','student','session','dow','prep','adult','subject','userobjid','status','substatus','recordtype','source','id']
     
     # parse rows
@@ -688,7 +727,11 @@ def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1
         datamembers = {}
         for i in range(len(cols)):
             datamembers[cols[i]] = row[i]
-        
+            
+        # this is a hack to quickly get a clean lessontype into the server
+        datamembers['recordtype'] = datamembers['recordtype'].split(".")[0]
+        if datamembers['recordtype'] == "subject": datamembers['recordtype'] = "academic"
+            
         _,lessontype_code,_,_ = datamembers['session'].split(".")
         datamembers['objtype'] = 'lesson'                               
 
@@ -703,5 +746,39 @@ def dataset_load(database,refdatabase,of,enums,saveversion=1,unknown='N',prep=-1
     # post log with results
     log.log(thisfuncname(),3,msg="db rows loaded",num=len(rows))        
     for i in range(len(cols)):
-        log.log(thisfuncname(),3,msg="lesson obj created",num=len(of.store[cols[i]]))
+        if of.store.has_key(cols[i]):
+            log.log(thisfuncname(),3,msg="lesson obj created",num=len(of.store[cols[i]]))
+        else:
+            log.log(thisfuncname(),3,msg="no records found to be loaded for",record=cols[i])
     
+
+def dataset_loadref(database,refdatabase,of,objtype,saveversion=1,unknown='N',
+                    keepversion=False,whereclause=[]):
+
+    # load from database
+    cols = ['name','code','enum']
+    if objtype == "student":
+        cols.append("prep")
+        
+    with database:
+        colndefn,rows,exec_str = tbl_rows_get(database,objtype,cols,whereclause)
+        log.log(thisfuncname(),9,msg="dbread",exec_str=exec_str)
+    
+    # parse rows
+    for row in rows:
+        datamembers = {}
+        for i in range(len(cols)):
+            datamembers[cols[i]] = row[i]
+        
+        datamembers['objtype'] = objtype
+        datamembers['userobjid'] = datamembers['name']
+        
+        obj = of.new(schoolschedgeneric,objtype,objid=datamembers['name'],
+                     constructor='datamembers',database=database,
+                     of=of,modname=__name__,recursion=False,dm=datamembers)
+    
+        log.log(thisfuncname(),10,msg="loading row",objtype=objtype,
+                dm=datamembers)
+        
+        #with database:
+        #    obj.persist()
