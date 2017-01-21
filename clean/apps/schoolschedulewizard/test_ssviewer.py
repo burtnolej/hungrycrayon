@@ -1274,6 +1274,9 @@ class Test_Viewer_Update(Test_Viewer_Base):
         # test that the id in dm has been updated
         self.assertEqual(_newid,lesson.dm['id'])
         
+        # test that the id in on the object has been updated
+        self.assertEqual(lesson.id.name,_newid)
+        
     '''def test_(self):
         pass'''
         

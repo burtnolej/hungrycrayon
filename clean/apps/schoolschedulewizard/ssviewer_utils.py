@@ -250,6 +250,7 @@ class schoolschedgeneric(dbtblgeneric):
             # update internal dm
             _dm = getattr(self,"dm")
             _dm[field] = newvalue
+            _dm['id'] = _id
             setattr(self,"dm",_dm)
             
         return _id
