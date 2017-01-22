@@ -223,7 +223,6 @@ class schoolschedgeneric(dbtblgeneric):
                 
             _newvalobj = of.object_get_byval(field,newvalue)
             
-            
             if _newvalobj == None:
                 log.log(thisfuncname(),2,msg="tryng to update to a value that does not exist",field=field,newvalue=newvalue)
                 return -1

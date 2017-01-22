@@ -42,6 +42,26 @@ class Test_Base(unittest.TestCase):
     def _getelementstext(self,elements):
         return [element.find('value').text for element in elements]  
     
+    def _parsedmdump(self,xml,field):
+        # if field equal to id result will be [[#id,#subject,dm=#id]]
+        # if there is only one record and subject,id is requested
+        
+        tree_element = xmltree.fromstring(xml)
+        xmlroot = ElementTree.ElementTree(tree_element) 
+
+        dm = []
+        for xmlrow in xmlroot.findall(".//tr"):
+            _dm = []
+            for xmlcell in xmlrow.findall(".//td")[1:-1]: # skip 1st and last
+                if xmlcell.text.find("=") <> -1:
+                    k,v = xmlcell.text.split("=")
+                    if k == field:
+                        _dm.append(v)
+                else:
+                    _dm.append(xmlcell.text)
+            dm.append(_dm)
+        return dm
+    
     def tearDown(self):
         shutil.copyfile(self.dbname+".backup",self.dbname)
         
@@ -154,71 +174,100 @@ class Test_Update(Test_Base):
         
     def test_update_subject(self):
 
-        expected_results = ['Student News']
+        expected_results = ['Humanities']
                 
-        ssrest.restquery(self.url + "update/046CE5DA",
-                         value_changes="subject,Student News") 
+        ssrest.restquery(self.url + "update/02B1EEDC",
+                         value_changes="subject,Humanities") 
 
         buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
                            yaxis="dow",ztypes="subject",source_type="student",
-                           source_value="Clayton",cnstr_dow="MO")    
+                           source_value="Clayton",cnstr_dow="WE")    
     
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
         self.assertListEqual(results,expected_results)
+        
+    def test_update_subject_object(self):
+        ssrest.restquery(self.url + "update/054C4D26",
+                         value_changes="subject,Math")
+        
+        results = ssrest.restquery(self.url + "command/dump",
+                                   objtypes='lesson',
+                                   fields='id,subject,dm',
+                                   objref=0,
+                                   pprint=1,
+                                   constraints="dow='TU'",)
+
+        objvals = self._parsedmdump(results,'id')
+        
+        # check id and dmid are equals
+        self.assertEquals(objvals[0][0],objvals[0][-1])
+        
+        # check id <> orig id
+        self.assertNotEquals(objvals[0][0],"054C4D26")
+        
+        # check dmid <> orig id
+        self.assertNotEquals(objvals[0][-1],"054C4D26")
+        
+        # check subject has been updated
+        self.assertEquals(objvals[0][1],"Math")
         
     def test_2_subject_updates(self):
         
         sleep(1)
         
         # server already has state post execution of test_
-        expected_results = ['Math']  
+        expected_results = 'Humanities' 
 
-        ssrest.restquery(self.url + "update/054C4D26",
-                         value_changes="subject,Math")    
+        results = ssrest.restquery(self.url + "command/dump",
+                                   objtypes='lesson',
+                                   fields='id,subject,dm',
+                                   objref=0,
+                                   pprint=1,
+                                   constraints="dow='TU'",)
 
+        newid = self._parsedmdump(results,'id')[0][0]
+        
+        ssrest.restquery(self.url + "update/"+newid,
+                         value_changes="subject,Humanities")    
 
+        results = ssrest.restquery(self.url + "command/dump",
+                                   objtypes='lesson',
+                                   fields='id,subject,dm',
+                                   objref=0,
+                                   pprint=1,
+                                   constraints="dow='TU'",)
+
+        self.assertEquals(self._parsedmdump(results,'id')[0][1],expected_results)
+        
+    ''''def test_multi_subject_updates_direct(self):
+        
+        # ie using the new id provided by the rest call
+
+        expected_results = ['Math']
+        
+        newid = ssrest.restquery(self.url + "update/054C4D26",
+                         value_changes="subject,Humanities")
+        newid = ssrest.restquery(self.url + "update/"+newid,
+                         value_changes="subject,Math") 
+        
         buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
                            yaxis="dow",ztypes="subject",source_type="student",
                            source_value="Clayton",cnstr_dow="TU")    
     
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
-        self.assertListEqual(results,expected_results)
-                
-    def test_multi_subject_updates(self):
-
-        expected_results = ['Math']
-        
-        newid = ssrest.restquery(self.url + "update/05C8F56C",
-                         value_changes="subject,Humanities")
-        newid = ssrest.restquery(self.url + "update/"+newid,
-                         value_changes="subject,Student News") 
-        newid = ssrest.restquery(self.url + "update/"+newid,
-                         value_changes="subject,Humanities")
-        newid = ssrest.restquery(self.url + "update/"+newid,
-                         value_changes="subject,Math") 
-
-        
-        buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
-                           yaxis="dow",ztypes="subject",source_type="student",
-                           source_value="Clayton",cnstr_dow="TH")    
-    
-        results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
-        self.assertListEqual(results,expected_results)
+        self.assertListEqual(results,expected_results)'''
 
         
     def test_update_adult(self):
 
         expected_results = ['Stan']
-                
-        ssrest.restquery(self.url + "add/adult",
-                         name='Stan',code='STAN')
         
-        ssrest.restquery(self.url + "update/046CE5DA",
+        ssrest.restquery(self.url + "update/054C4D26",
                          value_changes="teacher,Stan") 
 
         buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
                            yaxis="dow",ztypes="adult",source_type="student",
-                           source_value="Clayton",cnstr_dow="MO")    
+                           source_value="Clayton",cnstr_dow="TU")    
     
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
         self.assertListEqual(results,expected_results)
@@ -242,10 +291,14 @@ class Test_Add_Lesson(Test_Base):
                            [u'Clayton', u'Amelia', u'Humanities', u'830-910', u'TU'], 
                            [u'Clayton', u'??', u'Humanities', u'830-910', u'FR'], 
                            [u'Clayton', u'Stan', u'Math', u'830-910', u'TU']]
+        
+        expected_results = [[u'Clayton', u'Amelia', u'Humanities', u'830-910', u'TU'], 
+                            [u'Clayton', u'Stan', u'Math', u'910-950', u'WE'], 
+                            [u'Clayton', u'Stan', u'Math', u'830-910', u'TU']]
                 
         ssrest.restquery(self.url + "add/lesson",
                          student='Clayton',teacher='Stan',subject='Math',period='830-910',
-                         recordtype='subject',dow='Tuesday')
+                         recordtype='subject',dow='TU')
         
         db = Database(self.dbname)
         
@@ -256,7 +309,7 @@ class Test_Add_Lesson(Test_Base):
         
     def test_object(self):
 
-        expected_results ='<table><tr><td>ROOT</td><td>Clayton</td><td>??</td><td>Math</td><td>MO</td><td>830-910</td><td>lesson</td></tr><tr><td>ROOT</td><td>Clayton</td><td>??</td><td>??</td><td>WE</td><td>830-910</td><td>lesson</td></tr><tr><td>ROOT</td><td>Clayton</td><td>??</td><td>Student News</td><td>TH</td><td>830-910</td><td>lesson</td></tr><tr><td>ROOT</td><td>Clayton</td><td>Amelia</td><td>Humanities</td><td>TU</td><td>830-910</td><td>lesson</td></tr><tr><td>ROOT</td><td>Clayton</td><td>??</td><td>Humanities</td><td>FR</td><td>830-910</td><td>lesson</td></tr><tr><td>ROOT</td><td>Clayton</td><td>Stan</td><td>Math</td><td>TU</td><td>830-910</td><td>lesson</td></tr></table>'
+        expected_results ='<table><tr><td>ROOT</td><td>Clayton</td><td>Amelia</td><td>Humanities</td><td>TU</td><td>830-910</td><td>lesson</td></tr><tr><td>ROOT</td><td>Clayton</td><td>Stan</td><td>Math</td><td>WE</td><td>910-950</td><td>lesson</td></tr><tr><td>ROOT</td><td>Clayton</td><td>Stan</td><td>Math</td><td>None</td><td>830-910</td><td>lesson</td></tr></table>'
         
         ssrest.restquery(self.url + "add/lesson",
                          student='Clayton',teacher='Stan',subject='Math',period='830-910',
@@ -281,8 +334,7 @@ class Test_Add_Ref(Test_Base):
         # this does not give everything because we have not 
         # loaded the ref data 
         # ssrest.restquery(self.url + "load/period")
-        expected_results = '<table><tr><td>ROOT</td><td>830-910</td><td>period</td></tr><tr><td>ROOT</td><td>330-410</td><td>period</td></tr></table>';        
-
+        expected_results = '<table><tr><td>ROOT</td><td>830-910</td><td>period</td></tr><tr><td>ROOT</td><td>910-950</td><td>period</td></tr><tr><td>ROOT</td><td>330-410</td><td>period</td></tr></table>'
         ssrest.restquery(self.url + "add/period",
                          name='330-410',code='330')
         
@@ -293,20 +345,11 @@ class Test_Add_Ref(Test_Base):
         
         self.assertEqual(expected_results,results)
 
-        
     def test_period_db(self):
 
         expected_results = [[u'830-910', u'830', u'1'], 
                             [u'910-950', u'910', u'2'], 
-                            [u'950-1030', u'950', u'3'], 
-                            [u'1030-1110', u'1030', u'4'], 
-                            [u'1110-1210', u'1110', u'5'], 
-                            [u'1210-100', u'1210', u'6'], 
-                            [u'100-140', u'1310', u'7'], 
-                            [u'140-220', u'1340', u'8'],
-                            [u'220-300', u'1420', u'9'], 
-                            [u'300-330', u'1500', u'10'], 
-                            [u'330-410', u'330', u'11']]
+                            [u'330-410', u'330', u'3']]
         
         ssrest.restquery(self.url + "add/period",
                          name='330-410',code='330')
@@ -328,22 +371,19 @@ class Test_Add_Lesson_With_New_Ref(Test_Base):
         
     def test_period_object(self):
 
-        expected_results = '<table><tr><td>ROOT</td><td>330-410</td><td>lesson</td></tr></table>';
+        expected_results = '<table><tr><td>ROOT</td><td>430-510</td><td>lesson</td></tr></table>';
         
         ssrest.restquery(self.url + "add/period",
-                         name='330-410',code='330')
+                         name='430-510',code='330')
                 
         ssrest.restquery(self.url + "add/lesson",
-                         student='Clayton',teacher='Stan',subject='Math',period='330-410',
-                         recordtype='subject',dow='Tuesday')
-        
-        ssrest.restquery(self.url + "update/046CE5DA",
-                         value_changes="subject,Student News") 
+                         student='Clayton',teacher='Stan',subject='Math',period='430-510',
+                         recordtype='subject',dow='TU')
         
         results = ssrest.restquery(self.url + "command/dump",
                                    objtypes='lesson',
                                    fields='period',
-                                   constraints="period='330-410'",
+                                   constraints="period='430-510'",
                                    pprint=1)
 
         self.assertEqual(expected_results,results)
@@ -354,27 +394,34 @@ class Test_Add_Lesson_Update_to_New_Ref(Test_Base):
         
     def test_period_object(self):
 
-        expected_results = '<table><tr><td>ROOT</td><td>330-410</td><td>lesson</td></tr></table>';
+        expected_results = '<table><tr><td>ROOT</td><td>430-510</td><td>lesson</td></tr></table>';
         
         buf = ssrest.restquery(self.url + "add/lesson",
-                         student='Clayton',teacher='Stan',subject='Math',period='300-330',
-                         recordtype='subject',dow='Tuesday')
+                         student='Clayton',teacher='Stan',subject='Math',period='910-950',
+                         recordtype='subject',dow='TU')
 
-        #ssrest.restquery(self.url + "add/period",
-        #                 name='330-410',code='330')
+        ssrest.restquery(self.url + "add/period",
+                         name='430-510',code='430')
         
-        print self._getelementstext(self._queryxml(buf,".//item[2]","value"))[0]
-        
-        #ssrest.restquery(self.url + "update/046CE5DA",
-        #                 value_changes="subject,Student News")         
+        results = ssrest.restquery(self.url + "command/dump",
+                                   objtypes='lesson',
+                                   fields='id,subject,dm',
+                                   objref=0,
+                                   pprint=1,
+                                   constraints="dow='TU',period='910-950'",)
+
+        objvals = self._parsedmdump(results,'id')
                 
-        '''results = ssrest.restquery(self.url + "command/dump",
+        ssrest.restquery(self.url + "update/"+objvals[0][0],
+                         value_changes="period,430-510")         
+                
+        results = ssrest.restquery(self.url + "command/dump",
                                    objtypes='lesson',
                                    fields='period',
-                                   constraints="period='330-410'",
+                                   constraints="period='430-510'",
                                    pprint=1)
 
-        self.assertEqual(expected_results,results)'''
+        self.assertEqual(expected_results,results)
         
 class Test_SearchByID(Test_Base):
     def setUp(self):
@@ -382,9 +429,9 @@ class Test_SearchByID(Test_Base):
         
     def test_(self):
         
-        expected_result = '<root><parser><value>drawform</value></parser><item id="1"><value>wp</value><valuetype>recordtype</valuetype></item><item id="2"><value>830-910</value><valuetype>period</valuetype></item><item id="3"><value>??</value><valuetype>adult</valuetype></item><item id="4"><value>Clayton</value><valuetype>student</valuetype></item><item id="5"><value>MO</value><valuetype>dow</valuetype></item><item id="6"><value>Math</value><valuetype>subject</valuetype></item></root>'
+        expected_result = '<root><parser><value>drawform</value></parser><item id="1"><value>wp</value><valuetype>recordtype</valuetype></item><item id="2"><value>830-910</value><valuetype>period</valuetype></item><item id="3"><value>Amelia</value><valuetype>adult</valuetype></item><item id="4"><value>Clayton</value><valuetype>student</valuetype></item><item id="5"><value>TU</value><valuetype>dow</valuetype></item><item id="6"><value>Humanities</value><valuetype>subject</valuetype></item></root>'
         
-        result = ssrest.restquery(self.url + "id/046CE5DA")
+        result = ssrest.restquery(self.url + "id/054C4D26")
         self.assertEqual(expected_result,result)
         
     def tearDown(self):
@@ -435,7 +482,18 @@ class Test_LoadRef(Test_Base):
                                               fields='name',
                                               count=0)
         
-        self.assertEqual(numperiods,'10')
+        self.assertEqual(numperiods,'2')
+        
+    def test_subject(self):
+    
+        ssrest.restquery(self.url + "load/subject")
+        
+        numperiods = ssrest.restquery(self.url + "command/dump",
+                                              objtypes='subject',
+                                              fields='name',
+                                              count=0)
+        
+        self.assertEqual(numperiods,'4')
         
 class Test_Reload(Test_Base):
     def setUp(self):
@@ -450,7 +508,7 @@ class Test_Reload(Test_Base):
     
         ssrest.restquery(self.url + "add/lesson",
                          student='Clayton',teacher='Stan',subject='Math',period='830-910',
-                         recordtype='subject',dow='Tuesday') 
+                         recordtype='subject',dow='TU') 
 
         pre_count = ssrest.restquery(self.url + "command/dump",
                                               objtypes='lesson',
@@ -467,23 +525,24 @@ class Test_Reload(Test_Base):
                                               fields='id,__timestamp',
                                               count=0)
 
-        self.assertEquals(pre_count,'6')
-        self.assertEquals(post_count,'5')
+        self.assertEquals(pre_count,'3')
+        self.assertEquals(post_count,'2')
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New))    
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRef))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Reload))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))'''
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Ref))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_With_New_Ref))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Ref))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_With_New_Ref))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_Update_to_New_Ref))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update_UID))
+
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Reload))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update_UID))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Student))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Adult))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Subject))'''

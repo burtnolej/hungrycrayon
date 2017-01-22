@@ -57,7 +57,7 @@ class Test_Add(Test_Base):
         values = dict(period=[dict(name='830-910',code='830-910'),
                               dict(name='910-950',code='910-950'),
                               dict(name='950-1030',code='950-1030'),
-                              dict(name='1030-1100',code='1030-1100')                              ],
+                              dict(name='1030-1110',code='1030-1110')                              ],
                       dow=[dict(name='MO',code='MO'),
                            dict(name='TU',code='TU'),
                            dict(name='WE',code='WE'),
@@ -166,11 +166,6 @@ class Test_Add(Test_Base):
     def tearDown(self):
         self.browser.quit()
              
-             
-             
-the id is not being updated on the inmemory record after 
-update - there should be a test for this that is failing in test_ssviewer_utils.py
-
 class Test_Update(Test_Base):
 
     def setUp(self):
@@ -240,7 +235,7 @@ class Test_Update(Test_Base):
             _macro_update_field(self.browser,ids[i],dict(period="950-1030"))
             
         # update TU to TH
-        _macro_list_objects(self.browser,"period",dict(period='910-950'))
+        _macro_list_objects(self.browser,"lesson",dict(period='910-950'))
     
         ids = get_table_values(self.browser,onlyid=True)
     
