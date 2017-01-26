@@ -72,13 +72,14 @@ class Test_Pivot_Student(Test_Base):
  
     def test_(self):
         
-        expected_results = ['Humanities','Math','Humanities','??','Student News']
+        expected_results = ['Humanities','Math']
             
         buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
                                yaxis="dow",ztypes="subject",source_type="student",
                                source_value="Clayton")    
 
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
+        
         self.assertListEqual(results,expected_results)
 
     def test_filter(self):
@@ -87,21 +88,20 @@ class Test_Pivot_Student(Test_Base):
             
         buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
                                yaxis="dow",ztypes="subject",source_type="student",
-                               source_value="Clayton",cnstr_dow="MO")    
+                               source_value="Clayton",cnstr_dow="WE")    
 
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
         self.assertListEqual(results,expected_results)
         
     def test_adult_xaxis(self):
         # this is the xml to define a 1 by 2 grid - Amelia/?? - 830/910 and then Math,??,Student News and Humanities
-        expected_results = '<root><parser><value>drawnoformatgrid</value></parser><row><cell><bgcolor>#ffffff</bgcolor><valuetype>adult</valuetype><fgcolor>#000000</fgcolor><value /></cell><cell><bgcolor>#ffffff</bgcolor><valuetype>adult</valuetype><fgcolor>#000000</fgcolor><value>??</value></cell><cell><bgcolor>#ffffff</bgcolor><valuetype>adult</valuetype><fgcolor>#000000</fgcolor><value>Amelia</value></cell></row><row><cell><bgcolor>#ffffff</bgcolor><valuetype>period</valuetype><fgcolor>#000000</fgcolor><value>830-910</value></cell><cell><subrow><subcell><valuetype>subject</valuetype><value>Math</value></subcell></subrow><subrow><subcell><valuetype>subject</valuetype><value>??</value></subcell></subrow><subrow><subcell><valuetype>subject</valuetype><value>Student News</value></subcell></subrow><subrow><subcell><valuetype>subject</valuetype><value>Humanities</value></subcell></subrow></cell><cell><subrow><subcell><valuetype>subject</valuetype><value>Humanities</value></subcell></subrow></cell></row></root>'
+        expected_results = '<root><parser><value>drawnoformatgrid</value></parser><row><cell><bgcolor>#ffffff</bgcolor><valuetype>adult</valuetype><fgcolor>#000000</fgcolor><value /></cell><cell><bgcolor>#ffffff</bgcolor><valuetype>adult</valuetype><fgcolor>#000000</fgcolor><value>Amelia</value></cell><cell><bgcolor>#ffffff</bgcolor><valuetype>adult</valuetype><fgcolor>#000000</fgcolor><value>Stan</value></cell></row><row><cell><bgcolor>#ffffff</bgcolor><valuetype>period</valuetype><fgcolor>#000000</fgcolor><value>830-910</value></cell><cell><subrow><subcell><valuetype>subject</valuetype><value>Humanities</value></subcell></subrow></cell><cell /></row><row><cell><bgcolor>#ffffff</bgcolor><valuetype>period</valuetype><fgcolor>#000000</fgcolor><value>910-950</value></cell><cell /><cell><subrow><subcell><valuetype>subject</valuetype><value>Math</value></subcell></subrow></cell></row></root>'
         
         buf = ssrest.restquery(self.url + "student/Clayton",xaxis="period",
                                yaxis="adult",ztypes="subject",source_type="student",
                                source_value="Clayton")    
 
         self.assertEqual(buf,expected_results)
-        
         
     def tearDown(self):
         Test_Base.tearDown(self)
@@ -128,27 +128,27 @@ class Test_Pivot_Subject(Test_Base):
  
     def test_(self):
         
-        expected_results = ['Clayton','Clayton']
+        expected_results = ['Amelia']
             
         buf = ssrest.restquery(self.url + "subject/Humanities",xaxis="period",
-                               yaxis="dow",ztypes="student",source_type="subject",
+                               yaxis="dow",ztypes="adult",source_type="subject",
                                source_value="Humanities")    
 
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
         
         self.assertListEqual(results,expected_results)
         
-    '''def test_subject_student_axes(self):
+    def test_subject_student_axes(self):
         
-        expected_results = ['Clayton','Clayton']
+        expected_results = ['Amelia']
             
         buf = ssrest.restquery(self.url + "subject/Humanities",xaxis="subject",
-                               yaxis="student",ztypes="student",source_type="subject",
+                               yaxis="student",ztypes="adult",source_type="subject",
                                source_value="Humanities")    
 
         results = self._getelementstext(self._queryxml(buf,".//subcell[valuetype]","value"))
         
-        self.assertListEqual(results,expected_results)'''
+        self.assertListEqual(results,expected_results)
         
 class Test_Update_UID(Test_Base):
     def setUp(self):
@@ -457,13 +457,14 @@ class Test_Dump(Test_Base):
  
     def test_(self):
         
-        expected_results = '<table><tr><td>1.1.2.8.4</td><td>-</td><td>-</td><td>830-910</td><td>period</td></tr><tr><td>ROOT</td><td>830-910</td><td>Math</td><td>-</td><td>lesson</td></tr><tr><td>1.4.2.8.17</td><td>-</td><td>-</td><td>830-910</td><td>period</td></tr><tr><td>ROOT</td><td>830-910</td><td>??</td><td>-</td><td>lesson</td></tr><tr><td>1.3.2.8.5</td><td>-</td><td>-</td><td>830-910</td><td>period</td></tr><tr><td>ROOT</td><td>830-910</td><td>Student News</td><td>-</td><td>lesson</td></tr><tr><td>1.2.2.6.22</td><td>-</td><td>-</td><td>830-910</td><td>period</td></tr><tr><td>ROOT</td><td>830-910</td><td>Humanities</td><td>-</td><td>lesson</td></tr><tr><td>1.5.2.8.22</td><td>-</td><td>-</td><td>830-910</td><td>period</td></tr><tr><td>ROOT</td><td>830-910</td><td>Humanities</td><td>-</td><td>lesson</td></tr><tr><td>ROOT</td><td>-</td><td>-</td><td>830-910</td><td>period</td></tr></table>'
-            
+        expected_results = '<table><tr><td>ROOT</td><td>830-910</td><td>Humanities</td><td>lesson</td></tr><tr><td>ROOT</td><td>910-950</td><td>Math</td><td>lesson</td></tr></table>'
+        
         results = ssrest.restquery(self.url + "command/dump",
-                                   objtypes='lesson,period',
-                                   fields='period,subject,name',
+                                   objtypes='lesson',
+                                   fields='period,subject',
                                    objref=0,
                                    pprint=1)
+        
         self.assertEqual(expected_results,results)
         
     def tearDown(self):
@@ -539,12 +540,11 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Ref))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_With_New_Ref))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_Update_to_New_Ref))
-
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Reload))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update_UID))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update_UID))'''
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Student))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Adult))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Subject))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Subject))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

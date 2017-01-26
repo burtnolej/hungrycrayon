@@ -227,7 +227,7 @@ class Test_Add_Ref(Test_Base):
         expected_results = [u'code', u'name', u'enum', u'objtype', u'userobjid', 
                             u'Humanities', u'Humanities', u'0', u'subject', u'Humanities', 
                             u'Math', u'Math', u'2', u'subject', u'Math', 
-                            u'CYCL', u'cycling', u'3', u'subject', u'cycling']
+                            u'CYCL', u'cycling', u'5', u'subject', u'cycling']
 
         _macro_add_new_record(self.browser,"subject",dict(name="cycling",code="CYCL"))
 
@@ -269,7 +269,7 @@ class Test_Add_Lesson(Test_Base):
         expected_results = [u'status', u'substatus', u'recordtype', u'period', u'dow', u'source', u'session', u'adult', u'student', u'objtype', u'prep', u'userobjid', u'subject', 
                             u'master', u'complete', u'wp', u'830-910', u'TU', u'dbinsert', u'Amelia.Humanities.Tuesday.830-910', u'Amelia', u'Clayton', u'lesson', u'5', u'1.2.2.6.22', u'Humanities', 
                             u'master', u'complete', u'academic', u'910-950', u'WE', u'dbinsert', u'Stan.Math.Wednesday.910-950', u'Stan', u'Clayton', u'lesson', u'5', u'1.2.3.4.5', u'Math', 
-                            u'master', u'complete', u'subject', u'400-430', u'FU', u'manual', u'Stan.cycling.FU.400-430', u'Stan', u'Jon', u'lesson', u'5', u'3.3.2.None.3', u'cycling']
+                            u'master', u'complete', u'subject', u'400-430', u'FU', u'manual', u'Stan.cycling.FU.400-430', u'Stan', u'Jon', u'lesson', u'5', u'3.3.2.None.5', u'cycling']
         
                 
         _macro_add_new_record(self.browser,"lesson",dict(recordtype="seminar",period="400-430",
@@ -354,7 +354,7 @@ class Test_Pivot_Select(Test_Base):
         self.assertListEqual(self.select_elements['cnstr_source'],expect_results_cnstr_source)
          
         # test_filter_subject(self):
-        expect_results_cnstr_subject = [u'NotSelected', u'All', u'Humanities', u'Math']
+        expect_results_cnstr_subject = [u'NotSelected', u'All', u'Humanities', u'Math', u'Physics', u'English']
         self.assertListEqual(self.select_elements['cnstr_subject'],expect_results_cnstr_subject)
 
         # test_filter_dow(self):
@@ -610,7 +610,7 @@ class Test_Update(Test_Base):
         expected_results =  [u'status', u'substatus', u'recordtype', u'period', u'dow', u'source', u'session', u'adult', u'student', u'objtype', u'prep', u'userobjid', u'subject', 
                              u'master', u'complete', u'wp', u'400-430', u'TU', u'dbinsert', u'Amelia.Humanities.Tuesday.830-910', u'Amelia', u'Clayton', u'lesson', u'5', u'1.2.2.6.22', u'Humanities', 
                              u'master', u'complete', u'academic', u'910-950', u'WE', u'dbinsert', u'Stan.Math.Wednesday.910-950', u'Stan', u'Clayton', u'lesson', u'5', u'1.2.3.4.5', u'Math', 
-                             u'master', u'complete', u'subject', u'400-430', u'FU', u'manual', u'Stan.cycling.FU.400-430', u'Stan', u'Jon', u'lesson', u'5', u'3.3.2.None.3', u'cycling']
+                             u'master', u'complete', u'subject', u'400-430', u'FU', u'manual', u'Stan.cycling.FU.400-430', u'Stan', u'Jon', u'lesson', u'5', u'3.3.2.None.5', u'cycling']
         
         _macro_add_new_record(self.browser,"period",dict(name="400-430",code="400-430"))
         
@@ -653,9 +653,5 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Ref))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
-    
-
-    
-    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

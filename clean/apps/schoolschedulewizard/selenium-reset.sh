@@ -1,4 +1,5 @@
 #!/bin/bash
+. ~/.bashrc
 
 killall Python
 cp test_ssviewer_rest.sqlite.backup test_ssviewer_rest.sqlite
