@@ -1,0 +1,96 @@
+<html>
+<body></body>
+<style>
+
+html * {
+	font-family: Arial, Helvetica, sans-serif;  !important;
+}
+ 
+div.params {
+	background-color:#00F;
+	float:left;
+	display:block;
+	width:400px;
+}
+
+div.history {
+	overflow:scroll;
+	float:left;
+	background-color:#F00;
+	display:block;
+	width:200px;
+	height:300px;
+}
+
+div.url {
+	position:absolute;
+	top:300px;
+	background-color:#0F0;
+	float:none;
+}
+
+div.message { 
+	position:absolute;
+	top:350px;
+	background-color:#0FF;
+	width:2220px;
+} 
+
+#time {
+	position:absolute;
+	top:0px;
+	right:10px;
+	color:#F0F;
+}
+
+#status {
+	width:100px;
+}
+
+#url {
+	width:100%;
+}
+
+p.history {
+	color:#0F0;
+}
+
+label {
+	color:#000;
+	text-align: left;
+	display:inline-block;
+	width:100px;
+	font-weight: bold;
+}
+
+input[type="text"] {
+	color:#000;
+	text-align: left;
+	display:inline-block;
+	width:200px;
+}
+
+body { 
+	width:3000px;
+}
+
+table {
+	word-wrap:break-word;
+	border-collapse: collapse;
+}
+tr {
+	color: #000;
+	border: 1px solid #000; 
+}
+
+td {
+	word-wrap:break-word; 
+	border-right: 1px solid #000; 
+	font-size:80%;  !important;
+}
+            
+</style>
+<script data-main="js/service_debugger.js" src="js/require.js"></script>
+</html>
+
+

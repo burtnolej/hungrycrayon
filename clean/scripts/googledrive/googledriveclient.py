@@ -117,7 +117,9 @@ def main():
     #gfilesofinterest = ['Prep 4 Individual Schedules','Prep 4 schedule new work period','Prep 5 and 6 schedule new work period',
     #          'Prep 6 Individual Schedules','Copy of Prep 5 Individual Schedules']
 
-    gfilesofinterest = ['Prep 4 Individual Schedules',
+    gfilesofinterest = ['Master Schedule Prep 5 & 6']
+
+    '''gfilesofinterest = ['Prep 4 Individual Schedules',
                         'Prep 4 schedule new work period',
                         'Prep 5 and 6 schedule new work period',
                         'Prep 6 Individual Schedules',
@@ -139,7 +141,7 @@ def main():
                         'Thea Schedule',
                         'Jacki Schedule',
                         'Amelia Schedule',
-                        'Eric Schedule']  
+                        'Eric Schedule']  '''
     
 
     picklefilename = "metastore.dat"

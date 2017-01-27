@@ -1009,11 +1009,8 @@ class Test_ObjFrameworkDumpRptNestedSchoolschedFieldNameHdr(unittest.TestCase):
         results = self.of.dumpobjrpt(objtypes=['DBLesson'],
                                      objref=False,
                                      fields=['student','period'],
-                                     omitfields=['id'],
-                                     C 1-on-1
-G 1-on-1
-A 1-on-1
-E 1-on-1=True)
+                                     omitfields=['id'], 
+					fieldnames=True)
          
         
         expected_results.sort()

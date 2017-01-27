@@ -214,11 +214,11 @@ class Test_Log_Names(unittest.TestCase):
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Logger_Member_Function))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log_Multiple_Entries))
-    
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Misc))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Logger_Member_Function))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log_Multiple_Entries))
+   
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Misc))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Log_Names))
     
     unittest.TextTestRunner(verbosity=2).run(suite)

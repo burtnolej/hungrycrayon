@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+body { 
+	width:3000px;
+}
+</style>
+
+<body>
+		<script data-main="js/log_viewer.js" src="js/require.js"></script>
+</body>
+
+</html>

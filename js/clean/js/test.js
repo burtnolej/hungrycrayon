@@ -1,0 +1,338 @@
+requirejs.config({
+    baseUrl: 'js/lib',
+    paths: {
+       app: '../app'
+    }
+});
+
+requirejs(['jquery','myutils'],
+function   ($, myutils) {
+	
+	// low level helpers
+	QUnit.test('2 simple identical arrays', function (assert) {
+		arr = Array(1, 2, 3, 4, 5);
+		arr2 = Array(1, 2, 3, 4, 5);
+		assert.equal(compare_1darrays(arr, arr2), 0, 'passed');
+	});
+	
+	QUnit.test('1 difference', function (assert) {
+	  arr = Array(1, 2, 3, 4, 5);
+	  arr2 = Array(1, 2, 333, 4, 5);
+	  expected_results = Array();
+	  expected_results.push(2)
+	  results = compare_1darrays(arr, arr2);
+	  assert.equal(results[0], expected_results[0], 'passed');
+	});
+	
+	QUnit.test('2 differences', function (assert) {
+	  arr = Array(1, 2, 3, 4, 5);
+	  arr2 = Array(1, 22, 333, 4, 5);
+	  expected_results = Array(1, 2);
+	  results = compare_1darrays(arr, arr2);
+	  assert.equal(pp(results), pp(expected_results), 'passed');
+	});
+	
+	QUnit.test('all different', function (assert) {
+	  arr = Array(1, 2, 3, 4, 5);
+	  arr2 = Array('a', 'b', 'c', 'd', 'e');
+	  expected_results = Array(0, 1, 2, 3, 4);
+	  results = compare_1darrays(arr, arr2);
+	  assert.equal(pp(results), pp(expected_results), 'passed');
+	});
+	
+	QUnit.test('1 arg is not an array', function (assert) {
+	  arr = Array(1, 2, 3, 4, 5);
+	  arr2 = 'foobar';
+	  assert.throws(function () {
+	    compare_1darrays(arr, arr2);
+	  }, /both arguments need to be of type array/, 'passed'
+	  );
+	});
+	
+	QUnit.test('arrs different lengths', function (assert) {
+	  arr = Array(1, 2, 3, 4, 5);
+	  arr2 = Array(1, 2, 3, 4);
+	  assert.throws(function () {
+	    compare_1darrays(arr, arr2);
+	  }, /arrays are different lengths/, 'passed'
+	  );
+	});
+	
+	// testing a bug
+	QUnit.test('misc differences', function (assert) {
+	  arr = Array("a", "a", "a");
+	  arr2 = Array("c", "a", "c");
+	  expected_results = Array(0, 2);
+	  results = compare_1darrays(arr, arr2);
+	  assert.equal(pp(results), pp(expected_results), 'passed');
+	});
+	
+	// test creation of elements
+	QUnit.test("create button", function(assert) {
+		var options = {hidden:false,name:"autobutton",label:"click me"};
+		addElement("button","autobutton",options);
+	    assert.equal($('button[id="autobutton"]').attr('name'),"autobutton",'passed');
+	    delElement("autobutton");
+	});
+										 
+	QUnit.test("create select", function(assert) {
+		var options = {hidden:false,name:"foobar",options:Array("a","b","c")};				 
+		addElement("select","foobar",options);
+		assert.equal($('select[id="foobar"]').attr('name'),"foobar",'passed');
+		assert.equal($('select[id="foobar"]').is(':visible'),true,'passed');
+		delElement("foobar");
+	});	
+	
+		QUnit.test("create hidden select", function(assert) {
+			var options = {hidden:true,name:"hfoobar",options:Array("a","b","c")};		
+			addElement("select","hfoobar",options);
+			assert.equal($('select[id="hfoobar"]').is(':visible'),false,'passed');
+			delElement("hfoobar");
+		});
+		
+		// test deletion of elements
+		QUnit.test("delete element", function(assert) {
+			var options = {hidden:false,name:"foobar3",label:"foo me"};			
+			addElement("select","foobar3",options);
+			assert.equal(document.getElementsByName("foobar3").length,1);
+			delElement("foobar3");
+			assert.equal(document.getElementsByName("foobar3").length,0);
+		});
+		
+		// test interacting with elements
+		QUnit.test("select option", function(assert) {
+			var options = {hidden:true,name:"foobar",options:Array(6,7,8,9)};	
+			el = addElement("select","foobar",options);
+			el[1].selected = 'selected';
+			assert.equal(el.selectedIndex,1,'passed');	
+			el[3].selected = 'selected';
+			assert.equal(el.selectedIndex,3,'passed');	
+			delElement("foobar");
+		});
+		
+		// elements required for tests
+		var options = {hidden:false,name:"input2",label:"click me"};		
+		addElement("button","input2",options);
+		
+		var options = {hidden:false,name:"output2",label:"dd"};
+		addElement("p","output2",options);
+		
+		var options = {hidden:true,name:"sel1",options:Array("a","b","c")};	
+		sel1 = addElement("select","sel1",options);
+		
+		options.name = "sel2"
+		sel2 = addElement("select","sel2",options);
+		
+		options.name = "sel3"
+		sel3 = addElement("select","sel3",options);
+		
+		// test reading elements
+		QUnit.test("get element ids", function(assert) {
+				arr = getElementsIds("select");
+				assert.equal(arr.join(","),"sel1,sel2,sel3","passed");
+		});
+		
+		// test callbacks
+		QUnit.test("get selector attr works", function(assert) {
+		    result = $('select[id="sel1"]').attr('name');
+		    assert.ok(result,"sel1",'passed');
+		});
+				
+		QUnit.test("get selector attr fails", function(assert) {
+		    result = $('select[id="boofar"]').attr('name');
+		    assert.notOk(result,"foobar",'passed');
+		});
+		
+		QUnit.test("auto element callback works", function(assert) {
+			$("button").on('click',function()	{
+				$('p[id="output2"]').text("clicked");
+			});
+			$('button[id="input2"]').click();
+			result = $('p[id="output2"]').text();
+		    assert.equal(result,"clicked",'passed');
+		});
+		
+		QUnit.test("auto element callback fails", function(assert) {
+			$("button").on('click',function()	{
+				$('p[id="output2"]').text("clicked");
+			});
+			$('button[id="input2"]').click();
+			result = $('p[id="output2"]').text();
+		    assert.notEqual(result,"flickeedddd",'passed');
+		});
+		
+		// test scraping values of elements into array
+		QUnit.test("get selector values", function(assert) {
+			sel1[0].selected = 'selected';
+			sel2[1].selected = 'selected';
+			sel3[2].selected = 'selected';
+			
+			values = getElementValues("select");
+			
+			// only search for this pattern in case other selects remain on the page and add to the value list
+			// foobar5 seems hard to del for some reason
+			assert.equal(values.join("").includes("abc"),true,'passed');	
+		});
+		
+		// test detecting what values have changed
+		QUnit.test("test detecting select value changes - all", function(assert) {
+			sel1[0].selected = 'selected';
+			sel2[1].selected = 'selected';
+			sel3[2].selected = 'selected';
+			
+			var options = {hidden:true,name:"btn1",label:"submit"};
+			btnel = addElement("button","btn1",options);
+		
+			var initvalues = getElementValues("select");
+					
+			$("button").on('click',function()	{
+				newvalues = getElementValues("select");
+				results = compare_1darrays(initvalues,newvalues);
+			});
+			
+			sel1[2].selected = 'selected';
+			sel2[2].selected = 'selected';
+			sel3[2].selected = 'selected';
+			$('button[id="btn1"]').click();
+			
+			delElement("btn1");
+			
+			assert.equal(results.join(","),'0,1','passed');	
+		});
+		
+		// test detecting what values have changed
+		QUnit.test("test detecting select value changes - some", function(assert) {
+			sel1[0].selected = 'selected';
+			sel2[0].selected = 'selected';
+			sel3[0].selected = 'selected';
+			var options = {hidden:true,name:"btn1",label:"submit"};
+			btnel = addElement("button","btn1",options);
+			
+			var initvalues = getElementValues("select");
+					
+			$("button").on('click',function()	{
+				newvalues = getElementValues("select");
+				results = compare_1darrays(initvalues,newvalues);
+			});
+			
+			sel1[2].selected = 'selected';
+			sel3[2].selected = 'selected';
+			$('button[id="btn1"]').click();
+			
+			delElement("btn1");
+			
+			assert.equal(results.join(","),'0,2','passed');	
+		});
+		
+		QUnit.test("test detecting select ids/values that have changed - all changed", function(assert) {
+			sel1[0].selected = 'selected';
+			sel2[0].selected = 'selected';
+			sel3[0].selected = 'selected';
+			var options = {hidden:true,name:"btn1",label:"submit"};
+			btnel = addElement("button","btn1",options);
+			
+			var initvalues = getElementValues("select");
+					
+			$("button").on('click',function()	{
+				newvalues = getElementValues("select");
+				results = compare_1darrays(initvalues,newvalues);
+			});
+			
+			sel1[2].selected = 'selected';
+			sel2[2].selected = 'selected';
+			sel3[2].selected = 'selected';
+			$('button[id="btn1"]').click();
+			
+			delElement("btn1");
+			
+			ids = getElementsIds("select");
+			
+			assert.equal(results.join(","),'0,1,2','passed');	
+			assert.equal(ids.join(","),'sel1,sel2,sel3','passed');	
+		});
+		
+	QUnit.test("test detecting select ids/values that have changed - some", function(assert) {
+			sel1[0].selected = 'selected';
+			sel2[0].selected = 'selected';
+			sel3[0].selected = 'selected';
+			var options = {hidden:true,name:"btn2",label:"submit"};
+			btnel = addElement("button","btn2",options);
+			
+			var initvalues = getElementValues("select");
+			var results = Array();
+			
+			$('button[id="btn2"]').on('click',function()	{
+				newvalues = getElementValues("select");
+				diffindex = compare_1darrays(initvalues,newvalues);
+				
+				for (i=0;i<diffindex.length;i++) {
+					results.push(newvalues[diffindex[i]]);
+				}
+			});
+			
+			sel1[2].selected = 'selected';
+			sel3[2].selected = 'selected';
+			$('button[id="btn2"]').click();
+			
+			delElement("btn2");
+			
+			ids = getElementsIds("select");
+			
+			assert.equal(results.join(","),'c,c','passed');	
+			assert.equal(ids.join(","),'sel1,sel2,sel3','passed');	
+		});
+
+		QUnit.test("getElementValueChanges - all change", function(assert) {
+			sel1[0].selected = 'selected';
+			sel2[0].selected = 'selected';
+			sel3[0].selected = 'selected';
+			var options = {hidden:true,name:"btn1",label:"submit"};
+			btnel = addElement("button","btn1",options);
+			
+			var initvalues = getElementValues("select");
+					
+			$("button").on('click',function()	{
+				results = getElementValueChanges("select",initvalues);
+			});
+			
+			sel1[2].selected = 'selected';
+			sel2[2].selected = 'selected';
+			sel3[2].selected = 'selected';
+			$('button[id="btn1"]').click();
+
+			assert.equal(results.join(","),'sel1,c,sel2,c,sel3,c','passed');	
+		});	
+
+		QUnit.test("getElementValueChanges - some change", function(assert) {
+			sel1[0].selected = 'selected';
+			sel2[0].selected = 'selected';
+			sel3[0].selected = 'selected';
+			var options = {hidden:true,name:"btn3",label:"submit"};
+			btnel = addElement("button","btn3",options);
+			
+			var initvalues = getElementValues("select");
+			var results = Array();
+			
+			$("button[id='btn3']").on('click',function()	{
+				results = getElementValueChanges("select",initvalues);
+			});
+			
+			sel1[2].selected = 'selected';
+			sel3[2].selected = 'selected';
+			$('button[id="btn3"]').click();
+
+			assert.equal(results.join(","),'sel1,c,sel3,c','passed');	
+		});		
+		
+		// put in a delay so the callback has time to fire before the elements are deleted
+  		window.setTimeout(tearDown,1000);
+
+		function tearDown() {
+			delElement("output2");
+			delElement("input2");
+			delElement("sel1");
+			delElement("sel2");
+			delElement("sel3");
+		}		
+		
+});

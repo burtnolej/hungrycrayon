@@ -1,0 +1,8 @@
+
+// define module alertme as a function
+define(function() {
+        return function(msg)  {
+                  alert(msg);
+        }
+    }
+);

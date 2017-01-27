@@ -59,7 +59,7 @@ class SSLoader(object):
 	self.keepversion = False
 	self.database = Database(databasename)
 	_rules = [('computertime',[("Computer Time",1),(":",0),("with",0)]),
-
+	          ('pp.nostudent.subject.teacher',[('Prep Period',1),("\(",1),("\)",1),(":",1),('Computer Time',0),('with',0)]),
 	          ('wp.student.nosubject.noteacher', [("Subject=^Work Period",1),("\(",0),("\)",0),(":",1),('Computer Time',0),('with',0)]),
 	          ('wp.student.nosubject.teacher', [("Subject=^Work Period",1),("\(",1),("\)",1),(":",1),('Computer Time',0),('with',0)]),
 	          ('wp.nostudent.nosubject.noteacher', [("Subject=^Work Period$",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),
@@ -73,6 +73,11 @@ class SSLoader(object):
 	
 	          ('seminar.nostudent.subject.teacher.with', [("subject=^**",1),("Seminar",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',1)]),
 
+
+	          ('seminar.student.subject.teacher',[("Seminar",1),(":",1),("\(",1),("\)",1)]),
+
+	          
+	          
 	          ('ap.student.subject.teacher',[("Subject=^Activity Period",1),(":",1),("\(",1),("\)",1)]),
 	          ('ap.student.subject.noteacher',[("Subject=^Activity Period",1),(":",1),("\(",0),("\)",0)]),
 	          ('ap.nostudent.nosubject.noteacher', [("Subject=^Activity Period$",1),("\(",0),("\)",0),(":",0),('Computer Time',0),('with',0)]),
@@ -99,7 +104,8 @@ class SSLoader(object):
 	          ('dow4',[('Thursday',1)]),
 	          ('dow5',[('Friday',1)]),
 	          ('academicname',[('-',2)]),
-	          ('studentname',[('\*',2)])
+	          ('studentname',[('\*',2)]),
+	          
 	          ]
 	
 	
@@ -249,6 +255,17 @@ class SSLoader(object):
 		    subject = _setsubject()
 		    dow = _setdow()	
 		    _addrecord(locals())
+
+		elif recordtype == 'seminar.student.subject.teacher':
+		    # Math Seminar G2: Jack (Stan)
+		    location,_rest = self.extract_location(record)
+		    subject = _rest.split(" ")[0]
+		    teacher,_rest = self.extract_teacher(_rest.split(":")[1])
+		    students = self.extract_students(_rest)
+		    subject = _setsubject()
+		    dow = _setdow()	
+		    _addrecord(locals())
+		    
 		elif recordtype == 'wp.nostudent.nosubject.noteacher.with.and':
 		    # Work Period with Alyssa and Paraic
 		    
@@ -373,6 +390,17 @@ class SSLoader(object):
 		elif recordtype[:6] == "ignore":
 		    pass
 		    
+		elif recordtype == 'pp.nostudent.subject.teacher':
+		    # Prep Period: ?? (Amelia)"
+		    location,_rest = self.extract_location(record)
+		    subject,_rest = self.extract_subject(_rest)
+		    teacher,_rest = self.extract_teacher(_rest)
+		    students = ["Dummy"]
+		    dow = _setdow()
+		    period = _period()
+		    subject = "Prep Period"
+		    _addrecord(locals())		    
+		    
 		elif recordtype == 'subject.student.subject.teacher':
 		    # ELA: Nathaniel (Amelia)"
 		    location,_rest = self.extract_location(record)
@@ -456,6 +484,7 @@ class SSLoader(object):
 		    academicrecordflag=True
 		    
 		# special use cases
+		    
 		elif recordtype == 'computertime':
 		    if studentfile == True:
 			#studentname = self.extract_staff(record)
@@ -1116,9 +1145,6 @@ class SSLoader(object):
 	with self.database:
 	    _,rows,_ = tbl_rows_get(self.database,'lesson',self.fields)
 
-
-	print rows
-	
 	hashmap={}
 	for row in rows:
 
@@ -1294,16 +1320,18 @@ if __name__ == "__main__":
     '''files = [("/mnt/bumblebee-burtnolej/googledrive/current/Prep6IndividualSchedules_new.csv",6,True,"6s"),
              ("/mnt/bumblebee-burtnolej/googledrive/current/Prep5IndividualSchedules_new.csv",5,True,"5s")]'''
     
-    files = [("/Users/burtnolej/Development/pythonapps/clean/scripts/googledrive/googledrive/current/Prep6IndividualSchedules-2ndSemester_new.csv",6,True,"6s2"),
-             ("/Users/burtnolej/Development/pythonapps/clean/scripts/googledrive/googledrive/current/Prep5IndividualSchedules-2ndSemester_new.csv",5,True,"5s2")]
+    '''files = [("/Users/burtnolej/Development/pythonapps/clean/scripts/googledrive/googledrive/current/Prep6IndividualSchedules-2ndSemester_new.csv",6,True,"6s2"),
+             ("/Users/burtnolej/Development/pythonapps/clean/scripts/googledrive/googledrive/current/Prep5IndividualSchedules-2ndSemester_new.csv",5,True,"5s2")]'''
     	                                          
-	
+    files = [("/Users/burtnolej/Development/pythonapps/clean/scripts/googledrive/googledrive/current/MasterSchedulePrep5&6.csv",6,True,"56m")]
+    	
     '''else:
 	raise Exception("do not know how to run in this working dir",dir=os.getcwd())'''
     
     print "".join(["env=",env,"db=",databasename])
         
     ssloader = SSLoader(databasename)
+    ssloader.keepversion = True
     ssloader.fields =  ['period','dow','subject','teacher','students',"recordtype","record"] 
     ssloader.primary_record = False
     ssloader.run(databasename,files)

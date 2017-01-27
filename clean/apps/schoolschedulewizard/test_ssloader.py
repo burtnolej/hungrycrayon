@@ -792,6 +792,12 @@ class Test_RecordIdentifcation(Test_Base):
         
         self.assertEquals(recordtype, 'subject.student.subject.teacher')   
         
+    def test_teacher_prep_period(self):
+        self.inputstr = "Prep Period: ?? (Paraic)"
+        recordtype = self.ssloader.identify_record(self.inputstr)
+        
+        self.assertEquals(recordtype, 'pp.nostudent.subject.teacher')
+        
     def test_teacher_edgecase2(self):
         self.inputstr = "Movement: Shane, Simon B, Asher"
         recordtype = self.ssloader.identify_record(self.inputstr)
@@ -2947,15 +2953,13 @@ class Test_DBLoader_Versioning(Test_Base):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    '''
     # #####################################################################################################
     # unit tests=
     
     # pre_process_records
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Prep5_1period))   
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_3Student_1period))    
-    #unittest.TextTestRunner(verbosity=2).run(suite) 
-    #exit()
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_RecordIdentifcation))
+    unittest.TextTestRunner(verbosity=2).run(suite) 
+    exit()
     
     # loadrefobjects
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRefObjects)) 
@@ -3063,11 +3067,11 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic_Stan))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_3Student))  
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Academic))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_1Student_1Period))'''
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Student_1Student_1Period))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_Staff_with_Prep5_Period1_StudentPeter))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBInsert_Direct_Nathaniel))
 
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_SeminarWith))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_SeminarWith))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_DBLoader_1row_added_field))
     
     

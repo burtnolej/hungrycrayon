@@ -1,0 +1,6 @@
+define(["shirt"], function(shirt) {
+        return function(msg)  {
+                  alert(shirt.color);
+        }
+    }
+);

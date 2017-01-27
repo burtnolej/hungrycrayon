@@ -1,0 +1,26 @@
+
+
+
+<html>
+<script>
+
+function foo (attr1,attr2,attr3=null,attr4=null) {
+
+	if (attr3 != null) {
+		console.log(attr3);
+	}
+	
+	if (attr4 != null) {
+		console.log(attr4);
+	}
+
+}
+
+/* this works; params can be passed in selectively */
+
+foo(1,2,attr3="foo");
+foo(1,2,attr4="bar");
+
+
+</script>
+</html>

@@ -535,7 +535,7 @@ if __name__ == "__main__":
     except:
         pass
     
-    #args['source'] = '6s2,5s2'
+    args['source'] = '56m'
     run(**args)
     
     '''dbname,refdbname = sswizard_utils.getdatabase()
