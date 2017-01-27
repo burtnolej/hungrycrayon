@@ -532,10 +532,14 @@ if __name__ == "__main__":
         if sys.argv[1] == "--allow-unknown":
             args['unknown'] = 'Y'
             sys.argv.pop(1)
+        if sys.argv[1] == "--custom-source":
+            args['source'] = sys.argv[2]
+            sys.argv.pop(1)
+            sys.argv.pop(1)
     except:
         pass
     
-    args['source'] = '56m'
+    #args['source'] = '56m'
     run(**args)
     
     '''dbname,refdbname = sswizard_utils.getdatabase()
