@@ -1,0 +1,42 @@
+requirejs.config({
+    baseUrl: 'js/lib',
+    paths: {
+       app: '../app'
+    }
+});
+
+
+requirejs(['myutils','jquery','tabSlideOut'],    
+    function(myutils,$,tabSlideOut){
+    	
+    	$(function(){
+        $('.slide-out-div-top').tabSlideOut({
+            tabHandle: '.handle',                     //class of the element that will become your tab
+            leftPos: '600px',                          //position from left/ use if tabLocation is bottom or top
+        });
+     	});     
+     	
+    	$(function(){
+        $('.slide-out-div-top2').tabSlideOut({
+            tabHandle: '.handle2',                     //class of the element that will become your tab
+            leftPos: '400px',                          //position from left/ use if tabLocation is bottom or top
+        });
+     	});
+     	
+    	$(function(){
+        $('.slide-out-div-top3').tabSlideOut({
+            tabHandle: '.handle3',                     //class of the element that will become your tab
+            leftPos: '200px',                          //position from left/ use if tabLocation is bottom or top
+        });
+     	});
+     	
+		$(document).ready(function(){
+		   $("select, input").on('change',function(){
+		    	url = buildurl();
+		    	console.log(url);
+		    	window.location = url;
+		   });	   
+		})
+		
+});
+

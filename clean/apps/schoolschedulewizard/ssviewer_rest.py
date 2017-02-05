@@ -168,10 +168,16 @@ class List:
             if attr.startswith('cnstr_') == True:
                 if str(attr_val) <> "NotSelected":
                     constraints.append((attr[6:],str(attr_val)))
+                
+        columns=[]
+        if hasattr(data,'ztypes'):
+            columns = data.ztypes.split(",")
+        
         
         values,colnames = ssviewer_utils.dataset_list(of,enums,objtype,pagelen=pagelen,
                                                       pagenum=pagenum,
-                                                      constraints=constraints)
+                                                      constraints=constraints,
+                                                      columns=columns)
         
         # if rawdata flag is present just return the values list
         # row 1 is the column headings
@@ -179,6 +185,7 @@ class List:
             return values
             
         schema = dict(xaxis='row',yaxis='col',colnames=list(colnames))
+
         
         _values = ssviewer_utils.dataset_serialize(values,formatson=True,schema = schema)
         xml = xml_utils.grid2xml(_values)

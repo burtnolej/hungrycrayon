@@ -28,7 +28,7 @@
 					$GLOBALS['PHPLIBPATH'] = getenv("PHPLIBPATH");
 					$GLOBALS['SSDBPATH'] = getenv("SSDBPATH");
 					$GLOBALS['SSDBNAME'] = getenv("SSDBNAME");
-
+					
 					if ($GLOBALS['PHPLIBPATH'] == "") {
 						trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);	
 					}
@@ -36,7 +36,7 @@
 					$api = php_sapi_name();
 
 					if ($api=='cli') {
-						$GLOBALS['SSDBNAME'] = $argv[1];
+						//$GLOBALS['SSDBNAME'] = $argv[1];
 						$GLOBALS['SSDB'] = $GLOBALS['SSDBPATH']."/".$GLOBALS['SSDBNAME'];
 					}
 					else {
@@ -67,13 +67,12 @@
 	
 				function set_stylesheet() {
 					global $_GET;
-					if (in_array('formats',explode(",",$_GET['ztypes']))) {
-						//echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"default.css\" />";
-						echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"plain.css\" />";
-					}
-					else {
-						echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"plain.css\" />";
-					}
+					//if (in_array('formats',explode(",",$_GET['ztypes']))) {
+					//	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"plain.css\" />";
+					//}
+					//else {
+					echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"plain.css\" />";
+					//}
 				}
 				
 				function refreshpage() {
@@ -101,7 +100,9 @@
 					else {
 						$url = buildurl($SSRESTURL,$args);
 					}
-				
+					
+					echo $url; // for logging purposes
+					
 					return(getcurl($url));
 				}
 ?>

@@ -107,10 +107,24 @@ function drawrow($row,$args) {
 
 function drawgrid($utilsxml,$args=NULL,$formats=NULL) {
 	
-	//echo "<table id=table >";
-	echo "<table class = \"borderoff\">";
-
 	$_rows = $utilsxml->xpath("//row"); // get a list of all rows
+	
+	//echo "<table id=table >";
+	echo "<table class = \"borderoff\"";
+	
+	if (isset($args['id'])) {
+		echo " id =\"".$args['id']."\"";
+	}
+	
+	echo ">";
+
+	if (isset($args['headeronly'])) {
+		$_rows = Array($_rows[0]);
+	}
+	
+	if (isset($args['noheader'])) {
+		unset($_rows[0]);
+	}
 
 	foreach ($_rows as $_row) {
 	
@@ -126,8 +140,6 @@ function drawgrid($utilsxml,$args=NULL,$formats=NULL) {
 				//echo '<td><table class="table sub">'; // start a new table
 				echo "<td><table class = \"borderoff\">";
 				
-				
-
 				foreach ($_subrows as $_subrow) {					
 					drawrow($_subrow,$args);
 				}
@@ -152,11 +164,13 @@ function drawgrid($utilsxml,$args=NULL,$formats=NULL) {
 }
 
 function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
+
+	
 	
 	echo "<table class = \"borderoff\">";
 
 	$_rows = $utilsxml->xpath("//row"); // get a list of all rows
-
+	
 	foreach ($_rows as $_row) {
 	
 		echo "<tr>"; // start an html row
@@ -172,8 +186,7 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 
 				foreach ($_subrows as $_subrow) {	
 
-					//echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#E0E0E0\"";
-					echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#EEEEEE\"";
+					echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#E0E0E0\"";
 
 					$content="";	
 					$_subcells = $_subrow->xpath("child::subcell"); // see if any subcells exist
@@ -184,6 +197,9 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 							$url = getlinkurl($_subcells[$i],$args);
 							
 							$output = array();
+							
+							echo "inhere";
+							
 							if ($_subcells[$i]->valuetype == 'adult') {
 								$link = '<a href="'.$url.'">'."<font color=\"darkred\">".$_subcells[$i]->value."</font>".'</a>';
 								$content =$content." with ".$link;
@@ -329,7 +345,7 @@ function drawentryform($utilsxml,$args=NULL,$formats=NULL) {
    		$widgetcount=0;
 		foreach ($_items as $_item) {
 					
-			global $SSDB;			
+			global $SSDB;
 			getchtmlinput($_item->valuetype,$_item->valuetype,$_item->value,NULL);
 			$widgetcount=$widgetcount+1;
 		   }
@@ -358,10 +374,14 @@ function draw($xmlstr,$args=NULL) {
 		
 	}
 	else {
+		
 		$funcname = 'drawgrid';
 	}
 	
+	//$args = Array('headeronly' => true,'id' => 'table1');
 	call_user_func((string)$funcname,$utilsxml,$args,$formats);
+	//$args = Array('noheader' => true,'id' => 'table2');
+	//call_user_func((string)$funcname,$utilsxml,$args,$formats);
 	
 }	
 	

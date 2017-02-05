@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+     	<meta name="viewport" content="width=device-width">
+      	<title>QUnit Example</title>
+      	<link rel="stylesheet" href="qunit.css">
+	</head>
+
+	<body>
+		<div id="qunit"></div>
+	  	<div id="qunit-fixture"></div>
+	 	<script  type="text/javascript"  src="qunit.js"></script>
+		<script data-main="js/test_core.js" src="js/require.js"></script>
+	
+		<!-- output capture of test -->
+		<p id="output"></p><script src="jquery-3.1.1.js">
+	
+		</script><script src="stylesheets.js"></script>
+		<link rel="stylesheet" type="text/css" href="plain.css" />
+	
+		<div id="content">
+	
+			<!-- text input -->
+			
+			<!-- source_value = "Clayton: -->
+			<p class="label">foobar</p>
+			<input class = "custom" type="text" id="source_value" value="Clayton" />
+			
+			<!-- foobar1 = "b" -->
+			<p class="label">foobar1</p>
+			<input class = "custom" type="text" id="foobar1" value="b" />
+			
+			<!-- foobar2 = "c" -->
+			<p class="label">foobar2</p>
+			<input class = "custom" type="text" id="foobar2" value="c" />
+			
+			<!-- foobar3 NOT SET -->
+			<p class="label">foobar3</p>
+			<input class = "custom" type="text" id="foobar3" />
+			
+			
+			<input type="button" name="button" value="submit" />
+
+			<!-- selects -->
+			<p class="label">foobar4</p>
+			<span class="select">
+				<select class="custom" id="foobar4" name="foobar4">
+					<option value="a"selected>a</option>
+					<option value="b">b</option>
+				</select>
+			</span>
+			<p class="label">foobar5</p>
+			<span class="select">
+				<select class="custom" id="foobar5" name="foobar5">
+					<option value="c">c</option>
+					<option value="d"selected>d</option>
+				</select>
+			</span>
+			
+			
+			
+			
+			<!-- multi select -->
+			<table class = "switchtable" name="cnstr_period">
+				<tr>
+					<td class="switch" id="830-910">
+						<p class="label switch">830-910</p>
+						<label class="switch">
+							<input id="830-910" type="checkbox" name="830-910"checked>
+							<div class="slider"></div>
+						</label>
+					</td>
+					<td class="switch" id="910-950">
+						<p class="label switch">910-950</p>
+						<label class="switch">
+							<input id="910-950" type="checkbox" name="910-950"checked>
+							<div class="slider"></div>
+						</label>
+					</td>
+					<td class="switch" id="950-1030">
+						<p class="label switch">950-1030</p>
+						<label class="switch">
+							<input id="950-1030" type="checkbox" name="950-1030">
+							<div class="slider"></div></label></td><td class="switch" id="1030-1110"><p class="label switch">1030-1110</p><label class="switch"><input id="1030-1110" type="checkbox" name="1030-1110"><div class="slider"></div></label></td></tr><tr><td class="switch" id="1110-1210"><p class="label switch">1110-1210</p><label class="switch"><input id="1110-1210" type="checkbox" name="1110-1210"><div class="slider"></div></label></td><td class="switch" id="1210-100"><p class="label switch">1210-100</p><label class="switch"><input id="1210-100" type="checkbox" name="1210-100"><div class="slider"></div></label></td><td class="switch" id="100-140"><p class="label switch">100-140</p><label class="switch"><input id="100-140" type="checkbox" name="100-140"><div class="slider"></div></label></td><td class="switch" id="140-220"><p class="label switch">140-220</p><label class="switch"><input id="140-220" type="checkbox" name="140-220"><div class="slider"></div></label></td></tr><tr><td class="switch" id="220-300"><p class="label switch">220-300</p><label class="switch"><input id="220-300" type="checkbox" name="220-300"><div class="slider"></div></label></td>
+					<td class="switch" id="300-330">
+						<p class="label switch">300-330</p>
+						<label class="switch">
+							<input id="300-330" type="checkbox" name="300-330">
+							<div class="slider"></div>
+						</label>
+					</td>
+				</tr>
+			</table>
+			<table class = "switchtable" name="cnstr_dow">
+				<tr>
+					<td class="switch" id="Monday">
+						<p class="label switch">Monday</p>
+						<label class="switch">
+							<input id="Monday" type="checkbox" name="Monday">
+							<div class="slider"></div>
+						</label>
+					</td>
+					<td class="switch" id="Tuesday"><p class="label switch">Tuesday</p><label class="switch"><input id="Tuesday" type="checkbox" name="Tuesday"><div class="slider"></div></label></td><td class="switch" id="Thursday"><p class="label switch">Thursday</p><label class="switch"><input id="Thursday" type="checkbox" name="Thursday"><div class="slider"></div></label></td><td class="switch" id="Wednesday"><p class="label switch">Wednesday</p><label class="switch"><input id="Wednesday" type="checkbox" name="Wednesday"><div class="slider"></div></label></td></tr><tr>
+					<td class="switch" id="Friday">
+						<p class="label switch">Friday</p>
+						<label class="switch">
+							<input id="Friday" type="checkbox" name="Friday"checked>
+							<div class="slider"></div>
+						</label>
+					</td>
+				</tr>
+			</table>
+		
+		
+		
+			<!-- ztypes -->
+			<p class="label switch">status</p>
+			<span name="singleswitch">
+				<label class="switch">
+					<input id="status" type="checkbox" name="status">
+					<div class="slider"></div>
+				</label>
+			</span>
+			
+			<p class="label switch">subject</p>
+			<span name="singleswitch">
+				<label class="switch">
+					<input id="subject" type="checkbox" name="subject">
+					<div class="slider"></div>
+				</label>
+			</span>
+			
+			<p class="label switch">adult</p>
+			<span name="singleswitch">
+				<label class="switch">
+					<input id="adult" type="checkbox" name="adult" checked>
+					<div class="slider"></div>
+				</label>
+			</span>
+			
+			
+			
+		</div>												
+	</body>
+</html>

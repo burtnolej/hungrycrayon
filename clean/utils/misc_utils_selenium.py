@@ -129,7 +129,10 @@ def _macro_list_objects(browser,objtype,filter={},):
     browser.execute_script("var el = document.getElementsByName('source_value');el[0].value = '"+objtype+"';")
     time.sleep(sleeptime)
     
-    browser.execute_script("url = buildurl();get(url);")
+    #browser.execute_script("url = buildurl();get(url);")
+    browser.execute_script("url = buildurl();window.location = url;")
+    
+    
     time.sleep(sleeptime)
     
     

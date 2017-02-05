@@ -34,7 +34,7 @@ div.searchgrid {
 	height:600px;
 	/*width: :1100px;*/
 	overflow-y:scroll;
-	display:none;
+	display:block;
 	/*display:none;*/
 }
 
@@ -42,7 +42,7 @@ div.searchgrid {
 div.searchgridhdr {
 	margin-top:50px;
 	margin-left:200px;
-	display:none;
+	display:block;
 	/*display:none;*/
 }
 

@@ -43,7 +43,8 @@ fi
 
 # start the rest service
 echo "using "$PYEXELOG
-python $PYEXECPATH --allow-unknown >& /tmp/log/$PYEXECLOG
+python $PYEXECPATH --allow-unknown
+#python $PYEXECPATH --allow-unknown &> /tmp/log/$PYEXECLOG
 
 sleep 1
 if [ "$1" = "runtest" ]; then

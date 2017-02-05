@@ -753,21 +753,70 @@ class Test_loadref(unittest.TestCase):
     def tearDown(self):
         shutil.copyfile(self.dbname+".sqlite.backup",self.dbname + ".sqlite")
         
+
+class Test_list(unittest.TestCase):
+    
+    def setUp(self):
+        
+        self.dbname='test_ssviewer_util_list'
+        self.database = Database(self.dbname)
+        self.of = ObjFactory(True)
+        
+        self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.database)
+        
+        args = dict(database=self.database,refdatabase=self.database,saveversion=1,
+                    of=self.of,enums=self.enums)
+        
+        ssviewer_utils.dataset_load(**args)
+        
+    def test_all_cols(self):
+        
+        # 1 hdr row + 10 detail
+        # cannot test width as could change and also would need to eliminate the ids
+        grid,colnames = ssviewer_utils.dataset_list(of=self.of,
+                                            objtype='lesson',pagelen=10,
+                                            pagenum=1)
+                                            #columns=[u'status', u'substatus', u'recordtype', u'source', u'enum', u'period', u'saveversion', u'prep', u'record', u'teacher', u'session', u'student', u'dow', u'userobjid', u'subject'])
+        
+        self.assertEquals(len(grid),11)
+        
+    def test_some_cols_small_len(self):
+        
+
+        
+        grid,colnames = ssviewer_utils.dataset_list(of=self.of,
+                                            objtype='lesson',pagelen=3,
+                                            pagenum=1,
+                                            columns=[u'status', u'substatus', u'recordtype'])
+
+        expected_result = [[u'status', u'substatus', u'recordtype'], 
+                           [u'master', u'complete', 'academic'], 
+                           [u'master', u'complete', u'wp'], 
+                           [u'master', u'complete', 'academic']] 
+                               
+        self.assertListEqual(expected_result,grid)
+        
+        expected_result = [u'status', u'substatus', u'recordtype']
+                               
+        self.assertListEqual(expected_result,colnames)
+        
+
+        
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_add_update))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord_refdata))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_dump))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getpage))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_getrecord))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_add_update))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_addrecord_refdata))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_newrecord))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_dump))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_update))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_load))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_loadref))
-    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_list))
     
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

@@ -330,12 +330,43 @@ class Test_Viewer_All_X_Period_Y_DOW_Constraints(Test_Viewer_Base):
         
                 
         ssviewer_utils.dataset_load(self.database,self.refdatabase,
-                                    self.of,self.enums,unknown='Y')
+                                    self.of,self.enums,unknown='Y',source='dbinsert')
         
         args = dict(of=self.of,enums=self.enums,
                     yaxis_type='period',xaxis_type='dow',
-                    source_type='student',source_value='',
+                    source_type='student',source_value='Clayton',
                     ztypes=['subject','adult'],constraints=[['dow','WE'],['period','830-910']])
+                  
+        result = ssviewer_utils.dataset_pivot(**args)   
+
+        self.assertListEqual(result,expected_results)
+
+class Test_Viewer_All_X_Period_Y_DOW_Constraints_Multivalues(Test_Viewer_Base):
+    
+    def setUp(self):
+        #Test_Viewer_Base.setUp(self,"test_ssviewer_update",[("prep5studentClaytonPeriod1WP.csv",5,True)],True)
+        Test_Viewer_Base.setUp(self,"test_ssviewer")
+        
+        self.dbname='test_ssviewer'
+        refdbname='test_ssviewer'
+        
+        self.database = Database(self.dbname)
+        self.refdatabase = Database(refdbname)
+        self.of = ObjFactory(True)
+        self.enums = sswizard_utils.setenums(dow="all",prep=-1,database=self.refdatabase)
+        
+    def test_multiple_values(self):
+        
+        # simple case as subject index is not used in a period / dow pivot
+        expected_results = [['', u'910-950'], [u'WE', [(u'Humanities', u'Amelia')]], [u'TH', [(u'Math', u'Stan')]]]
+        
+        ssviewer_utils.dataset_load(self.database,self.refdatabase,
+                                    self.of,self.enums,unknown='Y',source='manual')
+        
+        args = dict(of=self.of,enums=self.enums,
+                    yaxis_type='period',xaxis_type='dow',
+                    source_type='student',source_value='Clayton',
+                    ztypes=['subject','adult'],constraints=[['dow','WE,TH'],['period','910-950']])
                   
         result = ssviewer_utils.dataset_pivot(**args)   
 
@@ -1347,13 +1378,13 @@ if __name__ == "__main__":
     # Testing pivots
     
     # Student pivot default axes (period/dow)
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_1subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_1subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_1row_1col_2subrow_2subcol))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_1col_2subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_2col_2subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nrow_ncol_2subrow_1subcol))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_2row_2col_2subrow_1subcol))'''
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_nrow_ncol_2subrow_1subcol))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW))
     
     # Student pivot different axes
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Student_Y_Subject))
@@ -1366,13 +1397,16 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_Subject_X_Student_Y_Recordtype)) 
     
     # source_value == all
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_All_X_Period_Y_DOW))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_All_X_Period_Y_DOW))'''
     
     # constraints
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_All_X_Period_Y_DOW_Constraints))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_All_X_Period_Y_DOW_Constraints_Multivalues))
+    
+    
     
     # Misc
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_X_Period_Y_DOW_Formats))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_valuetype))
 
@@ -1386,7 +1420,7 @@ if __name__ == "__main__":
     # Test lists (no pivots)
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_1lesson))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_2lessons))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_17lessons))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Service_nopivot_17lessons))'''
     
     #only need these if conflicts code is uncommented in viewer
     '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Viewer_UI_Conflicts))

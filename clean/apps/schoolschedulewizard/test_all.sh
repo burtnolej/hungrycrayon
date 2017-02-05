@@ -48,6 +48,8 @@ fi
 killall Python
 killall java
 
+sleep 1
+
 # start the rest service
 echo "using "$PYEXELOG
 python $PYEXECPATH --allow-unknown >& /tmp/log/$PYEXECLOG

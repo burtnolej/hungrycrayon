@@ -1,0 +1,1 @@
+../apps/sswebviewer/bootstrap.php

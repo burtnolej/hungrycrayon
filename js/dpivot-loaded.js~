@@ -1,0 +1,14 @@
+requirejs.config({
+    baseUrl: 'js/lib',
+    paths: {
+       app: '../app'
+    }
+});
+
+
+requirejs(['myutils','jquery'],    
+    function(myutils,$){
+    	console.log("dsd")l
+		setElementStyle();
+});
+

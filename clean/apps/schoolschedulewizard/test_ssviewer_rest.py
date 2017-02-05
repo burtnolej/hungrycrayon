@@ -62,6 +62,18 @@ class Test_Base(unittest.TestCase):
             dm.append(_dm)
         return dm
     
+    def _parsetable(self,xml):
+        tree_element = xmltree.fromstring(xml)
+        xmlroot = ElementTree.ElementTree(tree_element) 
+
+        rows = []
+        for xmlrow in xmlroot.findall(".//row"):
+            row = []
+            for xmlcell in xmlrow.findall(".//cell"):
+                row.append(xmlcell.find(".//value").text)
+            rows.append(row)
+        return rows   
+    
     def tearDown(self):
         shutil.copyfile(self.dbname+".backup",self.dbname)
         
@@ -529,22 +541,65 @@ class Test_Reload(Test_Base):
         self.assertEquals(pre_count,'3')
         self.assertEquals(post_count,'2')
         
+class Test_List(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,"test_ssviewer_rest.sqlite",8080)
+
+    def test_subject(self):
+
+        expected_results = [['code', 'name', 'enum'], 
+                            ['Humanities', 'Humanities', '0'],
+                            ['Math', 'Math', '2']]
+                
+        xml = ssrest.restquery(self.url + "list/subject",pagenum=1,pagelen=10,
+                               ztypes="code,name,enum")
+        
+        results = self._parsetable(xml)
+
+        self.assertListEqual(results,expected_results)
+        
+    def test_lesson_some(self):
+
+        expected_results = [['adult', 'student', 'subject'], 
+                            ['Amelia', 'Clayton', 'Humanities'], 
+                            ['Stan', 'Clayton', 'Math']]
+        
+                        
+        xml = ssrest.restquery(self.url + "list/lesson",pagenum=1,pagelen=10,
+                               ztypes="adult,student,subject")
+        
+        results = self._parsetable(xml)
+        
+        self.assertListEqual(results,expected_results)
+        
+        
+    '''def test_columns(self):
+
+        expected_results = '<table><tr><td>ROOT</td><td>430-510</td><td>lesson</td></tr></table>';
+        
+        buf = ssrest.restquery(self.url + "list/lesson",
+                               pagenum=1,pagelen=10,columns=['student','period','dow','subject'])
+    '''
+    
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New))    
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRef))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Ref))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_With_New_Ref))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_Update_to_New_Ref))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Reload))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_SearchByID))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_New))    
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_LoadRef))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Ref))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_With_New_Ref))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Add_Lesson_Update_to_New_Ref))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Reload))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Dump))
     '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Update_UID))'''
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Student))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Adult))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Subject))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Student))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Adult))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Subject))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_List))
+    
+    
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

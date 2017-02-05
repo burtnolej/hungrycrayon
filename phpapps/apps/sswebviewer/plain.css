@@ -29,8 +29,8 @@ table {
 	padding:0px;
 	min-height: 100px;
 	/*background-color: #FEFAFA;*/
-	display:none;
-	
+	/*display:none;*/
+	display:block;
 }
 
 td {

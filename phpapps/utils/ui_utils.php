@@ -1,5 +1,55 @@
-
 <?php
+
+/*label
+----
+gethtmllabel($label, $labelclass=NULL)
+
+dropdown
+--------
+gethtmldropdown($column,$values,$widgetcount,$default=NULL)
+gethtmldbdropdown($dbname,$tablename)
+gethtmltablecoldropdown($dbname,$tablename,$column,$widgetcount,$default=NULL)
+gethtmlxmldropdown($xml)
+
+select
+-----
+gethtmlselect($column,$values,$widgetcount,$default, $label=NULL,$labelclass=NULL,$spanclass=NULL,$class=NULL)
+getchtmlselect($column,$values,$widgetcount,$default,$args)
+getchtmlselect_nolabel($column,$values,$widgetcount,$default,$comment)
+getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$args)
+gethtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$labels=FALSE,$labelclass=FALSE,$spanclass=NULL,$class=NULL)
+getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) 
+gethtmlxmlselect($xml,$defaults,$labels=FALSE,$labelclass=FALSE,$spanclass=NULL,$class=NULL)
+
+input
+----
+getchtmlinput($label,$field,$default,$args) 
+getxmlhtmlinput($xml,$defaults,$divlabel,$starttag=NULL)
+
+button
+-----
+gethtmlbutton($type,$label)
+
+switch
+-----
+getdbhtmlmultiselect($dbname,$query,$name,$maxy=0,$args)
+gethtmlmultiselect($name,$value,$checked=NULL)
+gethtmlswitch($name,$value,$checked=NULL) 
+getchtmlswitch($name,$value,$args)
+
+menu
+-----
+_menu_iter($func,$root,$depth)
+build_dbmenu_xml($dbname,$tablename,$colname)
+build_menu_xml($keyarr,$menuname,$host="localhost",$script="dpivot.php",$args=NULL)
+_get_menu_xml($root,$arr,$label)
+get_menu_xml($arr,$label)
+getchtmlxmlmenu2($xml,$divlabel)
+
+div
+---
+gethtmldiv($label,$htmbodyfunc,$divclass=NULL,$pclass=NULL)
+gethtmlpopoutdiv($label,$htmbodyfunc,$divclass=NULL,$aclass=NULL) */
 
 $PHPLIBPATH = getenv("PHPLIBPATH");
 $SSDBPATH = getenv("SSDBPATH");
@@ -194,16 +244,24 @@ function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default
 	}
 }
 
-// Custom HTML input
-function getchtmlinput($label,$field,$default,$comment=NULL) {
+function getchtmlinput($label,$field,$default,$args=NULL) {
 
 	echo "<p class=\"label\">".$label."</p>";
-	echo "<input class = \"custom\" type=\"text\" id=\"".$field."\" value=\"".$default."\" />";
+	
+	if (isset($args['hidden']))  {
+		$type = 'hidden';
+	}
+	else {
+		$type = 'text';
+	}
+		
+	echo "<input class = \"custom\" type=\"".$type."\" id=\"".$field."\" value=\"".$default."\" />";
 
-	if ($comment <> NULL) {
-		echo "<p class=\"comment\">".$comment."</p>";
+	if (isset($args['comment']))  {
+		echo "<p class=\"comment\">".$args['comment']."</p>";
 	}
 }
+
 
 // Custom HTML XML input
 function getxmlhtmlinput($xml,$defaults,$divlabel,$starttag=NULL) {
@@ -235,8 +293,9 @@ function getxmlhtmlinput($xml,$defaults,$divlabel,$starttag=NULL) {
 		elseif (isset($_dropdown->default)){
 			$default = (string)$_dropdown->default;			
 		}
-
-		getchtmlinput($label,$field,$default,(string)$_dropdown->comment);
+		
+		$args= Array('comment' => (string)$_dropdown->comment);
+		getchtmlinput($label,$field,$default,$args);
 	}
 	echo "</div>";
 }
@@ -293,9 +352,6 @@ function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 	}
 	
 	$widgetcount = 0;
-	
-	echo "<div class=\"contain\">";
-	echo "<p class=\"divlabel\">".$divlabel."</p>";
 		
 	foreach ($_dropdowns as $_dropdown) {
 				
@@ -323,7 +379,6 @@ function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 				
 		$widgetcount = $widgetcount+1;
 	}
-	echo "</div>";
 }
 
 // HTML XML Select
@@ -412,25 +467,59 @@ function gethtmlbutton($type,$label) {
 }
 
 // HTML DB Checkbox
-function getdbhtmlmultiselect($dbname,$query,$name,$maxy=0,$checked=NULL) {
+function getdbhtmlmultiselect($dbname,$query,$name,$args) {
 	
+		/* create a set of switched based on the distinct values of a particular db field
+	thus allowing multiple values to be selected */
+
+		if (isset($args['checked'])) {
+			$args['checked'] = explode(",",$args['checked'][$name]);
+		}
+		else {
+			$args['checked'] = Array();
+		}
+			
 		$db = new SQLite3($dbname);
 
 		$results = $db->query($query);
-		
-		echo "<table><tr>";
+
+		// the class=switchtable is used by javasript to identify all the multiselect divs are out there
+		// the name is used to identify the name of the constraint fields that these values below too
+		//ie cnstr_period='830-910,910-950'
+		echo "<table class = \"switchtable\" name=\"".$name."\"><tr>";
 		$ycount=0;
 		while ($row = $results->fetchArray()) {
-				if ($ycount>$maxy) {
+			
+				if (isset($args['maxy']) and $ycount > $args['maxy']) { 
 					echo "</tr><tr>";
 					$ycount=0;
 				}
-				echo "<td>";
-				gethtmlmultiselect($name,$row['name'],$checked);
+				echo '<td class="switch" id="'.$row['name'].'">';
+				
+		 		getchtmlswitch($row['name'],$row['name'],$args);
+
 				echo "</td>";
 				$ycount=$ycount+1;
 		}
 		echo "</tr></table>";
+		
+
+		
+		/*echo '<script>';
+		echo ' url = "";';
+		echo '	ztypes = new Array();';
+		echo '$("input").each(function (index, value) {';
+	  	echo 'if (this.checked == true) {';
+	  	echo 'ztypes.push(this.id);	';
+	  	echo '}';
+	  	echo 'else {';
+	  	echo 'url = url + this.id + "=" + this.value + "&";';
+	  	echo '}';
+	   echo '});';
+	   echo 'url = url + "ztypes=" + ztypes.join() + "&";';
+	   echo "console.log(url)";
+	   echo "</script>";  */ 	
+    	
 }
 
 // HTML Checkbox
@@ -471,12 +560,13 @@ function gethtmlswitch($name,$value,$checked=NULL) {
 // Custom HTML switch/slider
 function getchtmlswitch($name,$value,$args) {
 
+		$checked=FALSE;
+		
 		if (isset($args['checked'])) {
+			
+			//echo var_dump($args['checked']);
 			if (in_array($value,$args['checked'])) {
 				$checked=TRUE;
-			}
-			else {
-				$checked=FALSE;
 			}
 		}
 		
@@ -487,24 +577,36 @@ function getchtmlswitch($name,$value,$args) {
 			$comment=NULL;
 		}	
 	
-		echo "<p class=\"label switch\">".$name."</p>";
-		echo "<label class=\"switch\">";
+		echo '<p class="label switch">'.$name.'</p>';
 		
-		echo "<input id=\"".$value."\" type=\"checkbox\" name=\"".$name."\"";
+		// need to add a tag so javascript can distinguish singles from multis
+		if (isset($args['single'])) {
+			echo '<span name="singleswitch">';
+		}
+		
+		echo '<label class="switch">';
+		echo '<input id="'.$value.'" type="checkbox" name="'.$name.'"';
 
 		if ($checked == TRUE) {
 			echo "checked";
 		}
 		
-		echo ">";
-		echo "<div class=\"slider\"></div>";
-		echo "</label>";
+		echo '>';
+		echo '<div class="slider"></div>';
+		echo '</label>';
+		
+		if (isset($args['single'])) {
+			echo '</span>';
+		}
 
 		if ($comment <> NULL) {
-			echo "<span class=\"comment\"><p>".$comment."</p></span>";
-	}	
+			echo '<span class="comment"><p>'.$comment.'</p></span>';
+		}
+		
+			
 }
 
+	
 function _menu_iter($func,$root,$depth){
 
 	if ($depth==0) {
@@ -641,7 +743,7 @@ function getchtmlxmlmenu2($xml,$divlabel) {
 }
 
 // 	div html
-function gethtmldiv($label,$htmbodyfunc,$divclass=NULL,$pclass=NULL) {
+function gethtmldiv($label,$htmbodyfunc,$param,$divclass=NULL,$pclass=NULL) {
 	echo "<div ";
 	if ($divclass<>NULL) { echo "class=\"".$divclass."\""; }
 	echo ">";
@@ -650,9 +752,18 @@ function gethtmldiv($label,$htmbodyfunc,$divclass=NULL,$pclass=NULL) {
 	if ($pclass<>NULL) { echo "class=\"".$pclass."\""; }
 	echo ">".$label."</p> ";
 
-	$htmbodyfunc();
+	$htmbodyfunc($param);
 	echo "</div>";
 }
 
+function gethtmlpopoutdiv($label,$htmbodyfunc,$param,$divclass=NULL,$aclass=NULL) {
+	/*echo "<p class='divlabel'>".$label."</>";*/
+	echo "<div class='nojs slide-out-base ".$divclass."'>";  //containswitch
+	//echo "<div class='slide-out-div-top nojs containswitch'>"; 
+	echo "<a class='nojs pol-base ".$aclass."'>".$label."</a>";
+	$htmbodyfunc($param);
+	echo "</div>";
+	
+}
 
 ?>

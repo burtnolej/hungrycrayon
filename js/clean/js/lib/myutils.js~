@@ -1,7 +1,6 @@
 
 
 /*
-
 isarray(obj)
 compare_1darrays(arr1, arr2) 
 pp(obj)
@@ -17,8 +16,9 @@ makeRequest(url,alert_contents)
 writeHttpResponse()
 writeHttpServiceStatus()
 geturl() 
-
-I*/
+buildurl()
+importlib()
+ */
 
 function isarray(obj) {
   /* returns true if the passed object is an array */
@@ -285,3 +285,168 @@ function geturl()  {
 	return url;
 }
 
+function buildurl(fields=null,values=null) {
+	// fields/values are assoc arrays of other name/values we want to put onto
+	// the get url to pass back to the webpage (ie last_source_value)
+ 	url = "http://".concat(Globals.server_name,"/",Globals.script_name,"?");
+   	
+   	ztypes = new Array();
+   		
+   	$('select').each(function (index, value) {
+	   		url = url + this.id + "=" + this.value + "&";
+	   });
+	    		
+	  $('input').each(function (index, value) {    			
+	  		if (this.checked == true) {
+	  			ztypes.push(this.id);	
+	  		}
+	  		else {
+	  			url = url + this.id + "=" + this.value + "&";
+	  		}
+	   });
+    		
+    	url = url + "ztypes=" + ztypes.join() + "&";
+    	
+    	if (fields != null) {
+    		for (i=0;i<fields.length;i++) {
+    			url = url + fields[i] + "=" + values[i] + "&";
+    		}
+    	}
+  return url
+}
+
+function getMultiSelectValues() {
+	/* scrape the DOM for any switchcontain divs; return name=value1,value2,name=value1,value2 */
+
+		els = document.getElementsByClassName('switchtable'); //
+		
+		var output = Array();
+		
+		for (i=0;i<els.length;i++) {
+		  var values = Array();
+		  inputs = els[i].getElementsByTagName('input');
+		  
+		  for (j=0;j<inputs.length;j++) {
+		    if (inputs[j].checked) {
+		      values.push(inputs[j].name);
+		    }
+		  }
+		  output.push(els[i].getAttribute('name') + "=" + values.join());
+		}
+		
+	return(output.join("&"));	
+}
+
+function getSelectValues() {
+	/* scrape the DOM for any singleswitch spans; return value1,value2 etc for names of checked boxes*/
+
+	output = Array();
+   	$('select').each(function (index, value) {
+	   		output.push(this.id + "=" + this.value)
+	   });
+
+	return(output.join("&"));	
+}
+
+function getSwitchValues() {
+	/* scrape the DOM for any singleswitch spans; return value1,value2 etc for names of checked boxes*/
+
+		els = document.getElementsByName('singleswitch');
+		
+		var output = Array();
+		
+		for (i=0;i<els.length;i++) {
+		  inputs = els[i].getElementsByTagName('input');
+		  
+		    if (inputs[0].checked) {
+		      output.push(inputs[0].name);
+		    }
+		}
+		
+	return(output.join(","));	
+}
+
+function getInputValues($ignore=[]) {
+	/* scrape the DOM for any singleswitch spans; return value1,value2 etc for names of checked boxes*/
+
+	output = Array();
+
+	$("input[type='text']").each(function (index, value) {
+
+			if ($.inArray(this.id, $ignore)  == -1) {
+	   			output.push(this.id + "=" + this.value);
+	   		}
+	   });
+
+	return(output.join("&"));	
+}
+
+function getAllInputValues($switchvarname,$ignore=[]) {
+	
+	$str=getInputValues($ignore);
+	$str = $str + "&" + switchvarname +"=" + getSwitchValues();
+	$str = $str + "&" + getMultiSelectValues();
+	$str = $str + "&" + getSelectValues();	
+	
+	return($str);
+}
+	
+function importlib(src) {
+	var imported = document.createElement("script");
+	imported.src = src;
+	document.head.appendChild(imported);	
+}
+
+function getTableColWidths(tableid) {
+	
+	/* return a 1d array containing the column widths in pixels of the table with id = tableif */
+	var tablecolwidths = Array();
+	
+	var table = document.getElementById(tableid);
+	var tablerows = table.getElementsByTagName('tr');
+	var tablecols = tablerows[0].getElementsByTagName('td');
+	
+	for (i = 0; i < tablecols.length; i++) {
+		tablecolwidths.push(tablecols[i].offsetWidth);
+	}
+	return tablecolwidths;
+}
+
+function setTableColWidths(widths,tableid) {
+	/* take a 1d array of of integers and apply to table tableid 
+	note that setting the width of top row will affect all subsequent rows*/
+	
+	var table = document.getElementById(tableid);
+	var tablerows = table.getElementsByTagName('tr');
+	var tablecols = tablerows[0].getElementsByTagName('td');
+	
+	for (i = 0; i < widths.length; i++) {
+		newwidth = widths[i];
+		tablecols[i].style.width = newwidth.toString()  + "px";
+	}
+}
+
+function cpTableColWidths(fromtableid,totableid) {
+	/* get the col widths from 1 table and apply to a 2nd table 
+	tables need to have the same number of columns */
+	
+	console.log(arguments.callee.name);
+
+	widths = getTableColWidths(fromtableid);
+	setTableColWidths(widths,totableid);
+} 
+
+function dumparray(arr) {
+		for (i = 0; i < arr.length; i++) {
+			//console.log(i.tostring() + ":" + arr[i].tostring());
+		}
+}
+
+function setElementStyle(classname,attr,attrval,timeoutlen) {
+	setTimeout(function() {
+		els = document.getElementsByClassName(classname);
+		for (i = 0; i < els.length; i++) {
+			els[i].setAttribute("style", attr + ": " + attrval + ";");
+		}
+  	},timeoutlen);
+ }

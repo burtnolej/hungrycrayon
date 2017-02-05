@@ -287,12 +287,18 @@ def dataset_list(of,enums=None,objtype='lesson',pagelen=30,pagenum=1,
     grid = []
     colnames = list(source_objs[0].dm.keys())
 
+    # first row is the column headers; if specific columns are provided
+    # then remove from colnames before adding
+    if columns<>None and columns<>[]:
+        colnames = columns
+        
     grid.append(colnames)
-    
+            
+
     startrow,endrow = _getpage(source_objs,pagelen,pagenum)
 
     for i in range(startrow,endrow+1):
-        if columns==None:
+        if columns==None or columns==[]:
             columns = colnames
             #grid.append(source_objs[i].dm.values())
         #else:
@@ -393,8 +399,18 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
                                 
                                 for objtype,objval in constraints:
 
-                                    if str(getattr(_val,objtype).name) <> str(objval):
+                                    lobjvals = objval.split(",")
+                                    
+                                    match=None
+                                    for lobjval in lobjvals:
+                                        if str(getattr(_val,objtype).name) <> str(lobjval):
+                                            if match <> False:
+                                                match=True
+                                        else:
+                                            match=False
+                                    if match==True:
                                         flag=True
+                                            
                                 if flag == True:
                                     continue
                                 

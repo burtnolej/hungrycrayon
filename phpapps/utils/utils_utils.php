@@ -1,5 +1,9 @@
 <?php
 
+/*
+
+there is one of these in bootstrap.php
+
 function getdbinfo() {
 	
 	$GLOBALS['PHPLIBPATH'] = getenv("PHPLIBPATH");
@@ -9,7 +13,7 @@ function getdbinfo() {
 	if ($GLOBALS['PHPLIBPATH'] == "") {
 		trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);	
 	}
-}
+}*/
 
 abstract class run_switch
 {
@@ -83,3 +87,19 @@ function nullfile($file)
 {
 	`cat /dev/null > application.log`;
 }
+
+function writetofile($filename,$content,$mode) 
+{
+	$myfile = fopen($filename, $mode) or die("Unable to open file!");
+	fwrite($myfile, $content);
+	fclose($myfile);
+}
+
+function readfromfile($filename)
+{
+	$myfile = fopen($filename, "r") or die("Unable to open file!");
+	$content = fread($myfile,filesize($filename));
+	fclose($myfile);
+	return $content;
+}
+?> 

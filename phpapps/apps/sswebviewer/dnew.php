@@ -13,7 +13,9 @@
 	
 ?>
 
-<script src="dnew.js"></script>
+<script data-main="js/dnew.js" src="js/require.js"></script>
+
+<!--script src="dnew.js"></script-->
 <script src="stylesheets.js"></script>
 <script>var Globals = <?php echo json_encode(array(
   'script_name' => $_SERVER['PHP_SELF'],
