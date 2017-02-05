@@ -1,50 +1,47 @@
+requirejs.config({
+    baseUrl: 'js/lib',
+    paths: {
+       app: '../app'
+    },
+    shim: {
+        'myutils': {
+            //These script dependencies should be loaded before loading
+            //backbone.js
+            deps: ['jquery'],
+            //Once loaded, use the global 'Backbone' as the
+            //module value.
+            exports: 'myutils'
+        },
+	}, waitSeconds: 15,
+});
+	
+//define(['myutils'], function(myutils) {
+		
+requirejs(['myutils','jquery'],
+	function (myutils,$) {
 
+		//$('head').html('<link rel="stylesheet" type="text/css" href="css/select.css" /><link rel="stylesheet" type="text/css" href="css/div.css" /><link rel="stylesheet" type="text/css" href="css/switch.css" /><link rel="stylesheet" type="text/css" href="css/menu.css" />');
 
-var ztypes = new Array();
-var url = "";
-
-function buildurl() {
- 	url = "http://".concat(Globals.server_name,"/",Globals.script_name,"?");
-   	
-   	ztypes = new Array();
-   		
-   	$('select').each(function (index, value) {
-	   		url = url + this.id + "=" + this.value + "&";
-	   });
-	    		
-	  $('input').each(function (index, value) {    			
-	  		if (this.checked == true) {
-	  			ztypes.push(this.id);	
-	  		}
-	  		else {
-	  			url = url + this.id + "=" + this.value + "&";
-	  		}
-	   });
-    		
-    	url = url + "ztypes=" + ztypes.join();
-  return url
-}
-
-$(document).ready(function(){
-   $("select, input").on('change',function(){
-    	url = buildurl();
-    	//console.log(url);
-    	get(url);
-   });
-   
+		//console.log(getAllInputValues());
+		
+		var ztypes = new Array();
+		var url = "";
+		$(document).ready(function(){
+		   $("select, input").on('change',function(){
+		   	
+		   		//url = "http://0.0.0.0/dpivot.php?" + getAllInputValues('ztypes',['qunit-filter-input']);
+		   		//url = "http://0.0.0.0/test_dpivot.php?" + getAllInputValues('ztypes',['qunit-filter-input']);
+		   		console.log(url);
+		    	url = buildurl();
+		    	window.location = url;
+		   });
+		});
+	},function (err) {
+    //The errback, error callback
+    //The error has a list of modules that failed
+    var failedId = err.requireModules && err.requireModules[0];
+    console.log(failedId);
 });
 
-function get(url) {
-	console.log(url);
-	window.location = url;
-}
 
-function alertme() {
-	alert("foo you");
-}
 
-function importlib(src) {
-	var imported = document.createElement("script");
-	imported.src = src;
-	document.head.appendChild(imported);	
-}

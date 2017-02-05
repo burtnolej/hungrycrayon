@@ -1,15 +1,57 @@
-/*
-*{
-    margin: 0;
-    padding: 0;
+
+.pol-base { /* base label for popout tab styles */
+	border-bottom: 1px solid #29216d;
+	border-left: 1px solid #29216d;
+	border-right: 1px solid #29216d;
+	text-align: center;
+	text-transform: uppercase;	
+	position: relative;	
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:100%;
+	font-weight: bold;
+  	align-items: center;
+  	justify-content: center;
+	background-color: #FFEFEF;
 }
-*/
+.pol1  { /* pop out label 1 */
+	width:160px;height:20px	;
+	padding-top: 4px;
+}
+.pol2  { /* pop put label 2 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+
+.pol3  { /* pop put label 2 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+	
+/* for the search results grid */
+div.searchgrid {
+	margin-top:5px;
+	margin-left:200px;
+	height:600px;
+	/*width: :1100px;*/
+	overflow-y:scroll;
+	display:none;
+	/*display:none;*/
+}
+
+/* for the search results grid */
+div.searchgridhdr {
+	margin-top:50px;
+	margin-left:200px;
+	display:none;
+	/*display:none;*/
+}
 
 div.contain {
 	margin:.25em .25em .25em .25em;
-	width:220px;
+	width:180px;
 	background-color: #FEFAFA;
 	display:block;
+	/*display:none;*/
 	/*overflow:auto;*/
 	float:left;
 }
@@ -18,7 +60,17 @@ div.containswitch {
 	width:160px;
 	background-color: #FEFAFA;
 	display:block;
+	/*display:none;*/
 	/*overflow:auto;*/
+	float:left;
+}
+
+
+div.wideswitch {
+	margin:.25em .25em .25em .25em;
+	background-color: #FEFAFA;
+	display:none;
+	width:320px;
 	float:left;
 }
 
@@ -47,3 +99,13 @@ div.tmp {
 	position: fixed;
 	background-color: FFEFEF;    
 }
+
+.slide-out-base {
+	border-top: 1px solid #29216d;
+	border-left: 1px solid #29216d;
+	border-right: 1px solid #29216d;
+   background: #ccc;
+   display: none;
+   padding-top: 10px;
+}
+
