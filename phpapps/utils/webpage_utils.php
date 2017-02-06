@@ -1,6 +1,8 @@
 <?php
 
 /*
+drawpivot($getargs = []) 
+drawsearch($getargs = []) 
 
 */
 
@@ -16,13 +18,33 @@ set_include_path($PHPLIBPATH);
 include_once 'db_utils.php';
 include_once 'utils_xml.php';
 
+function drawmultiselect($getargs = []) {
+
+	$args= Array('hidden' => 'true');
+	getchtmlinput('',"handle1",$getargs['handle1'],$args);
+	
+	$args= Array('hidden' => 'true');
+	getchtmlinput('','last_source_value',$getargs['source_value'],$args);
+		
+	$func = function($getargsarray) {
+		
+		$getargs = $getargsarray[0];
+		$SSDB = $getargsarray[1];
+
+		getdbhtmlmultiselect($SSDB,'select distinct name from dow','cnstr_dow',Array('checked' => $getargs,'maxy' => 10));
+		};
+
+	gethtmlpopoutdiv("datacolumns",$func,array($getargs,$GLOBALS['SSDB'])," tmp-slide-out wideswitch  ","handle1 pol1");	
+
+}
+
 function drawpivot($getargs = []) {
 	
 	/* getargs are the $_GET params passed into the php page; they will be used to provide default values */
 
 	include_once 'bootstrap.php';
 	initpage();
-		
+	
 	$func = function($getargsarray) {		
 	
 		$getargs = $getargsarray[0];
@@ -173,5 +195,104 @@ function drawsearch($getargs = []) {
 	};
  	gethtmlpopoutdiv("datacolumns",$func,Array($getargs,$GLOBALS['SSDB'])," slide-out-div-top containswitch  ","handle1 pol1");	
  	
+}
+
+function phpinit($funcname) {
+	// main php code 
+		$str = <<<PHP
+		<?php
+		include_once 'bootstrap.php';
+		include_once 'webpage_utils.php';
+		initpage();
+		$funcname(\$_GET);
+		?>
+PHP;
+		echo $str;
+}
+
+function jsinitpivot($scriptname) {
+		// initial includes; main js callback routines that recall page on change and base style sheets
+		$str = <<<JS
+<html>
+<head>
+<script src="jquery.js" type="text/javascript"></script>
+<script src="tabSlideOut.js"></script>
+<script data-main="js/$scriptname" src="js/require.js"></script>
+<link rel="stylesheet" type="text/css" href="css/select.css" />
+<link rel="stylesheet" type="text/css" href="css/div.css" />
+<link rel="stylesheet" type="text/css" href="css/switch.css" />
+<link rel="stylesheet" type="text/css" href="css/menu.css" />
+</head>
+
+</html>
+
+
+JS;
+		echo $str;
+}
+
+function jsslideoutinit() {
+		$str = <<<JS
+ <script type="text/javascript">
+
+        $(function(){
+        $('.tmp-slide-out').tabSlideOut({
+            tabHandle: '.handle1',                     //class of the element that will become your tab
+            leftPos: '600px',                          //position from left/ use if tabLocation is bottom or top
+        });
+        });
+</script>		
+JS;
+		echo $str;
+}
+
+function jsphpbridge($displaylist) {
+
+		// bridge between php and js code
+		$str = <<<JS
+<script>var Globals = <?php echo json_encode(array(
+'script_name' => 'tmp.php',
+'server_name' => '0.0.0.0',
+'display_list' => '$displaylist')); 
+?>;</script>		
+JS;
+		echo $str;
+}
+
+function jsdefer($defertime=150) {
+		// final display of widgets to avoid flicker
+		// uses Globals.display_list comma delim string to get the element classes to 'display'
+$str = <<<JS
+<script defer>
+function setElementStyle(classname,attr,attrval,timeoutlen) {
+	setTimeout(function() {
+		els = document.getElementsByClassName(classname);
+		for (i = 0; i < els.length; i++) {
+			els[i].setAttribute("style", attr + ": " + attrval + ";");
+		}
+  	},timeoutlen);
+ }
+ 
+         //setTimeout(function() {        
+         //var els = document.getElementsByTagName('div');
+ 		 	//for (i=0;i<els.length;i++) {
+ 		 	//		els[i].setAttribute("style", "display:block;");
+ 		 	//}
+  			//},10);
+         
+         
+ 
+ 			//document.body.style.display = 'block'; 	
+ 		 	var display_list = Globals.display_list.split(",");
+ 		 	
+ 		 	for (i=0;i<display_list.length;i++) {
+ 		 		setElementStyle(display_list[i],'display','block',$defertime);
+ 		 	}
+ 		 	
+ 		 	console.log("blah");
+
+</script>
+JS;
+		echo $str;
 }
 ?>

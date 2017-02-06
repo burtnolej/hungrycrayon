@@ -1,5 +1,13 @@
 <?php
 
+/* to run these tests
+	27  . ~/.bashrc
+   530  export SSDBNAME=/Users/burtnolej/Development/pythonapps/clean/db/fucia.sqlite
+   529  php ./test_webpage_utils.php 
+	output goes to /var/www/html/tmp.php which is linked to /Users/burtnolej/Development/pythonapps/phpapps/utils/tmp.html   
+	access in browser 0.0.0.0/tmp.php
+   */
+  
 $PHPLIBPATH = getenv("PHPLIBPATH");
 
 if ($PHPLIBPATH == "") {
@@ -15,43 +23,36 @@ include_once 'utils_utils.php';
 include_once 'test_utils.php';
 include_once 'webpage_utils.php';
 
+class test_drawmultiselectpopout extends PHPUnit_Framework_TestCase
+{
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit();
+		phpinit('drawmultiselect'); // main php code
+		jsphpbridge('wideswitch'); // bridge between php and js code
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("tmp.html",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+
 class test_drawpivot extends PHPUnit_Framework_TestCase
 {
 	public function test_()
 	{
 		ob_start(); 
+											
+		jsinitpivot('dpivot.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		phpinit('drawpivot'); // main php code
+		jsphpbridge('wideswitch'); // bridge between php and js code
+		jsdefer(); // final display of widgets to avoid flicker
 		
-		$getargs = array("source_value" => 'Clayton',
-											"ztypes" => "",
-											"cnstr_subject" => "",
-											"cnstr_dow" => "",
-											"cnstr_period" => "",
-											"cnstr_student" => "",
-											"cnstr_adult" => "",
-											"cnstr_prep" => "",
-											"cnstr_source" => "",
-											"cnstr_recordtype" => "");
-
-		$str = <<<JS
-<html><script src="jquery-3.1.1.js"></script><script src="stylesheets.js"></script><script data-main="js/dpivot.js" src="js/require.js"></script></html>
-JS;
-		echo $str;
-
-		drawpivot($getargs);
-
-		$str = <<<JS
-<script>var Globals = <?php echo json_encode(array(
-'script_name' => 'tmp.php',
-'server_name' => '0.0.0.0')); 
-?>;</script>		
-JS;
-		echo $str;
-
-		$str = <<<JS
-<script src="afterload.js"></script>
-JS;
-		echo $str;
-
 		$result = ob_get_contents();
 		ob_end_clean();		
 		
@@ -141,8 +142,12 @@ set_error_handler("handleError");
 try {
 	
 	/* drawpivot */
-	testrunner("drawsearch");
+	//testrunner("drawsearch");
 	//testrunner("drawpivot");
+	testrunner("drawmultiselectpopout");
+	
+	
+	
 	
 	
 } catch (Exception $e) {

@@ -50,7 +50,7 @@ div.contain {
 	margin:.25em .25em .25em .25em;
 	width:180px;
 	background-color: #FEFAFA;
-	display:block;
+	/*display:block;*/
 	/*display:none;*/
 	/*overflow:auto;*/
 	float:left;
@@ -65,11 +65,9 @@ div.containswitch {
 	float:left;
 }
 
-
 div.wideswitch {
 	margin:.25em .25em .25em .25em;
 	background-color: #FEFAFA;
-	display:none;
 	width:320px;
 	float:left;
 }
@@ -105,7 +103,18 @@ div.tmp {
 	border-left: 1px solid #29216d;
 	border-right: 1px solid #29216d;
    background: #ccc;
-   display: none;
    padding-top: 10px;
 }
+
+/*.tmp-slide-out {
+	margin:.25em .25em .25em .25em;
+	width:180px;
+	background-color: #FEFAFA;
+	border-top: 1px solid #29216d;
+	border-left: 1px solid #29216d;
+	border-right: 1px solid #29216d;
+   display: none;
+   padding-top: 10px;
+   float:left;
+}*/
 

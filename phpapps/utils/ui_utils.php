@@ -248,14 +248,22 @@ function getchtmlinput($label,$field,$default,$args=NULL) {
 
 	echo "<p class=\"label\">".$label."</p>";
 	
-	if (isset($args['hidden']))  {
+	/*if (isset($args['hidden']))  {
 		$type = 'hidden';
 	}
 	else {
 		$type = 'text';
+	}*/
+	
+	$type = 'text';
+	
+	echo "<input class = \"custom\" type=\"".$type."\" id=\"".$field."\" value=\"".$default."\"";
+	
+	if (isset($args['hidden']))  {
+		echo  'hidden';
 	}
-		
-	echo "<input class = \"custom\" type=\"".$type."\" id=\"".$field."\" value=\"".$default."\" />";
+	
+	 echo "/>";
 
 	if (isset($args['comment']))  {
 		echo "<p class=\"comment\">".$args['comment']."</p>";
