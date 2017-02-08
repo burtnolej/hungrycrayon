@@ -481,6 +481,7 @@ function getdbhtmlmultiselect($dbname,$query,$name,$args) {
 	thus allowing multiple values to be selected */
 
 		if (isset($args['checked'])) {
+			//echo var_dump($args['checked']);
 			$args['checked'] = explode(",",$args['checked'][$name]);
 		}
 		else {
@@ -497,7 +498,8 @@ function getdbhtmlmultiselect($dbname,$query,$name,$args) {
 		echo "<table class = \"switchtable\" name=\"".$name."\"><tr>";
 		$ycount=0;
 		while ($row = $results->fetchArray()) {
-			
+				
+				//if (isset($args['maxy']) and $ycount > 4) { 
 				if (isset($args['maxy']) and $ycount > $args['maxy']) { 
 					echo "</tr><tr>";
 					$ycount=0;
@@ -509,25 +511,7 @@ function getdbhtmlmultiselect($dbname,$query,$name,$args) {
 				echo "</td>";
 				$ycount=$ycount+1;
 		}
-		echo "</tr></table>";
-		
-
-		
-		/*echo '<script>';
-		echo ' url = "";';
-		echo '	ztypes = new Array();';
-		echo '$("input").each(function (index, value) {';
-	  	echo 'if (this.checked == true) {';
-	  	echo 'ztypes.push(this.id);	';
-	  	echo '}';
-	  	echo 'else {';
-	  	echo 'url = url + this.id + "=" + this.value + "&";';
-	  	echo '}';
-	   echo '});';
-	   echo 'url = url + "ztypes=" + ztypes.join() + "&";';
-	   echo "console.log(url)";
-	   echo "</script>";  */ 	
-    	
+		echo "</tr></table>";    	
 }
 
 // HTML Checkbox
@@ -571,8 +555,7 @@ function getchtmlswitch($name,$value,$args) {
 		$checked=FALSE;
 		
 		if (isset($args['checked'])) {
-			
-			//echo var_dump($args['checked']);
+			//if (in_array($value,$args['checked'])) {
 			if (in_array($value,$args['checked'])) {
 				$checked=TRUE;
 			}
@@ -588,6 +571,9 @@ function getchtmlswitch($name,$value,$args) {
 		echo '<p class="label switch">'.$name.'</p>';
 		
 		// need to add a tag so javascript can distinguish singles from multis
+		
+		//echo var_dump($args);
+		
 		if (isset($args['single'])) {
 			echo '<span name="singleswitch">';
 		}
@@ -764,11 +750,25 @@ function gethtmldiv($label,$htmbodyfunc,$param,$divclass=NULL,$pclass=NULL) {
 	echo "</div>";
 }
 
-function gethtmlpopoutdiv($label,$htmbodyfunc,$param,$divclass=NULL,$aclass=NULL) {
+function gethtmlpopoutdivold($label,$htmbodyfunc,$param,$divclass=NULL,$aclass=NULL) {
 	/*echo "<p class='divlabel'>".$label."</>";*/
 	echo "<div class='nojs slide-out-base ".$divclass."'>";  //containswitch
 	//echo "<div class='slide-out-div-top nojs containswitch'>"; 
 	echo "<a class='nojs pol-base ".$aclass."'>".$label."</a>";
+	$htmbodyfunc($param);
+	echo "</div>";
+	
+}
+
+function gethtmlpopoutdiv($label,$htmbodyfunc,$param,$tabnum,$divclass=NULL) {
+
+	// css stubs to append tab number too
+	$slideout = "slide-out".$tabnum;
+	$handle = "handle".$tabnum;
+	$pol = "pol".$tabnum;
+	
+	echo "<div class='nojs slide-out-base ".$slideout." ".$divclass."'>";  
+	echo "<a class='nojs pol-base ".$pol." ".$handle."'>".$label."</a>";
 	$htmbodyfunc($param);
 	echo "</div>";
 	

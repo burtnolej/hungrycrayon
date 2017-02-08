@@ -29,7 +29,9 @@ define(['myutils'], function(myutils) {
 		$(document).ready(function(){
 		   $("select, input").on('change',function(){
 		   	
-		   		url = "http://0.0.0.0/test_dpivot.php?" + getAllInputValues('ztypes',['qunit-filter-input']);
+		   		url = "http://".concat(Globals.server_name,"/",Globals.script_name,"?");
+		   	
+		   		url = url + getAllInputValues('ztypes',['qunit-filter-input']);
 		   		console.log(url);
 		    	//url = buildurl();
 		    	window.location = url;

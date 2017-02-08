@@ -12,6 +12,8 @@ require_once 'autoload.php';
 include_once 'ui_utils.php';
 include_once 'utils_error.php';
 include_once 'utils_utils.php';
+include_once 'test_utils.php';
+
 
 set_error_handler('\\UtilsError::error_handler');
 
@@ -237,8 +239,9 @@ class test_getdbhtmlmultiselect extends PHPUnit_Framework_TestCase
 		$query = "select distinct name from period";
 		$name = "cnstr_period";
 		
-		$checked = Array("period" => "830-910,910-950");
-		$args = Array('checked' => $checked['period'],'maxy' => 3);
+		$checked = Array("cnstr_period" => "830-910,910-950");
+		//$args = Array('checked' => $checked['period'],'maxy' => 3);
+		$args = Array('checked' => $checked,'maxy' => 3);
 		
 		getdbhtmlmultiselect($dbname,$query,$name,$args);
 			
@@ -270,16 +273,19 @@ class test_javascript extends PHPUnit_Framework_TestCase
 		$query = "select distinct name from period";
 		$name = "cnstr_period";
 		
-		$checked = Array("period" => "830-910,910-950");
-		$args = Array('checked' => $checked['period'],'maxy' => 3);
+		
+		$checked = Array("cnstr_period" => "830-910,910-950");
+		//$args = Array('checked' => $checked['cnstr_period'],'maxy' => 3);
+		$args = Array('checked' => $checked,'maxy' => 3);
 		
 		getdbhtmlmultiselect($dbname,$query,$name,$args);
 		
 		$query = "select distinct name from dow";
 		$name = "cnstr_dow";
 		
-		$checked = Array("dow" => "Friday");
-		$args = Array('checked' => $checked['dow'],'maxy' => 3);
+		$checked = Array("cnstr_dow" => "Friday");
+		//$args = Array('checked' => $checked['cnstr_dow'],'maxy' => 3);
+		$args = Array('checked' => $checked,'maxy' => 3);
 		
 		getdbhtmlmultiselect($dbname,$query,$name,$args);
 
@@ -299,8 +305,7 @@ JS;
 
 	public function test_singleswitch()
 	{
-		$this->expected_result = '<html><p id="output"></p><script src="jquery-3.1.1.js"></script><script src="stylesheets.js"></script><link rel="stylesheet" type="text/css" href="plain.css" /><div id="content"><p class="label switch">foobar</p><span name="singleswitch"><label class="switch"><input id="foobar" type="checkbox" name="foobar"><div class="slider"></div></label></span><p class="label switch">foobar1</p><span name="singleswitch"><label class="switch"><input id="foobar1" type="checkbox" name="foobar1"><div class="slider"></div></label></span><p class="label switch">foobar2</p><span name="singleswitch"><label class="switch"><input id="foobar2" type="checkbox" name="foobar2"><div class="slider"></div></label></span><script src="myutils.js"></script><script>$("select, input").on("change",function(){document.getElementById("output").innerHTML=getSwitchValues();});	</script>';
-												
+		$this->expected_result = '<html><p id="output"></p><script src="jquery-3.1.1.js"></script><script src="stylesheets.js"></script><link rel="stylesheet" type="text/css" href="plain.css" /><div id="content"><p class="label switch">foobar</p><span name="singleswitch"><label class="switch"><input id="foobar" type="checkbox" name="foobar"><div class="slider"></div></label></span><p class="label switch">foobar1</p><span name="singleswitch"><label class="switch"><input id="foobar1" type="checkbox" name="foobar1"><div class="slider"></div></label></span><p class="label switch">foobar2</p><span name="singleswitch"><label class="switch"><input id="foobar2" type="checkbox" name="foobar2"><div class="slider"></div></label></span><script src="myutils.js"></script><script>$("select, input").on("change",function(){document.getElementById("output").innerHTML="ztypes="+getSwitchValues();});</script>';
 		ob_start(); 
 		
 		echo '<html>';
@@ -311,17 +316,20 @@ JS;
 		echo '<div id="content">';
 				
 		$args = array('checked'=>array(),'single'=>TRUE);
+		
 		getchtmlswitch("foobar","foobar",$args);
 		getchtmlswitch("foobar1","foobar1",$args);
 		getchtmlswitch("foobar2","foobar2",$args);
 
 		$str = <<<JS
-<script src="myutils.js"></script><script>$("select, input").on("change",function(){document.getElementById("output").innerHTML=getSwitchValues();});	</script>
+<script src="myutils.js"></script><script>$("select, input").on("change",function(){document.getElementById("output").innerHTML="ztypes="+getSwitchValues();});</script>
 JS;
 		echo $str;
 		
 		$result = ob_get_contents();
 		ob_end_clean();
+		
+		writetofile("tmp.html",$result,"w");
 		
 		$this->assertEquals($result,$this->expected_result);
 	}
@@ -352,7 +360,7 @@ JS;
 		$result = ob_get_contents();
 		ob_end_clean();
 		
-		$result;
+		writetofile("tmp.html",$result,"w");
 		
 		$this->assertEquals($result,$this->expected_result);
 	}
@@ -377,8 +385,6 @@ JS;
 		getchtmlinput("foobar3","foobar3","d");
 		gethtmlbutton("button","submit");
 		
-
-
 		$str = <<<JS
 <script src="myutils.js"></script><script>$("input[name=\"button\"]").on("click",function(){document.getElementById("output").innerHTML= getInputValues();});</script>
 JS;
@@ -394,7 +400,7 @@ JS;
 	
 	public function test_all()
 	{
-		$this->expected_result = '<html><p id="output"></p><script src="jquery-3.1.1.js"></script><script src="stylesheets.js"></script><link rel="stylesheet" type="text/css" href="plain.css" /><div id="content"><p class="label">foobar</p><input class = "custom" type="text" id="foobar" value="a" /><p class="label">foobar1</p><input class = "custom" type="text" id="foobar1" value="b" /><p class="label">foobar2</p><input class = "custom" type="text" id="foobar2" value="c" /><p class="label">foobar3</p><input class = "custom" type="text" id="foobar3" value="d" /><input type="button" name="button" value="submit" /><p class="label">foobar4</p><span class="select"><select class="custom" id="foobar4" name="foobar4"><option value="a"selected>a</option><option value="b">b</option></select></span><p class="label">foobar5</p><span class="select"><select class="custom" id="foobar5" name="foobar5"><option value="c">c</option><option value="d"selected>d</option></select></span><table class = "switchtable" name="cnstr_period"><tr><td class="switch" id="830-910"><p class="label switch">830-910</p><label class="switch"><input id="830-910" type="checkbox" name="830-910"checked><div class="slider"></div></label></td><td class="switch" id="910-950"><p class="label switch">910-950</p><label class="switch"><input id="910-950" type="checkbox" name="910-950"checked><div class="slider"></div></label></td><td class="switch" id="950-1030"><p class="label switch">950-1030</p><label class="switch"><input id="950-1030" type="checkbox" name="950-1030"><div class="slider"></div></label></td><td class="switch" id="1030-1110"><p class="label switch">1030-1110</p><label class="switch"><input id="1030-1110" type="checkbox" name="1030-1110"><div class="slider"></div></label></td></tr><tr><td class="switch" id="1110-1210"><p class="label switch">1110-1210</p><label class="switch"><input id="1110-1210" type="checkbox" name="1110-1210"><div class="slider"></div></label></td><td class="switch" id="1210-100"><p class="label switch">1210-100</p><label class="switch"><input id="1210-100" type="checkbox" name="1210-100"><div class="slider"></div></label></td><td class="switch" id="100-140"><p class="label switch">100-140</p><label class="switch"><input id="100-140" type="checkbox" name="100-140"><div class="slider"></div></label></td><td class="switch" id="140-220"><p class="label switch">140-220</p><label class="switch"><input id="140-220" type="checkbox" name="140-220"><div class="slider"></div></label></td></tr><tr><td class="switch" id="220-300"><p class="label switch">220-300</p><label class="switch"><input id="220-300" type="checkbox" name="220-300"><div class="slider"></div></label></td><td class="switch" id="300-330"><p class="label switch">300-330</p><label class="switch"><input id="300-330" type="checkbox" name="300-330"><div class="slider"></div></label></td></tr></table><table class = "switchtable" name="cnstr_dow"><tr><td class="switch" id="Monday"><p class="label switch">Monday</p><label class="switch"><input id="Monday" type="checkbox" name="Monday"><div class="slider"></div></label></td><td class="switch" id="Tuesday"><p class="label switch">Tuesday</p><label class="switch"><input id="Tuesday" type="checkbox" name="Tuesday"><div class="slider"></div></label></td><td class="switch" id="Thursday"><p class="label switch">Thursday</p><label class="switch"><input id="Thursday" type="checkbox" name="Thursday"><div class="slider"></div></label></td><td class="switch" id="Wednesday"><p class="label switch">Wednesday</p><label class="switch"><input id="Wednesday" type="checkbox" name="Wednesday"><div class="slider"></div></label></td></tr><tr><td class="switch" id="Friday"><p class="label switch">Friday</p><label class="switch"><input id="Friday" type="checkbox" name="Friday"checked><div class="slider"></div></label></td></tr></table><p class="label switch">foobar6</p><span name="singleswitch"><label class="switch"><input id="foobar" type="checkbox" name="foobar6"><div class="slider"></div></label></span><p class="label switch">foobar7</p><span name="singleswitch"><label class="switch"><input id="foobar1" type="checkbox" name="foobar7"><div class="slider"></div></label></span><p class="label switch">foobar8</p><span name="singleswitch"><label class="switch"><input id="foobar2" type="checkbox" name="foobar8"><div class="slider"></div></label></span><script src="myutils.js"></script><script>$("input[name=\"button\"]").on("click",function(){document.getElementById("output").innerHTML= getAllInputValues();});</script>';
+		$this->expected_result = '<html><p id="output"></p><script src="jquery-3.1.1.js"></script><script src="stylesheets.js"></script><link rel="stylesheet" type="text/css" href="plain.css" /><div id="content"><p class="label">foobar</p><input class = "custom" type="text" id="foobar" value="a"/><p class="label">foobar1</p><input class = "custom" type="text" id="foobar1" value="b"/><p class="label">foobar2</p><input class = "custom" type="text" id="foobar2" value="c"/><p class="label">foobar3</p><input class = "custom" type="text" id="foobar3" value="d"/><input type="button" name="button" value="submit" /><p class="label">foobar4</p><span class="select"><select class="custom" id="foobar4" name="foobar4"><option value="a"selected>a</option><option value="b">b</option></select></span><p class="label">foobar5</p><span class="select"><select class="custom" id="foobar5" name="foobar5"><option value="c">c</option><option value="d"selected>d</option></select></span><table class = "switchtable" name="cnstr_period"><tr><td class="switch" id="830-910"><p class="label switch">830-910</p><label class="switch"><input id="830-910" type="checkbox" name="830-910"checked><div class="slider"></div></label></td><td class="switch" id="910-950"><p class="label switch">910-950</p><label class="switch"><input id="910-950" type="checkbox" name="910-950"checked><div class="slider"></div></label></td><td class="switch" id="950-1030"><p class="label switch">950-1030</p><label class="switch"><input id="950-1030" type="checkbox" name="950-1030"><div class="slider"></div></label></td><td class="switch" id="1030-1110"><p class="label switch">1030-1110</p><label class="switch"><input id="1030-1110" type="checkbox" name="1030-1110"><div class="slider"></div></label></td></tr><tr><td class="switch" id="1110-1210"><p class="label switch">1110-1210</p><label class="switch"><input id="1110-1210" type="checkbox" name="1110-1210"><div class="slider"></div></label></td><td class="switch" id="1210-100"><p class="label switch">1210-100</p><label class="switch"><input id="1210-100" type="checkbox" name="1210-100"><div class="slider"></div></label></td><td class="switch" id="100-140"><p class="label switch">100-140</p><label class="switch"><input id="100-140" type="checkbox" name="100-140"><div class="slider"></div></label></td><td class="switch" id="140-220"><p class="label switch">140-220</p><label class="switch"><input id="140-220" type="checkbox" name="140-220"><div class="slider"></div></label></td></tr><tr><td class="switch" id="220-300"><p class="label switch">220-300</p><label class="switch"><input id="220-300" type="checkbox" name="220-300"><div class="slider"></div></label></td><td class="switch" id="300-330"><p class="label switch">300-330</p><label class="switch"><input id="300-330" type="checkbox" name="300-330"><div class="slider"></div></label></td></tr></table><table class = "switchtable" name="cnstr_dow"><tr><td class="switch" id="Monday"><p class="label switch">Monday</p><label class="switch"><input id="Monday" type="checkbox" name="Monday"><div class="slider"></div></label></td><td class="switch" id="Tuesday"><p class="label switch">Tuesday</p><label class="switch"><input id="Tuesday" type="checkbox" name="Tuesday"><div class="slider"></div></label></td><td class="switch" id="Thursday"><p class="label switch">Thursday</p><label class="switch"><input id="Thursday" type="checkbox" name="Thursday"><div class="slider"></div></label></td><td class="switch" id="Wednesday"><p class="label switch">Wednesday</p><label class="switch"><input id="Wednesday" type="checkbox" name="Wednesday"><div class="slider"></div></label></td></tr><tr><td class="switch" id="Friday"><p class="label switch">Friday</p><label class="switch"><input id="Friday" type="checkbox" name="Friday"checked><div class="slider"></div></label></td></tr></table><p class="label switch">foobar6</p><span name="singleswitch"><label class="switch"><input id="foobar" type="checkbox" name="foobar6"><div class="slider"></div></label></span><p class="label switch">foobar7</p><span name="singleswitch"><label class="switch"><input id="foobar1" type="checkbox" name="foobar7"><div class="slider"></div></label></span><p class="label switch">foobar8</p><span name="singleswitch"><label class="switch"><input id="foobar2" type="checkbox" name="foobar8"><div class="slider"></div></label></span><script src="myutils.js"></script><script>$("input[name=\"button\"]").on("click",function(){document.getElementById("output").innerHTML= getAllInputValues("ztypes");});</script>';
 												
 		ob_start(); 
 		
@@ -423,16 +429,18 @@ JS;
 		$query = "select distinct name from period";
 		$name = "cnstr_period";
 		
-		$checked = Array("period" => "830-910,910-950");
-		$args = Array('checked' => $checked['period'],'maxy' => 3);
+		$checked = Array("cnstr_period" => "830-910,910-950");
+		//$args = Array('checked' => $checked['period'],'maxy' => 3);
+		$args = Array('checked' => $checked,'maxy' => 3);
 		
 		getdbhtmlmultiselect($dbname,$query,$name,$args);
 		
 		$query = "select distinct name from dow";
 		$name = "cnstr_dow";
 		
-		$checked = Array("dow" => "Friday");
-		$args = Array('checked' => $checked['dow'],'maxy' => 3);
+		$checked = Array("cnstr_dow" => "Friday");
+		//$args = Array('checked' => $checked['dow'],'maxy' => 3);
+		$args = Array('checked' => $checked,'maxy' => 3);
 		
 		getdbhtmlmultiselect($dbname,$query,$name,$args);
 	
@@ -442,8 +450,10 @@ JS;
 		getchtmlswitch("foobar7","foobar1",$args);
 		getchtmlswitch("foobar8","foobar2",$args);
 
+		$switchvarname="ztypes";
+		
 		$str = <<<JS
-<script src="myutils.js"></script><script>$("input[name=\"button\"]").on("click",function(){document.getElementById("output").innerHTML= getAllInputValues();});</script>
+<script src="myutils.js"></script><script>$("input[name=\"button\"]").on("click",function(){document.getElementById("output").innerHTML= getAllInputValues("$switchvarname");});</script>
 JS;
 		echo $str;
 		
@@ -1427,7 +1437,7 @@ class test_getxmlchtmlinput extends PHPUnit_Framework_TestCase
 	}
 }
 
-function testrunner($name) {
+/*function testrunner($name) {
 	
 	$testname = "test_".$name;
 	echo PHP_EOL.PHP_EOL.$testname.PHP_EOL;
@@ -1450,7 +1460,7 @@ function testrunner($name) {
       echo PHP_EOL;
       
       die();
-   }
+   }*/
   
 set_error_handler("handleError");
    
@@ -1487,7 +1497,8 @@ try {
 	//testrunner("getxmlchtmlinput");
 	
 	/* javascript */
-	testrunner("javascript");
+	//testrunner("javascript","test_singleswitch");
+	//testrunner("javascript","test_all");
 	
 	
 } catch (Exception $e) {

@@ -18,24 +18,48 @@ set_include_path($PHPLIBPATH);
 include_once 'db_utils.php';
 include_once 'utils_xml.php';
 
-function drawmultiselect($getargs = []) {
-
+function drawpopout($args) {
+		
+	$popoutnum = $args[0]; // internal css class used by the actual popout
+	$popoutstylename = $args[1]; // internal css class used by the widgets in the popout
+	$getargs = $args[2]; // $_GET params from the URL
+	$htmlfunc = $args[3]; // function to create actual html
+	$popoutlabel = $args[4];
+	
+	// to be passed to the functiona that creates the widgets that go on the popup
+	// drawmultiselect(5=multisel defn and 7=maxy)
+	// drawdbselects(5=tablename, 6=widgetdefnarr)
+	$widgetargs = Array($getargs,$args[5],$args[6]); 
+	
 	$args= Array('hidden' => 'true');
-	getchtmlinput('',"handle1",$getargs['handle1'],$args);
+	getchtmlinput('',"handle".$popoutnum,$getargs['handle'.$popoutnum],$args);
 	
 	$args= Array('hidden' => 'true');
 	getchtmlinput('','last_source_value',$getargs['source_value'],$args);
-		
-	$func = function($getargsarray) {
-		
-		$getargs = $getargsarray[0];
-		$SSDB = $getargsarray[1];
+	
+	gethtmlpopoutdiv($popoutlabel,$htmlfunc,$widgetargs,$popoutnum,$popoutstylename);
+}
 
-		getdbhtmlmultiselect($SSDB,'select distinct name from dow','cnstr_dow',Array('checked' => $getargs,'maxy' => 10));
-		};
+function drawmultiselect($arr = []) {
+	$getargs = $arr[0]; // $_GET for default value	
+	$multiseldefn = $arr[1]; // array of query/fieldname pairs
+	$maxy = $arr[2]; // for width of widgets in the panel
 
-	gethtmlpopoutdiv("datacolumns",$func,array($getargs,$GLOBALS['SSDB'])," tmp-slide-out wideswitch  ","handle1 pol1");	
+	foreach ($multiseldefn as $field => $query) {
+		getdbhtmlmultiselect($GLOBALS['SSDB'],$query,$field,Array('checked' => $getargs,'maxy' => $maxy));
+	}
+}
 
+function drawdbselects($arr = []) {
+	$getargs = $arr[0]; // $_GET for default value	
+	
+	$tablename = $arr[1];
+	$widgets = $arr[2];
+	
+	foreach ($widgets as $dbname => $fieldname) {
+		$args = array('comment'=>$comment, 'label' => $dbname,"distinct" => false);							
+		getchtmldbselect($GLOBALS['SSDB'],$tablename,$dbname,$fieldname,1,$getargs[$fieldname],$args);	
+	}	
 }
 
 function drawpivot($getargs = []) {
@@ -231,29 +255,30 @@ JS;
 		echo $str;
 }
 
-function jsslideoutinit() {
+function jsslideoutinit($tabnum,$leftpos) {
+	// $leftpos needs to be of the form XXpx
 		$str = <<<JS
  <script type="text/javascript">
 
-        $(function(){
-        $('.tmp-slide-out').tabSlideOut({
-            tabHandle: '.handle1',                     //class of the element that will become your tab
-            leftPos: '600px',                          //position from left/ use if tabLocation is bottom or top
+	$(function(){
+        $('.slide-out$tabnum').tabSlideOut({
+            tabHandle: '.handle$tabnum',                     //class of the element that will become your tab
+            leftPos: '$leftpos',                          //position from left/ use if tabLocation is bottom or top
         });
-        });
+    });
+    
 </script>		
 JS;
 		echo $str;
 }
 
-function jsphpbridge($displaylist) {
+function jsphpbridge($pagename) {
 
 		// bridge between php and js code
 		$str = <<<JS
 <script>var Globals = <?php echo json_encode(array(
-'script_name' => 'tmp.php',
-'server_name' => '0.0.0.0',
-'display_list' => '$displaylist')); 
+'script_name' => '$pagename',
+'server_name' => '0.0.0.0')); 
 ?>;</script>		
 JS;
 		echo $str;

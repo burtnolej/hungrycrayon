@@ -15,7 +15,8 @@ __all__ = ['full_url','set_select_element','set_select_element',
            '_macro_add_new_record','_macro_menu_click', 
            '_macro_list_objects','_macro_update_field','webdriver',
            'Keys', 'DesiredCapabilities','ActionChains','get_elements',
-           '_macro_do_pivot']
+           '_macro_do_pivot','click_popupmenu','get_dimensions',
+           'execute_script']
 
 def full_url():
     args = dict(source_type = "student",source_value = "Clayton",xaxis="period",
@@ -34,12 +35,41 @@ def full_url():
 
 # simple wrappers to run commands on DOM elements
 def set_select_element(name,value,browser):    
+    
+    
     browser.find_element_by_xpath("//select[@name=\""+name+"\"]/option[text()=\""+value+"\"]").click()
+
+def click_popupmenu(name,browser):
+
+    element = browser.find_element_by_xpath("//a[contains(@class,'"+name+"')]")
+    element.click()
+    
+def get_dimensions(name,browser,xpath=None):
+    
+    if xpath == None:
+        xpath = "//*[@name=\""+name+"\"]"
+        
+    e = browser.find_element_by_xpath(xpath)
+    return(e.location['x'],e.location['y'],e.size['width'],e.size['height']) 
 
 def click_menu_element(href,browser):
     element = browser.find_element_by_xpath('//*[@href="'+href+'"]')
     element.click()
     
+def execute_script(browser,script):
+    
+    #browser.refresh()
+    
+    #driver.find_element_by_tag_name('body').send_keys(Keys.COMMAND + 'r')
+    #el = browser.find_element_by_xpath('//body')
+    
+    #body = browser.find_element_by_tag_name('body')
+    #print el
+    #body.send_keys(Keys.COMMAND + 'r')
+    #body.send_keys("\uE035")
+    
+    browser.execute_script(script)
+   
 def set_checkbox_element(name,browser):    
     element = browser.find_element_by_xpath("//*[@name=\""+name+"\"]")
     browser.execute_script("arguments[0].click();", element)
