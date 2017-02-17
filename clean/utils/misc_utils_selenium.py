@@ -8,6 +8,8 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.remote.errorhandler import NoSuchElementException
+from selenium.webdriver.support.select import Select
 
 __all__ = ['full_url','set_select_element','set_select_element', 
            'click_menu_element','set_checkbox_element', 
@@ -16,7 +18,9 @@ __all__ = ['full_url','set_select_element','set_select_element',
            '_macro_list_objects','_macro_update_field','webdriver',
            'Keys', 'DesiredCapabilities','ActionChains','get_elements',
            '_macro_do_pivot','click_popupmenu','get_dimensions',
-           'execute_script']
+           'execute_script','element_exists','get_input_text_element',
+           'get_select_element_value','get_p_text','click_button',
+           'contextclick_element']
 
 def full_url():
     args = dict(source_type = "student",source_value = "Clayton",xaxis="period",
@@ -34,10 +38,28 @@ def full_url():
     return url
 
 # simple wrappers to run commands on DOM elements
+
+def element_exists(xpath,browser):
+
+    try:
+        browser.find_element_by_xpath(xpath)
+    except NoSuchElementException:
+        return False
+    return True
+
 def set_select_element(name,value,browser):    
-    
-    
+
     browser.find_element_by_xpath("//select[@name=\""+name+"\"]/option[text()=\""+value+"\"]").click()
+
+def get_select_element_value(id,browser):
+    
+    select = Select(browser.find_element_by_id(id))
+    selected_option = select.first_selected_option
+    return(selected_option.text)
+
+def get_p_text(id,browser):
+    element = browser.find_element_by_xpath("//p[@id=\""+id+"\"]")
+    return(element.text)
 
 def click_popupmenu(name,browser):
 
@@ -52,8 +74,21 @@ def get_dimensions(name,browser,xpath=None):
     e = browser.find_element_by_xpath(xpath)
     return(e.location['x'],e.location['y'],e.size['width'],e.size['height']) 
 
-def click_menu_element(href,browser):
-    element = browser.find_element_by_xpath('//*[@href="'+href+'"]')
+def click_menu_element(href,browser,xpath=None):
+    if xpath == None:
+        xpath = '//*[@href="'+href+'"]'
+    
+    element = browser.find_element_by_xpath(xpath)
+    element.click()
+    
+def contextclick_element(id,browser):
+    element = browser.find_element_by_xpath("//*[@id=\""+id+"\"]")
+    
+    ActionChains(browser).context_click(element).perform()
+    
+    
+def click_button(id,browser):
+    element = browser.find_element_by_xpath("//input[@id=\""+id+"\"]")
     element.click()
     
 def execute_script(browser,script):
@@ -74,9 +109,17 @@ def set_checkbox_element(name,browser):
     element = browser.find_element_by_xpath("//*[@name=\""+name+"\"]")
     browser.execute_script("arguments[0].click();", element)
         
-def set_input_text_element(id,value,browser):
-    element = browser.find_element_by_xpath("//*[@id=\""+id+"\"]")
+def set_input_text_element(id,value,browser,returnkey=False):
+    element = browser.find_element_by_xpath("//input[@id=\""+id+"\"]")
     element.send_keys(value)
+    
+    if returnkey == True:
+        set_input_text_element("source_value",Keys.RETURN,browser)
+        
+    
+def get_input_text_element(id,browser):
+    element = browser.find_element_by_xpath("//*[@id=\""+id+"\"]")
+    return(element.get_attribute('value'))
     
 def get_table_values(browser,xpathstr="//td/a",suppressid=False,onlyid=False):
     if suppressid==False and onlyid==False:

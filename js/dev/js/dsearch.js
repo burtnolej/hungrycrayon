@@ -1,9 +1,3 @@
-/*requirejs.config({
-    baseUrl: 'js/lib',
-    paths: {
-       app: '../app'
-    }
-});*/
 
 requirejs.config({
     baseUrl: 'js/lib',
@@ -15,27 +9,16 @@ requirejs.config({
             deps: ['jquery'],
             exports: 'myutils'
         },
-        //'tabSlideOut': {
-         //   deps: ['jquery'],
-        //    exports: 'tabSlideOut'
-       // },
 	}, 
-	/*waitSeconds: 15,*/
 });
 
-//define(['myutils','tabSlideOut'], function(myutils,tabSlideOut) {    	
 
 define(['myutils'], function(myutils) {    	
 
 		$(document).ready(function(){
 
-	    	//$(function(){
-	        //$('.tmp-slide-out').tabSlideOut({
-	          //  tabHandle: '.handle1',                     //class of the element that will become your tab
-	          //  leftPos: '600px',                          //position from left/ use if tabLocation is bottom or top
-	        //});
-	     	//});     
-	     	
+			setcontextmenu("div[id='wrap']","macro_updateid");
+			
 		   $("select, input").on('change',function(){
 		   		url = "http://".concat(Globals.server_name,"/",Globals.script_name,"?");
 		   		url = url + getAllInputValues('ztypes',['qunit-filter-input']);
@@ -44,14 +27,6 @@ define(['myutils'], function(myutils) {
 		    	window.location = url;
 		   });	  
 		})
-		
-		//widths = Array('220','220','220');
-		//cpTableColWidths('table2','table1');
-		//cpTableColWidths('table1','table2');
-		//setTableColWidths(widths,'table2');
-		//setTableColWidths(widths,'table1');
-		
-		//dumparray(getTableColWidths('table1'));	
 		
 });
 

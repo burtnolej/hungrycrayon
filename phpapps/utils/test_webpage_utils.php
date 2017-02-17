@@ -10,23 +10,27 @@
    */
   
 /* whats in this file 
-
 test_drawselectpopout  								1 popout with more than one select element on it
+test_drawxmlselectpopout
+test_drawdbselectpopout  							1 popout with more than one select element on it
 test_draw2multiselectpopout					1 popout with 2 multi-choice (checkboxes) on it
 test_drawmultiselectpopout                	1 popout with 1 multi-choice (checkboxes) on it
 test_drawmultiselectpopout_many			2 popouts with 1 multi-choice (checkboxes) on each
 test_drawmixedpopout								1 popout with both select and multi-choice elements on it
+test_drawtable
+test_drawpivot
+test_drawtextinputpopup
+test_drawserverpopout
+test_drawmenu
 
 */
-
-
 
 $PHPLIBPATH = getenv("PHPLIBPATH");
 
 if ($PHPLIBPATH == "") {
 	trigger_error("Fatal error: env PHPLIBPATH must be set", E_USER_ERROR);
 }
-
+			
 set_include_path($PHPLIBPATH);
 require_once 'autoload.php';
 
@@ -35,9 +39,509 @@ include_once 'utils_error.php';
 include_once 'utils_utils.php';
 include_once 'test_utils.php';
 include_once 'webpage_utils.php';
+	
+class test_menu_update extends PHPUnit_Framework_TestCase 
+{
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dedit.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
+			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+		?>
+PHP;
+		echo $str;
 
+		echo "<body><table><tr><td id='mytd'>booboo<p id='054C4D26' hidden /></td></tr></table></body>";
 
-class test_drawselectpopout extends PHPUnit_Framework_TestCase
+		jsphpbridge('popout_menu_update.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_menu_update.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+
+class test_drawmenu extends PHPUnit_Framework_TestCase
+{
+	public function test_()
+	{
+		// draw popout from server provided content
+		ob_start(); 
+									
+		jsinitpivot('dmenu.js');// initial includes; main js callback routines that recall page on change and base style sheets
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			
+			initpage(FALSE);			
+
+			\$menuxml  = "<root><item name='foo'><id>linka</id><link>foobar.php</link></item><item name='bar'><id>linkb</id><jscript>window.location = 'foobar.php'</jscript></item></root>";
+			getchtmlxmlmenu2(\$menuxml,"label");
+
+		?>
+PHP;
+		echo $str;
+		
+		echo "<body><table><tr><td id='mytd'>booboo<p id='1.1.1.1.1' hidden /></td></tr></table></body>";
+
+		//jsphpbridge('popout_server.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/menu.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+class test_drawserverpopout extends PHPUnit_Framework_TestCase
+{
+	// popout with input widgets passed from server
+	// new message window
+	public function test_()
+	{
+		// draw popout from server provided content
+		ob_start(); 
+									
+		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$getargs = array('source_value' => 'subject', 'source_type' => 'new');
+			\$serverdefnarr =  array();
+			\$poparr = array('drawservercontent' => \$serverdefnarr);
+			\$args = Array('1','contain',\$getargs,\$poparr,'new',1);
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge('popout_server.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_server.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	public function test_js()
+	{
+		// draw popout from server provided content
+		// call server with jscript
+		
+		ob_start(); 
+									
+		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew');
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge('popout_jsserver.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_jsserver.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	public function test_jsentry()
+	{
+		// uses passed in arg to to create callback fro button
+		
+		// draw popout from server provided content
+		// call server with jscript
+		// add a button that collects input and calls a function
+		
+		$callback = "\"var p= document.createElement('p');p.id='doodah';p.innerHTML= 'foobbaaaahhhrr';document.body.appendChild(p);\"";
+			
+		ob_start(); 
+									
+		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit', jscallback => $callback);			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew');
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge('popout_jsserverentry.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_jsserverentry.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	public function test_jsentry_externalfilecallback()
+	{
+		// uses dnew.js to create callback fro button
+		
+		// draw popout from server provided content
+		// call server with jscript
+		// add a button that collects input and calls a function
+		
+		ob_start(); 
+									
+		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew');
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge('popout_jsserverentry_ext.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_jsserverentry_ext.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	public function test_jsentry_externalfilecallback_cls()
+	{
+		// uses dnew.js to create callback fro button
+		
+		// draw popout from server provided content
+		// call server with jscript
+		// add a button that collects input and calls a function
+		
+		ob_start(); 
+									
+		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew',"class" => "new");
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge('popout_jsserverentry_ext_cls.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_jsserverentry_ext_cls.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	public function test_jsentry_externalfilecallback_cls_edit()
+	{
+		// this is actually the same as the dedit.php page
+		
+		// uses dnew.js to create callback fro button
+		
+		// draw popout from server provided content
+		// call server with jscript
+		// add a button that collects input and calls a function
+		
+		ob_start(); 
+									
+		jsinitpivot('dedit.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
+			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge('popout_edit.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_edit.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+public function test_jsentry_externalfilecallback_cls_2popouts()
+	{
+		// uses dnew.js to create callback fro button
+		
+		// draw popout from server provided content
+		// call server with jscript
+		// add a button that collects input and calls a function
+		
+		// each popout behaves differently which is configured by class and hooked in dnew.js
+		
+		ob_start(); 
+									
+		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+		jsslideoutinit(2,"450px");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
+			\$widgetdefnarr = array('fields' => array("student" => "source_value"));
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr, 
+												'drawdbselects' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew',"class" => "new");
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('2','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+			drawtable(\$_GET);
+			
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge('popout_jsserverentry_ext_cls2p.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_jsserverentry_ext_cls2p.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}	
+
+class test_drawpivot extends PHPUnit_Framework_TestCase
+{
+	// popout with multiple selects on it
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+		jsslideoutinit(2,"450px");
+		jsslideoutinit(3,"400px");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
+			\$widgetdefnarr =  array('fields' =>array("student" => "source_value"));
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr, 
+												'drawdbselects' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow',
+															  'cnstr_period' => 'select distinct name from period',
+															  'cnstr_subject' => 'select distinct name from subject');
+			\$poparr = array('drawmultiselect' => \$multiselectarr);
+			\$args = Array('3','wideswitch',\$_GET,\$poparr,'filters',2);
+			drawpopout(\$args);
+			
+			\$checkdefnarr = array("status" => "status","subject" => "subject","adult" => "adult",
+										           "student" => "student","period" => "period","dow" => "dow",
+											   		 "record" => "record","recordtype" => "recordtype","id" => "id");
+			\$poparr = array('drawcheckbox' => \$checkdefnarr);
+			\$args = Array('2','contain',\$_GET,\$poparr,'datacolumns',2);
+			drawpopout(\$args);
+			
+			\$getargs = array('source_value' => 'Clayton', 
+												 'ztypes' => 'subject,student',
+												 'source_type' => 'student',
+												 'xaxis' => 'period',
+												 'yaxis' => 'dow');
+
+			drawtable(\$_GET);
+			
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge();
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/pivot.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+
+			
+class test_drawtable extends PHPUnit_Framework_TestCase
+{
+	// draw some tables by getting XML from REST service (need to run prod.sh)
+	public function test_()
+	{
+		ob_start(); 
+											
+		$str = <<<PHP
+		<html><head><head><html>
+		<?php
+		
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage(FALSE);
+		
+			\$getargs = array('source_value' => 'Clayton', 
+												 'ztypes' => 'subject,student',
+												 'source_type' => 'student',
+												 'xaxis' => 'period',
+												 'yaxis' => 'dow');
+			drawtable(\$getargs);
+		?>
+PHP;
+		echo $str;
+
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/table.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	public function test_defaultargs()
+	{
+		// $_GET is insufficient to get a response out of the web service
+		// $_GET is indicative of what gets filled out by webpage as default only
+		ob_start(); 
+											
+		$str = <<<PHP
+		<html><head><head><html>
+		<?php
+		
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage(FALSE);
+		
+			\$getargs = array('source_type' => 'student',
+												 'xaxis' => 'period',
+												 'yaxis' => 'dow');
+			drawtable(\$getargs);
+		?>
+PHP;
+		echo $str;
+
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/table_noargs.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	public function test_noztype()
+	{
+		// $_GET is insufficient to get a response out of the web service
+		// $_GET is indicative of what gets filled out by webpage as default only
+		ob_start(); 
+											
+		$str = <<<PHP
+		<html><head><head><html>
+		<?php
+		
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage(FALSE);
+		
+			\$getargs = array('source_type' => 'student',
+											    'source_value' => 'Clayton',
+												 'xaxis' => 'period',
+												 'yaxis' => 'dow');
+			drawtable(\$getargs);
+		?>
+PHP;
+		echo $str;
+
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/table_noztypes.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+
+class test_drawmixedpopout extends PHPUnit_Framework_TestCase
 {
 	// popout with multiple selects on it
 	public function test_()
@@ -53,8 +557,152 @@ class test_drawselectpopout extends PHPUnit_Framework_TestCase
 			include_once 'webpage_utils.php';
 			initpage();
 			
-			\$widgetdefnarr =  array("subject" => "cnstr_subject","dow" => "cnstr_dow");
-			\$args = Array('1','contain',\$_GET,'drawdbselects','datacolumns','lesson',\$widgetdefnarr);
+			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
+			\$widgetdefnarr =  array("fields" => array("subject" => "cnstr_subject","student" => "cnstr_student"));
+			\$poparr = array('drawdbselects' => \$widgetdefnarr,'drawmultiselect' => \$multiselectarr);
+			\$args = Array('1','wideswitch',\$_GET,\$poparr,'datacolumns',1);
+
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+		
+		jsphpbridge('popout_mixed.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_mixed.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+
+class test_drawxmlselectpopout extends PHPUnit_Framework_TestCase
+{
+	// popout with multiple selects on it
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"600px");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+				
+			\$widgetdefnarr =  array("xmlfile" => "dropdowns.xml");
+			\$poparr = array('drawxmlselects' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'datacolumns',1);
+
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+		
+		jsphpbridge('popout_xml.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_xml.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	// popout with multiple selects on it and a special class
+	public function test_class()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"600px");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+				
+			\$widgetdefnarr =  array("xmlfile" => "dropdowns.xml","class" => "foo");
+			\$poparr = array('drawxmlselects' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'datacolumns',1);
+
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+		
+		jsphpbridge('popout_xmlcls.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_xmlcls.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+
+class test_drawbuttonpopout extends PHPUnit_Framework_TestCase
+{
+	// popout with multiple selects on it
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"600px");
+		
+		//$callback = "\"console.log('fooblahhhhh')\"";
+		//$callback = "\"alert('fooblahhhhh')\"";
+		$callback = "\"var p= document.createElement('p');p.id='doodah';p.innerHTML= 'foobbaaaahhhrr';document.body.appendChild(p);\"";
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+
+			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit', jscallback => $callback);
+			\$poparr = array('drawbutton' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'datacolumns',1);
+
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+				
+		jsphpbridge('popout_button.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_button.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+
+class test_drawdbselectpopout extends PHPUnit_Framework_TestCase
+{
+	// popout with multiple selects on it
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"600px");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$widgetdefnarr =  array('fields' => array("subject" => "cnstr_subject","dow" => "cnstr_dow"));
+			\$poparr = array('drawdbselects' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'datacolumns',1);
+
 			drawpopout(\$args);
 		?>
 PHP;
@@ -66,6 +714,77 @@ PHP;
 		ob_end_clean();		
 		
 		writetofile("/var/www/html-dev/popout_select.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+	
+	public function test_class()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"600px");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$widgetdefnarr =  array('fields' => array("subject" => "cnstr_subject","dow" => "cnstr_dow"),'class' => "foo");
+			\$poparr = array('drawdbselects' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'datacolumns',1);
+
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+		
+		jsphpbridge('popout_selectcls.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_selectcls.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
+
+class test_drawcheckboxpopout extends PHPUnit_Framework_TestCase
+{
+	//checkboxes this will create ztypes
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"600px");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			
+			\$checkdefnarr = array("status" => "status","subject" => "subject","adult" => "adult",
+										           "student" => "student","period" => "period","dow" => "dow",
+											   		 "record" => "record","recordtype" => "recordtype","id" => "id");
+			
+		
+			\$poparr = array('drawcheckbox' => \$checkdefnarr);
+			\$args = Array('1','containswitch',\$_GET,\$poparr,'datacolumns',1);
+
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+		
+		jsphpbridge('popout_check.php');
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_check.php",$result,"w");
 	   //$this->assertEquals($this->expected_result,$result);
 	}
 }
@@ -87,7 +806,8 @@ class test_draw2multiselectpopout extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
-			\$args = Array('1','wideswitch',\$_GET,'drawmultiselect','datacolumns',\$multiselectarr,1);
+			\$poparr = array('drawmultiselect' => \$multiselectarr);
+			\$args = Array('1','wideswitch',\$_GET,\$poparr,'datacolumns',1);
 			drawpopout(\$args);
 		?>
 PHP;
@@ -118,8 +838,11 @@ class test_drawmultiselectpopout extends PHPUnit_Framework_TestCase
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
 			initpage();
-			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow');
-			\$args = Array('1','wideswitch',\$_GET,'drawmultiselect','datacolumns',\$multiselectarr,1);
+			
+			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow');			
+			\$poparr = array('drawmultiselect' => \$multiselectarr);
+			\$args = Array('1','wideswitch',\$_GET,\$poparr,'datacolumns',1);
+			
 			drawpopout(\$args);
 		?>
 PHP;
@@ -165,25 +888,6 @@ PHP;
 		ob_end_clean();		
 		
 		writetofile("/var/www/html-dev/popout_many.php",$result,"w");
-	   //$this->assertEquals($this->expected_result,$result);
-	}
-}
-
-class test_drawpivot extends PHPUnit_Framework_TestCase
-{
-	public function test_()
-	{
-		ob_start(); 
-											
-		jsinitpivot('dpivot.js');// initial includes; main js callback routines that recall page on change and base style sheets
-		phpinit('drawpivot'); // main php code
-		jsphpbridge('wideswitch'); // bridge between php and js code
-		jsdefer(); // final display of widgets to avoid flicker
-		
-		$result = ob_get_contents();
-		ob_end_clean();		
-		
-		writetofile("tmp.html",$result,"w");
 	   //$this->assertEquals($this->expected_result,$result);
 	}
 }
@@ -264,23 +968,84 @@ echo $str;
 	}
 }
 
+class test_drawapp extends PHPUnit_Framework_TestCase
+{
+	// popout with multiple selects on it
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+		jsslideoutinit(2,"450px");
+		jsslideoutinit(3,"400px");
+		jsslideoutinit(4,"850px");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
+			\$widgetdefnarr =  array('fields' =>array("student" => "source_value"));
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr, 
+												'drawdbselects' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			drawpopout(\$args);
+			
+			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow',
+															  'cnstr_period' => 'select distinct name from period',
+															  'cnstr_subject' => 'select distinct name from subject');
+			\$poparr = array('drawmultiselect' => \$multiselectarr);
+			\$args = Array('3','wideswitch',\$_GET,\$poparr,'filters',2);
+			drawpopout(\$args);
+			
+			\$checkdefnarr = array("status" => "status","subject" => "subject","adult" => "adult",
+										           "student" => "student","period" => "period","dow" => "dow",
+											   		 "record" => "record","recordtype" => "recordtype","id" => "id");
+			\$poparr = array('drawcheckbox' => \$checkdefnarr);
+			\$args = Array('2','contain',\$_GET,\$poparr,'datacolumns',2);
+			drawpopout(\$args);
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
+			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('4','contain',\$_GET,\$poparr,'update',1);
+			drawpopout(\$args);
+			
+			drawtable(\$_GET);
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge("app.php");
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/app.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
 set_error_handler("handleError");
    
 try {
-	
-	/* drawpivot */
-	//testrunner("drawsearch");
-	//testrunner("drawpivot");
-	//testrunner("drawmultiselectpopout");
+	/*testrunner("drawmultiselectpopout");
 	testrunner("draw2multiselectpopout");
-	//testrunner("drawmultiselectpopout_many");
-	
-	testrunner("drawselectpopout");
-	
-	
-	
-	
-	
+	testrunner("drawmultiselectpopout_many");
+	testrunner("drawdbselectpopout");
+	testrunner("drawmixedpopout");
+	testrunner("drawtable");
+	testrunner("drawpivot");
+	testrunner("drawcheckboxpopout");
+	testrunner("drawxmlselectpopout");
+	testrunner("drawbuttonpopout");
+	testrunner("drawserverpopout");
+	testrunner("drawmenu");
+	testrunner("menu_update");*/
+	testrunner("drawapp");
+	 
 } catch (Exception $e) {
     echo 'Caught exception: ',  $e->getMessage(), "\n";
 }

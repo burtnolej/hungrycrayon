@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as xmltree
 import unittest
 from xml_utils import element_find_by_attrib_value, element_move, element_fuse, \
-     element_parent_get, element_find_tags,element_find_children, grid2xml, xml2string, record2xml
+     element_parent_get, element_find_tags,element_find_children, grid2xml, xml2string, record2xml, \
+     tree2xml
     
 from collections import OrderedDict
 
@@ -833,7 +834,17 @@ class Test_Pageto_XML(unittest.TestCase):
         
         self.assertEqual(xmltree.tostring(xml),expected_result)
         
+class Test_Tree2XML(unittest.TestCase):
+       
+    def test_(self):
         
+        expected_result = "<root><item><objtype>vegetable</objtype><value>courgette</value><value>carrot</value></item><item><objtype>fruit</objtype><value>banana</value><value>apple</value></item></root>"
+        page = {'fruit':['banana','apple'],'vegetable':['courgette','carrot']}
+        
+        xml = tree2xml(page)
+        
+        self.assertEqual(xmltree.tostring(xml),expected_result)
+                
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
@@ -849,6 +860,7 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_nopivot))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pageto_XML))
                   
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_header))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_header))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Tree2XML))
     
     unittest.TextTestRunner(verbosity=2).run(suite)

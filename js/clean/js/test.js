@@ -369,4 +369,63 @@ function   ($, myutils) {
 			//assert.equal(compare_1darrays(expected_results, results), 0, 'passed');
 		});
 		
-});
+		// test create of a custom styled select
+		QUnit.test("test custom select", function(assert) {
+			
+			$('head').append('<link rel="stylesheet" type="text/css" href="select.css">');
+			
+			options_arr = Array('a','b','c','d','e');
+			drawcselect(options_arr ,'myselect');
+			assert.equal(0, 0, 'passed');
+		});		
+		
+		// test create of a custom styled select
+		QUnit.test("test custom select with comment", function(assert) {
+			
+			$('head').append('<link rel="stylesheet" type="text/css" href="select.css">');
+			
+			options_arr = Array('a','b','c','d','e');
+			drawcselect(options_arr ,'myselect',"blah blah blah");
+			assert.equal(0, 0, 'passed');
+		});		
+		
+		// test create of a custom styled select and add it to a parent element
+		QUnit.test("test custom select and add to a parent", function(assert) {
+
+			var options = {hidden:false};
+			parentel = addElement("div","divid",options);
+		
+			$('head').append('<link rel="stylesheet" type="text/css" href="select.css">');
+			
+			options_arr = Array('a','b','c','d','e');
+			
+			var options = {values:options_arr,parentel:parentel}
+			drawcselectp('myselect',options);
+			assert.equal(0, 0, 'passed');
+		});		
+		
+		// test create of a custom styled select and add it to a parent element
+		QUnit.test("test custom select and selector based on class not", function(assert) {
+			
+			var options = {hidden:false};
+			parentel = addElement("div","divid",options);
+			
+				$('head').append('<link rel="stylesheet" type="text/css" href="select.css">');
+			
+				options_arr = Array('a','b','c','d','e');
+				var options = {values:options_arr,parentel:parentel,class:"foo"}
+				drawcselectp('myselect',options);
+				
+				options_arr = Array('a','b','c','d','e');
+				var options = {values:options_arr,parentel:parentel}
+				drawcselectp('myselect2',options);
+			
+				// test select does not contain a class
+					$("select").on('change',function(){
+						if (!$(this).hasClass("foo")) {
+							console.log("me");
+						}
+				});
+		});
+			
+	});

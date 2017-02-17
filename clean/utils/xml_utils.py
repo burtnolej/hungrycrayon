@@ -87,7 +87,24 @@ def _addxmlheader(root,header):
         
     return(root)
 
+
+def tree2xml(page,root=None,tag="item"):
     
+    if root == None:
+        root = xmltree.Element('root')
+        
+    for key in page.keys():
+        itemelement = xmltree.SubElement(root,tag)
+        objelement = xmltree.SubElement(itemelement,"objtype")
+        objelement.text = str(key)
+        
+        for value in page[key]:
+            
+            valelement = xmltree.SubElement(itemelement,"value")
+            valelement.text = str(value) 
+            
+    return(root)
+                
 def record2xml(page,root=None,name=None,header=None):
     
     if root == None:

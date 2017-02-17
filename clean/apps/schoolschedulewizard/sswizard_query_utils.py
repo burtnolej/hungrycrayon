@@ -14,6 +14,10 @@ __all__ = ['_execfunc','_rowheaderexecfunc','_columnheaderexecfunc','_dowexecfun
 def _asdict(values):
     return(dict((value[0],value[1]) for value in values))
 
+def _refexecfunc(database,objtype):
+    exec_str = "select name from " + objtype
+    return(tbl_query(database,exec_str))
+
 def _dowexecfunc(database,value,prep,*args):
     exec_str = "select code from dow "
     return(tbl_query(database,exec_str))

@@ -41,6 +41,7 @@
 	<dsearch>
 		<select id='1'>
 			<field>source_type</field>
+			<label>type</label>
 			<values>
 				<value>list</value>
 			</values>
@@ -48,6 +49,7 @@
 		</select>
 		<select id='2'>
 			<field>source_value</field>
+			<label>value</label>
 			<values>
 				<value>lesson</value>
 				<value>dow</value>
@@ -60,6 +62,7 @@
 		</select>
 		<select id='3'>
 			<field>pagenum</field>
+			<label>page #</label>
 			<values>
 				<value>1</value>
 				<value>2</value>
@@ -68,6 +71,7 @@
 		</select>
 		<select id='4'>
 			<field>pagelen</field>
+			<label>rows #</label>
 			<values>
 				<value>10</value>
 				<value>100</value>
@@ -79,10 +83,10 @@
 	</dsearch>
 	<dnew>
 		<select id='1'>
-			<field>source_value</field>
+			<field>objtype</field>
 			<label>record type</label>
 			<values>
-			<value>not selected</value>
+			<value>NotSelected</value>
 				<value>lesson</value>
 				<value>subject</value>
 				<value>student</value>
@@ -91,7 +95,7 @@
 				<value>dow</value>
 				<value>recordtype</value>
 			</values>
-			<default>not selected</default>
+			<default>NotSelected</default>
 		</select>
 	</dnew>
 </root>

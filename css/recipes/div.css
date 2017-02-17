@@ -14,7 +14,7 @@
 	background-color: #FFEFEF;
 }
 .pol1  { /* pop out label 1 */
-	width:160px;height:20px	;
+	width:180px;height:20px	;
 	padding-top: 4px;
 }
 .pol2  { /* pop put label 2 */
@@ -23,6 +23,16 @@
 }
 
 .pol3  { /* pop put label 2 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+
+.pol4  { /* pop put label 2 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+
+.pol5  { /* pop put label 2 */
 	width:180px;height:20px	;
 	padding-top: 4px;
 }
@@ -68,7 +78,7 @@ div.containswitch {
 div.wideswitch {
 	margin:.25em .25em .25em .25em;
 	background-color: #FEFAFA;
-	width:320px;
+	/*width:620px;*/
 	float:left;
 }
 

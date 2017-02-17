@@ -791,6 +791,25 @@ class test_getchtmlselect extends PHPUnit_Framework_TestCase
 		ob_end_clean();		
 		$this->assertEquals($result,$this->expected_result);
 	}
+	
+	public function test_class()
+	{
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+	
+		$this->expected_result = '<!DOCTYPE html><html><link rel="stylesheet" type="text/css" href="css/select.css" /><p class="label">vardy</p><span class="select"><select class="custom foobar" id="foobar" name="foobar"><option value="foobar">foobar</option><option value="barfoo"selected>barfoo</option></select></span><span class="comment"><p>blah blah blah blah blah blah blah blah blah blah blah blah blah blah</p></span>';
+				
+		ob_start(); 
+		
+		$values = array("foobar","barfoo");
+			
+		getchtmlselect("foobar",$values,1,"barfoo",array('class' => 'foobar', 'label' => 'vardy','comment' => 'blah blah blah blah blah blah blah blah blah blah blah blah blah blah'));
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
+	}
 }
 
 class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
@@ -828,11 +847,56 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 		
 		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
 		
-		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span></div>';
-										
+		$this->expected_result = '<p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><br><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span><br>';
+												                                                                                                                    
 		ob_start(); 
 
 		getxmlhtmlcselect($xml,$defaults,'this is a div label');
+
+		$result = ob_get_contents();
+		ob_end_clean();		
+		$this->assertEquals($result,$this->expected_result);
+	}
+	
+public function test_class()
+	{
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/select.css\" />";
+		echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/div.css\" />";
+	
+		$xml = "<root>
+		          <select id='1'>
+		            <field>xaxis</field>
+		            <values>
+		              <value>period</value>
+		          	  <value>dow</value>
+		              <value>adult</value>
+		              <value>subject</value>
+		            </values>
+		            <comment>foobar foobar foobar</comment>
+		            </select>
+		            
+		          <select id='2'>
+		            <field>yaxis</field>
+		            <values>
+		              <value>period</value>
+		              <value>dow</value>
+		              <value>adult</value>
+		              <value>subject</value>
+		            </values>
+		            <comment>barfoo barfoo barfoo</comment>
+		          </select>
+		        </root>";
+		
+		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
+		
+		$this->expected_result = '<p class="label">xaxis</p><span class="select"><select class="custom foo" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><br><p class="label">yaxis</p><span class="select"><select class="custom foo" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span><br>';                                                                                                               
+		ob_start(); 
+
+		$args = array("class" => "foo");
+		
+		getxmlhtmlcselect($xml,$defaults,'this is a div label',$args);
 
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -878,10 +942,11 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 		
 		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
 		
-		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span></div>';
+		$this->expected_result = '<p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><br><p class="label">yaxis</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span><br>';
+		
 		ob_start(); 
-
-		getxmlhtmlcselect($xml,$defaults,'this is a div label','foobar');
+		
+		getxmlhtmlcselect($xml,$defaults,'this is a div label',array('starttag' =>'foobar'));
 
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -916,10 +981,10 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 			
 		$defaults = array();
 		
-		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option></select></span></div>';
+		$this->expected_result = '<p class="label">xaxis</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option></select></span><br>';
 		ob_start(); 
 
-		getxmlhtmlcselect($xml,$defaults,'this is a div label','dpivot');
+		getxmlhtmlcselect($xml,$defaults,'this is a div label',array("starttag" => 'dpivot'));
 
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -967,10 +1032,11 @@ class test_getxmlchtmlselect extends PHPUnit_Framework_TestCase
 		
 		$defaults = array("xaxis" => "adult", "yaxis" => "dow");
 		
-		$this->expected_result = '<div class="contain"><p class="divlabel">this is a div label</p><p class="label">row header</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><p class="label">column header</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span></div>';
+		$this->expected_result = '<p class="label">row header</p><span class="select"><select class="custom" id="xaxis" name="xaxis"><option value="period">period</option><option value="dow">dow</option><option value="adult"selected>adult</option><option value="subject">subject</option></select></span><span class="comment"><p>foobar foobar foobar</p></span><br><p class="label">column header</p><span class="select"><select class="custom" id="yaxis" name="yaxis"><option value="period">period</option><option value="dow"selected>dow</option><option value="adult">adult</option><option value="subject">subject</option></select></span><span class="comment"><p>barfoo barfoo barfoo</p></span><br>';
+		
 		ob_start(); 
 
-		getxmlhtmlcselect($xml,$defaults,'this is a div label','foobar');
+		getxmlhtmlcselect($xml,$defaults,'this is a div label',array('starttag' => 'foobar'));
 
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -1179,6 +1245,34 @@ class test_getchtmlxmlmenu extends PHPUnit_Framework_TestCase
 		$result = ob_get_contents();
 		ob_end_clean();		
 		$this->assertEquals($result,$this->expected_result);     
+	}
+	
+	public function test_jscript()
+	{
+		echo "<!DOCTYPE html>";
+		echo "<html>";
+	   echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/menu.css\" />";
+	    
+	   //ob_start();
+	   
+		$xml = "<root>
+		          <item name='view'>
+		          	<item name='by student'>
+		          		<link>foobar.php</link>
+		          	</item>
+		          	<item name='by adult'>
+		          		<jscript>alert('foobar')</jscript>
+		          	</item>
+		          </item>
+		         </root>";	 
+		         
+		 $this->expected_result = '<div id="wrap"><ul class = "nav"><li>view<ul><li><a href="foobar.php">by student</a></li><li><a href="barfoo.php">by adult</a></li></ul></ul></div>';
+		 		         
+		 getchtmlxmlmenu2($xml,"foobar");   
+		 
+		//$result = ob_get_contents();
+		//ob_end_clean();		
+		//$this->assertEquals($result,$this->expected_result);     
 	}
 
 	public function test_multilevel()
@@ -1487,11 +1581,11 @@ try {
 	//testrunner("gethtmlswitch");
 	//testrunner("getchtmlswitch");
 	//testrunner("gethtmlmultiselect");
-	testrunner("getdbhtmlmultiselect");
+	//testrunner("getdbhtmlmultiselect");
 	
 	/* menu */
-	//testrunner("getchtmlxmlmenu");
-	
+	testrunner("getchtmlxmlmenu","test_jscript");
+
 	/* input */
 	//testrunner("getchtmlinput");
 	//testrunner("getxmlchtmlinput");

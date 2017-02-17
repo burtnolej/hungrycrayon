@@ -27,6 +27,9 @@ colorpalette = dbformats_get(dbname,'bgcolor')
 fontpalette = dbformats_get(dbname,'fgcolor')
 colors = dbcolors_get(dbname)
 
+class OFDuplicateRecord(Exception):
+    pass
+
 class schoolschedgeneric(dbtblgeneric):
 
     def __init__(self,of,database,recursion=True,**kwargs):
@@ -581,7 +584,20 @@ def _lesson_change(lesson,delete=False):
                         _delete(lesson_attr,xaxis,yaxis,lesson)
                     else:
                         _add(lesson_attr,xaxis,yaxis,lesson)
-                    
+          
+def dataset_refdata(database):
+    
+    reftypes = ['subject','student','period','dow','recordtype','adult']
+    
+    _refdata = {}
+    with database:
+        for reftype in reftypes:
+            _,values,_ = sswizard_query_utils._refexecfunc(database,reftype)
+            _refdata[reftype] = [value[0] for value in values]
+
+    return _refdata
+                
+    
 def dataset_new(source_type):
     
     if source_type == "lesson":
@@ -602,17 +618,19 @@ def dataset_add(database,refdatabase,of,enums,prepmap,datamembers,objtype='lesso
     _userobjid = None
     
     if objtype == "lesson":
-        datamembers['session'] = ".".join([datamembers['teacher'],datamembers['subject'],datamembers['dow'],
-                                   sswizard_utils._isname(enums,'period',datamembers['period'])])
         
-        datamembers['adult'] = datamembers['teacher']
-        datamembers.pop('teacher')
+        if (datamembers.has_key('adult') == False and datamembers.has_key('teacher') == True):
+            datamembers['adult'] = datamembers['teacher']
+            datamembers.pop('teacher')
+            
+        datamembers['session'] = ".".join([datamembers['adult'],datamembers['subject'],datamembers['dow'],
+                                   sswizard_utils._isname(enums,'period',datamembers['period'])])
         
         datamembers['userobjid'] = sswizard_utils._getuserobjid(enums,['period','dow','student','adult','subject'],datamembers)
         
         # check that the userobjid does not already exist
         if of.object_exists('lesson',datamembers['userobjid']) == True:
-            raise Exception("id already in use",datamembers['userobjid'])
+            raise OFDuplicateRecord("id already in use",datamembers['userobjid'])
         
         datamembers['objtype'] = 'lesson'   
         datamembers['substatus'] = 'complete'

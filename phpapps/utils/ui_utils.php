@@ -10,16 +10,22 @@ gethtmldropdown($column,$values,$widgetcount,$default=NULL)
 gethtmldbdropdown($dbname,$tablename)
 gethtmltablecoldropdown($dbname,$tablename,$column,$widgetcount,$default=NULL)
 gethtmlxmldropdown($xml)
+gethtmltablecoldropdown($dbname,$tablename,$column,$widgetcount,$default=NULL)
 
-select
------
+select - plain
+------------
+gethtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$labels=FALSE,$labelclass=FALSE,$spanclass=NULL,$class=NULL)
+gethtmlxmlselect($xml,$defaults,$labels=FALSE,$labelclass=FALSE,$spanclass=NULL,$class=NULL)
 gethtmlselect($column,$values,$widgetcount,$default, $label=NULL,$labelclass=NULL,$spanclass=NULL,$class=NULL)
+
+ 
+select - custom
+------------
 getchtmlselect($column,$values,$widgetcount,$default,$args)
 getchtmlselect_nolabel($column,$values,$widgetcount,$default,$comment)
 getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$args)
-gethtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,$labels=FALSE,$labelclass=FALSE,$spanclass=NULL,$class=NULL)
+getchtmlselect_nolabel($column,$values,$widgetcount,$default,$comment)
 getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) 
-gethtmlxmlselect($xml,$defaults,$labels=FALSE,$labelclass=FALSE,$spanclass=NULL,$class=NULL)
 
 input
 ----
@@ -149,7 +155,13 @@ function getchtmlselect($column,$values,$widgetcount,$default,$args) {
 	
 	echo "<p class=\"label\">".$label."</p>";
 	echo "<span class=\"select\">";		
-	echo "<select class=\"custom\" id=\"".$column."\" name=\"".$column."\">"; 
+	echo "<select class=\"custom";
+	
+	if (isset($args['class'])) {
+		echo " ".$args['class'];
+	}
+	
+	echo "\" id=\"".$column."\" name=\"".$column."\">"; 
 	
 	foreach ($values as $value) {
 			echo "<option value=\"".$value."\"";
@@ -270,7 +282,6 @@ function getchtmlinput($label,$field,$default,$args=NULL) {
 	}
 }
 
-
 // Custom HTML XML input
 function getxmlhtmlinput($xml,$defaults,$divlabel,$starttag=NULL) {
 	
@@ -286,8 +297,8 @@ function getxmlhtmlinput($xml,$defaults,$divlabel,$starttag=NULL) {
 	
 	$widgetcount = 0;
 	
-	echo "<div class=\"contain\">";
-	echo "<p class=\"divlabel\">".$divlabel."</p>";
+	//echo "<div class=\"contain\">";
+	//echo "<p class=\"divlabel\">".$divlabel."</p>";
 		
 	foreach ($_dropdowns as $_dropdown) {
 
@@ -305,7 +316,7 @@ function getxmlhtmlinput($xml,$defaults,$divlabel,$starttag=NULL) {
 		$args= Array('comment' => (string)$_dropdown->comment);
 		getchtmlinput($label,$field,$default,$args);
 	}
-	echo "</div>";
+	//echo "</div>";
 }
 
 // HTML DB Dropdown
@@ -346,16 +357,16 @@ function gethtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default,
 }
 
 // Custom HTML XML Select
-function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
+//function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
+function getxmlhtmlcselect($xml,$defaults,$divlabel,$globalargs=NULL) {
 	      
 	$utilsxml = simplexml_load_string($xml,'utils_xml');
 	
-	if ($starttag <> NULL) {		
-		$tmproot = $utilsxml->xpath("//".$starttag);
-		$_dropdowns = $tmproot[0]->xpath("./select");
+	if (isset($globalargs['starttag'])) {		
+		$tmproot = $utilsxml->xpath("//".$globalargs['starttag']);
+		$_dropdowns = $tmproot[0]->xpath("./select");		
 	}
 	else {
-	
 		$_dropdowns = $utilsxml->xpath("//select");
 	}
 	
@@ -366,7 +377,12 @@ function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 		$values = $_dropdown->values->xpath("child::value");
 		$field = (string)$_dropdown->field;
 		
-		$args = array();
+		if (isset($globalargs['class'])) {
+			$args = array('class' => $globalargs['class']);
+		}
+		else {
+			$args = array();
+		}
 		
 		if (isset($_dropdown->label)) {
 			$args['label'] = (string)$_dropdown->label;
@@ -384,6 +400,8 @@ function getxmlhtmlcselect($xml,$defaults,$divlabel,$starttag=NULL) {
 		}
 
 		getchtmlselect($field,$values,$widgetcount,$default,$args);
+		
+		echo "<br>";
 				
 		$widgetcount = $widgetcount+1;
 	}
@@ -423,8 +441,6 @@ function gethtmlxmlselect($xml,$defaults,$labels=FALSE,$labelclass=FALSE,$spancl
 		$widgetcount = $widgetcount+1;
 	}
 }
-
-
 
 // HTML DB Table Column Dropdown
 function gethtmltablecoldropdown($dbname,$tablename,$column,$widgetcount,$default=NULL){
@@ -468,9 +484,15 @@ function gethtmlxmldropdown($xml) {
 }
 
 // HTML Button
-function gethtmlbutton($type,$label) {
+function gethtmlbutton($type,$label,$id=null) {
 	
-	echo "<input type=\"".$type."\" name=\"".$type."\" value=\"".$label."\" />";
+	echo "<input type=\"".$type."\" name=\"".$type."\"";
+	
+	if ($id <> null) {
+		echo "id=\"".$id."\"";
+	}
+	
+	echo " value=\"".$label."\" />";
 
 }
 
@@ -499,7 +521,6 @@ function getdbhtmlmultiselect($dbname,$query,$name,$args) {
 		$ycount=0;
 		while ($row = $results->fetchArray()) {
 				
-				//if (isset($args['maxy']) and $ycount > 4) { 
 				if (isset($args['maxy']) and $ycount > $args['maxy']) { 
 					echo "</tr><tr>";
 					$ycount=0;
@@ -600,7 +621,6 @@ function getchtmlswitch($name,$value,$args) {
 			
 }
 
-	
 function _menu_iter($func,$root,$depth){
 
 	if ($depth==0) {
@@ -719,7 +739,18 @@ function getchtmlxmlmenu2($xml,$divlabel) {
 				else {
 					$link = (string)$node->link;			
 				}
-				echo "<a href=\"".$link."\">".$name."</a>";
+				echo "<a ";
+				if (isset($node->id) == TRUE) {
+					echo "id=\"".$node->id."\"";
+				}
+				echo " href=\"".$link."\">".$name."</a>";
+			}
+			elseif (isset($node->jscript) == TRUE) {
+				echo "<a ";
+				if (isset($node->id) == TRUE) {
+					echo "id=\"".$node->id."\"";
+				}
+				echo " onclick=\"".$node->jscript."\" href=\"javascript:void(0);\">".$name."</a>";
 			}
 			else {
 				echo $name;
@@ -750,17 +781,7 @@ function gethtmldiv($label,$htmbodyfunc,$param,$divclass=NULL,$pclass=NULL) {
 	echo "</div>";
 }
 
-function gethtmlpopoutdivold($label,$htmbodyfunc,$param,$divclass=NULL,$aclass=NULL) {
-	/*echo "<p class='divlabel'>".$label."</>";*/
-	echo "<div class='nojs slide-out-base ".$divclass."'>";  //containswitch
-	//echo "<div class='slide-out-div-top nojs containswitch'>"; 
-	echo "<a class='nojs pol-base ".$aclass."'>".$label."</a>";
-	$htmbodyfunc($param);
-	echo "</div>";
-	
-}
-
-function gethtmlpopoutdiv($label,$htmbodyfunc,$param,$tabnum,$divclass=NULL) {
+function gethtmlpopoutdivold($label,$htmbodyfunc,$param,$tabnum,$divclass=NULL) {
 
 	// css stubs to append tab number too
 	$slideout = "slide-out".$tabnum;
@@ -770,6 +791,25 @@ function gethtmlpopoutdiv($label,$htmbodyfunc,$param,$tabnum,$divclass=NULL) {
 	echo "<div class='nojs slide-out-base ".$slideout." ".$divclass."'>";  
 	echo "<a class='nojs pol-base ".$pol." ".$handle."'>".$label."</a>";
 	$htmbodyfunc($param);
+	echo "</div>";
+	
+}
+
+function gethtmlpopoutdiv($label,$getargs,$htmlfuncarr,$tabnum,$maxy,$divclass=NULL) {
+
+	// css stubs to append tab number too
+	$slideout = "slide-out".$tabnum;
+	$handle = "handle".$tabnum;
+	$pol = "pol".$tabnum;
+	
+	echo "<div class='nojs slide-out-base ".$slideout." ".$divclass."'>";  
+	echo "<a class='nojs pol-base ".$pol." ".$handle."'>".$label."</a>";
+	
+	foreach ($htmlfuncarr as $htmlbodyfunc => $param) {
+		$htmlbodyfunc($getargs,$param,$maxy);
+		echo "<br>";
+	}
+
 	echo "</div>";
 	
 }

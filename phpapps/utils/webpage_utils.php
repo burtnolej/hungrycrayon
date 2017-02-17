@@ -1,6 +1,10 @@
 <?php
 
 /*
+drawpopout
+drawmultiselect
+drawdbselects
+
 drawpivot($getargs = []) 
 drawsearch($getargs = []) 
 
@@ -18,51 +22,146 @@ set_include_path($PHPLIBPATH);
 include_once 'db_utils.php';
 include_once 'utils_xml.php';
 
+function drawtable($getargs) {
+		$result=refreshpage($getargs);
+
+			$xml = $result['xml'];
+			$url = $result['url'];
+			
+			$func = function() use ($xml,$url,$getargs) {
+				$args = Array('noheader' => true,'id' => 'table2');
+				
+				if ($xml == "-1") {
+					echo "ztype".$url;
+				}
+				elseif ($xml == "not found") {
+					echo "ztype".$url;
+				}
+				else {
+					draw($xml,$getargs);
+				}
+			};
+	
+			gethtmldiv("title blah blah",$func,"table","divlabel");	
+}
+
+function drawservercontent($getargs,$serverdefarr,$maxy) {
+	
+	$result=refreshpage($getargs);
+	$xml = $result['xml'];
+	$url = $result['url'];
+		
+	draw($xml,$getargs);
+
+}
+
 function drawpopout($args) {
 		
 	$popoutnum = $args[0]; // internal css class used by the actual popout
 	$popoutstylename = $args[1]; // internal css class used by the widgets in the popout
 	$getargs = $args[2]; // $_GET params from the URL
-	$htmlfunc = $args[3]; // function to create actual html
+	$htmlfuncarr = $args[3]; // function to create actual html
 	$popoutlabel = $args[4];
-	
-	// to be passed to the functiona that creates the widgets that go on the popup
-	// drawmultiselect(5=multisel defn and 7=maxy)
-	// drawdbselects(5=tablename, 6=widgetdefnarr)
-	$widgetargs = Array($getargs,$args[5],$args[6]); 
-	
+	$maxy = $args[5];
+		
 	$args= Array('hidden' => 'true');
 	getchtmlinput('',"handle".$popoutnum,$getargs['handle'.$popoutnum],$args);
 	
 	$args= Array('hidden' => 'true');
 	getchtmlinput('','last_source_value',$getargs['source_value'],$args);
 	
-	gethtmlpopoutdiv($popoutlabel,$htmlfunc,$widgetargs,$popoutnum,$popoutstylename);
+	gethtmlpopoutdiv($popoutlabel,$getargs,$htmlfuncarr,$popoutnum,$maxy,$popoutstylename);
 }
 
-function drawmultiselect($arr = []) {
-	$getargs = $arr[0]; // $_GET for default value	
-	$multiseldefn = $arr[1]; // array of query/fieldname pairs
-	$maxy = $arr[2]; // for width of widgets in the panel
 
-	foreach ($multiseldefn as $field => $query) {
+function drawmultiselect($getargs,$multiseldefnarr,$maxy) {
+	foreach ($multiseldefnarr as $field => $query) {
 		getdbhtmlmultiselect($GLOBALS['SSDB'],$query,$field,Array('checked' => $getargs,'maxy' => $maxy));
 	}
 }
 
-function drawdbselects($arr = []) {
-	$getargs = $arr[0]; // $_GET for default value	
+function drawdbselects($getargs,$arr,$maxy) {
 	
-	$tablename = $arr[1];
-	$widgets = $arr[2];
+	$dbselectdefnarr = $arr['fields'];
+
+	foreach ($dbselectdefnarr as $dbname => $fieldname) {
+		$args = array('comment'=>$comment, 'label' => $dbname,"distinct" => false);		
+		
+	if (isset($arr['class'])) {
+		$args['class'] = $arr['class'];
+	}
 	
-	foreach ($widgets as $dbname => $fieldname) {
-		$args = array('comment'=>$comment, 'label' => $dbname,"distinct" => false);							
 		getchtmldbselect($GLOBALS['SSDB'],$tablename,$dbname,$fieldname,1,$getargs[$fieldname],$args);	
+		echo "<br>"; // stacks selects vertically
 	}	
 }
 
-function drawpivot($getargs = []) {
+function drawcheckbox($getargs,$switchdefn,$arr = []) {
+	foreach ($switchdefn as $field => $name) {
+		$args = array('checked'=>explode(",",$getargs['ztypes']),'comment' => 'blah','single' => TRUE);	
+		getchtmlswitch($field,$name,$args);
+	}
+}
+
+function drawbutton($getargs,$buttondefn,$arr = []) {
+		gethtmlbutton($buttondefn['type'],$buttondefn['label'],$buttondefn['id']);
+		
+		$cb = $buttondefn['jscallback'];
+		$str = <<<JS
+	 	<script type="text/javascript">
+			$(document).ready(function(){
+				$("input[id='submitfoo']").on('click',function(){
+					$cb;
+				}
+			)});
+		</script>		
+JS;
+		echo $str;
+}
+
+function drawxmlinputs($getargs,$arr,$maxy) {
+
+		$xmlfile = $arr['xmlfile'];
+		if (!isset($arr['xmlfileparam'])) { // which bit of xml file to read
+			$args = array('starttag' => 'dpivot');
+		}
+		else {
+			$args = array('starttag' => $arr['xmlfileparam']);
+		}
+		
+		if (isset($arr['class'])) { // which bit of xml file to read
+			$args['class'] = $arr['class'];
+		}
+				
+		$xml = file_get_contents($xmlfile);
+	
+		getxmlhtmlinput($xml,$_GET,'edit',"dedit");
+}
+
+
+function drawxmlselects($getargs,$arr,$maxy) {
+		$xmlfile = $arr['xmlfile'];
+		if (!isset($arr['xmlfileparam'])) { // which bit of xml file to read
+			//$xmlfileparam = 'dpivot';
+			$args = array('starttag' => 'dpivot');
+		}
+		else {
+			//$xmlfileparam= $arr['xmlfileparam'];
+			$args = array('starttag' => $arr['xmlfileparam']);
+		}
+		
+		if (isset($arr['class'])) { // which bit of xml file to read
+			//$xmlfileparam = 'dpivot';
+			$args['class'] = $arr['class'];
+		}
+				
+		$xml = file_get_contents($xmlfile);
+		
+		//getxmlhtmlcselect($xml,$getargs,'pivot config',$xmlfileparam);
+		getxmlhtmlcselect($xml,$getargs,'pivot config',$args);
+}
+
+function drawpivotold($getargs = []) {
 	
 	/* getargs are the $_GET params passed into the php page; they will be used to provide default values */
 
@@ -272,13 +371,22 @@ JS;
 		echo $str;
 }
 
-function jsphpbridge($pagename) {
+function jsphpbridge($pagename=NULL,$servername=NULL) {
 
+		if ($pagename == NULL ) {
+			//$pagename = $_SERVER['PHP_SELF'];
+			$pagename = 'pivot.php';
+		}
+		if ($servername == NULL) {
+			//$servername = $_SERVER['SERVER_NAME'];
+			$servername = '0.0.0.0';
+		}
+		
 		// bridge between php and js code
 		$str = <<<JS
 <script>var Globals = <?php echo json_encode(array(
 'script_name' => '$pagename',
-'server_name' => '0.0.0.0')); 
+'server_name' => '$servername')); 
 ?>;</script>		
 JS;
 		echo $str;

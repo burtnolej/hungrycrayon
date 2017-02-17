@@ -27,6 +27,9 @@ requirejs(['myutils','jquery','tabSlideOut'],
     	
 		$(document).ready(function(){
 			
+			// set context menu
+			setcontextmenu("ul[class='nav']");
+			
     	$(function(){
         $('.slide-out-div-top').tabSlideOut({
             tabHandle: '.handle1',                     //class of the element that will become your tab
@@ -48,20 +51,17 @@ requirejs(['myutils','jquery','tabSlideOut'],
         });
      	});
      	
+    	$(function(){
+        $('.slide-out-div-top4').tabSlideOut({
+            tabHandle: '.handle4',                     //class of the element that will become your tab
+            leftPos: '1000px',                          //position from left/ use if tabLocation is bottom or top
+        });
+     	});
 
 		   $("select, input").on('change',function(){
 		    	url = buildurl();
 		    	window.location = url;
 		   });	  
-		})
-		
-		//widths = Array('220','220','220');
-		//cpTableColWidths('table2','table1');
-		//cpTableColWidths('table1','table2');
-		//setTableColWidths(widths,'table2');
-		//setTableColWidths(widths,'table1');
-		
-		//dumparray(getTableColWidths('table1'));	
-		
+		})		
 });
 

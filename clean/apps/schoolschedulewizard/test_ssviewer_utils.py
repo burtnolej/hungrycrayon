@@ -801,8 +801,17 @@ class Test_list(unittest.TestCase):
         self.assertListEqual(expected_result,colnames)
         
 
+class Test_refdata(unittest.TestCase):
+    
+    def setUp(self):
         
+        self.dbname='test_ssviewer_util_list'
+        self.database = Database(self.dbname)
         
+    def test_(self):
+        print ssviewer_utils.dataset_refdata(self.database)
+
+                
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
@@ -816,8 +825,9 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_update))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_load))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_loadref))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_list))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_list))
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_refdata))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
     

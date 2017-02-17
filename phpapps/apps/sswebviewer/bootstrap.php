@@ -1,7 +1,7 @@
 
 
 <?php
-				function initpage() {
+				function initpage($withmenu=TRUE) {
 					
 					global $PHPLIBPATH;
 					
@@ -17,8 +17,11 @@
 					include_once 'url.php';
 					
 					set_stylesheet();
-				
-					getchtmlxmlmenu2($menuxml,"label");
+					
+					if ($withmenu == TRUE) {
+						
+						getchtmlxmlmenu2($menuxml,"label");
+					}
 					
 					echo "<div id=\"content\">";
 				}
@@ -75,7 +78,11 @@
 					//}
 				}
 				
-				function refreshpage() {
+				function refreshpage($getargs=NULL) {
+
+					if ($getargs <> NULL) {
+						$_GET = $getargs;
+					}
 					
 					$SSRESTURL = getenv("SSRESTURL");
 
@@ -101,8 +108,12 @@
 						$url = buildurl($SSRESTURL,$args);
 					}
 					
-					echo $url; // for logging purposes
+					//echo $url; // for logging purposes
 					
-					return(getcurl($url));
+					$xml = getcurl($url);
+					
+					//echo "xml=".$xml; // sometimes curl can get not found or malformed address if there is a space in the url
+					
+					return(array('xml' =>$xml,'url' => $url));
 				}
 ?>

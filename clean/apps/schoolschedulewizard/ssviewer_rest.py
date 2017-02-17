@@ -27,10 +27,11 @@ import os.path
 class Add:
     def GET(self,objtype):
         
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
+        
         _dm = web.input()
         
-        print _dm
-
         datamembers = dict(zip(_dm.keys(),_dm.values()))  
         
         # these are not required to build the new record and
@@ -43,9 +44,12 @@ class Add:
         except:
             pass
 
-        newobj = ssviewer_utils.dataset_add(database,database,of,enums,prepmap,
+        try:
+            newobj = ssviewer_utils.dataset_add(database,database,of,enums,prepmap,
                                             datamembers,objtype,keepversion=True)
-            
+        except ssviewer_utils.OFDuplicateRecord:
+            return "-1"
+        
         header = "<root><parser><value>drawform</value></parser></root>"
         
         if hasattr(newobj.userobjid,"name"):
@@ -58,18 +62,23 @@ class Add:
         else:
             _objtype = newobj.objtype
 
-        _values =dict(objtype =_objtype,userobjid=_userobjid)
+        return "id="+_userobjid+","+",".join([k + "=" + _dm[k] for k in _dm.keys()])
+    
+        #values =dict(objtype =_objtype,userobjid=_userobjid)
         
-        xml=xml_utils.record2xml(_values,header=header)
+        #xml=xml_utils.record2xml(_values,header=header)
         
-        globals()['dbidlookup'][newobj.id] = _userobjid
-        print "added to dbid",newobj.id,_userobjid
+        #globals()['dbidlookup'][newobj.id] = _userobjid
+        #print "added to dbid",newobj.id,_userobjid
         
-        return xmltree.tostring(xml)
+        #return xmltree.tostring(xml)
     
         
 class New:
     def GET(self,objtype):
+        
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
                 
         _values = ssviewer_utils.dataset_new(objtype)
         
@@ -89,8 +98,14 @@ def _pivot(data,source_type,source_value):
 
     if source_value=="all": source_value=""
     
-    ztypes = data.ztypes.split(",")
+    if hasattr(data,'ztypes') == False:
+        ztypes = ['subject','adult']
+    else:
+        ztypes = data.ztypes.split(",")
     
+    if len(ztypes) == 0:
+        return "-1"
+        
     formatson=False
     header=None
     
@@ -155,9 +170,27 @@ class Schema:
         source_objs = of.query_advanced(objtype,[])
         colnames = list(source_objs[0].dm.keys())
         return ",".join(colnames)
+       
+class Refdata:
+    def GET(self,objtype):
+
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
         
+        reftree = ssviewer_utils.dataset_refdata(globals()['database'])
+        
+        xml = xml_utils.tree2xml(reftree)
+        
+        
+        return xmltree.tostring(xml)
+    
 class List:
     def GET(self,objtype):
+        
+        
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
+        
         data = web.input(id='')
 
         pagenum=int(data.pagenum)
@@ -212,6 +245,9 @@ class Load:
 class SearchID:
     def GET(self,id):
         
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
+
         source_type="lesson"
         
         dbid = dbidlookup[id]
@@ -225,10 +261,16 @@ class SearchID:
         for k in list(_values.keys()):
             if k not in ['adult','period','dow','recordtype','student','subject']:
                 _values.pop(k)
-                
-        xml=xml_utils.record2xml(_values,header=header)
         
-        return xmltree.tostring(xml)
+            
+        # get values for this particular record        
+        xml=xml_utils.record2xml(_values,header=header)
+
+        # get refdata in case the UI wants to build selects
+        reftree = ssviewer_utils.dataset_refdata(globals()['database'])
+        refxml = xml_utils.tree2xml(reftree,xml,"refitem")
+
+        return xmltree.tostring(refxml)
 
 def _update(obj,_value_changes):
     
@@ -280,6 +322,9 @@ class UpdateID:
     #def GET(self,clsname):
     def GET(self,id):
         
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
+        
         data = web.input()
         
         dbid = dbidlookup[id]
@@ -296,8 +341,14 @@ class UpdateID:
             log.log(thisfuncname(),3,msg=str(dbid) + " updated")
         else:
             log.log(thisfuncname(),2,msg="value to update to is not found",value=data['value_changes'])
-            
-        return newid
+    
+        if hasattr(obj.userobjid,"name"):
+            _userobjid = obj.userobjid.name
+        else:
+            _userobjid = obj.userobjid
+        
+        return "id="+_userobjid+",value_changes="+data['value_changes']
+
         
 class Command:
     def GET(self,cmd):
@@ -490,14 +541,14 @@ def _run(port,**xtraargs):
         '/new/(\w+)', 'New',
         '/command/(\w+)','Command',
         '/update/(\w+)','UpdateID',
-        '/updateuid/(\w+)','UpdateUID'
+        '/updateuid/(\w+)','UpdateUID',
+        '/refdata/(\w+)','Refdata'
     )
     
     globals()['database'] = Database(dbname)
     refdatabase = Database(refdbname)
     #of = ObjFactory(True)
     #enums = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)
-    
     
     globals()['of'] = ObjFactory(True)
     globals()['enums'] = sswizard_utils.setenums(dow="all",prep=-1,database=refdatabase)

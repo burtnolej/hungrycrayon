@@ -581,6 +581,18 @@ class Test_List(Test_Base):
                                pagenum=1,pagelen=10,columns=['student','period','dow','subject'])
     '''
     
+class Test_Refdata(Test_Base):
+    def setUp(self):
+        Test_Base.setUp(self,"test_ssviewer_rest.sqlite",8080)
+
+    def test_subject(self):
+                
+        xml = ssrest.restquery(self.url + "refdata/all")
+        
+        print xml
+
+        #self.assertListEqual(results,expected_results)
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     
@@ -599,6 +611,7 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Adult))
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot_Subject))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_List))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Refdata))
     
     
     

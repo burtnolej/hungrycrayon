@@ -13,7 +13,11 @@ set_include_path($PHPLIBPATH);
 include_once 'utils_xml.php';
 include_once 'ui_utils.php';
 
-function getlinkurl($cell,$args,$page='dpivot.php') {
+function getlinkurl($cell,$args,$page=NULL) {
+	
+	if ($page == NULL) {
+		$page = $_SERVER['PHP_SELF'];
+	}
 	
 		$url = $page."?source_type=".$cell->valuetype."&source_value=".$cell->value;
 		
@@ -89,9 +93,6 @@ function drawcell($cell,$class,$args,$size=1,$index=1) {
 function drawrow($row,$args) {
 	echo "<tr>"; // start a sub row
 	
-	
-	
-				
 	$_subcells = $row->xpath("child::subcell"); // see if any subcells exist
 	
 	if (sizeof($_subcells) <> 0) {
@@ -165,8 +166,6 @@ function drawgrid($utilsxml,$args=NULL,$formats=NULL) {
 
 function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 
-	
-	
 	echo "<table class = \"borderoff\">";
 
 	$_rows = $utilsxml->xpath("//row"); // get a list of all rows
@@ -197,8 +196,6 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 							$url = getlinkurl($_subcells[$i],$args);
 							
 							$output = array();
-							
-							echo "inhere";
 							
 							if ($_subcells[$i]->valuetype == 'adult') {
 								$link = '<a href="'.$url.'">'."<font color=\"darkred\">".$_subcells[$i]->value."</font>".'</a>';
