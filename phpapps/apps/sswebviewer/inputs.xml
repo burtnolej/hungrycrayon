@@ -1,7 +1,7 @@
 <root>
 	<dedit>
 		<input id='1'>
-			<field>source_value</field>
+			<field>edit_source_value</field>
 			<label>lesson id</label>
 		</input>
 	</dedit>

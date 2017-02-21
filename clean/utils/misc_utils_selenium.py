@@ -114,7 +114,7 @@ def set_input_text_element(id,value,browser,returnkey=False):
     element.send_keys(value)
     
     if returnkey == True:
-        set_input_text_element("source_value",Keys.RETURN,browser)
+        set_input_text_element(id,Keys.RETURN,browser)
         
     
 def get_input_text_element(id,browser):

@@ -39,7 +39,84 @@ include_once 'utils_error.php';
 include_once 'utils_utils.php';
 include_once 'test_utils.php';
 include_once 'webpage_utils.php';
+
+class test_popout 	extends PHPUnit_Framework_TestCase 
+{
+	public function test_bottompopout()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"600px","bottom");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$globals = array('script_name' => 'popout_bottom.php',
+										 'server_name' => '0.0.0.0');
+			
+			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
+			\$poparr = array('drawmultiselect' => \$multiselectarr);
+			\$args = Array('1','wideswitch',\$_GET,\$poparr,'datacolumns',1,'bottom');
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+		
+
+		//jsphpbridge('popout_bottom.php');
+		jsphpbridge($globals=NULL);
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_bottom.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
 	
+public function test_topbottompopout()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"600px","bottom");
+		jsslideoutinit(2,"600px","top");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+	
+			\$globals = array('script_name' => 'popout_topbottom.php',
+										 'server_name' => '0.0.0.0');
+			
+			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
+			\$poparr = array('drawmultiselect' => \$multiselectarr);
+			\$args = Array('1','wideswitch',\$_GET,\$poparr,'datacolumns',1,"bottom");
+			drawpopout(\$args);
+			
+			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
+			\$poparr = array('drawmultiselect' => \$multiselectarr);
+			\$args = Array('2','wideswitch',\$_GET,\$poparr,'datacolumns',1,"top");
+			drawpopout(\$args);
+		?>
+PHP;
+		echo $str;
+		
+		//jsphpbridge('popout_topbottom.php');
+		jsphpbridge($globals=NULL);
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_topbottom.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
 class test_menu_update extends PHPUnit_Framework_TestCase 
 {
 	public function test_()
@@ -47,7 +124,7 @@ class test_menu_update extends PHPUnit_Framework_TestCase
 		ob_start(); 
 									
 		jsinitpivot('dedit.js');// initial includes; main js callback routines that recall page on change and base style sheets
-		jsslideoutinit(1,"250px");
+		jsslideoutinit(1,"350px");
 	
 		$str = <<<PHP
 		<?php
@@ -55,7 +132,11 @@ class test_menu_update extends PHPUnit_Framework_TestCase
 			include_once 'webpage_utils.php';
 			initpage();
 			
-			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$globals = array('script_name' => 'popout_menu_update.php',
+										 'server_name' => '0.0.0.0',
+										 'editbutton' => 'editsubmit');
+										 			
+			\$widgetdefnarr =  array(type => 'submit', id => 'editsubmit', label => 'submit');			
 			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
 			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
 			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
@@ -65,9 +146,10 @@ class test_menu_update extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 
-		echo "<body><table><tr><td id='mytd'>booboo<p id='054C4D26' hidden /></td></tr></table></body>";
+		echo "<body><table><tr><td id='mytd'>booboo<p id='02B1EEDC' hidden /></td></tr></table></body>";
 
-		jsphpbridge('popout_menu_update.php');
+		//jsphpbridge('popout_menu_update.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -129,6 +211,9 @@ class test_drawserverpopout extends PHPUnit_Framework_TestCase
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'popout_server.php',
+										 'server_name' => '0.0.0.0');
+			
 			\$getargs = array('source_value' => 'subject', 'source_type' => 'new');
 			\$serverdefnarr =  array();
 			\$poparr = array('drawservercontent' => \$serverdefnarr);
@@ -138,7 +223,8 @@ class test_drawserverpopout extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 
-		jsphpbridge('popout_server.php');
+		//jsphpbridge('popout_server.php');
+		jsphpbridge($globals = NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -163,7 +249,10 @@ PHP;
 			include_once 'webpage_utils.php';
 			initpage();
 			
-			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew');
+			\$globals = array('script_name' => 'popout_jsserver.php',
+										 'server_name' => '0.0.0.0');
+			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew','class' => 'new');
 			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr);
 			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
 			drawpopout(\$args);
@@ -172,7 +261,8 @@ PHP;
 PHP;
 		echo $str;
 
-		jsphpbridge('popout_jsserver.php');
+		//jsphpbridge('popout_jsserver.php');
+		jsphpbridge($globals = NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -200,6 +290,10 @@ PHP;
 		<?php
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
+			
+			\$globals = array('script_name' => 'popout_jsserverentry.php',
+										 'server_name' => '0.0.0.0');
+										 
 			initpage();
 			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit', jscallback => $callback);			
 			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew');
@@ -211,7 +305,8 @@ PHP;
 PHP;
 		echo $str;
 
-		jsphpbridge('popout_jsserverentry.php');
+		//jsphpbridge('popout_jsserverentry.php');
+		jsphpbridge($globals = NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -239,6 +334,9 @@ PHP;
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'popout_jsserverentry_ext.php',
+										 'server_name' => '0.0.0.0');
+			
 			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
 			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew');
 			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
@@ -249,7 +347,8 @@ PHP;
 PHP;
 		echo $str;
 
-		jsphpbridge('popout_jsserverentry_ext.php');
+		//jsphpbridge('popout_jsserverentry_ext.php');
+		jsphpbridge($globals = NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -277,7 +376,11 @@ PHP;
 			include_once 'webpage_utils.php';
 			initpage();
 			
-			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$globals = array('script_name' => 'popout_jsserverentry_ext_cls.php',
+										 'server_name' => '0.0.0.0',
+										 'newbutton'=>'newsubmit');
+										 
+			\$widgetdefnarr =  array(type => 'submit', id => 'newsubmit', label => 'submit');			
 			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew',"class" => "new");
 			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
 			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
@@ -287,7 +390,8 @@ PHP;
 PHP;
 		echo $str;
 
-		jsphpbridge('popout_jsserverentry_ext_cls.php');
+		//jsphpbridge('popout_jsserverentry_ext_cls.php','newsubmit');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -316,8 +420,12 @@ PHP;
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
 			initpage();
+										 			
+			\$globals = array('script_name' => 'popout_edit.php',
+										 'server_name' => '0.0.0.0',
+										 'editbutton'=>'editsubmit');
 			
-			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$widgetdefnarr =  array(type => 'submit', id => 'editsubmit', label => 'submit');			
 			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
 			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
 			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
@@ -327,7 +435,8 @@ PHP;
 PHP;
 		echo $str;
 
-		jsphpbridge('popout_edit.php');
+		//jsphpbridge('popout_edit.php');
+		jsphpbridge($globals = NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -335,8 +444,8 @@ PHP;
 		writetofile("/var/www/html-dev/popout_edit.php",$result,"w");
 	   //$this->assertEquals($this->expected_result,$result);
 	}
-	
-public function test_jsentry_externalfilecallback_cls_2popouts()
+		
+ public function test_jsentry_externalfilecallback_cls_2popouts()
 	{
 		// uses dnew.js to create callback fro button
 		
@@ -358,6 +467,9 @@ public function test_jsentry_externalfilecallback_cls_2popouts()
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'popout_jsserverentry_ext_cls2p.php',
+										 'server_name' => '0.0.0.0','newbutton' => 'newsubmit');
+			
 			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
 			\$widgetdefnarr = array('fields' => array("student" => "source_value"));
 			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr, 
@@ -365,7 +477,7 @@ public function test_jsentry_externalfilecallback_cls_2popouts()
 			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
 			drawpopout(\$args);
 			
-			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$widgetdefnarr =  array(type => 'submit', id => 'newsubmit', label => 'submit');			
 			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew',"class" => "new");
 			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
 			\$args = Array('2','contain',\$_GET,\$poparr,'main',1);
@@ -377,7 +489,8 @@ public function test_jsentry_externalfilecallback_cls_2popouts()
 PHP;
 		echo $str;
 
-		jsphpbridge('popout_jsserverentry_ext_cls2p.php');
+		//jsphpbridge('popout_jsserverentry_ext_cls2p.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -387,6 +500,115 @@ PHP;
 	}
 }	
 
+class test_drawserverpopout_mixed extends PHPUnit_Framework_TestCase
+{
+	function test_()
+	{
+		// edit and new popout mixed to test that selectors are specific enough
+	ob_start(); 
+									
+		jsinitpivot('dmixed.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px","top");
+		jsslideoutinit(2,"450px","top");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$globals = array('script_name' => 'popout_server_mixed.php',
+										 'server_name' => '0.0.0.0',
+										 'editbutton'=>'editsubmit',
+										 'newbutton'=>'newsubmit');
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'editsubmit', label => 'submit');	
+			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
+			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1,'top');
+			drawpopout(\$args);
+			
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'newsubmit', label => 'submit');			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew',"class" => "new");
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('2','contain',\$_GET,\$poparr,'main',1,'top');
+			drawpopout(\$args);
+			
+		?>
+PHP;
+		echo $str;
+
+		//jsphpbridge('popout_server_mixed.php');
+		jsphpbridge($globals=NULL);
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_server_mixed.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	   
+	}
+	
+function test_with_pivot()
+	{
+		// edit and new popout mixed to test that selectors are specific enough
+	ob_start(); 
+									
+		jsinitpivot('dmixed_wpivot.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px","top");
+		jsslideoutinit(2,"450px","top");
+		jsslideoutinit(3,"650px","top");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$globals = array('script_name' => 'popout_server_mixed_wpivot.php',
+										 'server_name' => '0.0.0.0',
+										 'editbutton'=>'editsubmit',
+										 'newbutton'=>'newsubmit');
+			
+			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
+			\$widgetdefnarr =  array('fields' =>array("student" => "source_value"));
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr, 
+												'drawdbselects' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1,'top');
+			drawpopout(\$args);
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'editsubmit', label => 'submit');	
+			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
+			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('2','contain',\$_GET,\$poparr,'main',1,'top');
+			drawpopout(\$args);
+			
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'newsubmit', label => 'submit');			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew',"class" => "new");
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('3','contain',\$_GET,\$poparr,'main',1,'top');
+			drawpopout(\$args);
+			
+			drawtable(\$_GET);
+			
+		?>
+PHP;
+		echo $str;
+
+		//jsphpbridge('popout_server_mixed_wpivot.php');
+		jsphpbridge($globals=NULL);
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_server_mixed_wpivot.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	   
+	}
+}
+	
 class test_drawpivot extends PHPUnit_Framework_TestCase
 {
 	// popout with multiple selects on it
@@ -404,6 +626,9 @@ class test_drawpivot extends PHPUnit_Framework_TestCase
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
 			initpage();
+		
+			\$globals = array('script_name' => 'pivot.php',
+										 'server_name' => '0.0.0.0');
 			
 			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
 			\$widgetdefnarr =  array('fields' =>array("student" => "source_value"));
@@ -438,7 +663,7 @@ class test_drawpivot extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 
-		jsphpbridge();
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -557,6 +782,9 @@ class test_drawmixedpopout extends PHPUnit_Framework_TestCase
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'popout_mixed.php',
+										 'server_name' => '0.0.0.0');
+										 
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
 			\$widgetdefnarr =  array("fields" => array("subject" => "cnstr_subject","student" => "cnstr_student"));
 			\$poparr = array('drawdbselects' => \$widgetdefnarr,'drawmultiselect' => \$multiselectarr);
@@ -567,7 +795,8 @@ class test_drawmixedpopout extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_mixed.php');
+		//jsphpbridge('popout_mixed.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -592,6 +821,9 @@ class test_drawxmlselectpopout extends PHPUnit_Framework_TestCase
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
 			initpage();
+			
+			\$globals = array('script_name' => 'popout_xml.php',
+										 'server_name' => '0.0.0.0');
 				
 			\$widgetdefnarr =  array("xmlfile" => "dropdowns.xml");
 			\$poparr = array('drawxmlselects' => \$widgetdefnarr);
@@ -602,7 +834,8 @@ class test_drawxmlselectpopout extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_xml.php');
+		//jsphpbridge('popout_xml.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -624,6 +857,9 @@ PHP;
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
 			initpage();
+			
+			\$globals = array('script_name' => 'popout_xmlcls.php',
+										 'server_name' => '0.0.0.0');
 				
 			\$widgetdefnarr =  array("xmlfile" => "dropdowns.xml","class" => "foo");
 			\$poparr = array('drawxmlselects' => \$widgetdefnarr);
@@ -634,7 +870,8 @@ PHP;
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_xmlcls.php');
+		//jsphpbridge('popout_xmlcls.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -663,6 +900,9 @@ class test_drawbuttonpopout extends PHPUnit_Framework_TestCase
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
 			initpage();
+			
+			\$globals = array('script_name' => 'popout_button.php',
+										 'server_name' => '0.0.0.0');
 
 			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit', jscallback => $callback);
 			\$poparr = array('drawbutton' => \$widgetdefnarr);
@@ -673,7 +913,8 @@ class test_drawbuttonpopout extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 				
-		jsphpbridge('popout_button.php');
+		//jsphpbridge('popout_button.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -699,6 +940,9 @@ class test_drawdbselectpopout extends PHPUnit_Framework_TestCase
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'popout_select.php',
+										 'server_name' => '0.0.0.0');
+			
 			\$widgetdefnarr =  array('fields' => array("subject" => "cnstr_subject","dow" => "cnstr_dow"));
 			\$poparr = array('drawdbselects' => \$widgetdefnarr);
 			\$args = Array('1','contain',\$_GET,\$poparr,'datacolumns',1);
@@ -708,7 +952,8 @@ class test_drawdbselectpopout extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_select.php');
+		//jsphpbridge('popout_select.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -730,6 +975,9 @@ PHP;
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'popout_select.php',
+										 'server_name' => '0.0.0.0');
+										 
 			\$widgetdefnarr =  array('fields' => array("subject" => "cnstr_subject","dow" => "cnstr_dow"),'class' => "foo");
 			\$poparr = array('drawdbselects' => \$widgetdefnarr);
 			\$args = Array('1','contain',\$_GET,\$poparr,'datacolumns',1);
@@ -739,7 +987,8 @@ PHP;
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_selectcls.php');
+		//jsphpbridge('popout_selectcls.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -765,6 +1014,8 @@ class test_drawcheckboxpopout extends PHPUnit_Framework_TestCase
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'popout_check.php',
+										 'server_name' => '0.0.0.0');
 			
 			\$checkdefnarr = array("status" => "status","subject" => "subject","adult" => "adult",
 										           "student" => "student","period" => "period","dow" => "dow",
@@ -779,7 +1030,8 @@ class test_drawcheckboxpopout extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_check.php');
+		//jsphpbridge('popout_check.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -805,6 +1057,9 @@ class test_draw2multiselectpopout extends PHPUnit_Framework_TestCase
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'popout_dow_period.php',
+										 'server_name' => '0.0.0.0');			
+										 
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
 			\$poparr = array('drawmultiselect' => \$multiselectarr);
 			\$args = Array('1','wideswitch',\$_GET,\$poparr,'datacolumns',1);
@@ -813,7 +1068,8 @@ class test_draw2multiselectpopout extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_dow_period.php');
+		//jsphpbridge('popout_dow_period.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -838,6 +1094,10 @@ class test_drawmultiselectpopout extends PHPUnit_Framework_TestCase
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
 			initpage();
+
+	
+			\$globals = array('script_name' => 'popout_dow.php',
+										 'server_name' => '0.0.0.0');			
 			
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow');			
 			\$poparr = array('drawmultiselect' => \$multiselectarr);
@@ -848,7 +1108,7 @@ class test_drawmultiselectpopout extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_dow.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -874,6 +1134,10 @@ class test_drawmultiselectpopout_many extends PHPUnit_Framework_TestCase
 			include_once 'bootstrap.php';
 			include_once 'webpage_utils.php';
 			initpage();
+	
+			\$globals = array('script_name' => 'popout_many.php',
+										 'server_name' => '0.0.0.0');
+										 
 			\$args = Array('1','wideswitch',\$_GET,'drawmultiselect','datacolumns','select distinct name from dow','cnstr_dow',1);
 			drawpopout(\$args);
 			\$args = Array('2','wideswitch',\$_GET,'drawmultiselect','datacolumns','select distinct name from period','cnstr_period',1);
@@ -882,7 +1146,8 @@ class test_drawmultiselectpopout_many extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 		
-		jsphpbridge('popout_many.php');
+		//jsphpbridge('popout_many.php');
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -975,11 +1240,12 @@ class test_drawapp extends PHPUnit_Framework_TestCase
 	{
 		ob_start(); 
 									
-		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
-		jsslideoutinit(1,"250px");
-		jsslideoutinit(2,"450px");
-		jsslideoutinit(3,"400px");
-		jsslideoutinit(4,"850px");
+		jsinitpivot('dapp.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px","top");
+		jsslideoutinit(2,"450px","top");
+		jsslideoutinit(3,"250px","bottom");
+		jsslideoutinit(4,"650px","top");
+		jsslideoutinit(5,"450","bottom");
 		
 		$str = <<<PHP
 		<?php
@@ -987,31 +1253,42 @@ class test_drawapp extends PHPUnit_Framework_TestCase
 			include_once 'webpage_utils.php';
 			initpage();
 			
+			\$globals = array('script_name' => 'app.php',
+										 'server_name' => '0.0.0.0',
+										 'editbutton'=>'editsubmit',
+										 'newbutton'=>'newsubmit');
+			
 			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
 			\$widgetdefnarr =  array('fields' =>array("student" => "source_value"));
 			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr, 
 												'drawdbselects' => \$widgetdefnarr);
-			\$args = Array('1','contain',\$_GET,\$poparr,'main',1);
+			\$args = Array('1','contain',\$_GET,\$poparr,'main',1,"top");
 			drawpopout(\$args);
 			
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow',
 															  'cnstr_period' => 'select distinct name from period',
 															  'cnstr_subject' => 'select distinct name from subject');
 			\$poparr = array('drawmultiselect' => \$multiselectarr);
-			\$args = Array('3','wideswitch',\$_GET,\$poparr,'filters',2);
+			\$args = Array('3','wideswitch',\$_GET,\$poparr,'filters',2,"bottom");
 			drawpopout(\$args);
 			
 			\$checkdefnarr = array("status" => "status","subject" => "subject","adult" => "adult",
 										           "student" => "student","period" => "period","dow" => "dow",
 											   		 "record" => "record","recordtype" => "recordtype","id" => "id");
 			\$poparr = array('drawcheckbox' => \$checkdefnarr);
-			\$args = Array('2','contain',\$_GET,\$poparr,'datacolumns',2);
+			\$args = Array('2','contain',\$_GET,\$poparr,'datacolumns',2,"top");
 			drawpopout(\$args);
 			
-			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
+			\$widgetdefnarr =  array(type => 'submit', id => 'editsubmit', label => 'submit');			
 			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
 			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
-			\$args = Array('4','contain',\$_GET,\$poparr,'update',1);
+			\$args = Array('4','contain',\$_GET,\$poparr,'update',1,"top");
+			drawpopout(\$args);
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'newsubmit', label => 'submit');			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew',"class" => "new");
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('5','contain',\$_GET,\$poparr,'new',1,'bottom');
 			drawpopout(\$args);
 			
 			drawtable(\$_GET);
@@ -1019,7 +1296,8 @@ class test_drawapp extends PHPUnit_Framework_TestCase
 PHP;
 		echo $str;
 
-		jsphpbridge("app.php");
+		//jsphpbridge("app.php");
+		jsphpbridge($globals=NULL);
 		
 		$result = ob_get_contents();
 		ob_end_clean();		
@@ -1028,10 +1306,47 @@ PHP;
 	   //$this->assertEquals($this->expected_result,$result);
 	}
 }
+
+class test_misc 	extends PHPUnit_Framework_TestCase 
+{
+	public function test_jsphpbridge()
+	{
+		ob_start(); 
+										 
+		$str = <<<PHP
+		<?php
+			include_once 'webpage_utils.php';
+		\$globals = array('script_name' => 'phpbridge.php',
+										 'server_name' => '0.0.0.0',
+										 'foo' => 'bar');
+		?>
+PHP;
+		echo $str;
+		
+		echo "<html><body></body></html>";
+							 
+		jsphpbridge($globals=NULL);
+		
+
+				$str = <<<JS
+<script>
+var p= document.createElement('p');
+p.id=Globals.foo;
+document.body.appendChild(p);
+</script>		
+JS;
+		echo $str;
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/phpbridge.php",$result,"w");
+	}
+}
 set_error_handler("handleError");
    
 try {
-	/*testrunner("drawmultiselectpopout");
+	testrunner("drawmultiselectpopout");
 	testrunner("draw2multiselectpopout");
 	testrunner("drawmultiselectpopout_many");
 	testrunner("drawdbselectpopout");
@@ -1042,9 +1357,13 @@ try {
 	testrunner("drawxmlselectpopout");
 	testrunner("drawbuttonpopout");
 	testrunner("drawserverpopout");
+	testrunner("drawserverpopout_mixed");
 	testrunner("drawmenu");
-	testrunner("menu_update");*/
+	testrunner("menu_update");
 	testrunner("drawapp");
+	testrunner("popout");
+	testrunner("misc");
+	 
 	 
 } catch (Exception $e) {
     echo 'Caught exception: ',  $e->getMessage(), "\n";

@@ -3,13 +3,13 @@
 }
 
 table {
-	border: 1px solid #f00;
+	/*border: 1px solid #f00;*/
 	background-color: #ffffff;
 	table-layout:fixed
 }
 
 .borderoff {
-	border: 0px solid #f00;
+	/*border: 0px solid #f00;*/
 	border-collapse:collapse;
 	padding:2px;
 }

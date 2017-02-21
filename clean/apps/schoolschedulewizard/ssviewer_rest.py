@@ -179,8 +179,9 @@ class Refdata:
         
         reftree = ssviewer_utils.dataset_refdata(globals()['database'])
         
-        xml = xml_utils.tree2xml(reftree)
+        #xml = xml_utils.tree2xml(reftree)
         
+        xml = xml_utils.tree2xml(reftree,tag="refitem")
         
         return xmltree.tostring(xml)
     

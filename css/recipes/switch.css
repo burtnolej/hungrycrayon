@@ -12,6 +12,18 @@ p.label.switch  {
 	font-weight: bold;
 }
 
+.switch-divider-header {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:80%;
+	position:relative;	
+	font-weight: bold;
+	left:18px;
+	text-transform: uppercase;
+	display:block;
+	padding:0px;
+	height:10px;
+}
+
 .switch { 
 		position:relative;
 		display:inline-block;

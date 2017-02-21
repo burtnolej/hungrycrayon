@@ -34,6 +34,7 @@ requirejs(['myutils','jquery'],
 	function (myutils,$) {
 		var url = "";		
 		$(document).ready(function(){
+			var init_values = Array();
 			
 			// set context menu
 			setcontextmenu("ul[class='nav']"); 
@@ -52,6 +53,26 @@ requirejs(['myutils','jquery'],
 					makeGetNewForm(this.value,parentel)
 				}
 		 	});
+		 	
+			// get EDIT content from server on RETURN press
+			$("input").keypress(function (e) { 
+	 			var key = e.which;
+				if(key == 13)  { // the enter key code 
+					var parentel=$(this).closest("div");
+					
+				   makeGetDetailsRequest($(this).val(),drawform_multi,parentel);
+		 			setTimeout(function() { 	init_values = getElementValues("select",parentel);},200); // store init values so can detect fields that have changed
+				 }
+			});
+			
+			// scrape values and submit edit to server
+			$("input[id='" + Globals.editbutton + "']").on('click',function(){ 		
+					var id = $("input[id='edit_source_value']").val();
+					var parentel=$(this).closest("div");
+					var value_changes = getElementValueChanges("select",init_values,parentel); // compare with init to get what has changed
+
+					makeUpdateRequest(value_changes,id,alertme);
+			});  
 		});
 	}
 );

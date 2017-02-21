@@ -23,6 +23,7 @@ include_once 'db_utils.php';
 include_once 'utils_xml.php';
 
 function drawtable($getargs) {
+	
 		$result=refreshpage($getargs);
 
 			$xml = $result['xml'];
@@ -63,6 +64,13 @@ function drawpopout($args) {
 	$htmlfuncarr = $args[3]; // function to create actual html
 	$popoutlabel = $args[4];
 	$maxy = $args[5];
+	
+	if (isset($args[6])) {
+		$tablocation = $args[6];
+	}
+	else {
+		$tablocation = 'top';
+	}
 		
 	$args= Array('hidden' => 'true');
 	getchtmlinput('',"handle".$popoutnum,$getargs['handle'.$popoutnum],$args);
@@ -70,13 +78,18 @@ function drawpopout($args) {
 	$args= Array('hidden' => 'true');
 	getchtmlinput('','last_source_value',$getargs['source_value'],$args);
 	
-	gethtmlpopoutdiv($popoutlabel,$getargs,$htmlfuncarr,$popoutnum,$maxy,$popoutstylename);
+	gethtmlpopoutdiv($popoutlabel,$getargs,$htmlfuncarr,$popoutnum,$maxy,$popoutstylename,$tablocation);
 }
 
 
 function drawmultiselect($getargs,$multiseldefnarr,$maxy) {
+	$firstrow=TRUE;
 	foreach ($multiseldefnarr as $field => $query) {
+		if (!$firstrow) {
+		echo '<hr WIDTH="92%" COLOR="#E0E0E0" SIZE="1">';
+		}
 		getdbhtmlmultiselect($GLOBALS['SSDB'],$query,$field,Array('checked' => $getargs,'maxy' => $maxy));
+		$firstrow=FALSE;
 	}
 }
 
@@ -345,6 +358,8 @@ function jsinitpivot($scriptname) {
 <link rel="stylesheet" type="text/css" href="css/div.css" />
 <link rel="stylesheet" type="text/css" href="css/switch.css" />
 <link rel="stylesheet" type="text/css" href="css/menu.css" />
+<link rel="stylesheet" type="text/css" href="css/input.css" />
+<link rel="stylesheet" type="text/css" href="css/slideout.css" />
 </head>
 
 </html>
@@ -354,7 +369,11 @@ JS;
 		echo $str;
 }
 
-function jsslideoutinit($tabnum,$leftpos) {
+function jsslideoutinit($tabnum,$leftpos,$tabloc=NULL) {
+	
+	if ($tabloc==NULL) {
+		$tabloc="top";
+	}
 	// $leftpos needs to be of the form XXpx
 		$str = <<<JS
  <script type="text/javascript">
@@ -363,6 +382,7 @@ function jsslideoutinit($tabnum,$leftpos) {
         $('.slide-out$tabnum').tabSlideOut({
             tabHandle: '.handle$tabnum',                     //class of the element that will become your tab
             leftPos: '$leftpos',                          //position from left/ use if tabLocation is bottom or top
+            tabLocation:'$tabloc',
         });
     });
     
@@ -371,7 +391,24 @@ JS;
 		echo $str;
 }
 
-function jsphpbridge($pagename=NULL,$servername=NULL) {
+
+function jsphpbridge($globals) {
+
+		if (!isset($globals['script_name'])) {
+			$globals['script_name'] =  'pivot.php';
+		}
+		if (!isset($globals['server_name'])) {
+			$globals['server_name'] =  '0.0.0.0';
+		}
+		
+		// bridge between php and js code
+		$str = <<<JS
+<script>var Globals = <?php echo json_encode(\$globals); ?>;</script>		
+JS;
+		echo $str;
+}
+
+function jsphpbridgeold($pagename=NULL,$servername=NULL) {
 
 		if ($pagename == NULL ) {
 			//$pagename = $_SERVER['PHP_SELF'];
@@ -405,17 +442,7 @@ function setElementStyle(classname,attr,attrval,timeoutlen) {
 		}
   	},timeoutlen);
  }
- 
-         //setTimeout(function() {        
-         //var els = document.getElementsByTagName('div');
- 		 	//for (i=0;i<els.length;i++) {
- 		 	//		els[i].setAttribute("style", "display:block;");
- 		 	//}
-  			//},10);
-         
-         
- 
- 			//document.body.style.display = 'block'; 	
+
  		 	var display_list = Globals.display_list.split(",");
  		 	
  		 	for (i=0;i<display_list.length;i++) {

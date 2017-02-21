@@ -20,6 +20,16 @@ buildurl()
 importlib()
  */
 
+Array.prototype.contains = function(obj) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function isarray(obj) {
   /* returns true if the passed object is an array */
   if (Object.prototype.toString.call(obj) === '[object Array]') {
@@ -409,11 +419,21 @@ function myTimer() {
     makeRequest("http://0.0.0.0:8080/command/ping",writeHttpServiceStatus);
 }
 
-function getElementValues(type) {
+function getElementValues(type,parentel=null) {
 	var values = Array();
-	$(type).each(function (index, value) {
-   		values.push(this.value);
-	});
+	
+	if (parentel == null) {
+		$(type).each(function (index, value) {
+	   		values.push(this.value);
+		});
+	}
+	else {
+		var $selectels= parentel.find(type);
+		
+		$.each($selectels, function( key, value ) {
+				values.push(this.value);
+			});
+	}
 	return values;
 }
 
@@ -433,8 +453,8 @@ function getElementsIds(type) {
 	return values;
 }
 
-function getElementValueChanges(elementtype,initvalues) {
-	newvalues = getElementValues(elementtype);
+function getElementValueChanges(elementtype,initvalues,parentel=null) {
+	newvalues = getElementValues(elementtype,parentel);
 	diffvalues = compare_1darrays(initvalues,newvalues);
 	ids = getElementsIds(elementtype);
 	result = Array();
@@ -832,4 +852,46 @@ function setcontextmenu(selectorstr,callback=null) {
 
 				e.preventDefault();
 			});
+}
+
+function makeUpdateRequest (value_changes,id,callback) {
+	var url = "http://localhost:8080/update/"+id+"?value_changes=";				
+	//var value_changes = getElementValueChanges("select",init_values); // compare with init to get what has changed
+	url = url +  value_changes.join(",");
+	makeRequestResponse(url,callback);
+}
+
+function makeGetDetailsRequest(id,callback,parentel) {
+	if ($('#tmpdiv').length) {$('#tmpdiv').remove();}
+	var tmpdiv = addElement("div","tmpdiv",{hidden:false,parentel:parentel});
+	var url = "http://localhost:8080/id/" + id + "?";
+	makeRequestResponse(url,callback,tmpdiv);
+}
+
+function makeGetNewForm(objtype,parentel){
+
+	if ($('#tmpdiv').length) {$('#tmpdiv').remove();}
+	
+	var tmpdiv = addElement("div","tmpdiv",{hidden:false,parentel:parentel});
+	if (objtype == "lesson") {
+		url = "http://localhost:8080/refdata/all";
+		makeRequestResponse(url,drawform_multi,tmpdiv);
+	}
+	else {
+		url = "http://localhost:8080/new/"+objtype;
+		makeRequestResponse(url,drawentryform,tmpdiv);
+	}
+}
+					
+function makeAddRequest(objtype,argsurl,callback) {
+
+				if (objtype == "lesson") {
+					var url = "http://localhost:8080/add/lesson?" + argsurl;
+				}
+				else {
+					var url = "http://localhost:8080/add/"+objtype+"?" + argsurl;
+				}
+				
+				makeRequestResponse(url,callback);
+
 }

@@ -65,8 +65,8 @@ class Test_Popout_MultiSelect_DOW(Test_Base):
 
         self.assertAlmostEqual(x,604)
         self.assertAlmostEqual(y,1)
-        self.assertAlmostEqual(w,308)
-        self.assertAlmostEqual(h,55)
+        self.assertAlmostEqual(w,306)
+        self.assertAlmostEqual(h,89)
         
     def test_sticky(self):
 
@@ -80,8 +80,8 @@ class Test_Popout_MultiSelect_DOW(Test_Base):
         
         self.assertAlmostEqual(x,604)
         self.assertAlmostEqual(y,1)
-        self.assertAlmostEqual(w,308)
-        self.assertAlmostEqual(h,55)
+        self.assertAlmostEqual(w,306)
+        self.assertAlmostEqual(h,89)
         
     def test_openclose(self):
 
@@ -93,9 +93,9 @@ class Test_Popout_MultiSelect_DOW(Test_Base):
         x,y,w,h = get_dimensions('',self.browser,"//div[contains(@class,'slide-out1')]")
         
         self.assertAlmostEqual(x,604)
-        self.assertAlmostEqual(y,-51)
-        self.assertAlmostEqual(w,308)
-        self.assertAlmostEqual(h,55)
+        self.assertAlmostEqual(y,-89)
+        self.assertAlmostEqual(w,306)
+        self.assertAlmostEqual(h,89)
         
     def tearDown(self):
         self.browser.quit()
@@ -142,9 +142,9 @@ class Test_Popout_MultiSelect_DOW_Period(Test_Base):
         
         self.assertAlmostEqual(x,604)
         self.assertAlmostEqual(y,1)
-        self.assertAlmostEqual(w,308)
-        self.assertAlmostEqual(h,83)
-        
+        self.assertAlmostEqual(w,306)
+        self.assertAlmostEqual(h,159)
+
     def test_sticky(self):
 
         click_popupmenu("handle1",self.browser)
@@ -157,8 +157,8 @@ class Test_Popout_MultiSelect_DOW_Period(Test_Base):
         
         self.assertAlmostEqual(x,604)
         self.assertAlmostEqual(y,1)
-        self.assertAlmostEqual(w,308)
-        self.assertAlmostEqual(h,83)
+        self.assertAlmostEqual(w,306)
+        self.assertAlmostEqual(h,159)
         
     def test_openclose(self):
 
@@ -170,9 +170,9 @@ class Test_Popout_MultiSelect_DOW_Period(Test_Base):
         x,y,w,h = get_dimensions('',self.browser,"//div[contains(@class,'slide-out1')]")
         
         self.assertAlmostEqual(x,604)
-        self.assertAlmostEqual(y,-79)
-        self.assertAlmostEqual(w,308)
-        self.assertAlmostEqual(h,83)
+        self.assertAlmostEqual(y,-160)
+        self.assertAlmostEqual(w,306)
+        self.assertAlmostEqual(h,159)
         
     def tearDown(self):
         self.browser.quit()
@@ -396,12 +396,12 @@ class Test_Popout_JSServer(Test_Base):
         
         time.sleep(0.5)
         
-        set_select_element('recordtype','wp',self.browser)
-        set_select_element('period','130-210',self.browser)
+        set_select_element('recordtype','subject',self.browser)
+        set_select_element('period','830-910',self.browser)
         set_select_element('adult','Stan',self.browser)
         set_select_element('student','Clayton',self.browser)
         set_select_element('subject','Math',self.browser)
-        set_select_element('dow','Friday',self.browser)
+        set_select_element('dow','TU',self.browser)
         
         self.assertEqual(get_select_element_value('student',self.browser),'Clayton')
         
@@ -428,7 +428,7 @@ class Test_Popout_JSServerExtCls(Test_Base):
         
         time.sleep(0.2)
         
-        click_button('submitfoo',self.browser)
+        click_button('newsubmit',self.browser)
         
         time.sleep(0.2)
         
@@ -449,7 +449,7 @@ class Test_Popout_JSServerExtCls(Test_Base):
         
         time.sleep(0.2)
         
-        click_button('submitfoo',self.browser)
+        click_button('newsubmit',self.browser)
         
         time.sleep(0.2)
         
@@ -476,7 +476,7 @@ class Test_Popout_JSServerExtCls2p(Test_Base):
         time.sleep(0.2)
         
         # we can however make the selection if not poppped out
-        set_select_element('objtype','Clayton',self.browser)
+        set_select_element('source_value','Clayton',self.browser)
         
         time.sleep(0.2)
         
@@ -494,7 +494,7 @@ class Test_Popout_JSServerExtCls2p(Test_Base):
         
         time.sleep(0.2)
         
-        click_button('submitfoo',self.browser)
+        click_button('newsubmit',self.browser)
         
         time.sleep(1)
         
@@ -547,13 +547,17 @@ class Test_Pivot(Test_Base):
         self.assertListEqual(expected_results,results)
         
     def test_drawpivot_filter(self):
+        ''' sometimes because the css has changed elsewhere the popouts can
+        overlap on the screen and you cant click them programatically so
+        easier to not click them open '''
         
         #click_popupmenu("handle1",self.browser)
         
         set_select_element('source_value','Clayton',self.browser)
 
         # set filters
-        click_popupmenu("handle3",self.browser)        
+        #click_popupmenu("handle3",self.browser) 
+        
         set_checkbox_element('WE',self.browser)
         
         # set ztypes
@@ -640,14 +644,14 @@ class Test_Edit(Test_Base):
         
         click_popupmenu("handle1",self.browser)
         
-        set_input_text_element("source_value","054C4D26",self.browser,returnkey=True)
+        set_input_text_element("edit_source_value","054C4D26",self.browser,returnkey=True)
         time.sleep(0.2)
         
         set_select_element('subject','Math',self.browser)
         
         time.sleep(0.2)
         
-        click_button('submitfoo',self.browser)
+        click_button('editsubmit',self.browser)
         
         time.sleep(0.2)
         
@@ -674,35 +678,152 @@ class Test_Menu_Update(Test_Base):
         
         time.sleep(0.2)
         
-        set_select_element('dow','WE',self.browser)
-        
-        click_button('submitfoo',self.browser)
+        set_select_element('dow','TU',self.browser)
         
         time.sleep(0.2)
         
-        self.assertTrue(element_exists("//p[@id='1.2.2.6.22']",self.browser))
+        click_button('editsubmit',self.browser)
+        
+        time.sleep(0.2)
+        
+        self.assertTrue(element_exists("//p[@id='1.2.3.4.5']",self.browser))
+        
+    def tearDown(self):
+        self.browser.quit()
+    
+  
+        
+class Test_PHP_bridge(Test_Base):
+    
+    def setUp(self):
+        self.page = "phpbridge.php"
+        Test_Base.setUp(self,self.page)
+        
+    def test_(self):
+        self.assertTrue(element_exists("//p[@id='bar']",self.browser))
+        
+    def tearDown(self):
+        self.browser.quit()  
+        
+class Test_Mixed(Test_Base):
+    
+    def setUp(self):
+        self.page = "popout_server_mixed.php"
+        Test_Base.setUp(self,self.page)
+        
+    def test_(self):
+        
+        # edit 
+        
+        click_popupmenu("handle1",self.browser)
+        
+        set_input_text_element("edit_source_value","02B1EEDC",self.browser,returnkey=True)
+        time.sleep(0.2)
+        
+        set_select_element('subject','Humanities',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('editsubmit',self.browser)
+        
+        time.sleep(0.2)
+        
+        self.assertTrue(element_exists("//p[@id='1.2.3.4.5']",self.browser))
+        
+        click_popupmenu("handle2",self.browser)
+        
+        time.sleep(0.2)
+        
+        # new lesson
+        set_select_element('objtype','lesson',self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('dow','WE',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('newsubmit',self.browser)
+        
+        time.sleep(0.2)
+        
+        self.assertTrue(element_exists("//p[@id='1.3.2.6.22']",self.browser))
+
+        # new subject
+        #click_popupmenu("handle2",self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('objtype','subject',self.browser)
+        
+        time.sleep(0.2)
+        
+        set_input_text_element('code','mariokarts',self.browser)
+        set_input_text_element('name','mariokarts',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('newsubmit',self.browser)
+        
+        time.sleep(0.2)
+        
+        self.assertTrue(element_exists("//p[@id='mariokarts']",self.browser))
         
     def tearDown(self):
         self.browser.quit()
         
+class Test_Mixed_wpivot(Test_Base):
+    
+    def setUp(self):
+        self.page = "popout_server_mixed_wpivot.php"
+        Test_Base.setUp(self,self.page)
+        
+    def test_(self):
+        
+        # edit 
+        
+        click_popupmenu("handle1",self.browser)
+        
+        set_input_text_element("edit_source_value","02B1EEDC",self.browser,returnkey=True)
+        time.sleep(0.2)
+        
+        set_select_element('subject','Humanities',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('editsubmit',self.browser)
+        
+        time.sleep(0.2)
+        
+        self.assertTrue(element_exists("//p[@id='1.2.3.4.5']",self.browser))
+        
+        click_popupmenu("handle2",self.browser)
+        
+        time.sleep(0.2)
+        
+    def tearDown(self):
+        self.browser.quit()
         
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    '''
+
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_MultiSelect_DOW))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_MultiSelect_DOW_Period))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_Select))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_Mixed))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Table))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_JSButton))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_Server))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_Server))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_JSServer))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_JSServerExtCls))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_JSServerExtCls2p))
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_JSServerExtCls))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_JSServerExtCls2p))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Menu))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Edit))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Menu_Update))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Menu_Update))
     
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PHP_bridge))'''
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Edit))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

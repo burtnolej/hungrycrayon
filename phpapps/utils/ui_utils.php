@@ -259,14 +259,7 @@ function getchtmldbselect($dbname,$tablename,$column,$name,$widgetcount,$default
 function getchtmlinput($label,$field,$default,$args=NULL) {
 
 	echo "<p class=\"label\">".$label."</p>";
-	
-	/*if (isset($args['hidden']))  {
-		$type = 'hidden';
-	}
-	else {
-		$type = 'text';
-	}*/
-	
+
 	$type = 'text';
 	
 	echo "<input class = \"custom\" type=\"".$type."\" id=\"".$field."\" value=\"".$default."\"";
@@ -509,7 +502,11 @@ function getdbhtmlmultiselect($dbname,$query,$name,$args) {
 		else {
 			$args['checked'] = Array();
 		}
-			
+		
+		
+		
+		echo "<p class='switch-divider-header'>".$name."</p>";
+		
 		$db = new SQLite3($dbname);
 
 		$results = $db->query($query);
@@ -517,7 +514,9 @@ function getdbhtmlmultiselect($dbname,$query,$name,$args) {
 		// the class=switchtable is used by javasript to identify all the multiselect divs are out there
 		// the name is used to identify the name of the constraint fields that these values below too
 		//ie cnstr_period='830-910,910-950'
-		echo "<table class = \"switchtable\" name=\"".$name."\"><tr>";
+		echo "<table class = \"switchtable\" name=\"".$name."\">";
+		echo "</tr>";
+		echo "<tr>";
 		$ycount=0;
 		while ($row = $results->fetchArray()) {
 				
@@ -795,15 +794,18 @@ function gethtmlpopoutdivold($label,$htmbodyfunc,$param,$tabnum,$divclass=NULL) 
 	
 }
 
-function gethtmlpopoutdiv($label,$getargs,$htmlfuncarr,$tabnum,$maxy,$divclass=NULL) {
+function gethtmlpopoutdiv($label,$getargs,$htmlfuncarr,$tabnum,$maxy,$divclass,$tablocation) {
 
 	// css stubs to append tab number too
 	$slideout = "slide-out".$tabnum;
+	$slideoutloc = "slide-out-base-".$tablocation;
+	
 	$handle = "handle".$tabnum;
 	$pol = "pol".$tabnum;
+	$polloc = "pol".$tablocation;
 	
-	echo "<div class='nojs slide-out-base ".$slideout." ".$divclass."'>";  
-	echo "<a class='nojs pol-base ".$pol." ".$handle."'>".$label."</a>";
+	echo "<div class='nojs slide-out-base ".$slideout." ".$slideoutloc." ".$divclass."'>";  
+	echo "<a class='nojs pol-base ".$pol." ".$polloc." ".$handle."'>".$label."</a>";
 	
 	foreach ($htmlfuncarr as $htmlbodyfunc => $param) {
 		$htmlbodyfunc($getargs,$param,$maxy);
