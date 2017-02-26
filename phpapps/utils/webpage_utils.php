@@ -43,7 +43,8 @@ function drawtable($getargs) {
 				}
 			};
 	
-			gethtmldiv("title blah blah",$func,"table","divlabel");	
+			//gethtmldiv("title blah blah",$func,"table","divlabel");	
+			gethtmldiv("title blah blah",$func,"table","table");	
 }
 
 function drawservercontent($getargs,$serverdefarr,$maxy) {

@@ -391,6 +391,9 @@ class Command:
                      
             ssviewer_utils.dataset_load(**args)
          
+            logstr = "reloading " + globals()['dbname']
+            log.log(thisfuncname(),3,msg=logstr)            
+
             # get a mapping of userobjid to db refid (__id) as of uses the former to index but the web page
             # uses __id as they are easier to pass in URL
             with database:

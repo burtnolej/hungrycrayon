@@ -167,15 +167,20 @@ function drawgrid($utilsxml,$args=NULL,$formats=NULL) {
 function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 
 	echo "<table class = \"borderoff\">";
+	
 
 	$_rows = $utilsxml->xpath("//row"); // get a list of all rows
+	
+	$row_num=0;
 	
 	foreach ($_rows as $_row) {
 	
 		echo "<tr>"; // start an html row
 		$_cells = $_row->xpath("child::*"); // get a list of the cells (children) of this row
 	
+		$cell_num=0;
 		foreach ($_cells as $_cell) {
+			
 			echo "<td>";
 			
 			$_subrows = $_cell->xpath("child::subrow"); // see if any subrows exist
@@ -183,9 +188,12 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 			if (sizeof($_subrows) <> 0) {
 				 echo "<table class = \"borderoff\">"; // start a new table
 
+				$subrow_num=0;
 				foreach ($_subrows as $_subrow) {	
 
-					echo "<tr><td class=\"thincol borderoff\" bgcolor=\"#E0E0E0\"";
+					$id = $row_num.".".$cell_num.".".$subrow_num;
+					
+					echo "<tr><td id=".$id." class=\"thincol borderoff\" bgcolor=\"#E0E0E0\"";
 
 					$content="";	
 					$_subcells = $_subrow->xpath("child::subcell"); // see if any subcells exist
@@ -226,30 +234,37 @@ function drawnoformatgrid($utilsxml,$args=NULL,$formats=NULL) {
 							elseif ($_subcells[$i]->valuetype == 'id') {
 								$url = getlinkurl($_subcells[$i],$args,"dedit.php");
 								$link = '<a href="'.$url.'">'."<i>".$_subcells[$i]->value."</i>".'</a>';
-								//$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
-								$content = $content." {".$link."} ";
+								
+								$id = " <p id='".$_subcells[$i]->value."' hidden></p> ";
+								
+								$content = $content." {".$link.$id."} ";
+								
+								
 							}
 							else {
 								$link = '<a href="'.$url.'">'.$_subcells[$i]->value.'</a>';
 								$content = $content.$link;
 								//echo $_subcells[$i]->valuetype;
 							}
-
-							
 						}
 						echo ">".$content;
 					}
-					echo "</td></tr>";					
+					echo "</td></tr>";
+					$subcell_num=$subcell_num+1;			
 				}
 				echo "</table></td>";
+				
 			}
 			else {
 				$content = $_cell->value;
 				echo $content;
 			}
+			$cell_num=$cell_num+1;
 		}
 		echo "</td>";
 		echo "</tr>";
+		
+		$row_num=$row_num+1;
 	}
 	echo "</table> ";
 }

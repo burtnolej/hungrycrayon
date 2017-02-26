@@ -37,7 +37,8 @@ requirejs(['myutils','jquery'],
 			var init_values = Array();
 			
 			// set context menu
-			setcontextmenu("ul[class='nav']"); 
+			//setcontextmenu("ul[class='nav']"); 
+			setcontextmenu("div[id='wrap']","macro_updateid");
 			
 			//  scrape values and submit new to server		
 			$("input[id='" + Globals.newbutton + "']").on('click',function(){ 		
@@ -79,8 +80,10 @@ requirejs(['myutils','jquery'],
 		   $("select, input[type!='text']").on('change',function(){
 		   		if (!$(this).hasClass("new")) {
 		   			if (!$(this).hasClass("edit")) {
-			   			pageurl = buildurl();
-			   			window.location = pageurl;
+		   				
+		   			   	url = "http://".concat(Globals.server_name,"/",Globals.script_name,"?");
+		   				url = url + getAllInputValues('ztypes',['qunit-filter-input']);
+			   			window.location = url;
 			   		}
 			   	}
 		   });	 

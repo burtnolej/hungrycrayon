@@ -433,10 +433,10 @@ def dataset_pivot(of,enums,yaxis_type,xaxis_type,ztypes, source_type,source_valu
                                     try:
                                         _celltext.index(zval.name)
                                     except:
-                                        #if hasattr(zval,'name'):
-                                        _celltext = _additem(_celltext,zval.name)
-                                        #else:
-                                        #    _celltext = _additem(_celltext,zval)
+                                        if hasattr(zval,'name'):
+                                            _celltext = _additem(_celltext,zval.name)
+                                        else:
+                                            _celltext = _additem(_celltext,zval)
                                         pass
                                         
                             try:      

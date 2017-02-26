@@ -1,6 +1,8 @@
 import unittest
-
+import ssviewer_rest_utils as ssrest
 from misc_utils_selenium import *
+import shutil
+
 '''from selenium import webdriver
 
 from selenium import webdriver
@@ -20,6 +22,9 @@ class Test_Base(unittest.TestCase):
     
     def setUp(self,page):
     
+        shutil.copyfile("test_webcore.sqlite.backup","test_webcore.sqlite")
+        ssrest.restquery(baseurl + ":8080/command/reload",unknown="Y")
+        
         self.browser = webdriver.Remote(
             command_executor='http://127.0.0.1:4444/wd/hub',
             desired_capabilities=DesiredCapabilities.CHROME)    
@@ -499,7 +504,7 @@ class Test_Popout_JSServerExtCls2p(Test_Base):
         time.sleep(1)
         
         # scrape the table
-        expected_results = [u'Humanities', u'Amelia', u'Humanities', u'Amelia', u'Math', u'Stan']
+        expected_results = [u'Humanities', u'Amelia', u'Humanities', u'Amelia', u'Physics', u'Amelia',u'Math', u'Stan']
         results = get_table_values(self.browser)
         
         self.assertListEqual(expected_results,results)
@@ -523,7 +528,7 @@ class Test_Pivot(Test_Base):
     
         results = get_table_values(self.browser)
         
-        expected_results = [u'Humanities', u'Amelia', u'Math', u'Stan']
+        expected_results = [u'Humanities', u'Amelia', u'Physics', u'Amelia',u'Math', u'Stan']
         
         self.assertListEqual(expected_results,results)
         
@@ -542,7 +547,7 @@ class Test_Pivot(Test_Base):
     
         results = get_table_values(self.browser)
         
-        expected_results = [u'Amelia', u'Clayton', u'830-910', u'Stan', u'Clayton', u'910-950']
+        expected_results = [u'Amelia', u'Clayton', u'830-910', u'Amelia', u'Clayton', u'910-950',u'Stan', u'Clayton', u'910-950']
         
         self.assertListEqual(expected_results,results)
         
@@ -674,7 +679,7 @@ class Test_Menu_Update(Test_Base):
         
         time.sleep(0.2)
         
-        click_menu_element("",self.browser,"//a[@id='foobar']")
+        click_menu_element("",self.browser,"//a[@id='mytd']")
         
         time.sleep(0.2)
         
@@ -690,8 +695,6 @@ class Test_Menu_Update(Test_Base):
         
     def tearDown(self):
         self.browser.quit()
-    
-  
         
 class Test_PHP_bridge(Test_Base):
     
@@ -779,27 +782,214 @@ class Test_Mixed_wpivot(Test_Base):
         Test_Base.setUp(self,self.page)
         
     def test_(self):
+                
+        # edit
+
+        click_popupmenu("handle2",self.browser)
         
-        # edit 
-        
-        click_popupmenu("handle1",self.browser)
-        
-        set_input_text_element("edit_source_value","02B1EEDC",self.browser,returnkey=True)
+        set_input_text_element("edit_source_value","054C4D26",self.browser,returnkey=True)
         time.sleep(0.2)
         
-        set_select_element('subject','Humanities',self.browser)
+        set_select_element('subject','Math',self.browser)
         
         time.sleep(0.2)
         
         click_button('editsubmit',self.browser)
         
+        time.sleep(0.5)
+        
+        # pivot
+        #click_popupmenu("handle1",self.browser)
+        
         time.sleep(0.2)
         
-        self.assertTrue(element_exists("//p[@id='1.2.3.4.5']",self.browser))
+        set_select_element('source_value','Clayton',self.browser)
         
+        time.sleep(0.2)
+        
+        results = get_table_values(self.browser)
+        
+        expected_results = [u'Math', u'Amelia', u'Physics', u'Amelia', u'Math', u'Stan']
+        
+        self.assertListEqual(expected_results,results)
+        
+        # new subject
+        click_popupmenu("handle3",self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('objtype','subject',self.browser)
+        
+        time.sleep(0.2)
+        
+        set_input_text_element('code','foobar',self.browser)
+        set_input_text_element('name','foobar',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('newsubmit',self.browser)
+        
+        # new lesson
+        time.sleep(0.2)
+        
+        #click_popupmenu("handle3",self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('objtype','lesson',self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('subject','foobar',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('newsubmit',self.browser)
+        
+        time.sleep(0.5)
+        
+        results = get_table_values(self.browser)
+        
+        expected_results = [u'Math', u'Amelia', u'foobar', u'Amelia', u'Physics', u'Amelia', u'Math', u'Stan']
+        
+        self.assertListEqual(expected_results,results)
+        
+class Test_Mixed_wpivot_crit(Test_Base):
+    
+    def setUp(self):
+        self.page = "popout_server_mixed_wpivot_crit.php"
+        Test_Base.setUp(self,self.page)
+        
+    def test_(self):
+                
+        # edit
+
         click_popupmenu("handle2",self.browser)
         
+        set_input_text_element("edit_source_value","054C4D26",self.browser,returnkey=True)
         time.sleep(0.2)
+        
+        set_select_element('subject','Math',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('editsubmit',self.browser)
+        
+        time.sleep(0.5)
+        
+        # pivot
+        #click_popupmenu("handle1",self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('source_value','Clayton',self.browser)
+        
+        time.sleep(0.2)
+        
+        results = get_table_values(self.browser)
+        
+        expected_results = [u'Math', u'Amelia', u'Physics', u'Amelia', u'Math', u'Stan']
+        
+        self.assertListEqual(expected_results,results)
+        
+        # new subject
+        click_popupmenu("handle3",self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('objtype','subject',self.browser)
+        
+        time.sleep(0.2)
+        
+        set_input_text_element('code','foobar',self.browser)
+        set_input_text_element('name','foobar',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('newsubmit',self.browser)
+        
+        # new lesson
+        time.sleep(0.2)
+        
+        #click_popupmenu("handle3",self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('objtype','lesson',self.browser)
+        
+        time.sleep(0.2)
+        
+        set_select_element('subject','foobar',self.browser)
+        
+        time.sleep(0.2)
+        
+        click_button('newsubmit',self.browser)
+        
+        time.sleep(0.5)
+        
+        results = get_table_values(self.browser)
+        
+        expected_results = [u'Math', u'Amelia', u'foobar', u'Amelia', u'Physics', u'Amelia', u'Math', u'Stan']
+        
+        self.assertListEqual(expected_results,results)
+        
+        # change ztypes / data shown
+        
+        click_popupmenu("handle5",self.browser)
+        
+        set_checkbox_element("recordtype",self.browser)
+        set_checkbox_element("adult",self.browser)
+        set_checkbox_element("subject",self.browser)
+        set_checkbox_element("student",self.browser)
+        
+        results = get_table_values(self.browser)       
+        expected_result = [u'Math', u'Amelia', u'Clayton', u'wp', u'foobar', u'Amelia', u'Clayton', u'subject', u'Physics', u'Amelia', u'Clayton', u'academic',u'Math', u'Stan', u'Clayton', u'academic']
+            
+        self.assertEqual(expected_result,results)
+        
+        # and then filter
+        
+        click_popupmenu("handle4",self.browser)
+        
+        set_checkbox_element("TU",self.browser)
+        
+        results = get_table_values(self.browser)
+        
+        expected_result = [u'Math', u'Amelia', u'Clayton', u'wp', u'foobar', u'Amelia', u'Clayton', u'subject', u'Physics', u'Amelia', u'Clayton', u'academic']
+        
+        self.assertEqual(expected_result,results)
+        
+    def tearDown(self):
+        self.browser.quit()
+ 
+class Test_Mixed_wpivot_crit_menu_update(Test_Base):
+    
+    def setUp(self):
+        self.page = "popout_server_mixed_wpivot_crit.php"
+        Test_Base.setUp(self,self.page)
+        
+    def test_(self):
+                
+        # edit
+
+        time.sleep(0.2)
+        
+        set_select_element('source_value','Clayton',self.browser)
+        
+        time.sleep(0.2)
+
+        set_checkbox_element("id",self.browser)
+        
+        time.sleep(0.2)
+        
+        contextclick_element("1.1.0",self.browser)
+        
+        time.sleep(0.2)
+        
+        click_menu_element("",self.browser,"//a[@id='1.1.0']")
+        
+        time.sleep(0.2)
+        
         
     def tearDown(self):
         self.browser.quit()
@@ -807,7 +997,7 @@ class Test_Mixed_wpivot(Test_Base):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_MultiSelect_DOW))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_MultiSelect_DOW_Period))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_Select))
@@ -819,11 +1009,12 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_JSServerExtCls))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_JSServerExtCls2p))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Menu))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PHP_bridge))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Menu_Update))
-    
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_PHP_bridge))'''
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot))
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Edit))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot_crit))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot_crit_menu_update))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Edit))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 

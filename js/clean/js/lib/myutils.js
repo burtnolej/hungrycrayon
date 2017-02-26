@@ -445,18 +445,30 @@ function getElementsName(type) {
 	return values;
 }
 
-function getElementsIds(type) {
+function getElementsIds(type,parentel=null) {
 	var values = Array();
-	$(type).each(function (index, id) {
-   		values.push(this.id);
-	});
+	
+	if (parentel==null) {
+		$(type).each(function (index, id) {
+	   		values.push(this.id);
+		});
+		
+	}
+	else {
+		var $selectels= parentel.find(type);
+		
+		$.each($selectels, function( key, value ) {
+			values.push(this.id);
+		});
+	}
+	
 	return values;
 }
 
 function getElementValueChanges(elementtype,initvalues,parentel=null) {
 	newvalues = getElementValues(elementtype,parentel);
 	diffvalues = compare_1darrays(initvalues,newvalues);
-	ids = getElementsIds(elementtype);
+	ids = getElementsIds(elementtype,parentel);
 	result = Array();
 
 	for (i=0;i<diffvalues.length;i++) {
@@ -796,16 +808,21 @@ function _updateid(id) {
 	  },200);
 }
 
-function macro_updateid (targetobjid,menuitemid) {	
-	var $idel  = $("[id='"+targetobjid.id+"']").find("p");
-	$("[id='source_value']").val($idel.attr('id'));
+function macro_updateid (targetobjid) {	
+	//var $idel  = $("[id='"+targetobjid.id+"']").find("p");
 	
-	document.getElementsByClassName('handle1')[0].click();
+	// remove the temp menu item	
+	$("[class='contextmenu']").remove();
+	
+	var $idel  = $("[id='"+targetobjid+"']").find("p");
+	$("[id='edit_source_value']").val($idel.attr('id'));
+	
+	document.getElementsByClassName('handle2')[0].click();
 	
 	var e = $.Event('keypress');
 	e.which = 13;
 	
-	$("[id='source_value']").trigger(e);
+	$("[id='edit_source_value']").trigger(e);
 }
 					
 function foobar(msg) {
@@ -838,20 +855,27 @@ function setcontextmenu(selectorstr,callback=null) {
 				
 				if (currentCSSDisplay == "none") {
 					$parentel = $(selectorstr).find("ul")[0];
+					
+					$("[class='contextmenu']").remove();
 
-					$menuparent = addElement("li","foomenu",{parentel:$parentel});
+					//$menuparent = addElement("li","foomenu",{parentel:$parentel,class:"contextmenu"});
+					$menuparent = addElement("li","foo",{parentel:$parentel,class:"contextmenu"});
 					
 					options = {parentel:$menuparent,label:targetobj[0].tagName}
 					if (callback != null) {
-						options['onclick'] = callback + "("+targetobj[0].id+")";
+						options['onclick'] = callback + "('"+targetobj[0].id +"')";
 						options['href'] = "javascript:void(0);";
 					}
 					
-					addElement("a","foobar",options);
+					//addElement("a","foobar",options);
+					addElement("a",targetobj[0].id,options);
 				}
 
 				e.preventDefault();
 			});
+}
+
+function makeViewRequest(objtype,parentel) {
 }
 
 function makeUpdateRequest (value_changes,id,callback) {
@@ -885,13 +909,12 @@ function makeGetNewForm(objtype,parentel){
 					
 function makeAddRequest(objtype,argsurl,callback) {
 
-				if (objtype == "lesson") {
-					var url = "http://localhost:8080/add/lesson?" + argsurl;
-				}
-				else {
-					var url = "http://localhost:8080/add/"+objtype+"?" + argsurl;
-				}
-				
-				makeRequestResponse(url,callback);
-
+		if (objtype == "lesson") {
+			var url = "http://localhost:8080/add/lesson?" + argsurl;
+		}
+		else {
+			var url = "http://localhost:8080/add/"+objtype+"?" + argsurl;
+		}
+		
+		makeRequestResponse(url,callback);
 }
