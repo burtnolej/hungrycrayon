@@ -320,7 +320,6 @@ function drawform_multi($xml,$parentel=null) {
 
 		var xmlDoc = (new DOMParser()).parseFromString($xml, "text/xml");
 		
-		
 		// look for default values in the xml tree
 		var defaults = {};
 		var itemelements= xmlDoc.getElementsByTagName("item");

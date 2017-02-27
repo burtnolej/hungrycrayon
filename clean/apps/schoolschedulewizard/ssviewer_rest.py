@@ -73,7 +73,12 @@ class Add:
         
         #return xmltree.tostring(xml)
     
-        
+class Form:
+    def GET(self,objtype):
+               
+
+        return 
+    
 class New:
     def GET(self,objtype):
         

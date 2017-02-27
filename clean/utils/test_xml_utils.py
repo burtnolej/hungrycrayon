@@ -2,7 +2,7 @@ import xml.etree.ElementTree as xmltree
 import unittest
 from xml_utils import element_find_by_attrib_value, element_move, element_fuse, \
      element_parent_get, element_find_tags,element_find_children, grid2xml, xml2string, record2xml, \
-     tree2xml
+     tree2xml, file2xml
     
 from collections import OrderedDict
 
@@ -31,8 +31,6 @@ class Test_XML(unittest.TestCase):
         element = self.root.find(".//gchildA")
         self.assertEquals(element.attrib['name'],'brian')
 
-        
-        
     def test_element_create_new_child(self):
         parent = self.root.find(".//childA")
         xmltree.SubElement(parent,"gchildC")
@@ -844,7 +842,26 @@ class Test_Tree2XML(unittest.TestCase):
         xml = tree2xml(page)
         
         self.assertEqual(xmltree.tostring(xml),expected_result)
-                
+        
+
+class Test_File2XML(unittest.TestCase):
+    
+    def setUp(self):
+        self.filename = "/Users/burtnolej/Development/pythonapps/clean/utils/test_misc/test_file2xml.xml"
+        
+    def test_(self):
+        expected_results = "<tagA><childA1 /><childA2 /></tagA>"
+        results = file2xml(self.filename,"tagA")
+        self.assertEqual(results,expected_results)
+        
+    def test_all(self):
+        expected_results = "<root><tagA><childA1 /><childA2 /></tagA><tagB><childB1 /><childB2 /></tagB></root>"
+        results = file2xml(self.filename)
+        self.assertEqual(results,expected_results)
+        
+
+        
+        
 if __name__ == "__main__":
 
     suite = unittest.TestSuite()
@@ -861,6 +878,8 @@ if __name__ == "__main__":
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pageto_XML))
                   
     #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Grid_to_XML_header))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Tree2XML))
+    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Tree2XML))
+    
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_File2XML))
     
     unittest.TextTestRunner(verbosity=2).run(suite)

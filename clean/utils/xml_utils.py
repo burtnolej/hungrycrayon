@@ -129,6 +129,14 @@ def record2xml(page,root=None,name=None,header=None):
         
     return(root)
                         
+def file2xml(filename,starttag=None):
+    tree = xmltree.parse(filename)
+    root = tree.getroot()
+    if starttag <> None:
+        element = root.find(".//" + starttag)
+        return xml2string(element)
+    else:
+        return xml2string(root)
     
 def grid2xml(grid,schema=None,tags=None,ids=False,shrinkfont=None,header=None):
     # take a 2d array and return an XML string

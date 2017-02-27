@@ -1,4 +1,16 @@
 <root>
+	<dview>
+		<select id='1'>
+			<field>view_type</field>
+			<label>view_type</label>
+			<values>
+				<value>pivot</value>
+				<value>list</value>
+			</values>
+			<comment>Pick the display type you want</comment>
+			<default>pivot</default>
+		</select>
+	</dview>
 	<dpivot>
 		<select id='1'>
 			<field>xaxis</field>

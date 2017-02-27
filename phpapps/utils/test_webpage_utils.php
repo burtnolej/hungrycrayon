@@ -763,6 +763,47 @@ PHP;
 	}
 }
 
+class test_drawview extends PHPUnit_Framework_TestCase
+{
+	// toggleable pivot/search dropdown
+	public function test_()
+	{
+		ob_start(); 
+									
+		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px");
+		jsslideoutinit(2,"450px");
+		jsslideoutinit(3,"400px");
+		
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+		
+			\$globals = array('script_name' => 'view.php',
+										 'server_name' => '0.0.0.0');
+			
+			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml",'xmlfileparam' => 'dview',"class" => "view");
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'view',1);
+			drawpopout(\$args);
+		
+			drawtable(\$_GET);
+			
+		?>
+PHP;
+		echo $str;
+
+		jsphpbridge($globals=NULL);
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/view.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	}
+}
 			
 class test_drawpivot extends PHPUnit_Framework_TestCase
 {
@@ -1501,7 +1542,7 @@ JS;
 set_error_handler("handleError");
    
 try {
-	testrunner("drawmultiselectpopout");
+	/*testrunner("drawmultiselectpopout");
 	testrunner("draw2multiselectpopout");
 	testrunner("drawmultiselectpopout_many");
 	testrunner("drawdbselectpopout");
@@ -1517,7 +1558,9 @@ try {
 	testrunner("menu_update");
 	testrunner("drawapp");
 	testrunner("popout");
-	testrunner("misc");
+	testrunner("misc");*/
+	testrunner("drawview");
+	 
 	 
 	 
 } catch (Exception $e) {
