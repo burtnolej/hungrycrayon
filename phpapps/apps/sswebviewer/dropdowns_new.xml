@@ -1,0 +1,51 @@
+<root>
+	<dpivot>
+		<item id='1'>
+			<valuetype>xaxis</valuetype>
+			<label>row</label>
+			<value>period,dow,adult,subject,student</value>
+			<comment>Pick the field to represent on the xaxis or rows; Period is usually used</comment>
+			<default>period</default>
+		</item>
+		<item id='2'>
+			<valuetype>yaxis</valuetype>
+			<label>column</label>
+			<value>period,dow,adult,subject,student</value>
+			<comment>Pick the field to represent on the yaxis or columns; Day-of-week is usually used; putting adult here will create the view in the "schedule new work period" file on the googledrive</comment>
+			<default>dow</default>
+		</item>
+		<item id='3'>
+			<valuetype>source_type</valuetype>
+			<label>datatype</label>
+			<value>student,adult,subject</value>
+			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
+			<default>student</default>
+		</item>
+	</dpivot>
+	<dsearch>
+		<item id='1'>
+			<valuetype>source_type</valuetype>
+			<label>type</label>
+			<value>list</value>
+			<default>list</default>
+		</item>
+		<item id='2'>
+			<valuetype>source_value</valuetype>
+			<label>value</label>
+			<value>lesson,dow,period,subject,adult,lesson,student</value>
+			<default></default>
+		</item>
+		<item id='3'>
+			<valuetype>pagenum</valuetype>
+			<label>page #</label>
+			<value>1,2</value>
+			<default>1</default>
+		</item>
+		<item id='4'>
+			<valuetype>pagelen</valuetype>
+			<label>rows #</label>
+			<value>10,100,1000,10000</value>
+			<default>10</default>
+		</item>
+	</dsearch>
+</root>

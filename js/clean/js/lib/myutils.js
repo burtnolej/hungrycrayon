@@ -358,7 +358,7 @@ function drawform_multi($xml,$parentel=null) {
 		}
 }
 
-function drawform($xml,$parentid=null) {
+function drawform($xml,$parentel=null) {
 	// form just consists of db select boxes
 	// db data retrieved from rest service
 	// makes one call per objtype
@@ -371,15 +371,30 @@ function drawform($xml,$parentid=null) {
 			</item>
 		</root> */		
 	   
-		var elements= $xml.getElementsByTagName("valuetype");
-		var values= $xml.getElementsByTagName("options");
+	   var xmlDoc = (new DOMParser()).parseFromString($xml, "text/xml");
+	   
+		var elements= xmlDoc.getElementsByTagName("valuetype");
+		var values= xmlDoc.getElementsByTagName("value");
 		
 		for (var i=0;i<elements.length;i++) {
 			vt = elements[i].childNodes[0].nodeValue.toString();
 			val = values[i].childNodes[0].nodeValue.toString();
 			
-			var options = {hidden:false,name:vt,options:val.split(',')};		 
-			addElement("select",vt,options);
+			//var options = {hidden:false,name:vt,options:val.split(',')};		 
+			//addElement("select",vt,options);
+			
+			var options = {hidden:false,name:vt,values:val.split(','),class:"view"};		
+			//var options = {hidden:false,name:vt,values:values};		
+			
+			if ($parentel != null) {
+				options.parentel = $parentel;
+			}
+						
+			//if (vt in defaults) {
+			//	options.default = defaults[vt];
+			//}
+			
+			drawcselectp(vt,options);
 		}
 }
 
@@ -889,6 +904,21 @@ function makeGetDetailsRequest(id,callback,parentel) {
 	var tmpdiv = addElement("div","tmpdiv",{hidden:false,parentel:parentel});
 	var url = "http://localhost:8080/id/" + id + "?";
 	makeRequestResponse(url,callback,tmpdiv);
+}
+
+function makeViewForm(viewtype,parentel) {
+
+	if ($('#tmpdiv').length) {$('#tmpdiv').remove();}
+	
+	var tmpdiv = addElement("div","tmpdiv",{hidden:false,parentel:parentel});
+	if (viewtype == "list") {
+			url = "http://0.0.0.0:8080/form/dsearch";
+  			makeRequestResponse(url,drawform,tmpdiv);
+	}
+	else {
+			url = "http://0.0.0.0:8080/form/dpivot";
+  			makeRequestResponse(url,drawform,tmpdiv);
+	}
 }
 
 function makeGetNewForm(objtype,parentel){

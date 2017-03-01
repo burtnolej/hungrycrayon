@@ -75,9 +75,14 @@ class Add:
     
 class Form:
     def GET(self,objtype):
-               
-
-        return 
+        
+        web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Credientials','true')
+        
+        xmlconfig = "/Users/burtnolej/Development/pythonapps/phpapps/apps/sswebviewer/dropdowns_new.xml"
+        results = xml_utils.file2xml(xmlconfig,objtype)
+        
+        return results
     
 class New:
     def GET(self,objtype):
@@ -179,12 +184,17 @@ class Schema:
 class Refdata:
     def GET(self,objtype):
 
+        data = web.input()
+        
         web.header('Access-Control-Allow-Origin','*')
         web.header('Access-Control-Allow-Credientials','true')
         
-        reftree = ssviewer_utils.dataset_refdata(globals()['database'])
+        itemname=None
         
-        #xml = xml_utils.tree2xml(reftree)
+        if hasattr(data,'tag'):
+            itemname=data.tag
+        
+        reftree = ssviewer_utils.dataset_refdata(globals()['database'],objtype,itemname)
         
         xml = xml_utils.tree2xml(reftree,tag="refitem")
         
@@ -551,7 +561,8 @@ def _run(port,**xtraargs):
         '/command/(\w+)','Command',
         '/update/(\w+)','UpdateID',
         '/updateuid/(\w+)','UpdateUID',
-        '/refdata/(\w+)','Refdata'
+        '/refdata/(\w+)','Refdata',
+        '/form/(\w+)','Form'
     )
     
     globals()['database'] = Database(dbname)

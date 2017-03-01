@@ -1,0 +1,113 @@
+<root>
+	<dview>
+		<select id='1'>
+			<field>view_type</field>
+			<label>view_type</label>
+			<values>
+				<value>pivot</value>
+				<value>list</value>
+			</values>
+			<comment>Pick the display type you want</comment>
+			<default>pivot</default>
+		</select>
+	</dview>
+	<dpivot>
+		<select id='1'>
+			<field>xaxis</field>
+			<label>row</label>
+			<values>
+				<value>period</value>
+				<value>dow</value>
+				<value>adult</value>
+				<value>subject</value>
+				<value>student</value>
+			</values>
+			<comment>Pick the field to represent on the xaxis or rows; Period is usually used</comment>
+			<default>period</default>
+		</select>
+		<select id='2'>
+			<field>yaxis</field>
+			<label>column</label>
+			<values>
+				<value>period</value>
+				<value>dow</value>
+				<value>adult</value>
+				<value>subject</value>
+				<value>student</value>
+			</values>
+			<comment>Pick the field to represent on the yaxis or columns; Day-of-week is usually used; putting adult here will create the view in the "schedule new work period" file on the googledrive</comment>
+			<default>dow</default>
+		</select>
+		<select id='3'>
+			<field>source_type</field>
+			<label>datatype</label>
+			<values>
+				<value>student</value>
+				<value>adult</value>
+				<value>subject</value>
+			</values>
+			<comment>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</comment>
+			<default>student</default>
+		</select>
+	</dpivot>
+	<dsearch>
+		<select id='1'>
+			<field>source_type</field>
+			<label>type</label>
+			<values>
+				<value>list</value>
+			</values>
+			<default>list</default>
+		</select>
+		<select id='2'>
+			<field>source_value</field>
+			<label>value</label>
+			<values>
+				<value>lesson</value>
+				<value>dow</value>
+				<value>period</value>
+				<value>subject</value>
+				<value>adult</value>
+				<value>student</value>
+			</values>
+			<default>lesson</default>
+		</select>
+		<select id='3'>
+			<field>pagenum</field>
+			<label>page #</label>
+			<values>
+				<value>1</value>
+				<value>2</value>
+			</values>
+			<default>1</default>
+		</select>
+		<select id='4'>
+			<field>pagelen</field>
+			<label>rows #</label>
+			<values>
+				<value>10</value>
+				<value>100</value>
+				<value>1000</value>
+				<value>10000</value>
+			</values>
+			<default>10</default>
+		</select>
+	</dsearch>
+	<dnew>
+		<select id='1'>
+			<field>objtype</field>
+			<label>record type</label>
+			<values>
+			<value>NotSelected</value>
+				<value>lesson</value>
+				<value>subject</value>
+				<value>student</value>
+				<value>adult</value>
+				<value>period</value>
+				<value>dow</value>
+				<value>recordtype</value>
+			</values>
+			<default>NotSelected</default>
+		</select>
+	</dnew>
+</root>

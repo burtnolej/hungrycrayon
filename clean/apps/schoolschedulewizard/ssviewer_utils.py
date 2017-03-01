@@ -585,11 +585,35 @@ def _lesson_change(lesson,delete=False):
                     else:
                         _add(lesson_attr,xaxis,yaxis,lesson)
           
-def dataset_refdata(database):
-    
-    reftypes = ['subject','student','period','dow','recordtype','adult']
-    
+def dataset_refdata(database,objtype=None,itemname=None):
+
+    # objtype is set if you dont want all ref data
+    # itemname is set if you want the label in xml to not be the name of the objtype
+    # this could because the webpage is using this data to create an element and it needs to
+    # have a specific name
     _refdata = {}
+    
+    if objtype==None:
+        objtype="all"
+        
+    if objtype <> "all": 
+        
+        # so if just doing one not all
+        with database:
+            _,values,_ = sswizard_query_utils._refexecfunc(database,objtype)
+        
+        reftype=objtype
+        if itemname<>None: # and if itemname is being overridden
+            reftype=itemname
+            
+        _refdata[reftype] = [value[0] for value in values]
+        
+        return _refdata
+
+    else:
+        reftypes = ['subject','student','period','dow','recordtype','adult']
+    
+    
     with database:
         for reftype in reftypes:
             _,values,_ = sswizard_query_utils._refexecfunc(database,reftype)

@@ -859,8 +859,6 @@ class Test_File2XML(unittest.TestCase):
         results = file2xml(self.filename)
         self.assertEqual(results,expected_results)
         
-
-        
         
 if __name__ == "__main__":
 

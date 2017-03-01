@@ -47,7 +47,6 @@ requirejs(['myutils','jquery'],
 	  			$("select[id='objtype").val('NotSelected');
 			});
 			
-			
 			$("select").on('change',function(){ 
 				// get content from server on objtype selection
 		   		if ($(this).hasClass("new")) { 

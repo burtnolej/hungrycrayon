@@ -78,9 +78,8 @@ function   ($, myutils) {
  	QUnit.test('draw form widget using server provided xml', function (assert) {
 
 			$xml = '<root><parser><value>drawentryform</value></parser><item id="1"><value /><valuetype>code</valuetype></item><item id="2"><value /><valuetype>name</valuetype></item></root>';
-  			var xmlDoc = (new DOMParser()).parseFromString($xml, "text/xml");
 
-			drawentryform(xmlDoc);
+			drawentryform($xml);
 	
 			assert.equal($('input[id="code"]').attr('name'),"code",'passed');
 			assert.equal($('input[id="name"]').attr('name'),"name",'passed');
@@ -89,7 +88,7 @@ function   ($, myutils) {
 	 		
  	QUnit.test('get ref data', function (assert) {
 		
-			$expected_results = '<root><row><cell><bgcolor>#ffffff</bgcolor><valuetype>col</valuetype><fgcolor>#000000</fgcolor><value>student</value></cell></row><row><cell><bgcolor>#ffffff</bgcolor><valuetype>row</valuetype><fgcolor>#000000</fgcolor><value>Peter</value></cell></row><row><cell><bgcolor>#ffffff</bgcolor><valuetype>row</valuetype><fgcolor>#000000</fgcolor><value>Coby</value></cell></row></root>';
+			$expected_results = '<root><row><cell><bgcolor>#ffffff</bgcolor><valuetype>col</valuetype><fgcolor>#000000</fgcolor><value>student</value></cell></row><row><cell><bgcolor>#ffffff</bgcolor><valuetype>row</valuetype><fgcolor>#000000</fgcolor><value>Clayton</value></cell></row><row><cell><bgcolor>#ffffff</bgcolor><valuetype>row</valuetype><fgcolor>#000000</fgcolor><value>Clayton</value></cell></row></root>'
 
  			var options = {hidden:false};
 
@@ -120,7 +119,7 @@ function   ($, myutils) {
 					options.push($(this).val());
 				});
 
-				assert.equal(options.length,22, 0, 'passed');	
+				assert.equal(options.length,4, 0, 'passed');	
 
 	  			$("select#student").remove(); // tearDown
 				done();
@@ -131,9 +130,7 @@ function   ($, myutils) {
 
 			$xml = '<root><parser><value>drawform</value></parser><item id="6"><value /><valuetype>subject</valuetype><options>a,b,c,d</options></item></root>';
 		
-			 var xmlDoc = (new DOMParser()).parseFromString($xml, "text/xml");
-
-			drawform(xmlDoc);
+			drawform($xml);
 			
 			var options = Array();
 			var expected_results = Array('a','b','c','d');
@@ -149,13 +146,11 @@ function   ($, myutils) {
 	});
 	
 	
- 	QUnit.test('draw form widget using server provided xml  - 2 widget', function (assert) {
+ 	QUnit.test('drawform widget using server provided xml  - 2 widget', function (assert) {
 
 			$xml = '<root><parser><value>drawform</value></parser><item id="6"><value /><valuetype>subject</valuetype><options>i,j,k,l</options></item><item id="7"><value /><valuetype>student</valuetype><options>e,f,g,h</options></item></root>';
 		
-			 var xmlDoc = (new DOMParser()).parseFromString($xml, "text/xml");
-
-			drawform(xmlDoc);
+			drawform($xml);
 			
 			var options = Array();
 			var expected_results = Array('i','j','k','l');
@@ -179,10 +174,47 @@ function   ($, myutils) {
 			
 			assert.equal(compare_1darrays(options,expected_results), 0, 'passed');
 	});
+
+ 	QUnit.test('drawform widget using server', function (assert) {
+
+			var parentel = addElement("div","divparent",{hidden:false,name:"foo"});
+			
+  			url = "http://0.0.0.0:8080/form/dpivot";
+  			makeRequestResponse(url,drawform,parentel);
+  			
+  			var options = Array();
+  			var done = assert.async();
+ 			setTimeout(function() { 		
+				$("select#xaxis option").each(function() {
+					options.push($(this).val());
+				});
 	
- 	QUnit.test('draw form widget using server provided xml  - real example', function (assert) {
+				assert.ok(options.length==5, 'passed');	
+				options = Array();
+				
+				$("select#yaxis option").each(function() {
+					options.push($(this).val());
+				});
 	
-			$xml = '<root><item><objtype>recordtype</objtype><value>subject</value><value>wp</value><value>ap</value></item><item><objtype>period</objtype><value>830-910</value><value>910-950</value></item><item><objtype>adult</objtype><value>Amelia</value><value>Stan</value></item><item><objtype>student</objtype><value>Clayton</value></item><item><objtype>dow</objtype><value>TU</value><value>WE</value></item><item><objtype>subject</objtype><value>Humanities</value><value>Math</value><value>Physics</value><value>English</value></item></root>';
+				assert.ok(options.length==5, 'passed');	
+				options = Array();
+				
+				$("select#source_type option").each(function() {
+					options.push($(this).val());
+				});
+	
+				assert.ok(options.length==3, 'passed');	
+
+	  			$("div#divparent").remove(); // tearDown
+				done();
+  			},400);	
+
+	});
+	
+	
+ 	QUnit.test('drawform_multi widget using server provided xml  - real example', function (assert) {
+	
+			$xml = '<root><item><valuetype>recordtype</valuetype><value>subject</value></item><refitem><objtype>recordtype</objtype><value>subject</value><value>wp</value><value>ap</value></refitem></root>';
 			
 			var parentel = addElement("div","divparent",{hidden:false,name:"foo"});
 			
@@ -193,59 +225,13 @@ function   ($, myutils) {
 			
 			$("select#recordtype option").each(function() {
 				options.push($(this).val());
+				console.log($(this).val());
 			});
-
-			assert.equal(compare_1darrays(options,expected_results), 0, 'passed');
-			
-			var options = Array();
-			var expected_results = Array('830-910','910-950');
-			
-			$("select#period option").each(function() {
-				options.push($(this).val());
-			});
-
-			assert.equal(compare_1darrays(options,expected_results), 0, 'passed');
-			
-			var options = Array();
-			var expected_results = Array('Amelia','Stan');
-			
-			$("select#adult option").each(function() {
-				options.push($(this).val());
-			});
-
-			assert.equal(compare_1darrays(options,expected_results), 0, 'passed');
-			
-			var options = Array();
-			var expected_results = Array('Clayton');
-			
-			$("select#student option").each(function() {
-				options.push($(this).val());
-			});
-
-			assert.equal(compare_1darrays(options,expected_results), 0, 'passed');
-			
-			var options = Array();
-			var expected_results = Array('TU','WE');
-			
-			$("select#dow option").each(function() {
-				options.push($(this).val());
-			});
-
-			assert.equal(compare_1darrays(options,expected_results), 0, 'passed');
-			
-			var options = Array();
-			var expected_results = Array('Humanities','Math','Physics','English');
-			
-			$("select#subject option").each(function() {
-				options.push($(this).val());
-			});
-
-			$("div#divparent").remove(); // tearDown 
 			
 			assert.equal(compare_1darrays(options,expected_results), 0, 'passed');
 	});
 	
- 	QUnit.test('draw form widget using server  - real example', function (assert) {
+ 	QUnit.test('drawform_multi widget using server  - real example', function (assert) {
 
 			var parentel = addElement("div","divparent",{hidden:false,name:"foo"});
 			
@@ -266,9 +252,9 @@ function   ($, myutils) {
   			},400);	
 	});
 	
- 	QUnit.test('draw form widget using server  - real example get url from selections', function (assert) {
+ 	QUnit.test('drawform_multi widget using server  - real example get url from selections', function (assert) {
 
-			expected_results = 'http://localhost:8080/add/lesson?recordtype=subject&period=830-910&adult=Aaron&student=Nathaniel&dow=Monday&subject=ELA&';
+			expected_results = 'http://localhost:8080/add/lesson?recordtype=subject&period=830-910&adult=Amelia&student=Clayton&dow=TU&subject=Humanities&';
 			
 			var parentel = addElement("div","divparent",{hidden:false,name:"foo"});
 			

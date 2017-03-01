@@ -994,10 +994,36 @@ class Test_Mixed_wpivot_crit_menu_update(Test_Base):
     def tearDown(self):
         self.browser.quit()
         
+class Test_View(Test_Base):
+    
+    def setUp(self):
+        self.page = "view.php"
+        Test_Base.setUp(self,self.page)
+        
+    def test_(self):
+                
+        # edit
+        click_popupmenu("handle1",self.browser)
+        
+        time.sleep(0.2)
+        set_select_element('view_type','list',self.browser)
+        
+        time.sleep(0.2)
+
+        click_button('viewsubmit',self.browser)
+        
+        time.sleep(1)
+        
+        results = get_table_values(self.browser)
+        
+        expected_results = [u'status', u'substatus', u'recordtype', u'period', u'dow', u'source', u'session', u'adult', u'student', u'id', u'objtype', u'prep', u'userobjid', u'subject', u'master', u'complete', u'wp', u'830-910', u'TU', u'dbinsert', u'Amelia.Humanities.Tuesday.830-910', u'Amelia', u'Clayton', u'054C4D26', u'lesson', u'5', u'1.2.2.6.22', u'Humanities', u'master', u'complete', u'academic', u'910-950', u'WE', u'dbinsert', u'Stan.Math.Wednesday.910-950', u'Stan', u'Clayton', u'02B1EEDC', u'lesson', u'5', u'1.2.3.4.5', u'Math', u'master', u'complete', u'academic', u'910-950', u'TU', u'dbinsert', u'Amelia.Physics.TU.910-950', u'Amelia', u'Clayton', u'00FE6F46', u'lesson', u'5', u'1.2.3.6.33', u'Physics']
+        
+        self.assertListEqual(expected_results,results)
+        
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot))
+    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_MultiSelect_DOW))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_MultiSelect_DOW_Period))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_Select))
@@ -1015,6 +1041,7 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot_crit))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot_crit_menu_update))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Edit))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Edit))'''
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_View))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
