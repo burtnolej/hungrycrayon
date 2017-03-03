@@ -105,7 +105,7 @@ class New:
         return xmltree.tostring(xml)
     
 def _pivot(data,source_type,source_value):
-
+    
     if source_value=="all": source_value=""
     
     if hasattr(data,'ztypes') == False:
@@ -144,9 +144,41 @@ def _pivot(data,source_type,source_value):
                                                           ztypes=ztypes))
     xml = xml_utils.grid2xml(grid,header=header)
     
-
+    globals()['last_source_value'] = source_value
+    globals()['last_source_type'] = source_type
+    globals()['last_view_type'] = "pivot"
+    globals()['last_xaxis'] = data.xaxis
+    globals()['last_yaxis'] = data.yaxis
+    
     return xmltree.tostring(xml)
     
+class Last:
+    def GET(self,objtype):
+         
+        #if globals().has_key('last_xaxis') == False:
+        if globals().has_key('last_source_type') == False:
+            print "not found"
+            return "not found"
+        
+        args={}          
+
+        if globals()['last_view_type'] == 'pivot':
+            args['source_type']=globals()['last_source_type']
+            args['source_value']=globals()['last_source_value']
+            args['xaxis']=globals()['last_xaxis']
+            args['yaxis']=globals()['last_yaxis']
+            data = web.input(**args)
+            
+            return (_pivot(data,args['source_type'],args['source_value']))
+        
+        elif globals()['last_view_type'] == 'list':
+            args['source_type']=globals()['last_source_type']
+            args['pagenum']=1
+            args['pagelen']=10
+            data = web.input(**args)
+
+            return (_list(data,args['source_type']))
+            
 class Student:
     def GET(self,id):
         
@@ -200,46 +232,49 @@ class Refdata:
         
         return xmltree.tostring(xml)
     
+def _list(data,objtype):
+            
+    pagenum=int(data.pagenum)
+    pagelen=int(data.pagelen)
+    
+    constraints=[]
+    for attr,attr_val in data.iteritems():
+        if attr.startswith('cnstr_') == True:
+            if str(attr_val) <> "NotSelected":
+                constraints.append((attr[6:],str(attr_val)))
+            
+    columns=[]
+    if hasattr(data,'ztypes'):
+        columns = data.ztypes.split(",")
+    
+    
+    print objtype,pagelen,pagenum,constraints,columns
+    values,colnames = ssviewer_utils.dataset_list(of,enums,objtype,pagelen=pagelen,
+                                                  pagenum=pagenum,
+                                                  constraints=constraints,
+                                                  columns=columns)
+    
+    if data.has_key('rawdata'):
+        return values
+        
+    schema = dict(xaxis='row',yaxis='col',colnames=list(colnames))
+
+    _values = ssviewer_utils.dataset_serialize(values,formatson=True,schema = schema)
+    xml = xml_utils.grid2xml(_values)
+    
+    globals()['last_source_type'] = objtype
+    globals()['last_view_type'] = "list"
+    
+    return xmltree.tostring(xml)
+    
 class List:
     def GET(self,objtype):
-        
-        
         web.header('Access-Control-Allow-Origin','*')
         web.header('Access-Control-Allow-Credientials','true')
         
-        data = web.input(id='')
-
-        pagenum=int(data.pagenum)
-        pagelen=int(data.pagelen)
+        data = web.input()
                 
-        constraints=[]
-        for attr,attr_val in data.iteritems():
-            if attr.startswith('cnstr_') == True:
-                if str(attr_val) <> "NotSelected":
-                    constraints.append((attr[6:],str(attr_val)))
-                
-        columns=[]
-        if hasattr(data,'ztypes'):
-            columns = data.ztypes.split(",")
-        
-        
-        values,colnames = ssviewer_utils.dataset_list(of,enums,objtype,pagelen=pagelen,
-                                                      pagenum=pagenum,
-                                                      constraints=constraints,
-                                                      columns=columns)
-        
-        # if rawdata flag is present just return the values list
-        # row 1 is the column headings
-        if data.has_key('rawdata'):
-            return values
-            
-        schema = dict(xaxis='row',yaxis='col',colnames=list(colnames))
-
-        
-        _values = ssviewer_utils.dataset_serialize(values,formatson=True,schema = schema)
-        xml = xml_utils.grid2xml(_values)
-        
-        return xmltree.tostring(xml)
+        return _list(data,objtype)
     
 class Load:
     def GET(self,objtype):
@@ -562,7 +597,8 @@ def _run(port,**xtraargs):
         '/update/(\w+)','UpdateID',
         '/updateuid/(\w+)','UpdateUID',
         '/refdata/(\w+)','Refdata',
-        '/form/(\w+)','Form'
+        '/form/(\w+)','Form',
+        '/last/(\w+)','Last'
     )
     
     globals()['database'] = Database(dbname)

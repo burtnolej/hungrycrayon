@@ -761,6 +761,80 @@ PHP;
 	   //$this->assertEquals($this->expected_result,$result);
 	   
 	}
+	
+function test_with_pivot_criteria_view()
+	{
+		// edit and new popout mixed to test that selectors are specific enough
+	ob_start(); 
+									
+		jsinitpivot('dmixed_wpivot_crit_view.js');// initial includes; main js callback routines that recall page on change and base style sheets
+		jsslideoutinit(1,"250px","top");
+		jsslideoutinit(4,"450px","top");
+		jsslideoutinit(5,"650px","top");
+		jsslideoutinit(2,"250px","bottom");
+		jsslideoutinit(3,"450px","bottom");
+	
+		$str = <<<PHP
+		<?php
+			include_once 'bootstrap.php';
+			include_once 'webpage_utils.php';
+			initpage();
+			
+			\$globals = array('script_name' => 'popout_server_mixed_wpivot_critv.php',
+										 'server_name' => '0.0.0.0',
+										 'editbutton'=>'editsubmit',
+										 'newbutton'=>'newsubmit',
+										 'viewbutton'=>'viewsubmit');
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'viewsubmit', label => 'submit');			
+			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml",'xmlfileparam' => 'dview',"class" => "view");
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('1','contain',\$_GET,\$poparr,'view',1);
+			drawpopout(\$args);
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'editsubmit', label => 'submit');	
+			\$xmlinputdefnarr =  array('xmlfile' => 'inputs.xml','xmlfileparam' => 'dedit',"class" => "edit");
+			\$poparr = array('drawxmlinputs' => \$xmlinputdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('2','contain',\$_GET,\$poparr,'edit',1,'bottom');
+			drawpopout(\$args);
+			
+			
+			\$widgetdefnarr =  array(type => 'submit', id => 'newsubmit', label => 'submit');			
+			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew',"class" => "new");
+			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr,'drawbutton' => \$widgetdefnarr);
+			\$args = Array('3','contain',\$_GET,\$poparr,'new',1,'bottom');
+			drawpopout(\$args);
+			
+			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow',
+															  'cnstr_period' => 'select distinct name from period',
+															  'cnstr_subject' => 'select distinct name from subject');
+			\$poparr = array('drawmultiselect' => \$multiselectarr);
+			\$args = Array('4','wideswitch',\$_GET,\$poparr,'filters',2,"top");
+			drawpopout(\$args);
+			
+			\$checkdefnarr = array("status" => "status","subject" => "subject","adult" => "adult",
+										           "student" => "student","period" => "period","dow" => "dow",
+											   		 "record" => "record","recordtype" => "recordtype","id" => "id");
+			\$poparr = array('drawcheckbox' => \$checkdefnarr);
+			\$args = Array('5','contain',\$_GET,\$poparr,'datacolumns',2,"top");
+			drawpopout(\$args);
+		
+			drawtable(\$_GET);
+			
+		?>
+PHP;
+		echo $str;
+
+		//jsphpbridge('popout_server_mixed_wpivot_critv.php');
+		jsphpbridge($globals=NULL);
+		
+		$result = ob_get_contents();
+		ob_end_clean();		
+		
+		writetofile("/var/www/html-dev/popout_server_mixed_wpivot_critv.php",$result,"w");
+	   //$this->assertEquals($this->expected_result,$result);
+	   
+	}
 }
 
 class test_drawview extends PHPUnit_Framework_TestCase
@@ -1555,13 +1629,14 @@ try {
 	testrunner("drawxmlselectpopout");
 	testrunner("drawbuttonpopout");
 	testrunner("drawserverpopout");
-	testrunner("drawserverpopout_mixed");
+	
 	testrunner("drawmenu");
 	testrunner("menu_update");
 	testrunner("drawapp");
 	testrunner("popout");
-	testrunner("misc");*/
 	testrunner("drawview");
+	testrunner("misc");*/
+	testrunner("drawserverpopout_mixed");
 	 
 	 
 	 

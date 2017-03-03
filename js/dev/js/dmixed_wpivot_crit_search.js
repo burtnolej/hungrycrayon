@@ -77,7 +77,8 @@ requirejs(['myutils','jquery'],
 			
 			// redraw if any non edit/new selects are changed (ie draw pivot))
 			// but need to scrape across divs/popouts to get fil
-		   $("select, input[type!='text']").on('change',function(){
+			$("body").on("change","select, input[type!='text']",function(){ 
+		   //$("select, input[type!='text']").on('change',function(){
 		   		if (!$(this).hasClass("new")) {
 		   			if (!$(this).hasClass("edit")) {
 		   				

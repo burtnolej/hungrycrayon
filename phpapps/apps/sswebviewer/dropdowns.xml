@@ -4,11 +4,12 @@
 			<field>view_type</field>
 			<label>view_type</label>
 			<values>
+				<value>NotSelected</value>
 				<value>pivot</value>
 				<value>list</value>
 			</values>
 			<comment>Pick the display type you want</comment>
-			<default>pivot</default>
+			<default>NotSelected</default>
 		</select>
 	</dview>
 	<dpivot>

@@ -52,9 +52,7 @@ requirejs(['myutils','jquery'],
 			});
 
 			$("input[id='" + Globals.viewbutton + "']").on('click',function(){ 		
-				//_add($(this),Array(Globals.newbutton,"source_value"));
 				_async_redraw(400);	  		
-	  			//$("select[id='objtype").val('NotSelected');
 			});
 		   
 		});

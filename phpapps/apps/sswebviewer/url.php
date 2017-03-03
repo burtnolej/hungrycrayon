@@ -8,11 +8,23 @@ function pop(&$array,$key) {
 }
 
 function buildurl($rooturl,$args,$viewer=False) {
-	
+
 	// only the viewer pages/service calls rely on get HTML GET args source_type/value to build the url
 	if ($viewer==False) {
-		$url = $rooturl.$args['source_type']."/";
-		$url = $url.$args['source_value']."?";
+		
+		// add last where source_type and source_value are not known server to replacea last with what was pivoted or listed last
+		if (!isset($args['source_type'])) {
+			$url = $rooturl."last/";
+		}
+		else {
+				$url = $rooturl.$args['source_type']."/";
+		}
+		if (!isset($args['source_value'])) {
+			$url = $url."last?";
+		}
+		else {
+			$url = $url.$args['source_value']."?";
+		}
 	}
 	
 	foreach ($args as $key => $value){
