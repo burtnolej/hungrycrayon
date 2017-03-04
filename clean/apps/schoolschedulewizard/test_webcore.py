@@ -16,7 +16,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import os
 import time
 
-baseurl = "http://0.0.0.0"
+baseurl = "http://192.168.1.254"
 
 class Test_Base(unittest.TestCase):
     
@@ -41,7 +41,7 @@ class Test_Popout_MultiSelect_DOW(Test_Base):
         
     def test_1select(self):
         
-        expected_result = "http://0.0.0.0/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU&"
+        expected_result = "http://192.168.1.254/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU&"
         
         click_popupmenu("handle1",self.browser)
         
@@ -51,7 +51,7 @@ class Test_Popout_MultiSelect_DOW(Test_Base):
         
     def test_2select(self):
         
-        expected_result = "http://0.0.0.0/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU,WE&"
+        expected_result = "http://192.168.1.254/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU,WE&"
         
         click_popupmenu("handle1",self.browser)
         
@@ -78,7 +78,7 @@ class Test_Popout_MultiSelect_DOW(Test_Base):
         click_popupmenu("handle1",self.browser)
     
         time.sleep(0.1)
-        execute_script(self.browser, "window.location = 'http://0.0.0.0/"+self.page+"?'+ getAllInputValues('ztypes',['qunit-filter-input']);")
+        execute_script(self.browser, "window.location = 'http://192.168.1.254/"+self.page+"?'+ getAllInputValues('ztypes',['qunit-filter-input']);")
         time.sleep(0.1)
 
         x,y,w,h = get_dimensions('',self.browser,"//div[contains(@class,'slide-out1')]")
@@ -113,7 +113,7 @@ class Test_Popout_MultiSelect_DOW_Period(Test_Base):
         
     def test_1select(self):
                 
-        expected_result = "http://0.0.0.0/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU&cnstr_period=830-910&"
+        expected_result = "http://192.168.1.254/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU&cnstr_period=830-910&"
         
         click_popupmenu("handle1",self.browser)
         
@@ -124,7 +124,7 @@ class Test_Popout_MultiSelect_DOW_Period(Test_Base):
         
     def test_2select(self):
         
-        expected_result = "http://0.0.0.0/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU,WE&cnstr_period=830-910,910-950&"
+        expected_result = "http://192.168.1.254/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU,WE&cnstr_period=830-910,910-950&"
         
         click_popupmenu("handle1",self.browser)
         
@@ -155,7 +155,7 @@ class Test_Popout_MultiSelect_DOW_Period(Test_Base):
         click_popupmenu("handle1",self.browser)
     
         time.sleep(0.1)
-        execute_script(self.browser, "window.location = 'http://0.0.0.0/"+self.page+"?'+ getAllInputValues('ztypes',['qunit-filter-input']);")
+        execute_script(self.browser, "window.location = 'http://192.168.1.254/"+self.page+"?'+ getAllInputValues('ztypes',['qunit-filter-input']);")
         time.sleep(0.1)
 
         x,y,w,h = get_dimensions('',self.browser,"//div[contains(@class,'slide-out1')]")
@@ -212,7 +212,7 @@ class Test_Popout_Select(Test_Base):
         
     def test_1select(self):
         
-        expected_result = "http://0.0.0.0/popout_select.php?handle1=out&last_source_value=&ztypes=&&cnstr_subject=NotSelected&cnstr_dow=TU"
+        expected_result = "http://192.168.1.254/popout_select.php?handle1=out&last_source_value=&ztypes=&&cnstr_subject=NotSelected&cnstr_dow=TU"
         
         click_popupmenu("handle1",self.browser)
         
@@ -222,7 +222,7 @@ class Test_Popout_Select(Test_Base):
         
     '''def test_2select(self):
         
-        expected_result = "http://0.0.0.0/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=Wednesday,Friday&"
+        expected_result = "http://192.168.1.254/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=Wednesday,Friday&"
         
         click_popupmenu("handle1",self.browser)
         
@@ -249,7 +249,7 @@ class Test_Popout_Select(Test_Base):
         click_popupmenu("handle1",self.browser)
     
         time.sleep(0.1)
-        execute_script(self.browser, "window.location = 'http://0.0.0.0/"+self.page+"?'+ getAllInputValues('ztypes',['qunit-filter-input']);")
+        execute_script(self.browser, "window.location = 'http://192.168.1.254/"+self.page+"?'+ getAllInputValues('ztypes',['qunit-filter-input']);")
         time.sleep(0.1)
 
         x,y,w,h = get_dimensions('',self.browser,"//div[contains(@class,'slide-out1')]")
@@ -284,7 +284,7 @@ class Test_Popout_Mixed(Test_Base):
         
     def test_1select(self):
         
-        expected_result = "http://0.0.0.0/popout_mixed.php?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU&cnstr_period=830-910&cnstr_subject=NotSelected&cnstr_student=Clayton"
+        expected_result = "http://192.168.1.254/popout_mixed.php?handle1=out&last_source_value=&ztypes=&cnstr_dow=TU&cnstr_period=830-910&cnstr_subject=NotSelected&cnstr_student=Clayton"
         
         click_popupmenu("handle1",self.browser)
         
@@ -296,7 +296,7 @@ class Test_Popout_Mixed(Test_Base):
         
     '''def test_2select(self):
         
-        expected_result = "http://0.0.0.0/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=Wednesday,Friday&"
+        expected_result = "http://192.168.1.254/"+self.page+"?handle1=out&last_source_value=&ztypes=&cnstr_dow=Wednesday,Friday&"
         
         click_popupmenu("handle1",self.browser)
         
@@ -323,7 +323,7 @@ class Test_Popout_Mixed(Test_Base):
         click_popupmenu("handle1",self.browser)
     
         time.sleep(0.1)
-        execute_script(self.browser, "window.location = 'http://0.0.0.0/"+self.page+"?'+ getAllInputValues('ztypes',['qunit-filter-input']);")
+        execute_script(self.browser, "window.location = 'http://192.168.1.254/"+self.page+"?'+ getAllInputValues('ztypes',['qunit-filter-input']);")
         time.sleep(0.1)
 
         x,y,w,h = get_dimensions('',self.browser,"//div[contains(@class,'slide-out1')]")
@@ -587,7 +587,7 @@ class Test_Menu(Test_Base):
         
     def test_hyperlink(self):
         
-        expected_result = "http://0.0.0.0/foobar.php"
+        expected_result = "http://192.168.1.254/foobar.php"
         
         contextclick_element("mytd",self.browser)
         
@@ -601,7 +601,7 @@ class Test_Menu(Test_Base):
         
     def test_jscript(self):
         
-        expected_result = "http://0.0.0.0/foobar.php"
+        expected_result = "http://192.168.1.254/foobar.php"
         
         contextclick_element("mytd",self.browser)
         
@@ -624,7 +624,7 @@ class Test_MenuUpdate(Test_Base):
         
     def test_hyperlink(self):
         
-        expected_result = "http://0.0.0.0/foobar.php"
+        expected_result = "http://192.168.1.254/foobar.php"
         
         contextclick_element("mytd",self.browser)
         
@@ -1159,7 +1159,7 @@ class Test_Mixed_wpivot_crit(Test_Base):
 if __name__ == "__main__":
     suite = unittest.TestSuite()
 
-    '''suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Pivot))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_MultiSelect_DOW))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_MultiSelect_DOW_Period))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Popout_Select))
@@ -1177,8 +1177,8 @@ if __name__ == "__main__":
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot_crit))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot_crit_menu_update))
-    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Edit))'''
-    #suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot_crit))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Edit))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_Mixed_wpivot_crit))
     suite.addTest(unittest.TestLoader().loadTestsFromTestCase(Test_View))
     
     unittest.TextTestRunner(verbosity=2).run(suite) 
