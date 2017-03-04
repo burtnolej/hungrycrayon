@@ -1657,7 +1657,7 @@ set_error_handler("handleError");
 $localip = getHostByName(getHostName());
 
 try {
-	/*testrunner("drawmultiselectpopout");
+	testrunner("drawmultiselectpopout");
 	testrunner("draw2multiselectpopout");
 	testrunner("drawmultiselectpopout_many");
 	testrunner("drawdbselectpopout");
@@ -1674,7 +1674,7 @@ try {
 	testrunner("drawapp");
 	testrunner("popout");
 	testrunner("drawview");
-	testrunner("misc");*/
+	testrunner("misc");
 	testrunner("drawserverpopout_mixed");
 	 
 	 
