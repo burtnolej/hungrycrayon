@@ -45,6 +45,9 @@ class test_popout 	extends PHPUnit_Framework_TestCase
 	public function test_bottompopout()
 	{
 		ob_start(); 
+		global $localip;
+		
+		
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px","bottom");
@@ -56,7 +59,7 @@ class test_popout 	extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_bottom.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 			
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
 			\$poparr = array('drawmultiselect' => \$multiselectarr);
@@ -80,6 +83,7 @@ PHP;
 public function test_topbottompopout()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px","bottom");
@@ -92,7 +96,7 @@ public function test_topbottompopout()
 			initpage();
 	
 			\$globals = array('script_name' => 'popout_topbottom.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 			
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
 			\$poparr = array('drawmultiselect' => \$multiselectarr);
@@ -122,6 +126,7 @@ class test_menu_update extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dedit.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(2,"350px");
@@ -133,7 +138,7 @@ class test_menu_update extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_menu_update.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'editbutton' => 'editsubmit');
 										 			
 			\$widgetdefnarr =  array(type => 'submit', id => 'editsubmit', label => 'submit');			
@@ -165,6 +170,7 @@ class test_drawmenu extends PHPUnit_Framework_TestCase
 	{
 		// draw popout from server provided content
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dmenu.js');// initial includes; main js callback routines that recall page on change and base style sheets
 	
@@ -201,6 +207,7 @@ class test_drawserverpopout extends PHPUnit_Framework_TestCase
 	{
 		// draw popout from server provided content
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -212,7 +219,7 @@ class test_drawserverpopout extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_server.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 			
 			\$getargs = array('source_value' => 'subject', 'source_type' => 'new');
 			\$serverdefnarr =  array();
@@ -239,6 +246,7 @@ PHP;
 		// call server with jscript
 		
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -250,7 +258,7 @@ PHP;
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_jsserver.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 			
 			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew','class' => 'new');
 			\$poparr = array('drawxmlselects' => \$xmlselectdefnarr);
@@ -282,6 +290,7 @@ PHP;
 		$callback = "\"var p= document.createElement('p');p.id='doodah';p.innerHTML= 'foobbaaaahhhrr';document.body.appendChild(p);\"";
 			
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -292,7 +301,7 @@ PHP;
 			include_once 'webpage_utils.php';
 			
 			\$globals = array('script_name' => 'popout_jsserverentry.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 										 
 			initpage();
 			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit', jscallback => $callback);			
@@ -324,6 +333,7 @@ PHP;
 		// add a button that collects input and calls a function
 		
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -335,7 +345,7 @@ PHP;
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_jsserverentry_ext.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 			
 			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit');			
 			\$xmlselectdefnarr =  array('xmlfile' => 'dropdowns.xml','xmlfileparam' => 'dnew');
@@ -366,6 +376,7 @@ PHP;
 		// add a button that collects input and calls a function
 		
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -377,7 +388,7 @@ PHP;
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_jsserverentry_ext_cls.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'newbutton'=>'newsubmit');
 										 
 			\$widgetdefnarr =  array(type => 'submit', id => 'newsubmit', label => 'submit');			
@@ -411,6 +422,7 @@ PHP;
 		// add a button that collects input and calls a function
 		
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dedit.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -422,7 +434,7 @@ PHP;
 			initpage();
 										 			
 			\$globals = array('script_name' => 'popout_edit.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'editbutton'=>'editsubmit');
 			
 			\$widgetdefnarr =  array(type => 'submit', id => 'editsubmit', label => 'submit');			
@@ -456,6 +468,7 @@ PHP;
 		// each popout behaves differently which is configured by class and hooked in dnew.js
 		
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dnew.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -468,7 +481,7 @@ PHP;
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_jsserverentry_ext_cls2p.php',
-										 'server_name' => '0.0.0.0','newbutton' => 'newsubmit');
+										'server_name' => "$localip",'newbutton' => 'newsubmit');
 			
 			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
 			\$widgetdefnarr = array('fields' => array("student" => "source_value"));
@@ -506,6 +519,7 @@ class test_drawserverpopout_mixed extends PHPUnit_Framework_TestCase
 	{
 		// edit and new popout mixed to test that selectors are specific enough
 	ob_start(); 
+	global $localip;
 									
 		jsinitpivot('dmixed.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px","top");
@@ -518,7 +532,7 @@ class test_drawserverpopout_mixed extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_server_mixed.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'editbutton'=>'editsubmit',
 										 'newbutton'=>'newsubmit');
 			
@@ -554,6 +568,7 @@ function test_with_pivot()
 	{
 		// edit and new popout mixed to test that selectors are specific enough
 	ob_start(); 
+	global $localip;
 									
 		jsinitpivot('dmixed_wpivot.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px","top");
@@ -567,7 +582,7 @@ function test_with_pivot()
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_server_mixed_wpivot.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'editbutton'=>'editsubmit',
 										 'newbutton'=>'newsubmit');
 			
@@ -612,6 +627,8 @@ function test_with_pivot_criteria()
 	{
 		// edit and new popout mixed to test that selectors are specific enough
 	ob_start(); 
+	global $localip;
+								
 									
 		jsinitpivot('dmixed_wpivot_crit.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px","top");
@@ -627,7 +644,7 @@ function test_with_pivot_criteria()
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_server_mixed_wpivot_crit.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'editbutton'=>'editsubmit',
 										 'newbutton'=>'newsubmit');
 			
@@ -686,6 +703,7 @@ function test_with_pivot_criteria_search()
 	{
 		// edit and new popout mixed to test that selectors are specific enough
 	ob_start(); 
+	global $localip;
 									
 		jsinitpivot('dmixed_wpivot_crit_search.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px","top");
@@ -702,7 +720,7 @@ function test_with_pivot_criteria_search()
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_server_mixed_wpivot_crits.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'editbutton'=>'editsubmit',
 										 'newbutton'=>'newsubmit');
 			
@@ -766,7 +784,6 @@ function test_with_pivot_criteria_view()
 	{
 		// edit and new popout mixed to test that selectors are specific enough
 	ob_start(); 
-		
 		global $localip;
 		
 		jsinitpivot('dmixed_wpivot_crit_view.js');// initial includes; main js callback routines that recall page on change and base style sheets
@@ -845,6 +862,7 @@ class test_drawview extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dview.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -858,7 +876,7 @@ class test_drawview extends PHPUnit_Framework_TestCase
 			initpage();
 		
 			\$globals = array('script_name' => 'view.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										  'viewbutton'=>'viewsubmit',);
 			
 			\$widgetdefnarr =  array(type => 'submit', id => 'viewsubmit', label => 'submit');			
@@ -889,6 +907,7 @@ class test_drawpivot extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px");
@@ -902,7 +921,7 @@ class test_drawpivot extends PHPUnit_Framework_TestCase
 			initpage();
 		
 			\$globals = array('script_name' => 'pivot.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 			
 			\$xmlselectdefnarr =  array("xmlfile" => "dropdowns.xml");
 			\$widgetdefnarr =  array('fields' =>array("student" => "source_value"));
@@ -954,6 +973,7 @@ class test_drawtable extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 											
 		$str = <<<PHP
 		<html><head><head><html>
@@ -985,6 +1005,7 @@ PHP;
 		// $_GET is insufficient to get a response out of the web service
 		// $_GET is indicative of what gets filled out by webpage as default only
 		ob_start(); 
+		global $localip;
 											
 		$str = <<<PHP
 		<html><head><head><html>
@@ -1014,6 +1035,7 @@ PHP;
 		// $_GET is insufficient to get a response out of the web service
 		// $_GET is indicative of what gets filled out by webpage as default only
 		ob_start(); 
+		global $localip;
 											
 		$str = <<<PHP
 		<html><head><head><html>
@@ -1046,6 +1068,7 @@ class test_drawmixedpopout extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1057,7 +1080,7 @@ class test_drawmixedpopout extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_mixed.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 										 
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
 			\$widgetdefnarr =  array("fields" => array("subject" => "cnstr_subject","student" => "cnstr_student"));
@@ -1086,6 +1109,7 @@ class test_drawxmlselectpopout extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1097,7 +1121,7 @@ class test_drawxmlselectpopout extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_xml.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 				
 			\$widgetdefnarr =  array("xmlfile" => "dropdowns.xml");
 			\$poparr = array('drawxmlselects' => \$widgetdefnarr);
@@ -1122,6 +1146,7 @@ PHP;
 	public function test_class()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1133,7 +1158,7 @@ PHP;
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_xmlcls.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 				
 			\$widgetdefnarr =  array("xmlfile" => "dropdowns.xml","class" => "foo");
 			\$poparr = array('drawxmlselects' => \$widgetdefnarr);
@@ -1161,6 +1186,7 @@ class test_drawbuttonpopout extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;		
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1176,7 +1202,7 @@ class test_drawbuttonpopout extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_button.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 
 			\$widgetdefnarr =  array(type => 'submit', id => 'submitfoo', label => 'submit', jscallback => $callback);
 			\$poparr = array('drawbutton' => \$widgetdefnarr);
@@ -1203,7 +1229,8 @@ class test_drawdbselectpopout extends PHPUnit_Framework_TestCase
 	// popout with multiple selects on it
 	public function test_()
 	{
-		ob_start(); 
+		ob_start();
+		global $localip; 
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1215,7 +1242,7 @@ class test_drawdbselectpopout extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_select.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 			
 			\$widgetdefnarr =  array('fields' => array("subject" => "cnstr_subject","dow" => "cnstr_dow"));
 			\$poparr = array('drawdbselects' => \$widgetdefnarr);
@@ -1239,6 +1266,7 @@ PHP;
 	public function test_class()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1250,7 +1278,7 @@ PHP;
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_select.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 										 
 			\$widgetdefnarr =  array('fields' => array("subject" => "cnstr_subject","dow" => "cnstr_dow"),'class' => "foo");
 			\$poparr = array('drawdbselects' => \$widgetdefnarr);
@@ -1278,6 +1306,7 @@ class test_drawcheckboxpopout extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1289,7 +1318,7 @@ class test_drawcheckboxpopout extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_check.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 			
 			\$checkdefnarr = array("status" => "status","subject" => "subject","adult" => "adult",
 										           "student" => "student","period" => "period","dow" => "dow",
@@ -1321,6 +1350,7 @@ class test_draw2multiselectpopout extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1332,7 +1362,7 @@ class test_draw2multiselectpopout extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_dow_period.php',
-										 'server_name' => '0.0.0.0');			
+										'server_name' => "$localip");			
 										 
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow','cnstr_period' => 'select distinct name from period');
 			\$poparr = array('drawmultiselect' => \$multiselectarr);
@@ -1359,6 +1389,7 @@ class test_drawmultiselectpopout extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"600px");
@@ -1371,7 +1402,7 @@ class test_drawmultiselectpopout extends PHPUnit_Framework_TestCase
 
 	
 			\$globals = array('script_name' => 'popout_dow.php',
-										 'server_name' => '0.0.0.0');			
+										'server_name' => "$localip");			
 			
 			\$multiselectarr = array( 'cnstr_dow' => 'select distinct name from dow');			
 			\$poparr = array('drawmultiselect' => \$multiselectarr);
@@ -1398,6 +1429,7 @@ class test_drawmultiselectpopout_many extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dsearch.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"200px");
@@ -1410,7 +1442,7 @@ class test_drawmultiselectpopout_many extends PHPUnit_Framework_TestCase
 			initpage();
 	
 			\$globals = array('script_name' => 'popout_many.php',
-										 'server_name' => '0.0.0.0');
+										'server_name' => "$localip");
 										 
 			\$args = Array('1','wideswitch',\$_GET,'drawmultiselect','datacolumns','select distinct name from dow','cnstr_dow',1);
 			drawpopout(\$args);
@@ -1436,6 +1468,7 @@ class test_drawsearch extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 		
 		$getargs = array("source_value" => 'Clayton',
 											"ztypes" => "",
@@ -1513,6 +1546,7 @@ class test_drawapp extends PHPUnit_Framework_TestCase
 	public function test_()
 	{
 		ob_start(); 
+		global $localip;
 									
 		jsinitpivot('dapp.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px","top");
@@ -1528,7 +1562,7 @@ class test_drawapp extends PHPUnit_Framework_TestCase
 			initpage();
 			
 			\$globals = array('script_name' => 'app.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'editbutton'=>'editsubmit',
 										 'newbutton'=>'newsubmit');
 			
@@ -1586,12 +1620,13 @@ class test_misc 	extends PHPUnit_Framework_TestCase
 	public function test_jsphpbridge()
 	{
 		ob_start(); 
+		global $localip;
 										 
 		$str = <<<PHP
 		<?php
 			include_once 'webpage_utils.php';
 		\$globals = array('script_name' => 'phpbridge.php',
-										 'server_name' => '0.0.0.0',
+										'server_name' => "$localip",
 										 'foo' => 'bar');
 		?>
 PHP;
