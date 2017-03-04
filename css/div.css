@@ -1,0 +1,74 @@
+
+	
+/* for the search results grid */
+div.searchgrid {
+	margin-top:5px;
+	margin-left:200px;
+	height:600px;
+	/*width: :1100px;*/
+	overflow-y:scroll;
+	display:block;
+	/*display:none;*/
+}
+
+/* for the search results grid */
+div.searchgridhdr {
+	margin-top:50px;
+	margin-left:200px;
+	display:block;
+	/*display:none;*/
+}
+
+div.contain {
+	margin:.25em .25em .25em .25em;
+	width:180px;
+	background-color: #FEFAFA;
+	/*display:block;*/
+	/*display:none;*/
+	/*overflow:auto;*/
+	float:left;
+}
+div.containswitch {
+	margin:.25em .25em .25em .25em;
+	width:160px;
+	background-color: #FEFAFA;
+	display:block;
+	/*display:none;*/
+	/*overflow:auto;*/
+	float:left;
+}
+
+div.wideswitch {
+	margin:.25em .25em .25em .25em;
+	background-color: #FEFAFA;
+	/*width:620px;*/
+	float:left;
+}
+
+div.blank {
+	margin:0px;
+	width:100px;
+	float:left;
+}
+
+div.tmp {
+	margin-top: 150px;
+	position:absolute;
+}
+
+#content {
+	float:left;
+	margin-left: 107px;
+}
+
+#navwrap {
+	margin:.25em .25em .25em .25em;
+	width: 100px; 
+	height: 20px; 
+   padding-bottom: 0px;
+	z-index: 1; /* Makes sure that your menu remains on top of other page elements */
+	position: fixed;
+	background-color: FFEFEF;    
+}
+
+

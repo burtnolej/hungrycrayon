@@ -34,12 +34,12 @@ def mask(oldlist,newlist,map,namemap=None):
                         exec_str += " where __id = \"{0}\"".format(__id)
                         
                         tbl_query(database,exec_str)
-                        #print exec_str
+                        print exec_str
                     
     
-'''adultdbloc =dict(adult=['name'],session=['teacher','code'],lesson=['teacher','session'])
+adultdbloc =dict(adult=['name'],session=['teacher','code'],lesson=['teacher','session'])
 studentdbloc =dict(student=['name'],lesson=['student'])
-subjectdbloc =dict(subject=['name'],session=['subject','code'],lesson=['subject','session'])'''
+subjectdbloc =dict(subject=['name'],session=['subject','code'],lesson=['subject','session'])
 formatsdbloc =dict(formats=['name'])
 
 new_names = os_file_to_list('names.txt',strip=True)
@@ -50,24 +50,24 @@ dbname,_ = sswizard_utils.getdatabase()
 
 database = Database(dbname)
 with database:
-    '''_,adults,_ = sswizard_query_utils._distinct(database,'name','adult')
+    _,adults,_ = sswizard_query_utils._distinct(database,'name','adult')
     _,students,_ = sswizard_query_utils._distinct(database,'name','student')
-    _,subjects,_ = sswizard_query_utils._distinct(database,'name','subject')'''
+    _,subjects,_ = sswizard_query_utils._distinct(database,'name','subject')
     _,formats,_ = sswizard_query_utils._distinct(database,'name','formats')
 
-'''current_adults = [adult[0] for adult in adults] 
+current_adults = [adult[0] for adult in adults] 
 current_students = [student[0] for student in students]
-current_subjects = [subject[0] for subject in subjects]'''
+current_subjects = [subject[0] for subject in subjects]
 current_formats = [format[0] for format in formats]
 
-'''current_adults.pop(current_adults.index('A'))
+current_adults.pop(current_adults.index('A'))
 current_adults.pop(current_adults.index('B'))
 current_adults.pop(current_adults.index('C'))
-current_adults.pop(current_adults.index('D'))'''
+current_adults.pop(current_adults.index('D'))
 
-'''mask(current_adults ,new_names,adultdbloc)
+mask(current_adults ,new_names,adultdbloc)
 mask(current_students ,new_names,studentdbloc)
-mask(current_subjects ,new_subjects,subjectdbloc)'''
+mask(current_subjects ,new_subjects,subjectdbloc)
 
 usednamemap = {u'Paraic': 'Vilma', u'SONJA': 'Deana', u'Aaron': 'Eulah', 
            u'Melissa': 'Carlene', u'Alberto': 'Johnetta', u'John': 'Ginger', 

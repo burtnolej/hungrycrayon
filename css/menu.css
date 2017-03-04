@@ -1,0 +1,60 @@
+<html>
+
+<style>
+
+a	{ 			
+		text-decoration: none;  /* Removes the default hyperlink styling. */
+		color: #000; /* Text color is black */
+}
+
+#wrap {
+	position:fixed;
+	z-index:1;
+	display:none;
+	
+}
+.nav {
+	position: fixed;
+	margin-left: -30px;
+	width: 150px;  /* Each menu item is 150px wide */
+	
+}
+
+.nav li  {
+	margin:0px;
+	height: auto;
+	width: 100px;  /* Each menu item is 150px wide */
+	list-style: none;  /* Removes the default styling (bullets) for the list */
+	text-align: center;  /* All text is placed in the center of the box */
+	border: 1px solid #000000;
+	border-bottom:0px;
+	opacity: 0.9;
+	background-color: #EEE;
+}
+
+ .nav li:hover { 
+	background-color: #F00;
+	display: block;
+}
+ 
+.nav li ul { /* top level menu item elements in the nav */
+	height:20px; 
+	width: 100px;  /* Each menu item is 150px wide */
+	text-align: center;  /* All text is placed in the center of the box */
+	list-style: none;  /* Removes the default styling (bullets) for the list */
+	padding:0px;
+	margin-left:100px;
+	margin-top: -20px;
+}
+
+.nav li ul {
+	display: none;
+}
+
+.nav li:hover > ul {
+	display: block;
+}
+
+
+</style>
+</html>

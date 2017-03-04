@@ -1,0 +1,69 @@
+
+.pol-base { /* base label for popout tab styles */
+	text-align: center;
+	text-transform: uppercase;	
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:100%;
+	font-weight: bold;
+  	align-items: center;
+  	justify-content: center;
+	background-color: #FFEFEF;
+	position:absolute;
+	left:-1px;
+}
+
+.poltop {
+	border-bottom: 1px solid #29216d;
+	border-left: 1px solid #29216d;
+	border-right: 1px solid #29216d;
+}
+
+.polbottom {
+	border-top: 1px solid #29216d;
+	border-left: 1px solid #29216d;
+	border-right: 1px solid #29216d;
+}
+
+.pol1  { /* pop out label 1 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+.pol2  { /* pop put label 2 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+
+.pol3  { /* pop put label 2 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+
+.pol4  { /* pop put label 2 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+
+.pol5  { /* pop put label 2 */
+	width:180px;height:20px	;
+	padding-top: 4px;
+}
+
+.slide-out-base {
+   background: #ccc;
+   padding-top: 10px;
+   z-index:1;
+}
+
+.slide-out-base-top {
+	border-bottom: 1px solid #29216d;
+	border-left: 1px solid #29216d;
+	border-right: 1px solid #29216d;
+}
+
+.slide-out-base-bottom {
+	border-top: 1px solid #29216d;
+	border-left: 1px solid #29216d;
+	border-right: 1px solid #29216d;
+}
+
+
