@@ -766,7 +766,9 @@ function test_with_pivot_criteria_view()
 	{
 		// edit and new popout mixed to test that selectors are specific enough
 	ob_start(); 
-									
+		
+		global $localip;
+		
 		jsinitpivot('dmixed_wpivot_crit_view.js');// initial includes; main js callback routines that recall page on change and base style sheets
 		jsslideoutinit(1,"250px","top");
 		jsslideoutinit(4,"450px","top");
@@ -781,7 +783,7 @@ function test_with_pivot_criteria_view()
 			initpage();
 			
 			\$globals = array('script_name' => 'popout_server_mixed_wpivot_critv.php',
-										 'server_name' => '0.0.0.0',
+										 'server_name' => "$localip",
 										 'editbutton'=>'editsubmit',
 										 'newbutton'=>'newsubmit',
 										 'viewbutton'=>'viewsubmit');
@@ -1617,6 +1619,8 @@ JS;
 }
 set_error_handler("handleError");
    
+$localip = getHostByName(getHostName());
+
 try {
 	/*testrunner("drawmultiselectpopout");
 	testrunner("draw2multiselectpopout");
