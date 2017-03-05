@@ -3,6 +3,8 @@
 
 ROOT=quad
 
+
+
 #ROOTPATH=/Users/burtnolej/Development/pythonapps/clean
 ROOTPATH=$APPROOT/clean
 TARGETDB=$ROOTPATH/db/fucia.sqlite
@@ -12,6 +14,7 @@ PYEXECPATH=$ROOTPATH/apps/schoolschedulewizard/$PYEXEC
 
 RUNDATE=`date +"%m%d%y-%H%M%S"`
 PYEXECLOG=$RUNDATE"_"$PYEXEC.log
+UNAMESTR=`uname`
 
 # remove the current link
 if [ -f $TARGETDB ]; then
@@ -29,7 +32,15 @@ else
 fi
 
 # killall the existing python instances
-killall Python
+if [ "$UNAMESTR" == "Darwin" ]; then
+	killall Python
+elif [ "$UNAMESTR" == "Linux" ]; then
+	killall python
+else
+	echo "unknown os:"$UNAMESTR
+	exit
+fi
+
 killall java
 
 # start the rest service
