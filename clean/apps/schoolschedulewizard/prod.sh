@@ -3,7 +3,8 @@
 
 ROOT=quad
 
-ROOTPATH=/Users/burtnolej/Development/pythonapps/clean
+#ROOTPATH=/Users/burtnolej/Development/pythonapps/clean
+ROOTPATH=$APPROOT/clean
 TARGETDB=$ROOTPATH/db/fucia.sqlite
 SOURCEDB=$ROOTPATH/apps/schoolschedulewizard/$ROOT.sqlite
 PYEXEC=ssviewer_rest.py
